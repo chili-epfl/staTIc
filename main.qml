@@ -45,6 +45,12 @@ ApplicationWindow {
     Loader{
         id:loader
         anchors.fill: parent
+        onLoaded: item1.visible=false;
+    }
+    Connections{
+        target: loader.item
+        onExitView: {item1.visible=true,loader.source=""}
+
     }
 
 
