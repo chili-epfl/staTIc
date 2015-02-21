@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.1
+import Qt3D 1.0
 
 Item{
     id: item1

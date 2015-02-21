@@ -1,6 +1,7 @@
 TEMPLATE = app
 
 QT += qml quick widgets
+CONFIG += qt3d_deploy_qml qt3dquick_deploy_pkg
 
 SOURCES += main.cpp
 
