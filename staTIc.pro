@@ -1,9 +1,12 @@
 TEMPLATE = app
 
 QT += qml quick widgets
-CONFIG += qt3d_deploy_qml qt3dquick_deploy_pkg
 
-SOURCES += main.cpp
+SOURCES += main.cpp \
+    structureitemmodel.cpp
+HEADERS += \
+    structureitemmodel.h
+
 
 RESOURCES += qml.qrc
 
@@ -12,3 +15,5 @@ QML_IMPORT_PATH =
 
 # Default rules for deployment.
 include(deployment.pri)
+
+
