@@ -11,19 +11,28 @@ ApplicationWindow {
     width: 2560
     height: 1600
     color: "#0033CC"
+    property string currentStructure_modelFile: "";
+    property string currentStructure_staticsFile: "";
+
     Loader{
         id:windowloader
         property bool valid: item !== null
         anchors.fill: parent
-        onLoaded: {intromenu.visible=false;console.log("loaded")}
+        onLoaded: {
+            intromenu.visible=false;
+            intromenu.enabled=false;
+            console.log("loaded");
+            item.loadStructure(currentStructure_modelFile,currentStructure_staticsFile);
+        }
     }
+
     Connections {
         ignoreUnknownSignals: true
         target: windowloader.valid? windowloader.item : null
-        onPageExit: { intromenu.visible=true, windowloader.source=""}
+        onPageExit: { intromenu.visible=true;intromenu.enabled=true;windowloader.source=""}
     }
 
-    /*Item conteining all the item for the intro menu*/
+    /*Item conteining all the item for the intro menu.*/
     ColumnLayout{
         anchors.fill: parent
         anchors.margins:10
@@ -105,7 +114,13 @@ ApplicationWindow {
             Layout.preferredHeight: parent.height*0.1
             Button {
                 text: "Button"
-                onClicked: { windowloader.source="exploreView.qml" }
+                onClicked: {
+                    if(gridview.currentIndex !=-1){
+                        currentStructure_modelFile= gridview.model.get(gridview.currentIndex,"ModelFile");
+                        currentStructure_staticsFile= gridview.model.get(gridview.currentIndex,"StaticsFile");
+                        windowloader.source="exploreView.qml"
+                        }
+                    }
                 anchors.right: parent.right
                 anchors.rightMargin: 10
             }

@@ -2,30 +2,11 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>exploreView.qml</file>
+        <file>Scene.qml</file>
     </qresource>
     <qresource prefix="/models">
-        <file>models/test1 (copy).png</file>
-        <file>models/test1 (copy).obj</file>
-        <file>models/test1 (another copy).png</file>
-        <file>models/test1 (another copy).obj</file>
-        <file>models/test1 (10th copy).png</file>
-        <file>models/test1 (10th copy).obj</file>
-        <file>models/test1 (9th copy).png</file>
-        <file>models/test1 (9th copy).obj</file>
-        <file>models/test1 (8th copy).png</file>
-        <file>models/test1 (8th copy).obj</file>
-        <file>models/test1 (7th copy).png</file>
-        <file>models/test1 (7th copy).obj</file>
-        <file>models/test1 (6th copy).png</file>
-        <file>models/test1 (6th copy).obj</file>
-        <file>models/test1 (5th copy).png</file>
-        <file>models/test1 (5th copy).obj</file>
-        <file>models/test1 (4th copy).png</file>
-        <file>models/test1 (4th copy).obj</file>
-        <file>models/test1 (3rd copy).png</file>
-        <file>models/test1 (3rd copy).obj</file>
-        <file>models/test1.png</file>
-        <file>models/test1.obj</file>
+        <file>models/Model 1/test1.obj</file>
+        <file>models/Model 1/test1.png</file>
     </qresource>
     <qresource prefix="/icons">
         <file>icons/ic_keyboard_arrow_up_black_36px.svg</file>

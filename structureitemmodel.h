@@ -20,11 +20,15 @@ public:
     //int columnCount(const QModelIndex &parent)const{return 0;} ;
     QVariant data(const QModelIndex &index, int role)const;
     void setSource(QString source);
+    Q_INVOKABLE QVariant get(int index, QString info) const;
 
 private:
     QString m_source;
     QVector<QString> m_fileNames;
+
     QMap<QString, QUrl> m_thumbs;
+    QMap<QString, QUrl> m_modelfiles;
+    QMap<QString, QUrl> m_staticsfiles;
 };
 
 #endif // STRUCTURELISTMODEL_H

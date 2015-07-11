@@ -30,17 +30,42 @@ QVariant StructureItemModel::data(const QModelIndex &index, int role)const{
     }
 }
 
+QVariant StructureItemModel::get(int index, QString info)const{
+    //qDebug()<<index.row()<<"Col"<<index.column();
+    if (index<0 || index>=m_fileNames.size()) return QVariant();
+    if(info.compare("ModelFile",Qt::CaseInsensitive)==0){
+        return m_modelfiles[m_fileNames[index]];
+
+    }
+    else if(info.compare("StaticsFile",Qt::CaseInsensitive)==0){
+        return m_staticsfiles[m_fileNames[index]];
+
+    }
+
+
+    return QVariant();
+
+}
+
+
 void StructureItemModel::setSource(QString source){
     m_source= source;
     QDirIterator it(m_source);
-        while(it.hasNext()){
+    while(it.hasNext()){
         it.next();
-        if(it.fileInfo().isFile() ){
-            if(it.fileInfo().suffix()=="obj")
-                m_fileNames.append(it.fileInfo().baseName());
-            else if(it.fileInfo().suffix()=="png"){
-                QString tmp=it.fileInfo().canonicalFilePath();
-                m_thumbs[it.fileInfo().baseName()]=QUrl::fromLocalFile(it.fileInfo().canonicalFilePath());
+        if(it.fileInfo().isDir() ){
+            QString name=it.fileInfo().baseName();
+            m_fileNames.append(name);
+            QDirIterator it2(it.fileInfo().canonicalFilePath());
+            while(it2.hasNext()){
+                it2.next();
+                if(it2.fileInfo().suffix()=="dae")
+                    m_modelfiles[name]=QUrl::fromLocalFile(it2.fileInfo().canonicalFilePath());
+                else if(it2.fileInfo().suffix()=="png")
+                    m_thumbs[name]=QUrl::fromLocalFile(it2.fileInfo().canonicalFilePath());
+                else if(it2.fileInfo().suffix()=="lol")
+                    m_staticsfiles[name]=QUrl::fromLocalFile(it2.fileInfo().canonicalFilePath());
+
             }
         }
     }
