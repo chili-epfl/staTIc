@@ -1,28 +1,33 @@
 TEMPLATE = app
 
-QT += qml quick widgets 3dcore 3drenderer 3dinput
+QT += qml quick widgets 3dcore 3drenderer 3dinput multimedia
+
 CONFIG += c++11
 SOURCES += main.cpp \
     structureitemmodel.cpp \
-    controller.cpp \
-    joint.cpp \
-    member.cpp \
-    abstractstaticsmodule.cpp \
-    twodimensionalstaticsmodule.cpp \
-    abstractelement.cpp \
-    force.cpp
+    statics/twodimensionalstaticsmodule.cpp \
+    statics/member.cpp \
+    statics/joint.cpp \
+    statics/force.cpp \
+    statics/abstractstaticsmodule.cpp \
+    statics/abstractelement.cpp \
+    controller.cpp
 HEADERS += \
     structureitemmodel.h \
-    controller.h \
-    joint.h \
-    member.h \
-    abstractstaticsmodule.h \
-    twodimensionalstaticsmodule.h \
-    abstractelement.h \
-    force.h
+    statics/twodimensionalstaticsmodule.h \
+    statics/member.h \
+    statics/joint.h \
+    statics/force.h \
+    statics/abstractstaticsmodule.h \
+    statics/abstractelement.h \
+    controller.h
 
 
 RESOURCES += qml.qrc
+
+INCLUDEPATH+= /home/chili/QTProjects/qml-chilitags/src
+
+
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
@@ -30,13 +35,15 @@ QML_IMPORT_PATH =
 # Default rules for deployment.
 include(deployment.pri)
 
-LIBS += -lopencv_core -lopencv_highgui -lopencv_imgproc
-LIBS += -lchilitags
+LIBS += -lopencv_core
+#-lopencv_highgui -lopencv_imgproc
+#-lopencv_video -lopencv_calib3d
+
 
 android {
     #INCLUDEPATH += $(ANDROID_STANDALONE_TOOLCHAIN)/sysroot/usr/include
     INCLUDEPATH += /home/chili/opencv/platforms/build-android/install/sdk/native/jni/include
-    #INCLUDEPATH += /home/chili/chilitags/build-android/install/include
+    INCLUDEPATH += /home/chili/chilitags/build-android/install/include
 
     #LIBS += -L$(ANDROID_STANDALONE_TOOLCHAIN)/sysroot/usr/lib
     LIBS += -L/home/chili/opencv/platforms/build-android/install/sdk/native/libs/armeabi-v7a/
@@ -45,7 +52,7 @@ android {
 }
 !android{
     INCLUDEPATH += /home/chili/opencv/build-linux/install/include
-    #INCLUDEPATH += /home/chili/chilitags/build-linux/install/include
+    INCLUDEPATH += /home/chili/chilitags/build-linux/install/include
     LIBS += -L/home/chili/opencv/build-linux/install/lib
     LIBS += -L/home/chili/chilitags/build-linux/install/lib
 }

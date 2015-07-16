@@ -4,8 +4,9 @@
 #include <QObject>
 #include <Qt3DCore/QEntity>
 #include <Qt3DRenderer>
-#include "abstractstaticsmodule.h"
-#include "twodimensionalstaticsmodule.h"
+#include "statics/abstractstaticsmodule.h"
+#include "statics/twodimensionalstaticsmodule.h"
+
 
 
 class Controller : public QObject
@@ -15,10 +16,13 @@ class Controller : public QObject
 public:
     Controller(QObject* parent=0);
     void setSceneroot(Qt3D::QEntity* sceneroot){this->sceneroot=sceneroot;}
+    //void setChilitags(QObject* chilitags){this->chilitags=chilitags;}
 
 public slots:
-    void onClickItem(Qt3D::QEntity* item);
-    void loadStructure(QString modelFile, QString staticsFile);
+    void onEntityClicked(Qt3D::QEntity* item){qDebug()<<item->objectName();}
+    void loadStructure(QUrl staticsFile);
+    void loadStructure(QString staticsFile);
+
 private:
     Qt3D::QEntity* sceneroot;
     AbstractStaticsModule* staticsModule;

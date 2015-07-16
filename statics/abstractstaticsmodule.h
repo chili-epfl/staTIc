@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QVector4D>
+#include <QUrl>
 #include "force.h"
 class AbstractStaticsModule : public QObject
 {

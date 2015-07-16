@@ -5,11 +5,16 @@ import Qt3D.Renderer 2.0
 Entity {
     id: sceneRoot
     property alias sceneroot: sceneRoot
+    property alias camera: camera
+
+    property alias sceneloader : sceneloader
+    property alias sceneloadermatrix:sceneloadermatrix
+
     Camera {
         id: camera
         projectionType: CameraLens.FrustumProjection
         nearPlane : 0.1
-        farPlane : 1000
+        farPlane : 100000
 
         top: 0.1*(chilitags.projectionMatrix.m23/chilitags.projectionMatrix.m11)
         bottom: -0.1*(chilitags.projectionMatrix.m23/chilitags.projectionMatrix.m11)
@@ -23,8 +28,6 @@ Entity {
 
     Configuration  {
         controlledCamera: camera
-        onControlledCameraChanged: console.log(sphereTransform.matrix)
-
     }
 
     components: [
@@ -43,25 +46,23 @@ Entity {
         id: material
     }
 
-
-    Mesh {
-        id: cuboidMesh
-        source: "qrc:/models/models/untitled.obj"
-
+    SceneLoader{
+           id:sceneloader
     }
 
     Transform {
-        id: sphereTransform
-
-        Translate{dx:10
-                  dy:10}
-        MatrixTransform{matrix: tag.transform}
-
+        id: sceneloadertransform
+        Rotate{
+            axis: Qt.vector3d(1, 0, 0)
+            angle: -90
+            }
+        MatrixTransform{
+            id: sceneloadermatrix
+            matrix: tag.transform
+        }
     }
-
     Entity {
-        id: sphereEntity
-        components: [ cuboidMesh, material, sphereTransform ]
+        components: [ sceneloader, material, sceneloadertransform ]
     }
 
 }

@@ -29,6 +29,8 @@ private:
     QMap<QString, QUrl> m_thumbs;
     QMap<QString, QUrl> m_modelfiles;
     QMap<QString, QUrl> m_staticsfiles;
+    QMap<QString, QUrl> m_tagfiles;
+
 };
 
 #endif // STRUCTURELISTMODEL_H

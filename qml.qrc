@@ -5,8 +5,10 @@
         <file>Scene.qml</file>
     </qresource>
     <qresource prefix="/models">
-        <file>models/Model 1/test1.obj</file>
-        <file>models/Model 1/test1.png</file>
+        <file>models/Model1/test1.png</file>
+        <file>models/Model1/Model1.yml</file>
+        <file>models/Model1/Model1.lol</file>
+        <file>models/Model1/Model1.dae</file>
     </qresource>
     <qresource prefix="/icons">
         <file>icons/ic_keyboard_arrow_up_black_36px.svg</file>

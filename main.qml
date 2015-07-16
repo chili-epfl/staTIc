@@ -11,8 +11,12 @@ ApplicationWindow {
     width: 2560
     height: 1600
     color: "#0033CC"
-    property string currentStructure_modelFile: "";
-    property string currentStructure_staticsFile: "";
+
+    /*Two variables hold the related files of the selected structure*/
+    property string currentStructure_modelName: "";
+    property url currentStructure_modelFile: "";
+    property url currentStructure_staticsFile: "";
+    property url currentStructure_tagFile: "";
 
     Loader{
         id:windowloader
@@ -22,7 +26,7 @@ ApplicationWindow {
             intromenu.visible=false;
             intromenu.enabled=false;
             console.log("loaded");
-            item.loadStructure(currentStructure_modelFile,currentStructure_staticsFile);
+            item.loadStructure(currentStructure_modelName,currentStructure_modelFile,currentStructure_staticsFile,currentStructure_tagFile);
         }
     }
 
@@ -116,8 +120,11 @@ ApplicationWindow {
                 text: "Button"
                 onClicked: {
                     if(gridview.currentIndex !=-1){
+
+                        currentStructure_modelName= gridview.model.get(gridview.currentIndex,"Name");
                         currentStructure_modelFile= gridview.model.get(gridview.currentIndex,"ModelFile");
                         currentStructure_staticsFile= gridview.model.get(gridview.currentIndex,"StaticsFile");
+                        currentStructure_tagFile= gridview.model.get(gridview.currentIndex,"TagFile");
                         windowloader.source="exploreView.qml"
                         }
                     }

@@ -41,6 +41,13 @@ QVariant StructureItemModel::get(int index, QString info)const{
         return m_staticsfiles[m_fileNames[index]];
 
     }
+    else if(info.compare("TagFile",Qt::CaseInsensitive)==0){
+        return m_tagfiles[m_fileNames[index]];
+
+    }
+    else if(info.compare("Name",Qt::CaseInsensitive)==0){
+        return m_fileNames[index];
+    }
 
 
     return QVariant();
@@ -65,6 +72,8 @@ void StructureItemModel::setSource(QString source){
                     m_thumbs[name]=QUrl::fromLocalFile(it2.fileInfo().canonicalFilePath());
                 else if(it2.fileInfo().suffix()=="lol")
                     m_staticsfiles[name]=QUrl::fromLocalFile(it2.fileInfo().canonicalFilePath());
+                else if(it2.fileInfo().suffix()=="yml")
+                    m_tagfiles[name]=QUrl::fromLocalFile(it2.fileInfo().canonicalFilePath());
 
             }
         }

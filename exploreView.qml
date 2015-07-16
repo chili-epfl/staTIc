@@ -5,18 +5,26 @@ import QtQuick.Layouts 1.1
 import QtQuick.Scene3D 2.0
 import Chilitags 1.0
 import Controller 1.0
+import MouseInterface3D 1.0
 
 Item{
     id: root
     signal exitView()
-    signal loadStructure(string modelFile,string staticsFile);
+    signal loadStructure(string modelName,url modelFile,url staticsFile,url tagFile);
 
-    onLoadStructure: controller.loadStructure(modelFile,staticsFile);
+    onLoadStructure: {
+        scene.sceneloader.source=modelFile
+        controller.loadStructure(staticsFile)
+        chilitags.tagConfigurationFile=tagFile
+        tag.name=modelName
+        console.log(modelName)
+    }
 
     anchors.fill: parent
     state: "AG"
     states:[State {
             name: "AG"
+
             StateChangeScript {
                 name: "stopcamera"
                 script: camDevice.start();
@@ -38,6 +46,7 @@ Item{
     /*UI*/
     Item{
         id:topmenu
+
         anchors.horizontalCenter: parent.horizontalCenter
         y:0 ; z:1
         state: "HIDDEN"
@@ -154,6 +163,20 @@ Item{
                     id:scene
                 }
             }
+        MouseInterface3D{
+            id:mouseInterface
+            scene3D:scene.sceneroot
+            camera:scene.camera
+            onSelectedItem:{
+                controller.onEntityClicked(item);
+            }
+        }
+        MouseArea{
+            anchors.fill: parent
+            onClicked: {
+                mouseInterface.select(Qt.vector2d((2.0 * mouseX)/width - 1.0,1.0-(2.0 * mouseY)/height))
+            }
+        }
     }
 
     Chilitags{
@@ -164,7 +187,6 @@ Item{
 
     ChilitagsObject{
         id: tag
-        name: "tag_1018"
     }
 
 

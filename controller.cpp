@@ -1,4 +1,5 @@
 #include "controller.h"
+#include <ChilitagsObject.h>
 
 Controller::Controller(QObject* parent):
     QObject(parent)
@@ -6,10 +7,12 @@ Controller::Controller(QObject* parent):
 
 }
 
-void Controller::loadStructure(QString modelFile, QString staticsFile){
+void Controller::loadStructure( QString staticsFile){
+    /*TODO: Check the nature of the shape 2d-3d*/
     staticsModule=new TwoDimensionalStaticsModule(staticsFile);
-    Qt3D::QSceneLoader* sceneLoader=new Qt3D::QSceneLoader(sceneroot);
-    sceneLoader->setSource(modelFile);
 }
 
 
+void Controller::loadStructure( QUrl staticsFile){
+        loadStructure(staticsFile.toLocalFile());
+}
