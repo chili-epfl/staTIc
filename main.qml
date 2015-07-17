@@ -120,7 +120,6 @@ ApplicationWindow {
                 text: "Button"
                 onClicked: {
                     if(gridview.currentIndex !=-1){
-
                         currentStructure_modelName= gridview.model.get(gridview.currentIndex,"Name");
                         currentStructure_modelFile= gridview.model.get(gridview.currentIndex,"ModelFile");
                         currentStructure_staticsFile= gridview.model.get(gridview.currentIndex,"StaticsFile");

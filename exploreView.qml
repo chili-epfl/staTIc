@@ -43,6 +43,25 @@ Item{
         sceneRoot: scene.sceneroot
 
     }
+    Connections{
+        target: mousearea
+        onCustomClicked:{
+            controller.inputEventHandler("CLICKED",{"Point":p0,"Entity":entity});
+        }
+        onCustomDragged:{
+            controller.inputEventHandler("DRAGGED",{"Point0":p0,"Entity0":p0_entity,
+                                                    "Point1":p1,"Entity1":p1_entity});
+        }
+        onCustomHeld:{
+            controller.inputEventHandler("HELD",{"Point":p0,"Entity":entity,
+                                                    "Timespan":timespan});
+        }
+        onCustomHolding:{
+            console.log("Holding");
+            console.log(timespan);
+        }
+
+    }
     /*UI*/
     Item{
         id:topmenu
@@ -156,26 +175,93 @@ Item{
         source:camDevice
         filters:[chilitags]
         Scene3D {
-                anchors.fill: parent
-                focus: true
-                aspects: "input"
-                Scene {
-                    id:scene
-                }
+            anchors.fill: parent
+            focus: true
+            aspects: "input"
+            Scene {
+                id:scene
             }
+        }
         MouseInterface3D{
             id:mouseInterface
             scene3D:scene.sceneroot
             camera:scene.camera
-            onSelectedItem:{
-                controller.onEntityClicked(item);
-            }
+
         }
         MouseArea{
+            id:mousearea
             anchors.fill: parent
-            onClicked: {
-                mouseInterface.select(Qt.vector2d((2.0 * mouseX)/width - 1.0,1.0-(2.0 * mouseY)/height))
+            property bool fastRelease: true
+            property vector2d p0_normalized;
+            property variant p0_entity;
+            property vector2d p1_normalized;
+            property variant p1_entity;
+            property int timespan;
+
+            signal customClicked (vector2d p0,variant entity);
+            signal customDragged (vector2d p0,variant p0_entity,vector2d p1,variant p1_entity);
+            signal customHeld (vector2d p0,variant entity,int timespan);
+            signal customHolding (int timespan);
+
+            Timer {
+                id:fastReleaseTimer
+                interval: 100; running: false; repeat: false
+                onTriggered: parent.fastRelease=false
             }
+            Timer {
+                id:holdingTimer
+                interval: 100; running: false; repeat: true
+                onTriggered: {
+                    parent.timespan+=interval
+                    parent.customHolding(parent.timespan);
+                }
+            }
+            state:"IDLE"
+            states:[
+                State {
+                    name: "IDLE"
+                    PropertyChanges {
+                        target:mousearea
+                        onPressed:{
+                            fastRelease=true;
+                            fastReleaseTimer.start();
+                            timespan=0;
+                            holdingTimer.start();
+                            p0_normalized=Qt.vector2d((2.0 * mouseX)/width - 1.0,1.0-(2.0 * mouseY)/height);
+                            p0_entity=mouseInterface.select(p0_normalized);
+                            state="PRESSED";
+                        }
+                        onReleased:{}
+                    }
+                },
+                State {
+                    name: "PRESSED"
+                    PropertyChanges {
+                        target:mousearea
+                        onPressed:{}
+                        onReleased:{
+                            fastReleaseTimer.stop();
+                            holdingTimer.stop();
+                            p1_normalized= Qt.vector2d((2.0 * mouseX)/width - 1.0,1.0-(2.0 * mouseY)/height);
+                            p1_entity=mouseInterface.select(p1_normalized);
+                            var diff=p0_normalized.minus(p1_normalized);
+                            if(diff.length()>0.10){
+                                customDragged(p0_normalized,p0_entity,p1_normalized,p1_entity);
+                            }
+                            else{
+                                if(fastRelease){
+                                    customClicked(p0_normalized,p0_entity);
+                                }
+                                else{
+                                    customHeld(p0_normalized,p0_entity,timespan);
+                                }
+
+                            }
+                            state="IDLE";
+                        }
+                    }
+                }
+            ]
         }
     }
 

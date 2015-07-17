@@ -19,8 +19,6 @@ private:
     QString generateExternalForceID();
     static QList<int> last_ids;
 
-
-
 };
 
 #endif // FORCE_H

@@ -62,6 +62,7 @@ Entity {
         }
     }
     Entity {
+        objectName: "Model"
         components: [ sceneloader, material, sceneloadertransform ]
     }
 

@@ -43,12 +43,12 @@ bool TwoDimensionalStaticsModule::readStructure(QString path){
         }
         else if(parts.at(0).compare("m")==0){
             if(parts.size()<4) {qWarning("Structure file incorrect format"); return false;}
-            Member* member=new Member(parts.at(3));
+            Beam* beam=new Beam(parts.at(3));
             Joint* extreme1=joints.at(parts.at(1).toInt());
             Joint* extreme2=joints.at(parts.at(2).toInt());
-            member->extremes.first=extreme1;
-            member->extremes.second=extreme2;
-            members.append(member);
+            beam->extremes.first=extreme1;
+            beam->extremes.second=extreme2;
+            beams.append(beam);
         }
     }
 
@@ -75,10 +75,8 @@ void TwoDimensionalStaticsModule::solve(){
         i+=2;
     }
 
-
     cv::Mat solution;
     bool solved=cv::solve(internalF_matrix,external_forces_matrix,solution);
-
     /*cv::MatIterator_<float> _it = internalF_matrix.begin<float>();
     i=0;
     QString text;
@@ -90,10 +88,9 @@ void TwoDimensionalStaticsModule::solve(){
     }
     qDebug()<<text;
     */
-
     i=0;
-    for(Member* member: members){
-        member->setAxialForce(solution.at<float>(i,0));
+    for(Beam* beam: beams){
+        beam->setAxialForce(solution.at<float>(i,0));
         i++;
     }
     for(Joint* support: supportJoints){
@@ -125,16 +122,16 @@ void TwoDimensionalStaticsModule::update(){
     }
 
 
-    internalF_matrix=cv::Mat::zeros(2*joints.size(),members.size()+n_reactions,CV_32F);
+    internalF_matrix=cv::Mat::zeros(2*joints.size(),beams.size()+n_reactions,CV_32F);
     int i=0;
     for(Joint* joint : joints){
         int j=0;
-        for(Member* member: members){
-            if(member->extremes.first==joint || member->extremes.second==joint){
-                QVector3D firstPosition=member->extremes.first->getPosition();
-                QVector3D secondPosition=member->extremes.second->getPosition();
+        for(Beam* beam: beams){
+            if(beam->extremes.first==joint || beam->extremes.second==joint){
+                QVector3D firstPosition=beam->extremes.first->getPosition();
+                QVector3D secondPosition=beam->extremes.second->getPosition();
                 QVector3D dir;
-                if(member->extremes.first==joint)
+                if(beam->extremes.first==joint)
                     dir=firstPosition-secondPosition;
                 else
                     dir=secondPosition-firstPosition;
@@ -166,7 +163,7 @@ void TwoDimensionalStaticsModule::update(){
 }
 
 void TwoDimensionalStaticsModule::check_stability(){
-    int n_members=members.size();
+    int n_beams=beams.size();
     int n_joints=joints.size();
 
     int n_reactions=0;
@@ -178,10 +175,10 @@ void TwoDimensionalStaticsModule::check_stability(){
             n_reactions+=1;
     }
 
-    if (2*n_joints==n_members+n_reactions){
+    if (2*n_joints==n_beams+n_reactions){
         stability=Stability::DETERMINATE;
     }
-    else if(2*n_joints<n_members+n_reactions){
+    else if(2*n_joints<n_beams+n_reactions){
         stability=Stability::UNSTABLE;
 
     }
@@ -189,4 +186,13 @@ void TwoDimensionalStaticsModule::check_stability(){
         stability=Stability::INDETERMINATE;
 }
 
+AbstractElement* TwoDimensionalStaticsModule::getElementbyName(QString name){
+    for(Joint* joint : joints)
+        if(joint->objectName().compare(name)==0)
+            return joint;
+    for(Beam* beam : beams)
+        if(beam->objectName().compare(name)==0)
+            return beam;
 
+    return NULL;
+}

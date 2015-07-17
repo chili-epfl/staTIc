@@ -21,7 +21,7 @@ public:
 
     Status getStatus(){return status;}
     Stability getStability(){return stability;}
-
+    virtual AbstractElement* getElementbyName(QString name) =0;
 
 public slots:
     virtual bool readStructure(QString path) =0;

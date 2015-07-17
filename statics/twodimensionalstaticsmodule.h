@@ -2,7 +2,7 @@
 #define STATICSMODULE_H
 
 #include "joint.h"
-#include "member.h"
+#include "beam.h"
 #include <QList>
 #include <QMap>
 #include <opencv2/core.hpp>
@@ -16,6 +16,7 @@ class TwoDimensionalStaticsModule : public AbstractStaticsModule
 public:
     TwoDimensionalStaticsModule();
     TwoDimensionalStaticsModule(QString path);
+    AbstractElement* getElementbyName(QString name);
     //QVector3D getInternalForce(QString element_id);
 
 public slots:
@@ -27,10 +28,10 @@ private:
     void update_internalF_matrix();
     void solve();
     QList<Joint*> joints;
-    QList<Member*> members;
+    QList<Beam*> beams;
+    QList<Joint*> supportJoints;
 
     cv::Mat internalF_matrix;
-    QList<Joint*> supportJoints;
 
 };
 

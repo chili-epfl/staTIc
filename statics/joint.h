@@ -6,7 +6,7 @@
 #include <QVector3D>
 #include "abstractelement.h"
 
-class Member;
+class Beam;
 
 class Joint:public AbstractElement
 {
@@ -15,7 +15,7 @@ public:
     enum SupportType {NOSUPPORT,FIXED,ROLLING};
 
     Joint(QString name);
-    QList<Member*> connected_members;
+    QList<Beam*> connected_beams;
 
     void setSupport(SupportType jointSupport){this->jointSupport=jointSupport;}
     SupportType getSupport(){return jointSupport;}

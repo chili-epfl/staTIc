@@ -3,6 +3,7 @@
         <file>main.qml</file>
         <file>exploreView.qml</file>
         <file>Scene.qml</file>
+        <file>ArrowComponent.qml</file>
     </qresource>
     <qresource prefix="/models">
         <file>models/Model1/test1.png</file>
@@ -12,5 +13,6 @@
     </qresource>
     <qresource prefix="/icons">
         <file>icons/ic_keyboard_arrow_up_black_36px.svg</file>
+        <file>icons/arrow.obj</file>
     </qresource>
 </RCC>

@@ -16,13 +16,11 @@ class Controller : public QObject
 public:
     Controller(QObject* parent=0);
     void setSceneroot(Qt3D::QEntity* sceneroot){this->sceneroot=sceneroot;}
-    //void setChilitags(QObject* chilitags){this->chilitags=chilitags;}
 
 public slots:
-    void onEntityClicked(Qt3D::QEntity* item){qDebug()<<item->objectName();}
     void loadStructure(QUrl staticsFile);
     void loadStructure(QString staticsFile);
-
+    void inputEventHandler(QString type, QVariantMap args);
 private:
     Qt3D::QEntity* sceneroot;
     AbstractStaticsModule* staticsModule;

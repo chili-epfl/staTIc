@@ -6,21 +6,21 @@ CONFIG += c++11
 SOURCES += main.cpp \
     structureitemmodel.cpp \
     statics/twodimensionalstaticsmodule.cpp \
-    statics/member.cpp \
     statics/joint.cpp \
     statics/force.cpp \
     statics/abstractstaticsmodule.cpp \
     statics/abstractelement.cpp \
-    controller.cpp
+    controller.cpp \
+    statics/beam.cpp
 HEADERS += \
     structureitemmodel.h \
     statics/twodimensionalstaticsmodule.h \
-    statics/member.h \
     statics/joint.h \
     statics/force.h \
     statics/abstractstaticsmodule.h \
     statics/abstractelement.h \
-    controller.h
+    controller.h \
+    statics/beam.h
 
 
 RESOURCES += qml.qrc

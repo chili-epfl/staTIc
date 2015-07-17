@@ -1,5 +1,5 @@
 #include "joint.h"
-#include "member.h"
+#include "beam.h"
 
 Joint::Joint(QString name):
     AbstractElement(name)
