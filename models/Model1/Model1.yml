@@ -5,10 +5,10 @@ Model1:
       translation: [0., 0., 0.]
     - tag: 2
       size: 20
-      translation: [-259., 251.48, 0.]
+      translation: [-259., -251.48, 0.]
     - tag: 3
       size: 20
-      translation: [0., 251.48, 0.]
+      translation: [0., -251.48, 0.]
     - tag: 4
       size: 20
-      translation: [259., 251.48, 0.]
+      translation: [259., -251.48, 0.]

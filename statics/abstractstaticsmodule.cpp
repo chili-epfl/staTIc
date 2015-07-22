@@ -1,29 +1,15 @@
 #include "abstractstaticsmodule.h"
-
-AbstractStaticsModule::AbstractStaticsModule():
-    QObject()
+#include "abstracteventhandler.h"
+AbstractStaticsModule::AbstractStaticsModule(QObject* parent ):
+    QObject(parent)
 {
-    status=NOT_LOADED;
-}
-AbstractStaticsModule::AbstractStaticsModule(QString path):
-    QObject()
-{
+    m_status=NOT_LOADED;
 }
 
-
-
-void AbstractStaticsModule::addExternalForce(Force* force){
-    force_list.append(force);
+void AbstractStaticsModule::setEventHandler(QVariant eventHandler){
+    if(!eventHandler.canConvert<AbstractEventHandler*>()) return;
+    m_event_handler=eventHandler.value<AbstractEventHandler*>();
+    m_event_handler->setStaticsModule(this);
 }
-void AbstractStaticsModule::removeExternalForce(QString id){
-    int i=0;
-    for(Force* force: force_list){
-        if(force->objectName().compare(id)==0){
-            delete force;
-            break;
-        }
-        i++;
-    }
-    force_list.removeAt(i);
-}
+
 

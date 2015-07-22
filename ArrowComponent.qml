@@ -5,20 +5,32 @@ import Qt3D.Renderer 2.0
 Entity{
     property real myAngle:0;
     property real arrowLength:10;
+    property real positionX: 0;
+    property real positionY: 0;
+    property real positionZ: 0;
+    property real coneLength: 18
     Mesh{
         id:tip_mesh
-        source:"qrc:/icons/icons/arrow.obj"
+        source:"qrc:/icons/icons/arrow_ble.obj"
     }
     Transform{
         id:tip_transform
         Rotate{
-            axis:Qt.vector3d(0,1,0)
+            axis:Qt.vector3d(0,0,1)
             angleRad: myAngle
         }
+        Translate{
+              dx:positionX;
+              dy:positionY;
+              dz:positionZ;
+        }
+
     }
     Entity{
+
         CylinderMesh{
             id:tail_mesh
+
             radius: 10
             length: arrowLength
         }
@@ -29,13 +41,20 @@ Entity{
                 angle: 90
             }
             Translate{
-                dx:tail_mesh.length
+                dx:coneLength
             }
         }
 
         components: [tail_mesh,tail_transform]
 
     }
-    components: [tip_mesh,tip_transform]
+    PhongMaterial {
+            id: floorMaterial
+             ambient: "red"
+             diffuse: "red"
+             specular: "red"
+             shininess: 0.5
+         }
+    components: [tip_mesh,floorMaterial,tip_transform]
 }
 

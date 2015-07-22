@@ -2,16 +2,22 @@
 #define ABSTRACTELEMENT_H
 
 #include <QObject>
+#include <Qt3DCore>
+
 
 class AbstractElement : public QObject
 {
     Q_OBJECT
 public:
-    explicit AbstractElement(QString name, QObject *parent = 0);
+    AbstractElement(QObject *parent = 0);
+    AbstractElement(QString name, QObject *parent = 0);
 
 signals:
 
 public slots:
+
+protected:
+
 };
 
 #endif // ABSTRACTELEMENT_H

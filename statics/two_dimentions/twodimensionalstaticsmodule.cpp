@@ -1,16 +1,61 @@
-#include "twodimensionalstaticsmodule.h"
-#include <QDebug>
+#include "statics/two_dimentions/twodimensionalstaticsmodule.h"
 
-TwoDimensionalStaticsModule::TwoDimensionalStaticsModule()
-    :AbstractStaticsModule()
+TwoDimensionalStaticsModule::TwoDimensionalStaticsModule(QObject *parent )
+    :AbstractStaticsModule(parent)
 {
 }
-TwoDimensionalStaticsModule::TwoDimensionalStaticsModule(QString path)
-    :AbstractStaticsModule(path)
-{
-    readStructure(path);
+
+void TwoDimensionalStaticsModule::addElement(AbstractElement* element){
+    if(!element) return;
+    if(m_elements.contains(element->objectName()))
+        removeElement(element,false);
+    m_elements[element->objectName()]=element;
+    if(element->inherits("Joint")){
+        m_joints.append(qobject_cast<Joint*>(element));
+        update();
+    }
+    else if(element->inherits("Beam")){
+        m_beams.append(qobject_cast<Beam*>(element));
+        update();
+    }
+    else if(element->inherits("Force")){
+        m_forces.append(qobject_cast<Force*>(element));
+    }
+
 
 }
+void TwoDimensionalStaticsModule::removeElement(AbstractElement* element,bool update){
+    if(!element) return;
+    if(m_elements.contains(element->objectName())){
+        AbstractElement* old_val=m_elements[element->objectName()];
+        m_elements.remove(element->objectName());
+        if(old_val->inherits("Joint")){
+            m_joints.removeAll(qobject_cast<Joint*>(old_val));
+            if(update)
+                this->update();
+        }
+        else if(old_val->inherits("Beam")){
+            m_beams.removeAll(qobject_cast<Beam*>(old_val));
+            if(update)
+                this->update();
+        }
+        else if(old_val->inherits("Force")){
+            m_forces.removeAll(qobject_cast<Force*>(old_val));
+        }
+
+    }
+
+}
+AbstractElement* TwoDimensionalStaticsModule::getElement(QString elementName){
+    if(!m_elements.contains(elementName)) return NULL;
+    return m_elements[elementName];
+}
+
+bool TwoDimensionalStaticsModule::containsElement(QString elementName){
+    return m_elements.contains(elementName);
+}
+
+
 
 bool TwoDimensionalStaticsModule::readStructure(QString path){
 
@@ -24,6 +69,7 @@ bool TwoDimensionalStaticsModule::readStructure(QString path){
     while (!in.atEnd()) {
         QString line = in.readLine();
         QStringList parts=line.split(",");
+
         if(parts.size()==0) continue;
         if(parts.at(0).compare("j")==0) {
             if(parts.size()<5) {qWarning("Structure file incorrect format"); return false;}
@@ -33,39 +79,39 @@ bool TwoDimensionalStaticsModule::readStructure(QString path){
                 joint->setSupport(Joint::NOSUPPORT);
             else if(parts.at(5).compare("fixed",Qt::CaseInsensitive)==0){
                 joint->setSupport(Joint::FIXED);
-                supportJoints.append(joint);
             }
             else if(parts.at(5).compare("rolling",Qt::CaseInsensitive)==0){
                 joint->setSupport(Joint::ROLLING);
-                supportJoints.append(joint);
             }
-            joints.append(joint);
+            m_elements[joint->objectName()]=joint;
+            m_joints.append(joint);
         }
         else if(parts.at(0).compare("m")==0){
             if(parts.size()<4) {qWarning("Structure file incorrect format"); return false;}
             Beam* beam=new Beam(parts.at(3));
-            Joint* extreme1=joints.at(parts.at(1).toInt());
-            Joint* extreme2=joints.at(parts.at(2).toInt());
+            Joint* extreme1=m_joints.at(parts.at(1).toInt());
+            Joint* extreme2=m_joints.at(parts.at(2).toInt());
             beam->extremes.first=extreme1;
             beam->extremes.second=extreme2;
-            beams.append(beam);
+            m_elements[beam->objectName()]=beam;
+            m_beams.append(beam);
         }
     }
 
-    status=LOADED;
-
-    check_stability();
     update();
+
+    m_status=LOADED;
+    emit statusChanged();
 
     return true;
 
 }
 
 void TwoDimensionalStaticsModule::solve(){
-    cv::Mat external_forces_matrix=cv::Mat::zeros(2*joints.size(),1,CV_32F);
+    cv::Mat external_forces_matrix=cv::Mat::zeros(2*m_joints.size(),1,CV_32F);
     int i=0;
-    for(Joint* joint : joints){
-        for(Force* force :force_list){
+    for(Joint* joint : m_joints){
+        for(Force* force :m_forces){
             if(force->applicationElement.compare(joint->objectName())==0){
                 external_forces_matrix.at<float>(i,0)=external_forces_matrix.at<float>(i,0)+force->vector.x();
                 external_forces_matrix.at<float>(i+1,0)=external_forces_matrix.at<float>(i+1,0)+force->vector.y();
@@ -76,7 +122,7 @@ void TwoDimensionalStaticsModule::solve(){
     }
 
     cv::Mat solution;
-    bool solved=cv::solve(internalF_matrix,external_forces_matrix,solution);
+    cv::solve(internalF_matrix,external_forces_matrix,solution);
     /*cv::MatIterator_<float> _it = internalF_matrix.begin<float>();
     i=0;
     QString text;
@@ -89,11 +135,11 @@ void TwoDimensionalStaticsModule::solve(){
     qDebug()<<text;
     */
     i=0;
-    for(Beam* beam: beams){
+    for(Beam* beam: m_beams){
         beam->setAxialForce(solution.at<float>(i,0));
         i++;
     }
-    for(Joint* support: supportJoints){
+    for(Joint* support: m_joints){
         if(support->getSupport()==Joint::FIXED){
             support->setReaction(QVector3D(solution.at<float>(i,0),solution.at<float>(i+1,0),0));
             i+=2;
@@ -106,27 +152,27 @@ void TwoDimensionalStaticsModule::solve(){
 
 }
 
-
 void TwoDimensionalStaticsModule::update(){
+    check_stability();
 
     /*Check stability*/
-    if(stability!=Stability::DETERMINATE) return;
+    if(m_stability!=Stability::DETERMINATE) return;
 
     /*Compute reactions*/
     int n_reactions=0;
-    for(Joint* joint: joints){
+    for(Joint* joint:m_joints){
         if(joint->getSupport()==Joint::FIXED)
             n_reactions+=2;
         else if(joint->getSupport()==Joint::ROLLING)
-            n_reactions+=1;
+            n_reactions++;
+
     }
 
-
-    internalF_matrix=cv::Mat::zeros(2*joints.size(),beams.size()+n_reactions,CV_32F);
+    internalF_matrix=cv::Mat::zeros(2*m_joints.size(),m_beams.size()+n_reactions,CV_32F);
     int i=0;
-    for(Joint* joint : joints){
+    for(Joint* joint : m_joints){
         int j=0;
-        for(Beam* beam: beams){
+        for(Beam* beam: m_beams){
             if(beam->extremes.first==joint || beam->extremes.second==joint){
                 QVector3D firstPosition=beam->extremes.first->getPosition();
                 QVector3D secondPosition=beam->extremes.second->getPosition();
@@ -141,7 +187,7 @@ void TwoDimensionalStaticsModule::update(){
             }
             j++;
         }
-        for(Joint* support :supportJoints){
+        for(Joint* support :m_joints){
             //TODO: supports can have orientation
             if(support->getSupport()==Joint::FIXED){
                 if(support==joint){
@@ -163,36 +209,31 @@ void TwoDimensionalStaticsModule::update(){
 }
 
 void TwoDimensionalStaticsModule::check_stability(){
-    int n_beams=beams.size();
-    int n_joints=joints.size();
 
+    Stability old_val=m_stability;
+    int n_beams=m_beams.size();
+    int n_joints=m_joints.size();
     int n_reactions=0;
 
-    for(Joint* joint: joints){
+    for(Joint* joint:m_joints){
         if(joint->getSupport()==Joint::FIXED)
             n_reactions+=2;
         else if(joint->getSupport()==Joint::ROLLING)
-            n_reactions+=1;
+            n_reactions++;
+
     }
 
     if (2*n_joints==n_beams+n_reactions){
-        stability=Stability::DETERMINATE;
+        m_stability=Stability::DETERMINATE;
     }
     else if(2*n_joints<n_beams+n_reactions){
-        stability=Stability::UNSTABLE;
+        m_stability=Stability::UNSTABLE;
 
     }
     else
-        stability=Stability::INDETERMINATE;
+        m_stability=Stability::INDETERMINATE;
+
+    if(old_val!=m_stability)
+        emit stabilityChanged();
 }
 
-AbstractElement* TwoDimensionalStaticsModule::getElementbyName(QString name){
-    for(Joint* joint : joints)
-        if(joint->objectName().compare(name)==0)
-            return joint;
-    for(Beam* beam : beams)
-        if(beam->objectName().compare(name)==0)
-            return beam;
-
-    return NULL;
-}

@@ -4,7 +4,10 @@ import QtMultimedia 5.5
 import QtQuick.Layouts 1.1
 import QtQuick.Scene3D 2.0
 import Chilitags 1.0
-import Controller 1.0
+
+import StaticsModule2D 1.0
+import EventHandler2D 1.0
+
 import MouseInterface3D 1.0
 
 Item{
@@ -13,11 +16,10 @@ Item{
     signal loadStructure(string modelName,url modelFile,url staticsFile,url tagFile);
 
     onLoadStructure: {
+        staticsmodule.sourceUrl=staticsFile
         scene.sceneloader.source=modelFile
-        controller.loadStructure(staticsFile)
         chilitags.tagConfigurationFile=tagFile
         tag.name=modelName
-        console.log(modelName)
     }
 
     anchors.fill: parent
@@ -38,27 +40,31 @@ Item{
             }        }
     ]
 
-    Controller{
-        id:controller
-        sceneRoot: scene.sceneroot
-
+    StaticsModule2D{
+        id:staticsmodule
+        eventHandler: eventhandler
     }
+    EventHandler2D{
+        id:eventhandler
+        sceneRoot: scene.sceneroot
+        camera:scene.camera
+    }
+
     Connections{
         target: mousearea
         onCustomClicked:{
-            controller.inputEventHandler("CLICKED",{"Point":p0,"Entity":entity});
+            eventhandler.inputEventHandler(EventHandler2D.CLICKED,{"Point":p0,"Entity":entity});
         }
         onCustomDragged:{
-            controller.inputEventHandler("DRAGGED",{"Point0":p0,"Entity0":p0_entity,
+            eventhandler.inputEventHandler(EventHandler2D.DRAGGED,{"Point0":p0,"Entity0":p0_entity,
                                                     "Point1":p1,"Entity1":p1_entity});
         }
         onCustomHeld:{
-            controller.inputEventHandler("HELD",{"Point":p0,"Entity":entity,
+            eventhandler.inputEventHandler(EventHandler2D.HELD,{"Point":p0,"Entity":entity,
                                                     "Timespan":timespan});
         }
         onCustomHolding:{
-            console.log("Holding");
-            console.log(timespan);
+
         }
 
     }
@@ -164,6 +170,7 @@ Item{
 
     Camera{
         id:camDevice
+        deviceId:QtMultimedia.availableCameras[1].deviceId
         imageCapture.resolution: "640x480" //Android sets the viewfinder resolution as the capture one
         //viewfinder.resolution:"640x480"
     }

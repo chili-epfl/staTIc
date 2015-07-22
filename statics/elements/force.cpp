@@ -4,13 +4,12 @@
 QList<int> Force::last_ids={0};
 
 
-Force::Force(QObject *parent) : QObject(parent)
+Force::Force(QObject *parent) : AbstractElement(parent)
 {
     this->setObjectName(generateExternalForceID());
 }
 
 QString Force::generateExternalForceID(){
-
     if(last_ids.size()==1)
         return QString::number(last_ids.at(0)+1);
     else{
@@ -20,5 +19,4 @@ QString Force::generateExternalForceID(){
         last_ids.pop_front();
         return QString::number(id);
     }
-
 }

@@ -4,35 +4,56 @@
 #include <QObject>
 #include <QVector4D>
 #include <QUrl>
-#include "force.h"
+#include "elements/abstractelement.h"
+
+class AbstractEventHandler;
+
 class AbstractStaticsModule : public QObject
 {
-        Q_OBJECT
+    Q_OBJECT
+    Q_ENUMS(Status)
+    Q_ENUMS(Stability)
+    Q_PROPERTY(QUrl sourceUrl WRITE setSourceUrl)
+    Q_PROPERTY(QString source WRITE setSource)
+    Q_PROPERTY(Status status READ status NOTIFY statusChanged)
+    Q_PROPERTY(Stability stability READ stability NOTIFY stabilityChanged)
+    Q_PROPERTY(QVariant eventHandler WRITE setEventHandler)
+
 public:
+
     enum Status{NOT_LOADED,LOADED};
     enum Stability{UNSTABLE, DETERMINATE,INDETERMINATE};
 
-    AbstractStaticsModule();
-    AbstractStaticsModule(QString path);
+    AbstractStaticsModule(QObject *parent = 0);
 
-    //virtual QVector3D getInternalForce(QString element_id) =0;
-    virtual void addExternalForce(Force* force);
-    virtual void removeExternalForce(QString id);
+    void setSourceUrl(QUrl sourceUrl){readStructure(sourceUrl.toLocalFile());}
+    void setSource(QString source){readStructure(source);}
+    void setEventHandler(QVariant eventHandler);
 
-    Status getStatus(){return status;}
-    Stability getStability(){return stability;}
-    virtual AbstractElement* getElementbyName(QString name) =0;
+    Status status(){return m_status;}
+    Stability stability(){return m_stability;}
+    //QVariant eventHandler(){return QVariant::fromValue(m_event_handler);}
 
-public slots:
+    virtual void addElement(AbstractElement* element)=0;
+    virtual void removeElement(AbstractElement* element)=0;
+    virtual AbstractElement* getElement(QString elementName)=0;
+    virtual bool containsElement(QString elementName)=0;
+
+signals:
+    void statusChanged();
+    void stabilityChanged();
+protected:
     virtual bool readStructure(QString path) =0;
     virtual void update() =0;
 
-
 protected:
-    Status status;
-    Stability stability;
-    QString generateExternalForceID();
-    QList<Force*> force_list;
+    Status m_status;
+    Stability m_stability;
+    AbstractEventHandler* m_event_handler;
+
+
+
+
 
 };
 

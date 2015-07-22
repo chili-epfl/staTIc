@@ -1,6 +1,8 @@
 import Qt3D 2.0
 import Qt3D.Renderer 2.0
-
+import MaterialSetter 1.0
+import QtQuick 2.3
+import "qrc:/opengl/opengl"
 
 Entity {
     id: sceneRoot
@@ -21,9 +23,9 @@ Entity {
         left: -0.1*(chilitags.projectionMatrix.m13/chilitags.projectionMatrix.m22)
         right: 0.1*(chilitags.projectionMatrix.m13/chilitags.projectionMatrix.m22)
 
-        position: Qt.vector3d( 0.0, 0.0, -1 )
-        upVector: Qt.vector3d( 0.0, -1.0, 0.0 )
-        viewCenter: Qt.vector3d( 0.0, 0.0, 0.0 )
+        position: Qt.vector3d( 0.0, 0.0, 0 )
+        upVector: Qt.vector3d( 0.0, 1.0, 0.0 )
+        viewCenter: Qt.vector3d( 0.0, 0.0, -1.0 )
     }
 
     Configuration  {
@@ -38,32 +40,57 @@ Entity {
                 id: viewport
                 clearColor: "transparent"
                 camera:camera
+
             }
+
         }
+
+
     ]
 
-    PhongMaterial {
-        id: material
-    }
-
     SceneLoader{
-           id:sceneloader
+        id:sceneloader
+
     }
 
     Transform {
         id: sceneloadertransform
         Rotate{
             axis: Qt.vector3d(1, 0, 0)
-            angle: -90
-            }
+            angle: -180
+        }
         MatrixTransform{
             id: sceneloadermatrix
             matrix: tag.transform
         }
+        Rotate{
+            axis: Qt.vector3d(1, 0, 0)
+            angle: 180
+        }
+
     }
+
+    TransparentMaterial {
+        id: transparentMaterial
+    }
+
+    MaterialSetter{
+        id:materialsetter
+        sceneroot:scene
+        entityName: "Scene"
+        material: transparentMaterial
+        onMaterialChanged: {if(sceneloader.status==SceneLoader.Loaded) materialsetter.onAnyChange();}
+    }
+    Connections{
+        target: sceneloader
+        onStatusChanged:{ if(sceneloader.status==SceneLoader.Loaded) materialsetter.onAnyChange(); }
+    }
+
     Entity {
+        id:scene
         objectName: "Model"
-        components: [ sceneloader, material, sceneloadertransform ]
+        components: [ sceneloader, sceneloadertransform ]
     }
+
 
 }

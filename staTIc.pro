@@ -5,22 +5,26 @@ QT += qml quick widgets 3dcore 3drenderer 3dinput multimedia
 CONFIG += c++11
 SOURCES += main.cpp \
     structureitemmodel.cpp \
-    statics/twodimensionalstaticsmodule.cpp \
-    statics/joint.cpp \
-    statics/force.cpp \
+    statics/two_dimentions/twodimensionalstaticsmodule.cpp \
+    statics/elements/joint.cpp \
+    statics/elements/force.cpp \
     statics/abstractstaticsmodule.cpp \
-    statics/abstractelement.cpp \
-    controller.cpp \
-    statics/beam.cpp
+    statics/elements/abstractelement.cpp \
+    statics/elements/beam.cpp \
+    materialsetter.cpp \
+    statics/abstracteventhandler.cpp \
+    statics/two_dimentions/twodimentionaleventhandler.cpp
 HEADERS += \
     structureitemmodel.h \
-    statics/twodimensionalstaticsmodule.h \
-    statics/joint.h \
-    statics/force.h \
+    statics/two_dimentions/twodimensionalstaticsmodule.h \
+    statics/elements/joint.h \
+    statics/elements/force.h \
     statics/abstractstaticsmodule.h \
-    statics/abstractelement.h \
-    controller.h \
-    statics/beam.h
+    statics/elements/abstractelement.h \
+    statics/elements/beam.h \
+    materialsetter.h \
+    statics/abstracteventhandler.h \
+    statics/two_dimentions/twodimentionaleventhandler.h
 
 
 RESOURCES += qml.qrc

@@ -4,18 +4,22 @@
 #include <QObject>
 #include <QVector3D>
 #include "abstractelement.h"
-class Force : public QObject
+
+class Force : public AbstractElement
 {
     Q_OBJECT
 public:
-    explicit Force(QObject *parent = 0);
+    Force(QObject *parent = 0);
+    ~Force(){ last_ids.append(this->objectName().toInt());}
     QVector3D applicationPoint;
     QString applicationElement;
     QVector3D vector;
+
 signals:
 
 public slots:
-private:
+
+private:    
     QString generateExternalForceID();
     static QList<int> last_ids;
 

@@ -4,17 +4,19 @@
 #include <QString>
 #include <QList>
 #include <QVector3D>
-#include "abstractelement.h"
+#include "statics/elements/abstractelement.h"
 
 class Beam;
 
 class Joint:public AbstractElement
 {
+    Q_OBJECT
 
 public:
     enum SupportType {NOSUPPORT,FIXED,ROLLING};
 
-    Joint(QString name);
+    Joint(QString name,QObject* parent=0);
+    Joint(QObject* parent=0);
     QList<Beam*> connected_beams;
 
     void setSupport(SupportType jointSupport){this->jointSupport=jointSupport;}

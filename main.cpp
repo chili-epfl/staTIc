@@ -2,20 +2,22 @@
 #include <QQmlApplicationEngine>
 #include <QtQml>
 #include "structureitemmodel.h"
-#include <QScreen>
-#include "statics/abstractstaticsmodule.h"
-#include "statics/twodimensionalstaticsmodule.h"
-#include "controller.h"
+
+#include "statics/two_dimentions/twodimensionalstaticsmodule.h"
+
+#include "materialsetter.h"
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     QQmlApplicationEngine engine;
 
     qmlRegisterType<StructureItemModel>("StructureItemModel", 1, 0, "StructureItemModel");
-    qmlRegisterType<Controller>("Controller", 1, 0, "Controller");
+    qmlRegisterType<TwoDimensionalStaticsModule>("StaticsModule2D", 1, 0, "StaticsModule2D");
+    qmlRegisterType<TwoDimentionalEventHandler>("EventHandler2D", 1, 0, "EventHandler2D");
+    qmlRegisterType<MaterialSetter>("MaterialSetter", 1, 0, "MaterialSetter");
 
     engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
 
-    qDebug()<<"Testing...";
     return app.exec();
 }

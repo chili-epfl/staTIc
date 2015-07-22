@@ -14,5 +14,11 @@
     <qresource prefix="/icons">
         <file>icons/ic_keyboard_arrow_up_black_36px.svg</file>
         <file>icons/arrow.obj</file>
+        <file>icons/arrow_ble.obj</file>
+    </qresource>
+    <qresource prefix="/opengl">
+        <file>opengl/phongalpha.frag</file>
+        <file>opengl/phongalpha.vert</file>
+        <file>opengl/TransparentMaterial.qml</file>
     </qresource>
 </RCC>
