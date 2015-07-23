@@ -25,7 +25,6 @@ TwoDimentionalEventHandler::TwoDimentionalEventHandler(QObject* parent):
 
 void TwoDimentionalEventHandler::inputEventHandler(EventType type, QVariantMap args){
 
-    /*TODO: CONVERT TYPE INTO ENUM*/
     if(type==CLICKED){
         if(args.size()!=2) return;
     }
@@ -53,24 +52,13 @@ void TwoDimentionalEventHandler::inputEventHandler(EventType type, QVariantMap a
         QVector3D diff3D(diff2D,0);
         diff3D=matrix.inverted().mapVector(diff3D);
 
-        Force* force=new Force();
-        force->applicationPoint=QVector3D(element->getPosition());
-        force->applicationElement=element->objectName();
-        force->vector=QVector3D(diff3D.x(),diff3D.y(),0);
-        force->vector.normalize();
+        QVariantList args;
+        args.append("");
+        args.append(QVector3D(element->getPosition()));
+        args.append(QVector3D(diff3D.x(),diff3D.y(),0).normalized());
+        args.append(element->objectName());
 
-        m_staticsModule->addElement(force);
-
-        QQmlEngine engine;
-        QQmlComponent component(&engine,QUrl("qrc:/ArrowComponent.qml"));
-        Qt3D::QEntity *forceEntity = qobject_cast<Qt3D::QEntity*>(component.create());
-        forceEntity->setObjectName(force->objectName());
-        forceEntity->setParent(m_sceneRoot->findChild<Qt3D::QNode*>("Model"));
-        forceEntity->setProperty("myAngle",atan2(force->vector.y(),force->vector.x()));
-        forceEntity->setProperty("positionX",element->getPosition().x());
-        forceEntity->setProperty("positionY",element->getPosition().y());
-        forceEntity->setProperty("positionZ",element->getPosition().z());
-        forceEntity->setProperty("arrowLength",diff2D.length()*15);
+        m_staticsModule->createElement(AbstractElement::FORCE,args);
 
 
     }

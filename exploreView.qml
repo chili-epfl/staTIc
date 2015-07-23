@@ -42,12 +42,11 @@ Item{
 
     StaticsModule2D{
         id:staticsmodule
-        eventHandler: eventhandler
-    }
-    EventHandler2D{
-        id:eventhandler
         sceneRoot: scene.sceneroot
-        camera:scene.camera
+        eventHandler: EventHandler2D{
+                id:eventhandler
+                camera:scene.camera
+        }
     }
 
     Connections{
@@ -68,6 +67,7 @@ Item{
         }
 
     }
+
     /*UI*/
     Item{
         id:topmenu
@@ -77,8 +77,7 @@ Item{
         state: "HIDDEN"
         ColumnLayout{
             Row{
-                id:toolspace
-                Rectangle{width: 120; height: 120}
+                ToolBarComponent{id:toolspace}
             }
             Row{
                 Layout.alignment: Qt.AlignCenter

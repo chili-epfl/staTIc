@@ -5,6 +5,7 @@
 #include <QList>
 #include <QVector3D>
 #include "statics/elements/abstractelement.h"
+#include "statics/elements/jointvm.h"
 
 class Beam;
 
@@ -25,8 +26,10 @@ public:
     void setPosition(QVector3D pos){this->pos=pos;}
     QVector3D getPosition(){return pos;}
 
-    void setReaction(QVector3D reaction){this->reaction=reaction;}
+    void setReaction(QVector3D reaction){this->reaction=reaction;emit elementChanged();}
+
     QVector3D getReaction(){return reaction;}
+
 
 private:
     QVector3D pos;

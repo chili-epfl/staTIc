@@ -4,6 +4,8 @@
         <file>exploreView.qml</file>
         <file>Scene.qml</file>
         <file>ArrowComponent.qml</file>
+        <file>ReactionArrow.qml</file>
+        <file>ToolBarComponent.qml</file>
     </qresource>
     <qresource prefix="/models">
         <file>models/Model1/test1.png</file>
@@ -15,6 +17,7 @@
         <file>icons/ic_keyboard_arrow_up_black_36px.svg</file>
         <file>icons/arrow.obj</file>
         <file>icons/arrow_ble.obj</file>
+        <file>icons/Force_Icon.svg</file>
     </qresource>
     <qresource prefix="/opengl">
         <file>opengl/phongalpha.frag</file>

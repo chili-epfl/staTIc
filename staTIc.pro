@@ -13,7 +13,11 @@ SOURCES += main.cpp \
     statics/elements/beam.cpp \
     materialsetter.cpp \
     statics/abstracteventhandler.cpp \
-    statics/two_dimentions/twodimentionaleventhandler.cpp
+    statics/two_dimentions/twodimentionaleventhandler.cpp \
+    statics/abstractelementviewmodel.cpp \
+    statics/elements/beamvm.cpp \
+    statics/elements/forcevm.cpp \
+    statics/elements/jointvm.cpp
 HEADERS += \
     structureitemmodel.h \
     statics/two_dimentions/twodimensionalstaticsmodule.h \
@@ -24,7 +28,11 @@ HEADERS += \
     statics/elements/beam.h \
     materialsetter.h \
     statics/abstracteventhandler.h \
-    statics/two_dimentions/twodimentionaleventhandler.h
+    statics/two_dimentions/twodimentionaleventhandler.h \
+    statics/abstractelementviewmodel.h \
+    statics/elements/beamvm.h \
+    statics/elements/forcevm.h \
+    statics/elements/jointvm.h
 
 
 RESOURCES += qml.qrc

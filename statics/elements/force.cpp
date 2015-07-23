@@ -6,7 +6,8 @@ QList<int> Force::last_ids={0};
 
 Force::Force(QObject *parent) : AbstractElement(parent)
 {
-    this->setObjectName(generateExternalForceID());
+    QString name=generateExternalForceID();
+    this->setObjectName(name);
 }
 
 QString Force::generateExternalForceID(){

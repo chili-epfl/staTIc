@@ -5,30 +5,96 @@ TwoDimensionalStaticsModule::TwoDimensionalStaticsModule(QObject *parent )
 {
 }
 
-void TwoDimensionalStaticsModule::addElement(AbstractElement* element){
-    if(!element) return;
-    if(m_elements.contains(element->objectName()))
-        removeElement(element,false);
-    m_elements[element->objectName()]=element;
-    if(element->inherits("Joint")){
-        m_joints.append(qobject_cast<Joint*>(element));
-        update();
-    }
-    else if(element->inherits("Beam")){
-        m_beams.append(qobject_cast<Beam*>(element));
-        update();
-    }
-    else if(element->inherits("Force")){
-        m_forces.append(qobject_cast<Force*>(element));
-    }
 
 
+
+void TwoDimensionalStaticsModule::createElement(AbstractElement::Element_Type type, QVariantList args ){
+    /*Kind of a factory method. The function takes care of creating the viewmodel as well.
+    *   args[0]-> name of the object
+    *   Case BEAM
+    *       args[1-2]-> void* extremes
+    *   Case JOINT:
+    *       args[1]-> QVector3D Position
+    *       args[2]-> QString Support
+    *   Case FORCE
+    *       args[1]-> QVector3D ApplicationPoint
+    *       args[2]-> QVector3D Vector
+    *       args[3]-> QString ApplicationElement
+    *   TODO:Check if the object exists
+    **/
+    switch (type) {
+    case (AbstractElement::BEAM): {
+
+        Beam* beam=new Beam(args[0].toString(),this);
+        beam->extremes.first=(Joint*)args[1].value<void*>();
+        beam->extremes.second=(Joint*)args[2].value<void*>();
+        m_beams.append(beam);
+
+        BeamVM* beamVM=new BeamVM(this);
+        beamVM->setEntityName(beam->objectName());
+        beamVM->setObjectName(beam->objectName()+QString("_VM"));
+        beamVM->setSceneRoot(m_sceneRoot);
+
+        beam->setVM(beamVM);
+
+        /*Missing bindings*/
+        connect(this,SIGNAL(sceneRootChanged(Qt3D::QEntity*)),beamVM,SLOT(setSceneRoot(Qt3D::QEntity*)));
+
+        break;
+    }
+    case (AbstractElement::JOINT):{
+
+        Joint* joint=new Joint(args[0].toString(),this);
+        joint->setPosition(args[1].value<QVector3D>());
+        if(args.size()<3)
+            joint->setSupport(Joint::NOSUPPORT);
+        else if(args[2].toString().compare("fixed",Qt::CaseInsensitive)==0){
+            joint->setSupport(Joint::FIXED);
+        }
+        else if(args[2].toString().compare("rolling",Qt::CaseInsensitive)==0){
+            joint->setSupport(Joint::ROLLING);
+        }
+        m_joints.append(joint);
+
+        JointVM* jointVM=new JointVM(this);
+        jointVM->setEntityName(joint->objectName());
+        jointVM->setObjectName(joint->objectName()+QString("_VM"));
+        jointVM->setSceneRoot(m_sceneRoot);
+
+        joint->setVM(jointVM);
+        /*Missing bindings*/
+        connect(this,SIGNAL(sceneRootChanged(Qt3D::QEntity*)),jointVM,SLOT(setSceneRoot(Qt3D::QEntity*)));
+
+        break;
+    }
+    case (AbstractElement::FORCE):{
+
+        Force* force=new Force(this);
+        force->applicationPoint=args[1].value<QVector3D>();
+        force->vector=args[2].value<QVector3D>();
+        force->applicationElement=args[3].toString();
+        m_forces.append(force);
+
+        ForceVM* forceVM=new ForceVM(this);
+        forceVM->setEntityName(force->objectName());
+        forceVM->setObjectName(force->objectName()+QString("_VM"));
+        forceVM->setSceneRoot(m_sceneRoot);
+
+        force->setVM(forceVM);
+        /*Missing bindings*/
+        connect(this,SIGNAL(sceneRootChanged(Qt3D::QEntity*)),forceVM,SLOT(setSceneRoot(Qt3D::QEntity*)));
+
+        solve();
+        break;
 }
-void TwoDimensionalStaticsModule::removeElement(AbstractElement* element,bool update){
-    if(!element) return;
-    if(m_elements.contains(element->objectName())){
-        AbstractElement* old_val=m_elements[element->objectName()];
-        m_elements.remove(element->objectName());
+    default:
+        break;
+    }
+}
+
+void TwoDimensionalStaticsModule::removeElement( QString element,bool update){
+    AbstractElement* old_val=findChild<AbstractElement*>(element);
+    if(old_val){
         if(old_val->inherits("Joint")){
             m_joints.removeAll(qobject_cast<Joint*>(old_val));
             if(update)
@@ -42,20 +108,18 @@ void TwoDimensionalStaticsModule::removeElement(AbstractElement* element,bool up
         else if(old_val->inherits("Force")){
             m_forces.removeAll(qobject_cast<Force*>(old_val));
         }
-
+        old_val->deleteLater();
     }
 
 }
+
 AbstractElement* TwoDimensionalStaticsModule::getElement(QString elementName){
-    if(!m_elements.contains(elementName)) return NULL;
-    return m_elements[elementName];
+    return this->findChild<AbstractElement*>(elementName);
 }
 
 bool TwoDimensionalStaticsModule::containsElement(QString elementName){
-    return m_elements.contains(elementName);
+    return (this->findChild<AbstractElement*>(elementName)!=0);
 }
-
-
 
 bool TwoDimensionalStaticsModule::readStructure(QString path){
 
@@ -64,7 +128,6 @@ bool TwoDimensionalStaticsModule::readStructure(QString path){
         qWarning("Structure file not loaded");
         return false;
     }
-
     QTextStream in(&file);
     while (!in.atEnd()) {
         QString line = in.readLine();
@@ -73,28 +136,20 @@ bool TwoDimensionalStaticsModule::readStructure(QString path){
         if(parts.size()==0) continue;
         if(parts.at(0).compare("j")==0) {
             if(parts.size()<5) {qWarning("Structure file incorrect format"); return false;}
-            Joint* joint=new Joint(parts.at(4));
-            joint->setPosition(QVector3D( parts.at(1).toFloat(), parts.at(2).toFloat(), parts.at(3).toFloat()));
-            if(parts.size()<6)
-                joint->setSupport(Joint::NOSUPPORT);
-            else if(parts.at(5).compare("fixed",Qt::CaseInsensitive)==0){
-                joint->setSupport(Joint::FIXED);
-            }
-            else if(parts.at(5).compare("rolling",Qt::CaseInsensitive)==0){
-                joint->setSupport(Joint::ROLLING);
-            }
-            m_elements[joint->objectName()]=joint;
-            m_joints.append(joint);
+            QVariantList args;
+            args.append(parts.at(4));
+            args.append(QVector3D( parts.at(1).toFloat(), parts.at(2).toFloat(), parts.at(3).toFloat()));
+            if(parts.size()>=6)
+                args.append(parts.at(5));
+            createElement(AbstractElement::JOINT,args);
         }
         else if(parts.at(0).compare("m")==0){
             if(parts.size()<4) {qWarning("Structure file incorrect format"); return false;}
-            Beam* beam=new Beam(parts.at(3));
-            Joint* extreme1=m_joints.at(parts.at(1).toInt());
-            Joint* extreme2=m_joints.at(parts.at(2).toInt());
-            beam->extremes.first=extreme1;
-            beam->extremes.second=extreme2;
-            m_elements[beam->objectName()]=beam;
-            m_beams.append(beam);
+            QVariantList args;
+            args.append(parts.at(3));
+            args.append(qVariantFromValue((void*)m_joints.at(parts.at(1).toInt())));
+            args.append(qVariantFromValue((void*)m_joints.at(parts.at(2).toInt())));
+            createElement(AbstractElement::BEAM,args);
         }
     }
 
@@ -236,4 +291,6 @@ void TwoDimensionalStaticsModule::check_stability(){
     if(old_val!=m_stability)
         emit stabilityChanged();
 }
+
+
 

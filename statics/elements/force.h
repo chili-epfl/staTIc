@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QVector3D>
 #include "abstractelement.h"
+#include "statics/elements/forcevm.h"
 
 class Force : public AbstractElement
 {
@@ -15,6 +16,7 @@ public:
     QString applicationElement;
     QVector3D vector;
 
+
 signals:
 
 public slots:
@@ -22,7 +24,6 @@ public slots:
 private:    
     QString generateExternalForceID();
     static QList<int> last_ids;
-
 };
 
 #endif // FORCE_H

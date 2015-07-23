@@ -6,6 +6,7 @@
 
 #include "statics/elements/joint.h"
 #include "statics/elements/abstractelement.h"
+#include "statics/elements/beamvm.h"
 
 class Beam : public AbstractElement
 {
@@ -17,6 +18,10 @@ public:
     QPair<Joint*,Joint*> extremes;
     void setAxialForce(qreal val){this->axial_force=val;}
     qreal getAxialForce(){return axial_force;}
+
+
+
+
 private:
     qreal axial_force;
 

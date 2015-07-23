@@ -7,8 +7,7 @@
 #include "statics/elements/force.h"
 #include "statics/two_dimentions/twodimensionalstaticsmodule.h"
 #include "statics/abstracteventhandler.h"
-#include <QQmlEngine>
-#include <QQmlComponent>
+
 
 
 class TwoDimentionalEventHandler : public AbstractEventHandler
