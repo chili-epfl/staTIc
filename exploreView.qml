@@ -49,35 +49,18 @@ Item{
         }
     }
 
-    Connections{
-        target: mousearea
-        onCustomClicked:{
-            eventhandler.inputEventHandler(EventHandler2D.CLICKED,{"Point":p0,"Entity":entity});
-        }
-        onCustomDragged:{
-            eventhandler.inputEventHandler(EventHandler2D.DRAGGED,{"Point0":p0,"Entity0":p0_entity,
-                                                    "Point1":p1,"Entity1":p1_entity});
-        }
-        onCustomHeld:{
-            eventhandler.inputEventHandler(EventHandler2D.HELD,{"Point":p0,"Entity":entity,
-                                                    "Timespan":timespan});
-        }
-        onCustomHolding:{
-
-        }
-
-    }
 
     /*UI*/
     Item{
         id:topmenu
-
         anchors.horizontalCenter: parent.horizontalCenter
         y:0 ; z:1
         state: "HIDDEN"
         ColumnLayout{
             Row{
-                ToolBarComponent{id:toolspace}
+                ToolBarComponent{
+                    id:toolspace
+                }
             }
             Row{
                 Layout.alignment: Qt.AlignCenter
@@ -99,7 +82,6 @@ Item{
             }
 
         }
-
         states: [
             State {
                 name: "DISPLAYED"
@@ -164,6 +146,28 @@ Item{
 
 
     }
+
+    Connections{
+        target: mousearea
+        onCustomClicked:{
+            eventhandler.inputEventHandler(EventHandler2D.CLICKED,{"CurrentTool":toolspace.state,"Point":p0,"Entity":entity});
+        }
+        onCustomDragged:{
+            eventhandler.inputEventHandler(EventHandler2D.DRAGGED,{"CurrentTool":toolspace.state,"Point0":p0,"Entity0":p0_entity,
+                                                    "Point1":p1,"Entity1":p1_entity});
+        }
+        onCustomHeld:{
+            eventhandler.inputEventHandler(EventHandler2D.HELD,{"CurrentTool":toolspace.state,"Point":p0,"Entity":entity,
+                                                    "Timespan":timespan});
+        }
+        onCustomHolding:{
+
+        }
+
+    }
+
+
+
 
     /*3D Rendering*/
 

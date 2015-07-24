@@ -11,6 +11,8 @@ public:
 public slots:
     void onElementChanged();
     void onPropertyChanged(){};
+    void onElementDestroyed(){};
+
 private:
 };
 

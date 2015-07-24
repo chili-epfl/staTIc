@@ -10,7 +10,13 @@ ApplicationWindow {
     visible: true
     width: 2560
     height: 1600
-    color: "#0033CC"
+
+    Image{
+        anchors.fill: parent
+        fillMode: Image.Tile
+        id:background
+        source: "qrc:/images/images/woodbackground.png"
+    }
 
     /*Two variables hold the related files of the selected structure*/
     property string currentStructure_modelName: "";
@@ -47,10 +53,11 @@ ApplicationWindow {
             Layout.preferredWidth: parent.width
             Layout.preferredHeight: parent.height*0.2
             Layout.alignment: Qt.AlignCenter
-
-            Text{
-                text: "StaTIc"
-                font.pixelSize: pt2px(20)
+            Image{
+                anchors.centerIn: parent
+                anchors.fill: parent
+                fillMode: Image.PreserveAspectFit
+                source:"qrc:/images/images/mainbanner.png"
             }
         }
 
@@ -74,6 +81,7 @@ ApplicationWindow {
                     Image {
                         anchors.fill: parent
                         anchors.margins: 10
+                        fillMode: Image.PreserveAspectFit
                         source: decoration;
                     }
                     }

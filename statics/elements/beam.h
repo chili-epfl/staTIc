@@ -19,9 +19,6 @@ public:
     void setAxialForce(qreal val){this->axial_force=val;}
     qreal getAxialForce(){return axial_force;}
 
-
-
-
 private:
     qreal axial_force;
 

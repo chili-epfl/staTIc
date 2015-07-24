@@ -26,21 +26,30 @@ void JointVM::onElementChanged(){
     Joint* joint=qobject_cast<Joint*>(m_element);
     qDebug()<< joint->getReaction();
 
-    Qt3D::QEntity *forceEntity =m_sceneRoot->findChild<Qt3D::QEntity*>(m_entity_name+"_REACT");
+    if(joint->getReaction().length()>=EPSILON){
 
-    if(!forceEntity){
-        /*Create the entity*/
-        QQmlComponent component(&engine,QUrl("qrc:/ReactionArrow.qml"));
-        forceEntity = qobject_cast<Qt3D::QEntity*>(component.create());
-        forceEntity->setObjectName(m_entity_name+"_REACT");
-        forceEntity->setParent(m_sceneRoot->findChild<Qt3D::QNode*>("Model"));
+        Qt3D::QEntity *forceEntity =m_sceneRoot->findChild<Qt3D::QEntity*>(m_entity_name+"_REACT");
+        if(!forceEntity){
+            /*Create the entity*/
+            QQmlComponent component(&engine,QUrl("qrc:/ReactionArrow.qml"));
+            forceEntity = qobject_cast<Qt3D::QEntity*>(component.create());
+            forceEntity->setObjectName(m_entity_name+"_REACT");
+            forceEntity->setParent(m_sceneRoot->findChild<Qt3D::QNode*>("Model"));
+
+        }
+
+        forceEntity->setProperty("myAngle",atan2(joint->getReaction().y(),joint->getReaction().x()));
+        forceEntity->setProperty("positionX",joint->getPosition().x());
+        forceEntity->setProperty("positionY",joint->getPosition().y());
+        forceEntity->setProperty("positionZ",joint->getPosition().z());
+        forceEntity->setProperty("arrowLength",joint->getReaction().length()*15);
+        forceEntity->setProperty("visible",true);
+
     }
-
-    forceEntity->setProperty("myAngle",atan2(joint->getReaction().y(),joint->getReaction().x()));
-    forceEntity->setProperty("positionX",joint->getPosition().x());
-    forceEntity->setProperty("positionY",joint->getPosition().y());
-    forceEntity->setProperty("positionZ",joint->getPosition().z());
-    forceEntity->setProperty("arrowLength",joint->getReaction().length()*15);
-
-
+     else{
+        Qt3D::QEntity *forceEntity =m_sceneRoot->findChild<Qt3D::QEntity*>(m_entity_name+"_REACT");
+        if(forceEntity){
+            forceEntity->setProperty("visible",false);
+        }
+    }
 }

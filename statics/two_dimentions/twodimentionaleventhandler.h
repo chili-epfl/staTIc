@@ -21,6 +21,9 @@ public slots:
     void inputEventHandler(EventType type, QVariantMap args);
 
 private:
+    void inputEventHandlerOnSelect(EventType type, QVariantMap args);
+    void inputEventHandlerOnForce(EventType type, QVariantMap args);
+    void inputEventHandlerOnDelete(EventType type, QVariantMap args);
 
 };
 

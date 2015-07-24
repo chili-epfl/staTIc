@@ -27,7 +27,7 @@ Entity{
 
     }
     Entity{
-
+        objectName: parent.objectName
         CylinderMesh{
             id:tail_mesh
 

@@ -20,10 +20,11 @@ class TwoDimensionalStaticsModule : public AbstractStaticsModule
 public:
     TwoDimensionalStaticsModule(QObject* parent=0);
     void createElement(AbstractElement::Element_Type type, QVariantList args );
-    void removeElement(QString element){removeElement(element,false);}
+    void removeElement(QString element){removeElement(element,true);}
     AbstractElement* getElement(QString elementName);
     bool containsElement(QString elementName);
-
+public slots:
+    void onForceUpdate(){solve();}
 protected:
     bool readStructure(QString path);
     void update();

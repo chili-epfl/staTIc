@@ -62,6 +62,7 @@ void TwoDimensionalStaticsModule::createElement(AbstractElement::Element_Type ty
         jointVM->setSceneRoot(m_sceneRoot);
 
         joint->setVM(jointVM);
+
         /*Missing bindings*/
         connect(this,SIGNAL(sceneRootChanged(Qt3D::QEntity*)),jointVM,SLOT(setSceneRoot(Qt3D::QEntity*)));
 
@@ -70,10 +71,11 @@ void TwoDimensionalStaticsModule::createElement(AbstractElement::Element_Type ty
     case (AbstractElement::FORCE):{
 
         Force* force=new Force(this);
-        force->applicationPoint=args[1].value<QVector3D>();
-        force->vector=args[2].value<QVector3D>();
-        force->applicationElement=args[3].toString();
+        force->setApplicationPoint(args[1].value<QVector3D>());
+        force->setVector(args[2].value<QVector3D>());
+        force->setApplicationElement(args[3].toString());
         m_forces.append(force);
+        connect(force,SIGNAL(elementChanged()),this,SLOT(onForceUpdate()));
 
         ForceVM* forceVM=new ForceVM(this);
         forceVM->setEntityName(force->objectName());
@@ -83,7 +85,6 @@ void TwoDimensionalStaticsModule::createElement(AbstractElement::Element_Type ty
         force->setVM(forceVM);
         /*Missing bindings*/
         connect(this,SIGNAL(sceneRootChanged(Qt3D::QEntity*)),forceVM,SLOT(setSceneRoot(Qt3D::QEntity*)));
-
         solve();
         break;
 }
@@ -96,19 +97,29 @@ void TwoDimensionalStaticsModule::removeElement( QString element,bool update){
     AbstractElement* old_val=findChild<AbstractElement*>(element);
     if(old_val){
         if(old_val->inherits("Joint")){
-            m_joints.removeAll(qobject_cast<Joint*>(old_val));
-            if(update)
+            /*m_joints.removeAll(qobject_cast<Joint*>(old_val));
+            if(update){
                 this->update();
+                solve();
+
+            }*/
+            old_val->deleteLater();
+
         }
         else if(old_val->inherits("Beam")){
-            m_beams.removeAll(qobject_cast<Beam*>(old_val));
-            if(update)
+            /*m_beams.removeAll(qobject_cast<Beam*>(old_val));
+            if(update){
                 this->update();
+                solve();
+            }*/
+            old_val->deleteLater();
+
         }
         else if(old_val->inherits("Force")){
             m_forces.removeAll(qobject_cast<Force*>(old_val));
+            solve();
+            old_val->deleteLater();
         }
-        old_val->deleteLater();
     }
 
 }
@@ -167,9 +178,9 @@ void TwoDimensionalStaticsModule::solve(){
     int i=0;
     for(Joint* joint : m_joints){
         for(Force* force :m_forces){
-            if(force->applicationElement.compare(joint->objectName())==0){
-                external_forces_matrix.at<float>(i,0)=external_forces_matrix.at<float>(i,0)+force->vector.x();
-                external_forces_matrix.at<float>(i+1,0)=external_forces_matrix.at<float>(i+1,0)+force->vector.y();
+            if(force->getApplicationElement().compare(joint->objectName())==0){
+                external_forces_matrix.at<float>(i,0)=external_forces_matrix.at<float>(i,0)+force->getVector().x();
+                external_forces_matrix.at<float>(i+1,0)=external_forces_matrix.at<float>(i+1,0)+force->getVector().y();
                 //external_forces_matrix.at<float>(i+2,0)=external_forces_matrix.at<float>(i+2,0)+force.second.z();
             }
         }

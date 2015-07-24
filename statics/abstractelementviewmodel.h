@@ -20,6 +20,8 @@ public slots:
     void setSceneRoot(Qt3D::QEntity* sceneRoot){m_sceneRoot=sceneRoot;emit propertyChanged();}
     virtual void onElementChanged()=0;
     virtual void onPropertyChanged()=0;
+    virtual void onElementDestroyed()=0;
+
 protected:
     Qt3D::QEntity* m_sceneRoot;
     QString m_entity_name;

@@ -5,6 +5,8 @@
 #include <Qt3DCore>
 #include "statics/abstractelementviewmodel.h"
 
+#define EPSILON 0.001
+
 class AbstractElement : public QObject
 {
     Q_OBJECT
@@ -12,11 +14,11 @@ public:
     enum Element_Type{JOINT,BEAM,FORCE};
     AbstractElement(QObject *parent = 0);
     AbstractElement(QString name, QObject *parent = 0);
-
     void setVM(AbstractElementViewModel* vm){
         m_vm=vm;
         m_vm->setElement(this);
         connect(this,SIGNAL(elementChanged()),m_vm,SLOT(onElementChanged()));
+        connect(this,SIGNAL(destroyed(QObject*)),m_vm,SLOT(onElementDestroyed()));
     }
 
 signals:

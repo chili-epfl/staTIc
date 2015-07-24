@@ -9,10 +9,12 @@ Entity{
     property real positionY: 0;
     property real positionZ: 0;
     property real coneLength: 18
+    property bool visible: true
 
     Mesh{
         id:tip_mesh
         source:"qrc:/icons/icons/arrow_ble.obj"
+        enabled: visible;
     }
     Transform{
         id:tip_transform
@@ -31,11 +33,12 @@ Entity{
 
     }
     Entity{
-
+        objectName: parent.objectName
         CylinderMesh{
             id:tail_mesh
             radius: 10
             length: arrowLength
+            enabled: visible;
         }
         Transform{
             id:tail_transform
