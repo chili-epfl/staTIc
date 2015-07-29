@@ -37,7 +37,7 @@ public:
     QVariant eventHandler(){return qVariantFromValue((void*)m_event_handler);}
     Qt3D::QEntity* sceneRoot(){return m_sceneRoot;}
 
-    virtual void createElement(AbstractElement::Element_Type type, QVariantList args )=0;
+    virtual AbstractElement* createElement(AbstractElement::Element_Type type, QVariantList args )=0;
     virtual void removeElement(QString element)=0;
     virtual AbstractElement* getElement(QString elementName)=0;
     virtual bool containsElement(QString elementName)=0;

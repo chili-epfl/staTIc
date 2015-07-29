@@ -9,9 +9,21 @@ class BeamVM : public AbstractElementViewModel
 public:
     BeamVM(QObject* parent=0);
 public slots:
-    void onElementChanged(){};
-    void onPropertyChanged(){};
-    void onElementDestroyed(){};
+    void onElementNameChanged(QString name);
+    void onElementDestroyed();
+    void onElementVmChanged();
+
+    void onBeamExtremesChanged();
+    void onBeamAxialForceChanged(qreal val);
+
+    void onElementSelected();
+    void onStatusComplete();
+
+signals:
+    void updateForceMagnitude(qreal val);
+    void updateForceDirectionEx1(qreal val);
+    void updateForceDirectionEx2(qreal val);
+
 
 };
 

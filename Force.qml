@@ -9,21 +9,15 @@ Entity{
     property real positionY: 0;
     property real positionZ: 0;
     property real coneLength: 18
-    property bool visible: true
-
     Mesh{
         id:tip_mesh
         source:"qrc:/icons/icons/arrow_ble.obj"
-        enabled: visible;
     }
     Transform{
         id:tip_transform
-        Translate{
-              dx:-(arrowLength+coneLength);
-        }
         Rotate{
             axis:Qt.vector3d(0,0,1)
-            angleRad: myAngle > 0 ? 3.14-myAngle : 3.14+myAngle
+            angleRad: myAngle
         }
         Translate{
               dx:positionX;
@@ -32,13 +26,14 @@ Entity{
         }
 
     }
+
     Entity{
         objectName: parent.objectName
         CylinderMesh{
             id:tail_mesh
             radius: 10
             length: arrowLength
-            enabled: visible;
+
         }
         Transform{
             id:tail_transform
@@ -63,7 +58,4 @@ Entity{
          }
     components: [tip_mesh,floorMaterial,tip_transform]
 }
-
-
-
 

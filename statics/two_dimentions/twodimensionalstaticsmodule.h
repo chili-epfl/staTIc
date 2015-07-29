@@ -19,7 +19,7 @@ class TwoDimensionalStaticsModule : public AbstractStaticsModule
     Q_OBJECT
 public:
     TwoDimensionalStaticsModule(QObject* parent=0);
-    void createElement(AbstractElement::Element_Type type, QVariantList args );
+    AbstractElement* createElement(AbstractElement::Element_Type type, QVariantList args );
     void removeElement(QString element){removeElement(element,true);}
     AbstractElement* getElement(QString elementName);
     bool containsElement(QString elementName);

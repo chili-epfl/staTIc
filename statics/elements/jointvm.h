@@ -1,7 +1,8 @@
 #ifndef JOINTVM_H
 #define JOINTVM_H
 #include "statics/abstractelementviewmodel.h"
-#include "statics/elements/joint.h"
+
+class Joint;
 
 class JointVM:public AbstractElementViewModel
 {
@@ -9,10 +10,23 @@ class JointVM:public AbstractElementViewModel
 public:
     JointVM(QObject* parent=0);
 public slots:
-    void onElementChanged();
-    void onPropertyChanged(){};
-    void onElementDestroyed(){};
+    void onElementNameChanged(QString val);
+    void onElementDestroyed();
+    void onElementVmChanged();
 
+
+    void onJointReactionChanged(QVector3D val);
+    void onJointPositionChanged(QVector3D val);
+    void onJointSupportTypeChanged();
+    void onJointConnectedBeamsChanged();
+
+
+    void onElementSelected();
+    void onStatusComplete();
+
+signals:
+    void updateReactionDirection(qreal val);
+    void updateReactionMagnitude(qreal val);
 private:
 };
 

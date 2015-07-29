@@ -161,7 +161,8 @@ Item{
                                                     "Timespan":timespan});
         }
         onCustomHolding:{
-
+            eventhandler.inputEventHandler(EventHandler2D.HOLDING,{"CurrentTool":toolspace.state,"Point0":p0,"Entity0":p0_entity,
+                                                    "Point1":p1,"Entity1":p1_entity,"Timespan":timespan});
         }
 
     }
@@ -211,7 +212,7 @@ Item{
             signal customClicked (vector2d p0,variant entity);
             signal customDragged (vector2d p0,variant p0_entity,vector2d p1,variant p1_entity);
             signal customHeld (vector2d p0,variant entity,int timespan);
-            signal customHolding (int timespan);
+            signal customHolding (vector2d p0,variant p0_entity,vector2d p1,variant p1_entity,int timespan);
 
             Timer {
                 id:fastReleaseTimer
@@ -223,7 +224,9 @@ Item{
                 interval: 100; running: false; repeat: true
                 onTriggered: {
                     parent.timespan+=interval
-                    parent.customHolding(parent.timespan);
+                    var p_tmp=Qt.vector2d((2.0 * parent.mouseX)/parent.width - 1.0,1.0-(2.0 * parent.mouseY)/parent.height);
+                    var p_tmp_entity=mouseInterface.select(p_tmp);
+                    parent.customHolding(parent.p0_normalized,parent.p0_entity,p_tmp,p_tmp_entity,parent.timespan);
                 }
             }
             state:"IDLE"

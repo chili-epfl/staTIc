@@ -17,7 +17,8 @@ SOURCES += main.cpp \
     statics/abstractelementviewmodel.cpp \
     statics/elements/beamvm.cpp \
     statics/elements/forcevm.cpp \
-    statics/elements/jointvm.cpp
+    statics/elements/jointvm.cpp \
+    staticshelper.cpp
 HEADERS += \
     structureitemmodel.h \
     statics/two_dimentions/twodimensionalstaticsmodule.h \
@@ -32,8 +33,8 @@ HEADERS += \
     statics/abstractelementviewmodel.h \
     statics/elements/beamvm.h \
     statics/elements/forcevm.h \
-    statics/elements/jointvm.h
-
+    statics/elements/jointvm.h \
+    staticshelper.h
 
 RESOURCES += qml.qrc
 

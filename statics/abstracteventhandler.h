@@ -11,7 +11,7 @@ class AbstractEventHandler : public QObject
     Q_ENUMS(EventType)
     Q_PROPERTY(Qt3D::QCamera* camera READ camera WRITE setCamera)
 public:
-    enum EventType{CLICKED,DRAGGED,HELD};
+    enum EventType{CLICKED,DRAGGED,HELD,HOLDING};
 
     explicit AbstractEventHandler(QObject *parent = 0);
 
@@ -20,6 +20,7 @@ public:
 
     void setSceneRoot(Qt3D::QEntity* sceneRoot){this->m_sceneRoot=sceneRoot;}
     void setStaticsModule(AbstractStaticsModule* staticsModule){m_staticsModule=staticsModule;}
+
 signals:
 
 public slots:

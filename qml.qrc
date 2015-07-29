@@ -3,9 +3,9 @@
         <file>main.qml</file>
         <file>exploreView.qml</file>
         <file>Scene.qml</file>
-        <file>ArrowComponent.qml</file>
-        <file>ReactionArrow.qml</file>
+        <file>ForceArrow.qml</file>
         <file>ToolBarComponent.qml</file>
+        <file>FreeBodyDiagram.qml</file>
     </qresource>
     <qresource prefix="/models">
         <file>models/Model1/Model1.png</file>
