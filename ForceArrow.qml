@@ -3,8 +3,13 @@ import Qt3D.Renderer 2.0
 
 
 Entity{
+    property real ratioNL:50
+    property real scaleFactor: 0.5
+    property real minThreshold: 0.01
+    property bool tooSmall: false
+
     property real myAngle:0;
-    property real arrowLength:10;
+    property real arrowLength:ratioNL;
     property vector3d position: Qt.vector3d(0,0,0)
     property bool visible: true
     property bool isPointingAtPosition:true;
@@ -19,31 +24,36 @@ Entity{
     onChangePosition: position=pos
 
     signal changeArrowLength (real val)
-    onChangeArrowLength: { arrowLength=val}
+    onChangeArrowLength: { arrowLength=val*ratioNL; }
 
     signal changeMyAngle (real val)
     onChangeMyAngle: myAngle=val
 
+    onArrowLengthChanged: {arrowLength > minThreshold ? tooSmall=false: tooSmall=true}
 
     property real coneLength: 18
+
     Mesh{
         id:tip_mesh
         source:"qrc:/icons/icons/arrow_ble.obj"
-        enabled: visible;
+        enabled: visible && !tooSmall;
     }
     Transform{
         id:tip_transform_TailOnPos
         Translate{
               dx:-(arrowLength+coneLength);
-
         }
         Rotate{
             axis:Qt.vector3d(0,0,1)
             angleRad: 3.14+myAngle
         }
+        Scale{
+         scale: scaleFactor;
+        }
         Translate{
              translation: position
         }
+
     }
 
     Transform{
@@ -52,9 +62,13 @@ Entity{
             axis:Qt.vector3d(0,0,1)
             angleRad: 3.14+myAngle
         }
+        Scale{
+         scale: scaleFactor;
+        }
         Translate{
             translation: position
         }
+
     }
 
 
@@ -64,7 +78,7 @@ Entity{
             id:tail_mesh
             radius: 10
             length: arrowLength
-            enabled: visible;
+            enabled: visible && !tooSmall;
         }
         Transform{
             id:tail_transform

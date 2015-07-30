@@ -24,7 +24,7 @@ public:
     qreal axialForce(){return m_axial_force;}
 
     QPair<Joint*,Joint*> extremes(){return m_extremes;}
-    void setExtremes(QPair<Joint*,Joint*> extremes){if(m_extremes!=extremes){m_extremes=extremes;emit extremesChanged();}}
+    void setExtremes(QPair<Joint*,Joint*> extremes);
 
     AbstractElementViewModel* vm(){return (AbstractElementViewModel* )m_vm;}
     void setVm(AbstractElementViewModel* vm);
@@ -32,6 +32,7 @@ public:
 signals:
     void extremesChanged();
     void axialForceChanged(qreal axialForce);
+
 private:
     qreal m_axial_force;
     BeamVM* m_vm;

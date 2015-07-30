@@ -18,6 +18,12 @@ QMatrix4x4 getTranformationMatrix(Qt3D::QEntity* entity){
     else return getTranformationMatrix(entity->parentEntity());
 }
 
+
+qreal mapScreenDistanceToNewtons(qreal val){
+    if(val>2) val=2;
+    return val;
+}
+
 TwoDimentionalEventHandler::TwoDimentionalEventHandler(QObject* parent):
     AbstractEventHandler(parent)
 {
@@ -47,21 +53,21 @@ void TwoDimentionalEventHandler::inputEventHandlerOnSelect(EventType type, QVari
         QVector2D point=args["Point"].value<QVector2D>();
         Qt3D::QEntity* entity=args["Entity"].value<Qt3D::QEntity*>();
         if(!entity) return;
+
         AbstractElement* entity_element=m_staticsModule->getElement(StaticsHelper::NameResolution(entity->objectName(),
                                                                                                   StaticsHelper::Roles::ENTITY3D,StaticsHelper::Roles::MODEL));
-
         if(!entity_element) return;
 
         if(entity_element->inherits("Joint")){
             JointVM* tmp=m_staticsModule->findChild<JointVM*>(StaticsHelper::NameResolution(entity->objectName(),
                                                                                             StaticsHelper::Roles::ENTITY3D,StaticsHelper::Roles::VIEWMODEL));
-            tmp->onElementSelected();
+            tmp->select();
         }
         else if (entity_element->inherits("Beam")){
 
             BeamVM* tmp=m_staticsModule->findChild<BeamVM*>(StaticsHelper::NameResolution(entity->objectName(),
                                                                                           StaticsHelper::Roles::ENTITY3D,StaticsHelper::Roles::VIEWMODEL));
-            tmp->onElementSelected();
+            tmp->select();
 
         }
 
@@ -117,7 +123,7 @@ void TwoDimentionalEventHandler::inputEventHandlerOnForce(EventType type, QVaria
                 QVariantList args;
                 args.append("");
                 args.append(p03D);
-                args.append(QVector3D(diff3D.x(),diff3D.y(),0).normalized());
+                args.append(QVector3D(diff3D.x(),diff3D.y(),0).normalized()*mapScreenDistanceToNewtons(diff2D.length()));
                 args.append(QString());
                 args.append(false);
 
@@ -125,7 +131,7 @@ void TwoDimentionalEventHandler::inputEventHandlerOnForce(EventType type, QVaria
                     currentHoldingFocus=dynamic_cast<Force*>(m_staticsModule->createElement(AbstractElement::FORCE,args));
                 }
                 else{
-                    currentHoldingFocus->setVector(QVector3D(diff3D.x(),diff3D.y(),0).normalized());
+                    currentHoldingFocus->setVector(QVector3D(diff3D.x(),diff3D.y(),0).normalized()*mapScreenDistanceToNewtons(diff2D.length()));
                 }
             }
             else{
@@ -149,10 +155,10 @@ void TwoDimentionalEventHandler::inputEventHandlerOnForce(EventType type, QVaria
                             currentHoldingFocus->setApplicationPoint(QVector3D(element->position()));
                             currentHoldingFocus->setApplicationElement(element->objectName());
                        }
-                       currentHoldingFocus->setVector(QVector3D(diff3D.x(),diff3D.y(),0).normalized());
+                       currentHoldingFocus->setVector(QVector3D(diff3D.x(),diff3D.y(),0).normalized()*mapScreenDistanceToNewtons(diff2D.length()));
                        ForceVM* vm=m_staticsModule->findChild<ForceVM*>(StaticsHelper::NameResolution(currentHoldingFocus->objectName(),
                                                                                                       StaticsHelper::Roles::MODEL,StaticsHelper::Roles::VIEWMODEL));
-                       vm->setHasTipOnApplicationPoint(true);
+                       vm->setTipOnApplicationPoint(true);
 
                    }
 
@@ -182,7 +188,7 @@ void TwoDimentionalEventHandler::inputEventHandlerOnForce(EventType type, QVaria
                     QVariantList args;
                     args.append("");
                     args.append(QVector3D(element->position()));
-                    args.append(QVector3D(diff3D.x(),diff3D.y(),0).normalized());
+                    args.append(QVector3D(diff3D.x(),diff3D.y(),0).normalized()*mapScreenDistanceToNewtons(diff2D.length()));
                     args.append(element->objectName());
                     args.append(false);
 
@@ -196,7 +202,7 @@ void TwoDimentionalEventHandler::inputEventHandlerOnForce(EventType type, QVaria
                     QVector2D diff2D=p1-p0;
                     QVector3D diff3D(diff2D,0);
                     diff3D=matrix.inverted().mapVector(diff3D);
-                    element->setVector(QVector3D(diff3D.x(),diff3D.y(),0).normalized());
+                    element->setVector(QVector3D(diff3D.x(),diff3D.y(),0).normalized()*mapScreenDistanceToNewtons(diff2D.length()));
                     currentHoldingFocus=element;
                 }
             }
@@ -205,7 +211,7 @@ void TwoDimentionalEventHandler::inputEventHandlerOnForce(EventType type, QVaria
                 QVector2D diff2D=p1-p0;
                 QVector3D diff3D(diff2D,0);
                 diff3D=matrix.inverted().mapVector(diff3D);
-                currentHoldingFocus->setVector(QVector3D(diff3D.x(),diff3D.y(),0).normalized());
+                currentHoldingFocus->setVector(QVector3D(diff3D.x(),diff3D.y(),0).normalized()*mapScreenDistanceToNewtons(diff2D.length()));
             }
         }
     }

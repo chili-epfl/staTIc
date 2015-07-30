@@ -29,3 +29,14 @@ void Beam::setVm(AbstractElementViewModel *vm){
     connect(this,SIGNAL(axialForceChanged(qreal)),m_vm,SLOT(onBeamAxialForceChanged(qreal)));
 
 }
+
+void Beam::setExtremes(QPair<Joint *, Joint *> extremes){
+    if(m_extremes!=extremes){
+        m_extremes=extremes;
+        connect(this,SIGNAL(extremesChanged()),m_extremes.first,SIGNAL(connectedBeamsChanged()));
+        connect(this,SIGNAL(extremesChanged()),m_extremes.second,SIGNAL(connectedBeamsChanged()));
+        emit extremesChanged();
+    }
+
+
+}

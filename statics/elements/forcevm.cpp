@@ -3,6 +3,7 @@
 #include "staticshelper.h"
 ForceVM::ForceVM(QObject* parent):AbstractElementViewModel(parent)
 {
+    m_visible=true;
     m_hasTipOnApplicationPoint=true;
 }
 
@@ -25,7 +26,7 @@ void ForceVM::onForceApplicationElementChanged(QString val){
 
 void ForceVM::onForceVectorChanged(QVector3D val){
     emit updateForceDirection(atan2(val.y(),val.x()));
-    emit updateForceMagnitude(val.length()*15);
+    emit updateForceMagnitude(val.length());
 
 }
 
@@ -52,12 +53,15 @@ void  ForceVM::onStatusComplete(){
     Force* element=qobject_cast<Force*>(m_element);
     forceEntity->setProperty("myAngle",atan2(element->vector().y(),element->vector().x()));
     forceEntity->setProperty("position",element->applicationPoint());
-    forceEntity->setProperty("arrowLength",element->vector().length()*15);
+    forceEntity->setProperty("arrowLength",element->vector().length());
     forceEntity->setProperty("isPointingAtPosition",m_hasTipOnApplicationPoint);
+    forceEntity->setProperty("visible",m_visible);
 
     connect(this,SIGNAL(updateForceDirection(qreal)),forceEntity,SIGNAL(changeMyAngle(qreal)));
     connect(this,SIGNAL(updateForceMagnitude(qreal)),forceEntity,SIGNAL(changeArrowLength(qreal)));
     connect(this,SIGNAL(updateForcePosition(QVector3D)),forceEntity,SIGNAL(changePosition(QVector3D)));
+    connect(this,SIGNAL(visibilityChanged(bool)),forceEntity,SIGNAL(changeVisible(bool)));
+    connect(this,SIGNAL(tipOnApplicationPointChanged(bool)),forceEntity,SIGNAL(changeIsPointingAtPosition(bool)));
 
 }
 

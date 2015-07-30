@@ -4,7 +4,7 @@
 
 BeamVM::BeamVM(QObject* parent):AbstractElementViewModel(parent)
 {
-
+    m_visible=false;
 }
 
 
@@ -26,14 +26,15 @@ void BeamVM::onStatusComplete(){
 
     forceEntity1->setProperty("myAngle",atan2(dir.y(),dir.x()));
     forceEntity1->setProperty("position",extreme1->position());
-    forceEntity1->setProperty("arrowLength",fabs(beam->axialForce())*15);
+    forceEntity1->setProperty("arrowLength",fabs(beam->axialForce()));
     forceEntity1->setProperty("isPointingAtPosition",false);
-    forceEntity1->setProperty("visible",false);
+    forceEntity1->setProperty("visible",m_visible);
 
     connect(this,SIGNAL(updateForceMagnitude(qreal)),forceEntity1,SIGNAL(changeArrowLength(qreal)));
 
     connect(this,SIGNAL(updateForceDirectionEx1(qreal)),forceEntity1,SIGNAL(changeMyAngle(qreal)));
 
+    connect(this,SIGNAL(visibilityChanged(bool)),forceEntity1,SIGNAL(changeVisible(bool)));
 
     forceEntity1->setObjectName(StaticsHelper::NameResolution(m_entity_name,
                                                               StaticsHelper::Roles::MODEL,StaticsHelper::Roles::F_INTERNAL));
@@ -43,13 +44,15 @@ void BeamVM::onStatusComplete(){
 
     forceEntity2->setProperty("myAngle",atan2(-dir.y(),-dir.x()));
     forceEntity2->setProperty("position",extreme2->position());
-    forceEntity2->setProperty("arrowLength",fabs(beam->axialForce())*15);
+    forceEntity2->setProperty("arrowLength",fabs(beam->axialForce()));
     forceEntity2->setProperty("isPointingAtPosition",false);
-    forceEntity2->setProperty("visible",false);
+    forceEntity2->setProperty("visible",m_visible);
 
     connect(this,SIGNAL(updateForceMagnitude(qreal)),forceEntity2,SIGNAL(changeArrowLength(qreal)));
 
     connect(this,SIGNAL(updateForceDirectionEx2(qreal)),forceEntity2,SIGNAL(changeMyAngle(qreal)));
+
+    connect(this,SIGNAL(visibilityChanged(bool)),forceEntity2,SIGNAL(changeVisible(bool)));
 
     forceEntity2->setObjectName(StaticsHelper::NameResolution(m_entity_name,
                                                               StaticsHelper::Roles::MODEL,StaticsHelper::Roles::F_INTERNAL));
@@ -57,10 +60,7 @@ void BeamVM::onStatusComplete(){
 
 }
 
-void BeamVM::onElementSelected(){
 
-
-}
 
 void BeamVM::onElementNameChanged(QString name){
 

@@ -32,11 +32,15 @@ AbstractElement* TwoDimensionalStaticsModule::createElement(AbstractElement::Ele
         extremes.first=(Joint*)args[1].value<void*>();
         extremes.second=(Joint*)args[2].value<void*>();
 
-        beam->setExtremes(extremes);
-        m_beams.append(beam);
-
         extremes.first->connected_beams.append(beam);
         extremes.second->connected_beams.append(beam);
+        /*IMPORTANT: the order is important because is actually beam that is triggering the signal
+        connectedBeamsChange in the joint class*/
+        beam->setExtremes(extremes);
+
+        m_beams.append(beam);
+
+
 
         BeamVM* beamVM=new BeamVM(this);
         beamVM->setEntityName(beam->objectName());
@@ -98,7 +102,7 @@ AbstractElement* TwoDimensionalStaticsModule::createElement(AbstractElement::Ele
                                                              StaticsHelper::Roles::MODEL,StaticsHelper::Roles::VIEWMODEL));
         forceVM->setSceneRoot(m_sceneRoot);
         if(args.size()>4)
-            forceVM->setHasTipOnApplicationPoint(args[4].toBool());
+            forceVM->setTipOnApplicationPoint(args[4].toBool());
 
         force->setVm(forceVM);
 
