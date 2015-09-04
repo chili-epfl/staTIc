@@ -2,7 +2,7 @@
 #include "statics/elements/beam.h"
 #include "staticshelper.h"
 
-BeamVM::BeamVM(Beam* beam,Qt3D::QEntity* sceneRoot,QObject* parent):AbstractElementViewModel(sceneRoot,parent)
+BeamVM::BeamVM(Beam* beam,QObject* uiRoot,Qt3D::QEntity* sceneRoot,QObject* parent):AbstractElementViewModel(uiRoot,sceneRoot,parent)
 {
     m_beam=beam;
     m_visible=false;

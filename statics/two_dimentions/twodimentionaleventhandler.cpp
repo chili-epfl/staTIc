@@ -22,7 +22,6 @@ QMatrix4x4 getTranformationMatrix(Qt3D::QEntity* entity){
     else return getTranformationMatrix(entity->parentEntity());
 }
 
-
 qreal mapScreenDistanceToNewtons(qreal val){
     if(val>2) val=2;
     return val;
@@ -34,29 +33,17 @@ TwoDimentionalEventHandler::TwoDimentionalEventHandler(QObject* parent):
     AbstractEventHandler(parent)
 {
     m_staticsModule=Q_NULLPTR;
-}
+    connect(this,SIGNAL(uiRootChanged()),this,SLOT(initViewModels()));
+    connect(this,SIGNAL(sceneRootChanged()),this,SLOT(initViewModels()));
+    connect(this,SIGNAL(staticsModuleChanged()),this,SLOT(initViewModels()));
 
-void TwoDimentionalEventHandler::setStaticsModule(QVariant staticsModule ){
-    TwoDimensionalStaticsModule* staticsModule_cast=staticsModule.value<TwoDimensionalStaticsModule*>();
-    if(staticsModule_cast){
-        m_staticsModule=staticsModule_cast;
-        initViewModels();
-    }
-    else{
-        qWarning("SetStaticsModule: Invalid argument");
-    }
-}
-
-void TwoDimentionalEventHandler::setSceneRoot(Qt3D::QEntity *sceneRoot){
-    AbstractEventHandler::setSceneRoot(sceneRoot);
-    initViewModels();
 }
 
 void TwoDimentionalEventHandler::initViewModels(){
-    if(m_staticsModule==Q_NULLPTR || m_sceneRoot==Q_NULLPTR) return;
+    if(m_staticsModule==Q_NULLPTR || m_sceneRoot==Q_NULLPTR || m_uiRoot==Q_NULLPTR) return;
 
     for (Joint* joint:m_staticsModule->m_joints){
-        JointVM* jointVM=new JointVM(joint,m_sceneRoot,this);
+        JointVM* jointVM=new JointVM(joint,m_uiRoot,m_sceneRoot,this);
         m_viewmodels.insert(jointVM);
         Qt3D::QEntity* entity= m_sceneRoot->findChild<Qt3D::QEntity*>(joint->objectName());
         if(entity){
@@ -65,7 +52,7 @@ void TwoDimentionalEventHandler::initViewModels(){
         }
     }
     for(Beam* beam: m_staticsModule->m_beams){
-        BeamVM* beamVM=new BeamVM(beam,m_sceneRoot,this);
+        BeamVM* beamVM=new BeamVM(beam,m_uiRoot,m_sceneRoot,this);
         m_viewmodels.insert(beamVM);
         Qt3D::QEntity* entity= m_sceneRoot->findChild<Qt3D::QEntity*>(beam->objectName());
         if(entity){
@@ -78,6 +65,18 @@ void TwoDimentionalEventHandler::initViewModels(){
     }
 
 }
+
+void TwoDimentionalEventHandler::setStaticsModule(QVariant staticsModule ){
+    TwoDimensionalStaticsModule* staticsModule_cast=staticsModule.value<TwoDimensionalStaticsModule*>();
+    if(staticsModule_cast){
+        m_staticsModule=staticsModule_cast;
+        emit staticsModuleChanged();
+    }
+    else{
+        qWarning("SetStaticsModule: Invalid argument");
+    }
+}
+
 
 
 /*Tool definition
@@ -94,6 +93,8 @@ void TwoDimentionalEventHandler::initViewModels(){
 *   args[Point] -> QVector2D mouse position normalized
 *   args[Entity] -> QEntity*
 *   args[Timespan] -> timespan
+*
+*   Eventually all these will be implemented as tool classes and this class be becanme a simple dispacher.
 */
 
 
@@ -101,22 +102,26 @@ void TwoDimentionalEventHandler::inputEventHandlerOnSelect(EventType type, QVari
     if(type==CLICKED){
         if(args.size()!=3) return;
         Qt3D::QEntity* entity=args["Entity"].value<Qt3D::QEntity*>();
-        if(!entity) return;
+        if(!entity){
+            return;}
         if(m_Entity3D2ViewModel.contains(entity)){
             if(m_Entity3D2ViewModel[entity]->inherits("BeamVM")){
                 BeamVM* beam=static_cast<BeamVM*>(m_Entity3D2ViewModel[entity]);
-                beam->onSelect();
             }
             else if(m_Entity3D2ViewModel[entity]->inherits("JointVM")){
                 JointVM* joint=static_cast<JointVM*>(m_Entity3D2ViewModel[entity]);
                 joint->setFBDisVisible(!joint->FBDisVisible());
-                //joint->setReactionIsVisible(!joint->reactionIsVisible());
+                joint->setDetailIsVisible(!joint->detailIsVisible());
             }
+            else{
 
+            }
         }
     }
-
 }
+
+
+
 void TwoDimentionalEventHandler::inputEventHandlerOnForce(EventType type, QVariantMap args){
 
     static Force* currentHoldingFocus=0;
@@ -171,7 +176,7 @@ void TwoDimentionalEventHandler::inputEventHandlerOnForce(EventType type, QVaria
 
                 if(!currentHoldingFocus){
                     currentHoldingFocus=static_cast<Force*>(m_staticsModule->createElement(AbstractElement::FORCE,args));
-                    ForceVM* forceVm= new ForceVM(currentHoldingFocus,m_sceneRoot,this);
+                    ForceVM* forceVm= new ForceVM(currentHoldingFocus,m_uiRoot,m_sceneRoot,this);
                     forceVm->setTipOnApplicationPoint(false);
                     m_viewmodels.insert(forceVm);
                 }
@@ -235,7 +240,7 @@ void TwoDimentionalEventHandler::inputEventHandlerOnForce(EventType type, QVaria
                     args.append(element->objectName());
 
                     currentHoldingFocus=static_cast<Force*>(m_staticsModule->createElement(AbstractElement::FORCE,args));
-                    ForceVM* forceVm= new ForceVM(currentHoldingFocus,m_sceneRoot,this);
+                    ForceVM* forceVm= new ForceVM(currentHoldingFocus,m_uiRoot,m_sceneRoot,this);
                     forceVm->setTipOnApplicationPoint(false);
                     m_viewmodels.insert(forceVm);
                 }

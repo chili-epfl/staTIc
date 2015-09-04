@@ -16,20 +16,20 @@ public:
     TwoDimentionalEventHandler(QObject* parent=0);
 
     QVariant staticsModule(){return qVariantFromValue((void *) m_staticsModule); }
+
     void setStaticsModule(QVariant staticsModule);
-
-    void setSceneRoot(Qt3D::QEntity* sceneRoot);
-
-    void initViewModels();
-
 
 public slots:
     void inputEventHandler(EventType type, QVariantMap args);
+private slots:
+    void initViewModels();
 
 private:
+
     void inputEventHandlerOnSelect(EventType type, QVariantMap args);
     void inputEventHandlerOnForce(EventType type, QVariantMap args);
     void inputEventHandlerOnDelete(EventType type, QVariantMap args);
+
 
     TwoDimensionalStaticsModule* m_staticsModule;
 

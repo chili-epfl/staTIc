@@ -1,7 +1,7 @@
 #include "forcevm.h"
 #include "statics/elements/force.h"
 #include "staticshelper.h"
-ForceVM::ForceVM(Force* force,Qt3D::QEntity* sceneRoot,QObject* parent):AbstractElementViewModel(sceneRoot,parent)
+ForceVM::ForceVM(Force* force,QObject* uiRoot,Qt3D::QEntity* sceneRoot,QObject* parent):AbstractElementViewModel(uiRoot,sceneRoot,parent)
 {
     m_force=force;
     m_visible=true;

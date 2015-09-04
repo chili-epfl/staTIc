@@ -49,7 +49,7 @@ Item{
     EventHandler2D{
             id:eventhandler
             camera:scene.camera
-
+            uiRoot: root
     }
 
     /*UI*/
@@ -101,6 +101,53 @@ Item{
         Behavior on y {animation: NumberAnimation{duration: 250}}
     }
 
+    Rectangle{
+        id:detailsview
+        objectName: "Details_Tab"
+        color: "transparent"
+        anchors.verticalCenter: parent.verticalCenter
+        x:root.width-width
+        z:1
+        width: 0.25*parent.width
+        height: Math.min(0.5*parent.height,detailedViewJoint.count*0.3*width + 5)
+        state: detailedViewJoint.count>0 ? "DetailsJoint" : "Closed"
+        states: [
+            State {
+                name: "DetailsJoint"
+                PropertyChanges {
+                    target: detailsview
+                    x: root.width-0.25*parent.width
+
+                }
+            },
+            State {
+                name: "DetailsBeam"
+                PropertyChanges {
+                    target: detailsview
+                    x: root.width-0.25*parent.width
+                }
+            },
+            State {
+                name: "Closed"
+                PropertyChanges {
+                    target: detailsview
+                    x: root.width-5
+                }
+            }
+
+        ]
+        Behavior on x {animation: NumberAnimation{duration: 250}}
+
+        DetailedViewJoint{
+            objectName: "Details_Tab_Joints"
+            id:detailedViewJoint
+            onModelChanged: console.log(model)
+        }
+
+
+    }
+
+
     Item{
         id:leftmenu
         z:1
@@ -144,9 +191,6 @@ Item{
                 }
             }
         }
-
-
-
     }
 
     Connections{

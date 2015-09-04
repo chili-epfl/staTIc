@@ -2,22 +2,25 @@
 #define JOINTVM_H
 #include "statics/viewModels/abstractelementviewmodel.h"
 #include "statics/elements/joint.h"
+#include "jointvmitemmodel.h"
 
 class JointVM:public AbstractElementViewModel
 {
     Q_OBJECT
     Q_PROPERTY(bool reactionIsVisible READ reactionIsVisible WRITE setReactionIsVisible NOTIFY reactionIsVisibleChanged)
     Q_PROPERTY(bool FBDisVisible READ FBDisVisible WRITE setFBDisVisible NOTIFY FBDisVisibleChanged)
-
+    Q_PROPERTY(bool detailIsVisible READ detailIsVisible WRITE setDetailIsVisible NOTIFY detailIsVisibleChanged)
 public:
-    explicit JointVM(Joint* joint,Qt3D::QEntity* sceneRoot,QObject* parent=0);
+    explicit JointVM(Joint* joint,QObject* uiRoot,Qt3D::QEntity* sceneRoot,QObject* parent=0);
 
     bool reactionIsVisible(){return m_reactionIsVisible;}
     void setReactionIsVisible(bool val){if(m_isSupport && m_reactionIsVisible!=val){m_reactionIsVisible=val;emit reactionIsVisibleChanged(m_reactionIsVisible);}}
+
     bool FBDisVisible(){return m_FBDIsVisible;}
     void setFBDisVisible(bool val){if(m_FBDIsVisible!=val){m_FBDIsVisible=val;emit FBDisVisibleChanged(m_FBDIsVisible);}}
 
-    void onSelect(){setFBDisVisible(!m_FBDIsVisible);setReactionIsVisible(!m_reactionIsVisible);}
+    bool detailIsVisible(){return m_detailIsVisible;}
+    void setDetailIsVisible(bool val);
     AbstractElement* model(){return m_joint;}
 
 public slots:
@@ -32,11 +35,14 @@ public slots:
     void onBeamAxialForceChanged(qreal val);
     /*---------*/
 
+    void onDetailViewChangedModel();
+
 signals:
     void updateReactionDirection(qreal val);
     void updateReactionMagnitude(qreal val);
     void reactionIsVisibleChanged(bool val);
     void FBDisVisibleChanged(bool val);
+    void detailIsVisibleChanged(bool val);
 private:
 
     void initView();
@@ -44,9 +50,13 @@ private:
     bool m_reactionIsVisible;
     bool m_isSupport;
     bool m_FBDIsVisible;
+    bool m_detailIsVisible;
 
     /*A map between the beams and the relative entity*/
     QHash<Beam*,Qt3D::QEntity*> m_beamsMap;
+    QVector<Beam*> m_beamsVector;
+
+    JointVMItemModel m_itemModel;
 
     Joint* m_joint;
 };

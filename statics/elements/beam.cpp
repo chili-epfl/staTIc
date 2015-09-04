@@ -16,6 +16,4 @@ void Beam::setExtremes(QPair<Joint *, Joint *> extremes){
         connect(this,SIGNAL(extremesChanged()),m_extremes.second,SIGNAL(connectedBeamsChanged()));
         emit extremesChanged();
     }
-
-
 }

@@ -11,12 +11,13 @@ class AbstractElementViewModel : public QObject
 {
     Q_OBJECT
 public:
-    explicit AbstractElementViewModel(Qt3D::QEntity* sceneRoot,QObject *parent = 0);
+    explicit AbstractElementViewModel(QObject* uiRoot,Qt3D::QEntity* sceneRoot,QObject *parent = 0);
 
     void append_3D_resources(Qt3D::QEntity* root);
 
     virtual AbstractElement* model()=0;
 
+    /*A set to store the 3d entities created by this VM.*/
     QSet<Qt3D::QEntity*> m_3Dresources;
 
 signals:
@@ -28,7 +29,7 @@ protected:
 
     QQmlEngine engine;
     Qt3D::QEntity* m_sceneRoot;
-
+    QObject* m_uiRoot;
 
 };
 

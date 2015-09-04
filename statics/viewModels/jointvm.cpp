@@ -2,7 +2,7 @@
 #include "staticshelper.h"
 #include "statics/elements/beam.h"
 
-
+#include <QQmlProperty>
 /*class BeamSignalProxy: public QObject{
   Q_OBJECT
 public:
@@ -56,22 +56,21 @@ void BeamSignalProxy::onEntityDestroyed(){
 
 
 
-JointVM::JointVM(Joint* joint,Qt3D::QEntity* sceneRoot,QObject* parent): AbstractElementViewModel(sceneRoot,parent)
+JointVM::JointVM(Joint* joint,QObject* uiRoot,Qt3D::QEntity* sceneRoot,QObject* parent): AbstractElementViewModel(uiRoot,sceneRoot,parent)
 {
     m_joint=joint;
     m_isSupport=false;
     m_reactionIsVisible=m_isSupport;
     m_FBDIsVisible=false;
+    m_detailIsVisible=false;
 
     connect(m_joint,SIGNAL(destroyed(QObject*)),this,SLOT(onElementDestroyed()));
-
     connect(m_joint,SIGNAL(reactionChanged(QVector3D)),this,SLOT(onJointReactionChanged(QVector3D)));
     connect(m_joint,SIGNAL(positionChanged(QVector3D)),this,SLOT(onJointPositionChanged(QVector3D)));
     connect(m_joint,SIGNAL(supportTypeChanged()),this,SLOT(onJointSupportTypeChanged()));
     connect(m_joint,SIGNAL(connectedBeamsChanged()),this,SLOT(onJointConnectedBeamsChanged()));
 
     initView();
-
 }
 
 void JointVM::onElementDestroyed(){}
@@ -166,6 +165,7 @@ void JointVM::initView(){
         m_isSupport=true;
         m_reactionIsVisible=m_isSupport;
     }
+
     /*Create the reaction force entity*/
     Qt3D::QEntity *forceEntity;
     QQmlComponent componentArrow(&engine,QUrl("qrc:/ForceArrow.qml"));
@@ -225,7 +225,8 @@ void JointVM::initView(){
 
         connect(beam,SIGNAL(axialForceChanged(qreal)),this,SLOT(onBeamAxialForceChanged(qreal)));
 
-
+        m_itemModel.addForce(JointVMItemModel::Internal,dir.normalized()*beam->axialForce(),"Force due to beam "+ beam->objectName());
+        m_beamsVector.append(beam);
     }
 
     append_3D_resources(FBDEntity);
@@ -234,11 +235,28 @@ void JointVM::initView(){
 
 }
 
+void JointVM::setDetailIsVisible(bool val){
+    if(m_detailIsVisible!=val){
+        m_detailIsVisible=val;
+        if(m_detailIsVisible){
+            QObject* tab=m_uiRoot->findChild<QObject*>("Details_Tab_Joints");
+            QQmlProperty::write(tab, "model", QVariant::fromValue(&m_itemModel));
+            connect(tab,SIGNAL(modelChanged()),this,SLOT(onDetailViewChangedModel()));
+        }
+        emit detailIsVisibleChanged(m_detailIsVisible);
+    }
+}
+
+void JointVM::onDetailViewChangedModel(){
+    setDetailIsVisible(false);
+    QObject::sender()->disconnect(this);
+}
+
+
 void JointVM::onBeamAxialForceChanged(qreal val){
     Beam* beam=qobject_cast<Beam*>(QObject::sender());
 
     if(!beam) return;
-
 
     Joint* extreme1=beam->extremes().first;
     Joint* extreme2=beam->extremes().second;
@@ -257,6 +275,8 @@ void JointVM::onBeamAxialForceChanged(qreal val){
     QMetaObject::invokeMethod(forceEntity, "changeArrowLength",Qt::AutoConnection,
                               Q_ARG(qreal, fabs(val)));
 
+    int index=m_beamsVector.indexOf(beam);
+    m_itemModel.changeForce(index,JointVMItemModel::Internal,dir.normalized()*beam->axialForce(),"Force due to beam "+ beam->objectName());
 
 }
 

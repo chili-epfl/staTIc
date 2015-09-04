@@ -18,7 +18,8 @@ SOURCES += main.cpp \
     statics/viewModels/beamvm.cpp \
     statics/viewModels/forcevm.cpp \
     statics/viewModels/jointvm.cpp \
-    staticshelper.cpp
+    staticshelper.cpp \
+    statics/viewModels/jointvmitemmodel.cpp
 HEADERS += \
     structureitemmodel.h \
     statics/two_dimentions/twodimensionalstaticsmodule.h \
@@ -34,11 +35,13 @@ HEADERS += \
     statics/viewModels/beamvm.h \
     statics/viewModels/forcevm.h \
     statics/viewModels/jointvm.h \
-    staticshelper.h
+    staticshelper.h \
+    statics/viewModels/jointvmitemmodel.h
 
 RESOURCES += qml.qrc
 
 INCLUDEPATH+= /home/chili/QTProjects/qml-chilitags/src
+
 
 
 

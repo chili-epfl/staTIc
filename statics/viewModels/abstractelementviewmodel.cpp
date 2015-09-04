@@ -1,9 +1,10 @@
 #include "abstractelementviewmodel.h"
 
-AbstractElementViewModel::AbstractElementViewModel(Qt3D::QEntity* sceneRoot,QObject *parent):
+AbstractElementViewModel::AbstractElementViewModel(QObject* uiRoot,Qt3D::QEntity* sceneRoot,QObject *parent):
     QObject(parent)
 {
     m_sceneRoot=sceneRoot;
+    m_uiRoot=uiRoot;
 }
 
 void AbstractElementViewModel::append_3D_resources(Qt3D::QEntity* root){
