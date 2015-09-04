@@ -2,23 +2,31 @@
 #include "statics/elements/beam.h"
 #include "staticshelper.h"
 
-BeamVM::BeamVM(QObject* parent):AbstractElementViewModel(parent)
+BeamVM::BeamVM(Beam* beam,Qt3D::QEntity* sceneRoot,QObject* parent):AbstractElementViewModel(sceneRoot,parent)
 {
+    m_beam=beam;
     m_visible=false;
+
+    //Default bindings
+    connect(m_beam,SIGNAL(destroyed(QObject*)),this,SLOT(onElementDestroyed()));
+
+    //Element Specific bindings
+    connect(m_beam,SIGNAL(extremesChanged()),this,SLOT(onBeamExtremesChanged()));
+    connect(m_beam,SIGNAL(axialForceChanged(qreal)),this,SLOT(onBeamAxialForceChanged(qreal)));
+
+    initView();
+
 }
 
-
-void BeamVM::onStatusComplete(){
-
-    Beam* beam=qobject_cast<Beam*>(m_element);
-    Joint* extreme1=beam->extremes().first;
-    Joint* extreme2=beam->extremes().second;
+void BeamVM::initView(){
+    Joint* extreme1=m_beam->extremes().first;
+    Joint* extreme2=m_beam->extremes().second;
 
     QVector3D dir=extreme1->position()-extreme2->position();
 
     /*Compression > 0
-    * Tension < 0 */
-    if(beam->axialForce()>0)
+        * Tension < 0 */
+    if(m_beam->axialForce()>0)
         dir*=-1;
 
     QQmlComponent componentArrow(&engine,QUrl("qrc:/ForceArrow.qml"));
@@ -26,27 +34,28 @@ void BeamVM::onStatusComplete(){
 
     forceEntity1->setProperty("myAngle",atan2(dir.y(),dir.x()));
     forceEntity1->setProperty("position",extreme1->position());
-    forceEntity1->setProperty("arrowLength",fabs(beam->axialForce()));
+    forceEntity1->setProperty("arrowLength",fabs(m_beam->axialForce()));
     forceEntity1->setProperty("isPointingAtPosition",false);
     forceEntity1->setProperty("visible",m_visible);
+    forceEntity1->setProperty("type","Internal");
 
     connect(this,SIGNAL(updateForceMagnitude(qreal)),forceEntity1,SIGNAL(changeArrowLength(qreal)));
-
     connect(this,SIGNAL(updateForceDirectionEx1(qreal)),forceEntity1,SIGNAL(changeMyAngle(qreal)));
-
     connect(this,SIGNAL(visibilityChanged(bool)),forceEntity1,SIGNAL(changeVisible(bool)));
 
-    forceEntity1->setObjectName(StaticsHelper::NameResolution(m_entity_name,
-                                                              StaticsHelper::Roles::MODEL,StaticsHelper::Roles::F_INTERNAL));
+    append_3D_resources(forceEntity1);
+
+    //TODO:Better name for model
     forceEntity1->setParent(m_sceneRoot->findChild<Qt3D::QNode*>("Model"));
 
     Qt3D::QEntity* forceEntity2= qobject_cast<Qt3D::QEntity*>(componentArrow.create());
 
     forceEntity2->setProperty("myAngle",atan2(-dir.y(),-dir.x()));
     forceEntity2->setProperty("position",extreme2->position());
-    forceEntity2->setProperty("arrowLength",fabs(beam->axialForce()));
+    forceEntity2->setProperty("arrowLength",fabs(m_beam->axialForce()));
     forceEntity2->setProperty("isPointingAtPosition",false);
     forceEntity2->setProperty("visible",m_visible);
+    forceEntity2->setProperty("type","Internal");
 
     connect(this,SIGNAL(updateForceMagnitude(qreal)),forceEntity2,SIGNAL(changeArrowLength(qreal)));
 
@@ -54,28 +63,19 @@ void BeamVM::onStatusComplete(){
 
     connect(this,SIGNAL(visibilityChanged(bool)),forceEntity2,SIGNAL(changeVisible(bool)));
 
-    forceEntity2->setObjectName(StaticsHelper::NameResolution(m_entity_name,
-                                                              StaticsHelper::Roles::MODEL,StaticsHelper::Roles::F_INTERNAL));
+    //forceEntity2->setObjectName(StaticsHelper::NameResolution(m_entity_name,
+    //                                                          StaticsHelper::Roles::MODEL,StaticsHelper::Roles::F_INTERNAL));
+
+    append_3D_resources(forceEntity2);
+
+    //TODO:Better name for model
     forceEntity2->setParent(m_sceneRoot->findChild<Qt3D::QNode*>("Model"));
 
 }
 
 
-
-void BeamVM::onElementNameChanged(QString name){
-
-    /*IT's not so easy....*/
-    m_entity_name=name;
-
-}
-
 void BeamVM::onElementDestroyed(){
     /*Remove all the graphics associated*/
-
-}
-
-void BeamVM::onElementVmChanged(){
-    /*Destroy*/
 
 }
 
@@ -84,9 +84,8 @@ void BeamVM::onBeamExtremesChanged(){
 }
 
 void BeamVM::onBeamAxialForceChanged(qreal val){
-    Beam* beam=qobject_cast<Beam*>(m_element);
-    Joint* extreme1=beam->extremes().first;
-    Joint* extreme2=beam->extremes().second;
+    Joint* extreme1=m_beam->extremes().first;
+    Joint* extreme2=m_beam->extremes().second;
     QVector3D dir=extreme1->position()-extreme2->position();
     /*Compression > 0
     * Tension < 0 */
@@ -97,7 +96,6 @@ void BeamVM::onBeamAxialForceChanged(qreal val){
     emit updateForceDirectionEx2(atan2(-dir.y(),-dir.x()));
     emit updateForceMagnitude(fabs(val));
 }
-
 
 
 

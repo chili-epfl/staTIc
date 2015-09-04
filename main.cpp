@@ -4,7 +4,7 @@
 #include "structureitemmodel.h"
 
 #include "statics/two_dimentions/twodimensionalstaticsmodule.h"
-
+#include "statics/two_dimentions/twodimentionaleventhandler.h"
 #include "materialsetter.h"
 
 int main(int argc, char *argv[])
@@ -18,6 +18,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<MaterialSetter>("MaterialSetter", 1, 0, "MaterialSetter");
 
     engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
+
+    //engine.load(QUrl(QStringLiteral("qrc:/test_main.qml")));
 
     return app.exec();
 }

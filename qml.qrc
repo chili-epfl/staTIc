@@ -6,6 +6,8 @@
         <file>ForceArrow.qml</file>
         <file>ToolBarComponent.qml</file>
         <file>FreeBodyDiagram.qml</file>
+        <file>test_main.qml</file>
+        <file>DetailedViewJoint.qml</file>
     </qresource>
     <qresource prefix="/models">
         <file>models/Model1/Model1.png</file>
@@ -25,6 +27,8 @@
         <file>opengl/phongalpha.frag</file>
         <file>opengl/phongalpha.vert</file>
         <file>opengl/TransparentMaterial.qml</file>
+    </qresource>
+    <qresource prefix="/detailedviews">
     </qresource>
     <qresource prefix="/images">
         <file>images/mainbanner.png</file>

@@ -4,10 +4,8 @@
 TwoDimensionalStaticsModule::TwoDimensionalStaticsModule(QObject *parent )
     :AbstractStaticsModule(parent)
 {
+
 }
-
-
-
 
 AbstractElement* TwoDimensionalStaticsModule::createElement(AbstractElement::Element_Type type, QVariantList args ){
     /*Kind of a factory method. The function takes care of creating the viewmodel as well.
@@ -21,7 +19,6 @@ AbstractElement* TwoDimensionalStaticsModule::createElement(AbstractElement::Ele
     *       args[1]-> QVector3D ApplicationPoint
     *       args[2]-> QVector3D Vector
     *       args[3]-> QString ApplicationElement
-    *       args[4]-> **optional** bool hasTiponApplicationPoint
     *   TODO:Check if the object exists
     **/
     switch (type) {
@@ -39,19 +36,6 @@ AbstractElement* TwoDimensionalStaticsModule::createElement(AbstractElement::Ele
         beam->setExtremes(extremes);
 
         m_beams.append(beam);
-
-
-
-        BeamVM* beamVM=new BeamVM(this);
-        beamVM->setEntityName(beam->objectName());
-        beamVM->setObjectName(StaticsHelper::NameResolution(beam->objectName(),
-                                                            StaticsHelper::Roles::MODEL,StaticsHelper::Roles::VIEWMODEL));
-        beamVM->setSceneRoot(m_sceneRoot);
-
-        beam->setVm(beamVM);
-
-        /*Missing bindings*/
-        connect(this,SIGNAL(sceneRootChanged(Qt3D::QEntity*)),beamVM,SLOT(setSceneRoot(Qt3D::QEntity*)));
 
         return beam;
         break;
@@ -71,16 +55,6 @@ AbstractElement* TwoDimensionalStaticsModule::createElement(AbstractElement::Ele
         }
         m_joints.append(joint);
 
-        JointVM* jointVM=new JointVM(this);
-        jointVM->setEntityName(joint->objectName());
-        jointVM->setObjectName(StaticsHelper::NameResolution(joint->objectName(),
-                                                             StaticsHelper::Roles::MODEL,StaticsHelper::Roles::VIEWMODEL));
-        jointVM->setSceneRoot(m_sceneRoot);
-
-        joint->setVm(jointVM);
-
-        /*Missing bindings*/
-        connect(this,SIGNAL(sceneRootChanged(Qt3D::QEntity*)),jointVM,SLOT(setSceneRoot(Qt3D::QEntity*)));
         return joint;
         break;
     }
@@ -95,19 +69,6 @@ AbstractElement* TwoDimensionalStaticsModule::createElement(AbstractElement::Ele
         connect(force,SIGNAL(vectorChanged(QVector3D)),this,SLOT(onForceUpdate()));
         connect(force,SIGNAL(applicationPointChanged(QVector3D)),this,SLOT(onForceUpdate()));
         connect(force,SIGNAL(applicationElementChanged(QString)),this,SLOT(onForceUpdate()));
-
-        ForceVM* forceVM=new ForceVM(this);
-        forceVM->setEntityName(force->objectName());
-        forceVM->setObjectName(StaticsHelper::NameResolution(force->objectName(),
-                                                             StaticsHelper::Roles::MODEL,StaticsHelper::Roles::VIEWMODEL));
-        forceVM->setSceneRoot(m_sceneRoot);
-        if(args.size()>4)
-            forceVM->setTipOnApplicationPoint(args[4].toBool());
-
-        force->setVm(forceVM);
-
-        /*Missing bindings*/
-        connect(this,SIGNAL(sceneRootChanged(Qt3D::QEntity*)),forceVM,SLOT(setSceneRoot(Qt3D::QEntity*)));
 
         solve();
 

@@ -14,10 +14,10 @@ SOURCES += main.cpp \
     materialsetter.cpp \
     statics/abstracteventhandler.cpp \
     statics/two_dimentions/twodimentionaleventhandler.cpp \
-    statics/abstractelementviewmodel.cpp \
-    statics/elements/beamvm.cpp \
-    statics/elements/forcevm.cpp \
-    statics/elements/jointvm.cpp \
+    statics/viewModels/abstractelementviewmodel.cpp \
+    statics/viewModels/beamvm.cpp \
+    statics/viewModels/forcevm.cpp \
+    statics/viewModels/jointvm.cpp \
     staticshelper.cpp
 HEADERS += \
     structureitemmodel.h \
@@ -30,10 +30,10 @@ HEADERS += \
     materialsetter.h \
     statics/abstracteventhandler.h \
     statics/two_dimentions/twodimentionaleventhandler.h \
-    statics/abstractelementviewmodel.h \
-    statics/elements/beamvm.h \
-    statics/elements/forcevm.h \
-    statics/elements/jointvm.h \
+    statics/viewModels/abstractelementviewmodel.h \
+    statics/viewModels/beamvm.h \
+    statics/viewModels/forcevm.h \
+    statics/viewModels/jointvm.h \
     staticshelper.h
 
 RESOURCES += qml.qrc

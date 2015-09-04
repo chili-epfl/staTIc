@@ -56,16 +56,28 @@ void BeamSignalProxy::onEntityDestroyed(){
 
 
 
-JointVM::JointVM(QObject* parent): AbstractElementViewModel(parent)
+JointVM::JointVM(Joint* joint,Qt3D::QEntity* sceneRoot,QObject* parent): AbstractElementViewModel(sceneRoot,parent)
 {
+    m_joint=joint;
     m_isSupport=false;
     m_reactionIsVisible=m_isSupport;
     m_FBDIsVisible=false;
+
+    connect(m_joint,SIGNAL(destroyed(QObject*)),this,SLOT(onElementDestroyed()));
+
+    connect(m_joint,SIGNAL(reactionChanged(QVector3D)),this,SLOT(onJointReactionChanged(QVector3D)));
+    connect(m_joint,SIGNAL(positionChanged(QVector3D)),this,SLOT(onJointPositionChanged(QVector3D)));
+    connect(m_joint,SIGNAL(supportTypeChanged()),this,SLOT(onJointSupportTypeChanged()));
+    connect(m_joint,SIGNAL(connectedBeamsChanged()),this,SLOT(onJointConnectedBeamsChanged()));
+
+    initView();
+
 }
 
-void JointVM::onElementNameChanged(QString val){}
 void JointVM::onElementDestroyed(){}
-void JointVM::onElementVmChanged(){}
+
+
+
 
 void JointVM::onJointReactionChanged(QVector3D val){
     emit updateReactionMagnitude(val.length());
@@ -73,15 +85,16 @@ void JointVM::onJointReactionChanged(QVector3D val){
 }
 
 
+
 void JointVM::onJointPositionChanged(QVector3D val){}
 void JointVM::onJointSupportTypeChanged(){}
 
 
 void JointVM::onJointConnectedBeamsChanged(){
-    Joint* joint=qobject_cast<Joint*>(m_element);
+    /*Joint* joint=qobject_cast<Joint*>(m_element);
     if(!m_sceneRoot) return;
 
-    /*Check if the 3d entity has been created*/
+    //Check if the 3d entity has been created
     QString entityName=StaticsHelper::NameResolution(m_entity_name,StaticsHelper::Roles::MODEL,StaticsHelper::Roles::FBD);
 
     Qt3D::QEntity* FBDEntity=m_sceneRoot->findChild<Qt3D::QEntity*>(entityName);
@@ -143,14 +156,13 @@ void JointVM::onJointConnectedBeamsChanged(){
         }
         i++;
     }
-
+*/
 }
 
 
-void JointVM::onStatusComplete(){
+void JointVM::initView(){
 
-    Joint* joint=qobject_cast<Joint*>(m_element);
-    if(joint->supportType()!=Joint::SupportType::NOSUPPORT){
+    if(m_joint->supportType()!=Joint::SupportType::NOSUPPORT){
         m_isSupport=true;
         m_reactionIsVisible=m_isSupport;
     }
@@ -158,40 +170,38 @@ void JointVM::onStatusComplete(){
     Qt3D::QEntity *forceEntity;
     QQmlComponent componentArrow(&engine,QUrl("qrc:/ForceArrow.qml"));
     forceEntity = qobject_cast<Qt3D::QEntity*>(componentArrow.create());
-    forceEntity->setObjectName(StaticsHelper::NameResolution(m_entity_name,
-                                                             StaticsHelper::Roles::MODEL,StaticsHelper::Roles::F_REACTION));
 
-
-    forceEntity->setProperty("myAngle",atan2(joint->reaction().y(),joint->reaction().x()));
-    forceEntity->setProperty("position",joint->position());
-    forceEntity->setProperty("arrowLength",joint->reaction().length());
+    forceEntity->setProperty("myAngle",atan2(m_joint->reaction().y(),m_joint->reaction().x()));
+    forceEntity->setProperty("position",m_joint->position());
+    forceEntity->setProperty("arrowLength",m_joint->reaction().length());
     forceEntity->setProperty("isPointingAtPosition",false);
     forceEntity->setProperty("visible",m_reactionIsVisible);
+    forceEntity->setProperty("type","Support");
 
 
     connect(this,SIGNAL(updateReactionDirection(qreal)),forceEntity,SIGNAL(changeMyAngle(qreal)));
     connect(this,SIGNAL(updateReactionMagnitude(qreal)),forceEntity,SIGNAL(changeArrowLength(qreal)));
     connect(this,SIGNAL(reactionIsVisibleChanged(bool)),forceEntity,SIGNAL(changeVisible(bool)));
 
-    forceEntity->setParent(m_sceneRoot->findChild<Qt3D::QNode*>("Model"));
-    /*Create the FBD*/
+    append_3D_resources(forceEntity);
 
+    forceEntity->setParent(m_sceneRoot->findChild<Qt3D::QNode*>("Model"));
+
+    /*Create the FBD*/
     QQmlComponent componentFBD(&engine,QUrl("qrc:/FreeBodyDiagram.qml"));
 
     Qt3D::QEntity* FBDEntity = qobject_cast<Qt3D::QEntity*>(componentFBD.create());
-    FBDEntity->setObjectName(StaticsHelper::NameResolution(m_entity_name,
-                                                           StaticsHelper::Roles::MODEL,StaticsHelper::Roles::FBD));
-    FBDEntity->setProperty("position",joint->position());
+
+    FBDEntity->setProperty("position",m_joint->position());
     FBDEntity->setProperty("visible",m_FBDIsVisible);
     connect(this,SIGNAL(FBDisVisibleChanged(bool)),FBDEntity,SIGNAL(changeVisible(bool)));
 
-
-    for(Beam* beam: joint->connected_beams){
+    for(Beam* beam: m_joint->connected_beams){
 
         Joint* extreme1=beam->extremes().first;
         Joint* extreme2=beam->extremes().second;
         QVector3D dir;
-        if(extreme1==joint)
+        if(extreme1==m_joint)
             dir=extreme1->position()-extreme2->position();
         else
             dir=extreme2->position()-extreme1->position();
@@ -204,18 +214,21 @@ void JointVM::onStatusComplete(){
         forceEntity->setProperty("arrowLength",fabs(beam->axialForce()));
         forceEntity->setProperty("isPointingAtPosition",false);
         forceEntity->setProperty("visible",m_FBDIsVisible);
-        forceEntity->setObjectName(FBDEntity->objectName()+
-                                   StaticsHelper::NameResolution(beam->objectName(),StaticsHelper::Roles::MODEL,
-                                                                 StaticsHelper::Roles::FBD_ELEMENT));
+        forceEntity->setProperty("type","Internal");
+
         forceEntity->setParent(FBDEntity);
 
         connect(this,SIGNAL(FBDisVisibleChanged(bool)),forceEntity,SIGNAL(changeVisible(bool)));
 
+        append_3D_resources(forceEntity);
         m_beamsMap[beam]=forceEntity;
+
         connect(beam,SIGNAL(axialForceChanged(qreal)),this,SLOT(onBeamAxialForceChanged(qreal)));
 
 
     }
+
+    append_3D_resources(FBDEntity);
 
     FBDEntity->setParent(m_sceneRoot->findChild<Qt3D::QNode*>("Model"));
 
@@ -226,12 +239,11 @@ void JointVM::onBeamAxialForceChanged(qreal val){
 
     if(!beam) return;
 
-    Joint* joint=qobject_cast<Joint*>(m_element);
 
     Joint* extreme1=beam->extremes().first;
     Joint* extreme2=beam->extremes().second;
     QVector3D dir;
-    if(extreme1==joint)
+    if(extreme1==m_joint)
         dir=extreme1->position()-extreme2->position();
     else
         dir=extreme2->position()-extreme1->position();

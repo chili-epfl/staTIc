@@ -50,7 +50,9 @@ Entity {
 
     SceneLoader{
         id:sceneloader
-
+        onStatusChanged: {if (sceneloader.status===SceneLoader.Loaded){
+                eventhandler.sceneRoot=sceneroot;
+            }}
     }
 
     Transform {

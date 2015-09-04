@@ -1,7 +1,8 @@
 #ifndef FORCEVM_H
 #define FORCEVM_H
 
-#include "statics/abstractelementviewmodel.h"
+#include "statics/viewModels/abstractelementviewmodel.h"
+#include "statics/elements/force.h"
 
 class ForceVM: public AbstractElementViewModel
 {
@@ -9,7 +10,7 @@ class ForceVM: public AbstractElementViewModel
     Q_PROPERTY(bool visibility READ visibility WRITE setVisibility NOTIFY visibilityChanged)
     Q_PROPERTY(bool tipOnApplicationPoint READ tipOnApplicationPoint WRITE setTipOnApplicationPoint NOTIFY tipOnApplicationPointChanged)
 public:
-    ForceVM(QObject* parent=0);
+    explicit ForceVM(Force* force,Qt3D::QEntity* sceneRoot,QObject* parent=0);
 
     bool visibility(){return m_visible;}
     void setVisibility(bool val){if(val!=m_visible){m_visible=val;emit visibilityChanged(m_visible);}}
@@ -17,13 +18,11 @@ public:
     void setTipOnApplicationPoint(bool val){if(m_hasTipOnApplicationPoint!=val){m_hasTipOnApplicationPoint=val;emit tipOnApplicationPointChanged(m_hasTipOnApplicationPoint);}}
     bool tipOnApplicationPoint(){return m_hasTipOnApplicationPoint; }
 
-    void select(){setVisibility(!m_visible);}
-public slots:
-    void onElementNameChanged(QString name);
-    void onElementDestroyed();
-    void onElementVmChanged();
+    void onSelect(){setVisibility(!m_visible);}
+    AbstractElement* model(){return m_force;}
 
-    void onStatusComplete();
+public slots:
+    void onElementDestroyed();
 
     /*Slots for signals from the model*/
     void onForceApplicationPointChanged(QVector3D val);
@@ -39,8 +38,12 @@ signals:
     void tipOnApplicationPointChanged(bool val);
 
 private:
+    void initView();
+
     bool m_hasTipOnApplicationPoint;
     bool m_visible;
+
+    Force* m_force;
 
 };
 

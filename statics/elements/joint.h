@@ -5,7 +5,6 @@
 #include <QList>
 #include <QVector3D>
 #include "statics/elements/abstractelement.h"
-#include "statics/elements/jointvm.h"
 
 class Beam;
 
@@ -31,9 +30,6 @@ public:
     void setReaction(QVector3D reaction){if(m_reaction!=reaction){m_reaction=reaction;emit reactionChanged(m_reaction);}}
     QVector3D reaction(){return m_reaction;}
 
-    AbstractElementViewModel* vm(){return (AbstractElementViewModel* )m_vm;}
-    void setVm(AbstractElementViewModel* vm);
-
     QList<Beam*> connected_beams;
 
 signals:
@@ -46,7 +42,6 @@ private:
     QVector3D m_pos;
     QVector3D m_reaction;
     SupportType m_jointSupport;
-    JointVM* m_vm;
 
 };
 

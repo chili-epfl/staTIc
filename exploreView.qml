@@ -16,7 +16,7 @@ Item{
     signal loadStructure(string modelName,url modelFile,url staticsFile,url tagFile);
 
     onLoadStructure: {
-        staticsmodule.sourceUrl=staticsFile
+        staticsmodule.sourceUrl=staticsFile //<-------Should start later...
         scene.sceneloader.source=modelFile
         chilitags.tagConfigurationFile=tagFile
         tag.name=modelName
@@ -42,13 +42,15 @@ Item{
 
     StaticsModule2D{
         id:staticsmodule
-        sceneRoot: scene.sceneroot
-        eventHandler: EventHandler2D{
-                id:eventhandler
-                camera:scene.camera
-        }
+        onStatusChanged: {if(status===StaticsModule2D.LOADED){
+                console.log("Loaded");
+                eventhandler.staticsModule=staticsmodule}}
     }
+    EventHandler2D{
+            id:eventhandler
+            camera:scene.camera
 
+    }
 
     /*UI*/
     Item{
@@ -166,8 +168,6 @@ Item{
         }
 
     }
-
-
 
 
     /*3D Rendering*/

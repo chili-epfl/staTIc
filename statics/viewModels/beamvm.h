@@ -1,31 +1,28 @@
 #ifndef BEAMVM_H
 #define BEAMVM_H
 
-#include "statics/abstractelementviewmodel.h"
+#include "statics/viewModels/abstractelementviewmodel.h"
+#include "statics/elements/beam.h"
 
 class BeamVM : public AbstractElementViewModel
 {
     Q_OBJECT
     Q_PROPERTY(bool visibility READ visibility WRITE setVisibility NOTIFY visibilityChanged)
 public:
-    BeamVM(QObject* parent=0);
+    explicit BeamVM(Beam* beam,Qt3D::QEntity* sceneRoot,QObject* parent=0);
 
     bool visibility(){return m_visible;}
     void setVisibility(bool val){if(val!=m_visible){m_visible=val;emit visibilityChanged(m_visible);}}
-
-    void select(){setVisibility(!m_visible);}
+    void onSelect(){setVisibility(!m_visible);}
+    AbstractElement* model(){return m_beam;}
 
 public slots:        
-    void onElementNameChanged(QString name);
     void onElementDestroyed();
-    void onElementVmChanged();
 
     /*Slots for signals from the model*/
     void onBeamExtremesChanged();
     void onBeamAxialForceChanged(qreal val);
     /*-----*/
-
-    void onStatusComplete();
 
 signals:
     void updateForceMagnitude(qreal val);
@@ -34,7 +31,11 @@ signals:
     void visibilityChanged(bool val);
 
 private:
+
+    void initView();
+
     bool m_visible;
+    Beam* m_beam;
 
 };
 

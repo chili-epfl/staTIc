@@ -5,16 +5,20 @@ import Qt3D.Renderer 2.0
 Material {
     id: alphaMaterial
 
-    property real alpha: 0.5
+    property real alpha: 0.0
+    property color ka: "black"
+    property color kd : "blue"
+    property color ks: "blue"
+    property real shininess: 75
 
     effect:  Effect {
         parameters: [
             Parameter { name: "alpha";  value: alphaMaterial.alpha },
-            Parameter { name: "ka";   value: "black" },
-            Parameter { name: "kd";   value: "blue" },
-            Parameter { name: "ks";  value: "white" },
-            Parameter { name: "shininess"; value: 75.0 },
-            Parameter { name: "lightPosition"; value: Qt.vector4d(1.0, 1.0, 0.0, 1.0) },
+            Parameter { name: "ka";   value: alphaMaterial.ka },
+            Parameter { name: "kd";   value: alphaMaterial.kd },
+            Parameter { name: "ks";  value: alphaMaterial.ks },
+            Parameter { name: "shininess"; value: alphaMaterial.shininess },
+            Parameter { name: "lightPosition"; value: Qt.vector4d(0.0,0.0, 1.0, 1.0) },
             Parameter { name: "lightIntensity"; value: Qt.vector3d(1.0, 1.0, 1.0) }
         ]
 

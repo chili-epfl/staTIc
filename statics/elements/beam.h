@@ -6,7 +6,6 @@
 
 #include "statics/elements/joint.h"
 #include "statics/elements/abstractelement.h"
-#include "statics/elements/beamvm.h"
 
 typedef QPair<Joint*,Joint*> JointPair;
 
@@ -14,8 +13,8 @@ class Beam : public AbstractElement
 {
     Q_OBJECT
     Q_PROPERTY(JointPair extremes READ extremes WRITE setExtremes NOTIFY extremesChanged)
-
     Q_PROPERTY(qreal axialForce READ axialForce WRITE setAxialForce NOTIFY axialForceChanged)
+
 public:
     Beam(QString name,QObject* parent=0);
     Beam(QObject* parent=0);
@@ -26,16 +25,12 @@ public:
     QPair<Joint*,Joint*> extremes(){return m_extremes;}
     void setExtremes(QPair<Joint*,Joint*> extremes);
 
-    AbstractElementViewModel* vm(){return (AbstractElementViewModel* )m_vm;}
-    void setVm(AbstractElementViewModel* vm);
-
 signals:
     void extremesChanged();
     void axialForceChanged(qreal axialForce);
 
 private:
     qreal m_axial_force;
-    BeamVM* m_vm;
     QPair<Joint*,Joint*> m_extremes;
 
 };

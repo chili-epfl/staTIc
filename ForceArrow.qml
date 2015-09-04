@@ -3,19 +3,50 @@ import Qt3D.Renderer 2.0
 
 
 Entity{
-    property real ratioNL:50
-    property real scaleFactor: 0.5
-    property real minThreshold: 0.01
-    property bool tooSmall: false
+    property real ratioNL:25
+
+    property string type: "External"
 
     property real myAngle:0;
-    property real arrowLength:ratioNL;
     property vector3d position: Qt.vector3d(0,0,0)
     property bool visible: true
     property bool isPointingAtPosition:true;
+    property real arrowLength:ratioNL;
+    property bool highlighted: true;
+
+
+    /*Internal*/
+    property real coneLength: 18
+    property bool tooSmall: false
+    property real scaleFactor: 1
+    property real minThreshold: 0.01
+
+
+    onTypeChanged: {
+        if(type=="External"){
+            material.ambient= "black"
+            material.diffuse= "#b11414"//red
+            material.specular= "black"
+        }
+        if(type=="Support"){
+            material.ambient= "black"
+            material.diffuse= "#1430b1"//blue
+            material.specular= "black"
+        }
+        if(type=="Internal"){
+            material.ambient= "black"
+            material.diffuse= "#14b130"//green
+            material.specular= "black"
+        }
+    }
+
+
 
     signal changeIsPointingAtPosition (bool val)
     onChangeIsPointingAtPosition: isPointingAtPosition=val;
+
+    signal changeHighlighted (bool val)
+    onChangeHighlighted: highlighted=val
 
     signal changeVisible (bool val)
     onChangeVisible: visible=val
@@ -24,14 +55,19 @@ Entity{
     onChangePosition: position=pos
 
     signal changeArrowLength (real val)
-    onChangeArrowLength: { arrowLength=val*ratioNL; }
+    onChangeArrowLength: { arrowLength=val*ratioNL;}
 
     signal changeMyAngle (real val)
     onChangeMyAngle: myAngle=val
 
     onArrowLengthChanged: {arrowLength > minThreshold ? tooSmall=false: tooSmall=true}
 
-    property real coneLength: 18
+    PhongMaterial{
+        id:material
+        ambient:highlighted ? "black" : "#848484"
+        diffuse:"#b11414"
+        specular:"black"
+    }
 
     Mesh{
         id:tip_mesh
@@ -71,15 +107,15 @@ Entity{
 
     }
 
-
     Entity{
         objectName: parent.objectName
         CylinderMesh{
             id:tail_mesh
-            radius: 10
+            radius: 4
             length: arrowLength
             enabled: visible && !tooSmall;
         }
+
         Transform{
             id:tail_transform
             Rotate{
@@ -91,18 +127,12 @@ Entity{
             }
         }
 
-        components: [tail_mesh,tail_transform]
+        components: [tail_mesh,material,tail_transform]
 
     }
 
-    PhongMaterial {
-            id: floorMaterial
-             ambient: "red"
-             diffuse: "red"
-             specular: "red"
-             shininess: 0.5
-    }
-    components: isPointingAtPosition ? [tip_mesh,floorMaterial,tip_transform_TipOnPos] : [tip_mesh,floorMaterial,tip_transform_TailOnPos]
+
+    components: isPointingAtPosition ? [tip_mesh,material,tip_transform_TipOnPos] : [tip_mesh,material,tip_transform_TailOnPos]
 
 }
 
