@@ -31,7 +31,6 @@ ApplicationWindow {
         onLoaded: {
             intromenu.visible=false;
             intromenu.enabled=false;
-            console.log("loaded");
             item.loadStructure(currentStructure_modelName,currentStructure_modelFile,currentStructure_staticsFile,currentStructure_tagFile);
         }
     }

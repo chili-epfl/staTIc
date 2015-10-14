@@ -7,10 +7,9 @@
 class JointVM:public AbstractElementViewModel
 {
     Q_OBJECT
-    Q_PROPERTY(bool reactionIsVisible READ reactionIsVisible WRITE setReactionIsVisible NOTIFY reactionIsVisibleChanged)
-    Q_PROPERTY(bool FBDisVisible READ FBDisVisible WRITE setFBDisVisible NOTIFY FBDisVisibleChanged)
-    Q_PROPERTY(bool detailIsVisible READ detailIsVisible WRITE setDetailIsVisible NOTIFY detailIsVisibleChanged)
+
 public:
+    enum Roles{PRIMARY, DECORATOR};
     explicit JointVM(Joint* joint,QObject* uiRoot,Qt3D::QEntity* sceneRoot,QObject* parent=0);
 
     bool reactionIsVisible(){return m_reactionIsVisible;}
@@ -21,7 +20,8 @@ public:
 
     bool detailIsVisible(){return m_detailIsVisible;}
     void setDetailIsVisible(bool val);
-    AbstractElement* model(){return m_joint;}
+    Joint* joint(){return m_joint;}
+
 
 public slots:
     void onElementDestroyed();
@@ -55,6 +55,7 @@ private:
     /*A map between the beams and the relative entity*/
     QHash<Beam*,Qt3D::QEntity*> m_beamsMap;
     QVector<Beam*> m_beamsVector;
+
 
     JointVMItemModel m_itemModel;
 

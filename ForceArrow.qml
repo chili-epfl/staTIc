@@ -21,6 +21,7 @@ Entity{
     property real scaleFactor: 1
     property real minThreshold: 0.01
 
+    objectName:"FBD arrow"
 
     onTypeChanged: {
         if(type=="External"){
@@ -49,18 +50,53 @@ Entity{
     onChangeHighlighted: highlighted=val
 
     signal changeVisible (bool val)
-    onChangeVisible: visible=val
+    onChangeVisible:
+        {
+        visible=val;
+        if(visible && !tooSmall){
+            //tail.components=[tail_mesh,material,tail_transform]
+            components= isPointingAtPosition ? [tip_mesh,material,tip_transform_TipOnPos] : [tip_mesh,material,tip_transform_TailOnPos]
+        }
+        else{
+            tail.components=[]
+            components=[]
+        }
+
+
+        }
 
     signal changePosition (vector3d pos)
     onChangePosition: position=pos
 
     signal changeArrowLength (real val)
-    onChangeArrowLength: { arrowLength=val*ratioNL;}
+    onChangeArrowLength: {
+        arrowLength=val*ratioNL;
+
+    }
 
     signal changeMyAngle (real val)
-    onChangeMyAngle: myAngle=val
+    onChangeMyAngle: {
+        myAngle=val;
+    }
 
-    onArrowLengthChanged: {arrowLength > minThreshold ? tooSmall=false: tooSmall=true}
+    onArrowLengthChanged: {
+        if(arrowLength > minThreshold)
+            tooSmall=false
+        else
+            tooSmall=true
+    }
+
+    onTooSmallChanged:{
+        if(visible && !tooSmall){
+           //tail.components=[tail_mesh,material,tail_transform]
+           components= isPointingAtPosition ? [tip_mesh,material,tip_transform_TipOnPos] : [tip_mesh,material,tip_transform_TailOnPos]
+        }
+        else{
+           tail.components=[]
+           components=[]
+        }
+    }
+
 
     PhongMaterial{
         id:material
@@ -72,7 +108,7 @@ Entity{
     Mesh{
         id:tip_mesh
         source:"qrc:/icons/icons/arrow_ble.obj"
-        enabled: visible && !tooSmall;
+        enabled:  visible && !tooSmall;
     }
     Transform{
         id:tip_transform_TailOnPos
@@ -108,12 +144,14 @@ Entity{
     }
 
     Entity{
+        id:tail
         objectName: parent.objectName
+        //objectName: "FBD tail"
         CylinderMesh{
             id:tail_mesh
             radius: 4
             length: arrowLength
-            enabled: visible && !tooSmall;
+            enabled:  visible && !tooSmall;
         }
 
         Transform{
@@ -127,12 +165,12 @@ Entity{
             }
         }
 
-        components: [tail_mesh,material,tail_transform]
+        //components: [tail_mesh,material,tail_transform]
 
     }
 
 
-    components: isPointingAtPosition ? [tip_mesh,material,tip_transform_TipOnPos] : [tip_mesh,material,tip_transform_TailOnPos]
+    //components: isPointingAtPosition ? [tip_mesh,material,tip_transform_TipOnPos] : [tip_mesh,material,tip_transform_TailOnPos]
 
 }
 

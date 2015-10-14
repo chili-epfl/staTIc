@@ -17,3 +17,9 @@ void Beam::setExtremes(QPair<Joint *, Joint *> extremes){
         emit extremesChanged();
     }
 }
+void Beam::setAxialForce(qreal val){
+    if(m_axial_force!=val){
+        m_axial_force=val;
+        emit axialForceChanged(m_axial_force);
+    }
+}

@@ -23,3 +23,22 @@ int Force::generateExternalForceID(){
         return (id);
     }
 }
+
+void Force::setApplicationPoint(QVector3D applicationPoint){
+    if(m_applicationPoint!=applicationPoint){
+        m_applicationPoint=applicationPoint;
+        emit applicationPointChanged(m_applicationPoint);
+    }
+}
+void Force::setApplicationElement(AbstractElement* applicationElement){
+    if(m_applicationElement!=applicationElement){
+        m_applicationElement=applicationElement;
+        emit applicationElementChanged(m_applicationElement);
+    }
+}
+void Force::setVector(QVector3D vector){
+    if(m_vector!=vector){
+        m_vector=vector;
+        emit vectorChanged(m_vector);
+    }
+}

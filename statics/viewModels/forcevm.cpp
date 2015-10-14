@@ -36,13 +36,10 @@ void ForceVM::onForceVectorChanged(QVector3D val){
 void  ForceVM::initView(){
 
     Qt3D::QEntity *forceEntity;
-    QQmlComponent* component;
-    component=new QQmlComponent(&engine,QUrl("qrc:/ForceArrow.qml"));
-    forceEntity = qobject_cast<Qt3D::QEntity*>(component->create());
+    QQmlComponent component(&engine,QUrl("qrc:/ForceArrow.qml"));
+    forceEntity = qobject_cast<Qt3D::QEntity*>(component.create());
 
     //TODO:Better name for model
-    forceEntity->setParent(m_sceneRoot->findChild<Qt3D::QNode*>("Model"));
-    component->deleteLater();
 
     forceEntity->setProperty("myAngle",atan2(m_force->vector().y(),m_force->vector().x()));
     forceEntity->setProperty("position",m_force->applicationPoint());
@@ -51,7 +48,6 @@ void  ForceVM::initView(){
     forceEntity->setProperty("visible",m_visible);
     forceEntity->setProperty("type","External");
 
-
     append_3D_resources(forceEntity);
 
     connect(this,SIGNAL(updateForceDirection(qreal)),forceEntity,SIGNAL(changeMyAngle(qreal)));
@@ -59,6 +55,8 @@ void  ForceVM::initView(){
     connect(this,SIGNAL(updateForcePosition(QVector3D)),forceEntity,SIGNAL(changePosition(QVector3D)));
     connect(this,SIGNAL(visibilityChanged(bool)),forceEntity,SIGNAL(changeVisible(bool)));
     connect(this,SIGNAL(tipOnApplicationPointChanged(bool)),forceEntity,SIGNAL(changeIsPointingAtPosition(bool)));
+
+    forceEntity->setParent(m_sceneRoot->findChild<Qt3D::QNode*>("Model"));
 
 }
 

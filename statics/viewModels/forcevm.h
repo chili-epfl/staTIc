@@ -7,8 +7,7 @@
 class ForceVM: public AbstractElementViewModel
 {
     Q_OBJECT
-    Q_PROPERTY(bool visibility READ visibility WRITE setVisibility NOTIFY visibilityChanged)
-    Q_PROPERTY(bool tipOnApplicationPoint READ tipOnApplicationPoint WRITE setTipOnApplicationPoint NOTIFY tipOnApplicationPointChanged)
+
 public:
     explicit ForceVM(Force* force,QObject* uiRoot,Qt3D::QEntity* sceneRoot,QObject* parent=0);
 
@@ -18,7 +17,7 @@ public:
     void setTipOnApplicationPoint(bool val){if(m_hasTipOnApplicationPoint!=val){m_hasTipOnApplicationPoint=val;emit tipOnApplicationPointChanged(m_hasTipOnApplicationPoint);}}
     bool tipOnApplicationPoint(){return m_hasTipOnApplicationPoint; }
 
-    AbstractElement* model(){return m_force;}
+    Force* force(){return m_force;}
 
 public slots:
     void onElementDestroyed();

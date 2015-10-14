@@ -15,38 +15,37 @@
 class TwoDimensionalStaticsModule : public AbstractStaticsModule
 {
     Q_OBJECT
+
 public:
     TwoDimensionalStaticsModule(QObject* parent=0);
 
-    AbstractElement* createElement(AbstractElement::Element_Type type, QVariantList args );
+    /*AbstractElement* createElement(AbstractElement::Element_Type type, QVariantList args );
     void removeElement(QString element){removeElement(element,true);}
     AbstractElement* getElement(QString elementName);
-    bool containsElement(QString elementName);
+    bool containsElement(QString elementName);*/
 
-    QList<Joint*> m_joints;
-    QList<Beam*> m_beams;
-    QList<Force*> m_forces;
+    Force* createForce(QVector3D applicationPoint, QVector3D force_vector, AbstractElement* applicationElement=Q_NULLPTR);
+    Beam* createBeam(Joint* extreme1,Joint* extreme2,QString name=QString());
+    Joint* createJoint(QVector3D position, QString supportType=QString(),  QString name=QString() );
+
+    QList<Joint*> joints;
+    QList<Beam*> beams;
+    QList<Force*> forces;
 
 public slots:
-    void onForceUpdate(){solve();}
+    void onForceUpdate();
 
 protected:
     bool readStructure(QString path);
     void update();
 
 private:
-    void removeElement(QString element,bool update);
 
     void check_stability();
     void update_internalF_matrix();
     void solve();
 
     cv::Mat internalF_matrix;
-
-    //QHash<QString,AbstractElement*> m_elements;
-
-
-
 };
 
 #endif // STATICSMODULE_H

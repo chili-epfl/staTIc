@@ -5,7 +5,7 @@ import Qt3D.Renderer 2.0
 Material {
     id: alphaMaterial
 
-    property real alpha: 0.0
+    property real alpha: 0.5
     property color ka: "black"
     property color kd : "blue"
     property color ks: "blue"

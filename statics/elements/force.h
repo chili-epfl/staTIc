@@ -8,10 +8,6 @@
 class Force : public AbstractElement
 {
     Q_OBJECT
-    Q_PROPERTY(QVector3D applicationPoint READ applicationPoint WRITE setApplicationPoint NOTIFY applicationPointChanged)
-    Q_PROPERTY(QString applicationElement READ applicationElement WRITE setApplicationElement NOTIFY applicationElementChanged)
-    Q_PROPERTY(QVector3D vector READ vector WRITE setVector NOTIFY vectorChanged)
-
 public:
     Force(QObject *parent = 0);
     ~Force(){
@@ -19,25 +15,24 @@ public:
     }
 
     QVector3D applicationPoint(){return m_applicationPoint;}
-    QString applicationElement(){return m_applicationElement;}
+    AbstractElement* applicationElement(){return m_applicationElement;}
     QVector3D vector(){return m_vector;}
 
-    void setApplicationPoint(QVector3D applicationPoint){if(m_applicationPoint!=applicationPoint){m_applicationPoint=applicationPoint; emit applicationPointChanged(m_applicationPoint);}}
-    void setApplicationElement(QString applicationElement){if(m_applicationElement!=applicationElement){m_applicationElement=applicationElement;emit applicationElementChanged(m_applicationElement);}}
-    void setVector(QVector3D vector){if(m_vector!=vector){m_vector=vector;emit vectorChanged(m_vector);}}
-
+    void setApplicationPoint(QVector3D applicationPoint);
+    void setApplicationElement(AbstractElement* applicationElement);
+    void setVector(QVector3D vector);
 
 signals:
     void applicationPointChanged(QVector3D applicationPoint);
-    void applicationElementChanged(QString applicationElementChanged);
+    void applicationElementChanged(AbstractElement* applicationElementChanged);
     void vectorChanged(QVector3D vector);
 
 private:    
     int generateExternalForceID();
-    static QList<int> last_ids;    
+    static QList<int> last_ids;
 
     QVector3D m_applicationPoint;
-    QString m_applicationElement;
+    AbstractElement* m_applicationElement;
     QVector3D m_vector;
     int ID;
 

@@ -56,7 +56,8 @@ void BeamSignalProxy::onEntityDestroyed(){
 
 
 
-JointVM::JointVM(Joint* joint,QObject* uiRoot,Qt3D::QEntity* sceneRoot,QObject* parent): AbstractElementViewModel(uiRoot,sceneRoot,parent)
+JointVM::JointVM(Joint* joint,QObject* uiRoot,Qt3D::QEntity* sceneRoot,QObject* parent):
+    AbstractElementViewModel(uiRoot,sceneRoot,parent)
 {
     m_joint=joint;
     m_isSupport=false;
@@ -160,15 +161,15 @@ void JointVM::onJointConnectedBeamsChanged(){
 
 
 void JointVM::initView(){
+    QQmlComponent componentArrow(&engine,QUrl("qrc:/ForceArrow.qml"));
 
     if(m_joint->supportType()!=Joint::SupportType::NOSUPPORT){
         m_isSupport=true;
         m_reactionIsVisible=m_isSupport;
-    }
+
 
     /*Create the reaction force entity*/
     Qt3D::QEntity *forceEntity;
-    QQmlComponent componentArrow(&engine,QUrl("qrc:/ForceArrow.qml"));
     forceEntity = qobject_cast<Qt3D::QEntity*>(componentArrow.create());
 
     forceEntity->setProperty("myAngle",atan2(m_joint->reaction().y(),m_joint->reaction().x()));
@@ -182,11 +183,13 @@ void JointVM::initView(){
     connect(this,SIGNAL(updateReactionDirection(qreal)),forceEntity,SIGNAL(changeMyAngle(qreal)));
     connect(this,SIGNAL(updateReactionMagnitude(qreal)),forceEntity,SIGNAL(changeArrowLength(qreal)));
     connect(this,SIGNAL(reactionIsVisibleChanged(bool)),forceEntity,SIGNAL(changeVisible(bool)));
+    connect(this,SIGNAL(FBDisVisibleChanged(bool)),forceEntity,SIGNAL(changeVisible(bool)));
 
     append_3D_resources(forceEntity);
 
     forceEntity->setParent(m_sceneRoot->findChild<Qt3D::QNode*>("Model"));
 
+    }
     /*Create the FBD*/
     QQmlComponent componentFBD(&engine,QUrl("qrc:/FreeBodyDiagram.qml"));
 
@@ -234,6 +237,7 @@ void JointVM::initView(){
     FBDEntity->setParent(m_sceneRoot->findChild<Qt3D::QNode*>("Model"));
 
 }
+
 
 void JointVM::setDetailIsVisible(bool val){
     if(m_detailIsVisible!=val){

@@ -11,3 +11,23 @@ Joint::Joint(QObject* parent):
 {
 }
 
+void Joint::setSupportType(SupportType jointSupport){
+    if(m_jointSupport!=jointSupport){
+        m_jointSupport=jointSupport;
+        emit supportTypeChanged();
+    }
+}
+
+
+void Joint::setPosition(QVector3D pos){
+    if(m_pos!=pos){
+        m_pos=pos;
+        emit positionChanged(m_pos);
+    }
+}
+void Joint::setReaction(QVector3D reaction){
+    if(m_reaction!=reaction){
+        m_reaction=reaction;
+        emit reactionChanged(m_reaction);
+    }
+}

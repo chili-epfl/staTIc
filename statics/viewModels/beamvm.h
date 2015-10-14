@@ -7,14 +7,14 @@
 class BeamVM : public AbstractElementViewModel
 {
     Q_OBJECT
-    Q_PROPERTY(bool visibility READ visibility WRITE setVisibility NOTIFY visibilityChanged)
+
 public:
     explicit BeamVM(Beam* beam,QObject* uiRoot,Qt3D::QEntity* sceneRoot,QObject* parent=0);
 
     bool visibility(){return m_visible;}
     void setVisibility(bool val){if(val!=m_visible){m_visible=val;emit visibilityChanged(m_visible);}}
 
-    AbstractElement* model(){return m_beam;}
+    Beam* beam(){return m_beam;}
 
 
 public slots:        

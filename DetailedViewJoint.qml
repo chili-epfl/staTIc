@@ -27,7 +27,7 @@ Rectangle{
                         Image {
                             anchors.margins: 1
                             fillMode: Image.PreserveAspectFit
-                            source: icon;
+                            //source: icon;
                             anchors.fill: parent
                             MouseArea {
                                 anchors.fill: parent

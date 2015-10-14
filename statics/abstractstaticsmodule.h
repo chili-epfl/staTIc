@@ -7,6 +7,9 @@
 #include "elements/abstractelement.h"
 
 class AbstractEventHandler;
+class Joint;
+class Beam;
+class Force;
 
 class AbstractStaticsModule : public QObject
 {
@@ -33,13 +36,9 @@ public:
     Status status(){return m_status;}
     Stability stability(){return m_stability;}
 
-
-    virtual AbstractElement* createElement(AbstractElement::Element_Type type, QVariantList args )=0;
-    virtual void removeElement(QString element)=0;
-    virtual AbstractElement* getElement(QString elementName)=0;
-    virtual bool containsElement(QString elementName)=0;
-
-
+    virtual Force* createForce(QVector3D applicationPoint, QVector3D force_vector, AbstractElement* applicationElement=Q_NULLPTR)=0;
+    virtual Beam* createBeam(Joint* extreme1,Joint* extreme2,QString name=QString())=0;
+    virtual Joint* createJoint(QVector3D position, QString supportType=QString(),  QString name=QString() )=0;
 
 signals:
     void statusChanged();
@@ -52,8 +51,6 @@ protected:
 protected:
     Status m_status;
     Stability m_stability;
-
-
 };
 
 #endif // ABSTRACTSTATICSMODULE_H

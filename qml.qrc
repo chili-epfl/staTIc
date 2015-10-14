@@ -8,6 +8,8 @@
         <file>FreeBodyDiagram.qml</file>
         <file>test_main.qml</file>
         <file>DetailedViewJoint.qml</file>
+        <file>TangibleForce.qml</file>
+        <file>TangibleForce3DEntity.qml</file>
     </qresource>
     <qresource prefix="/models">
         <file>models/Model1/Model1.png</file>
@@ -28,10 +30,10 @@
         <file>opengl/phongalpha.vert</file>
         <file>opengl/TransparentMaterial.qml</file>
     </qresource>
-    <qresource prefix="/detailedviews">
-    </qresource>
+    <qresource prefix="/detailedviews"/>
     <qresource prefix="/images">
         <file>images/mainbanner.png</file>
         <file>images/woodbackground.png</file>
     </qresource>
+
 </RCC>

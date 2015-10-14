@@ -9,7 +9,6 @@ class AbstractElement : public QObject
 {
     Q_OBJECT
 public:
-    enum Element_Type{JOINT,BEAM,FORCE};
 
     AbstractElement(QObject *parent = 0);
     AbstractElement(QString name, QObject *parent = 0);

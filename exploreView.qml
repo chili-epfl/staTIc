@@ -4,6 +4,7 @@ import QtMultimedia 5.5
 import QtQuick.Layouts 1.1
 import QtQuick.Scene3D 2.0
 import Chilitags 1.0
+import QtPhysics.unofficial 1.0
 
 import StaticsModule2D 1.0
 import EventHandler2D 1.0
@@ -43,9 +44,11 @@ Item{
     StaticsModule2D{
         id:staticsmodule
         onStatusChanged: {if(status===StaticsModule2D.LOADED){
-                console.log("Loaded");
-                eventhandler.staticsModule=staticsmodule}}
+                eventhandler.staticsModule2D=staticsmodule
+            }
+        }
     }
+
     EventHandler2D{
             id:eventhandler
             camera:scene.camera
@@ -79,7 +82,6 @@ Item{
                         }
                     }
                 }
-
 
             }
 
@@ -220,7 +222,7 @@ Item{
         id:camDevice
         deviceId:QtMultimedia.availableCameras[1].deviceId
         imageCapture.resolution: "640x480" //Android sets the viewfinder resolution as the capture one
-        //viewfinder.resolution:"640x480"
+        viewfinder.resolution:"640x480"
     }
 
     VideoOutput{
@@ -232,7 +234,9 @@ Item{
         Scene3D {
             anchors.fill: parent
             focus: true
-            aspects: "input"
+            aspects: ["input","physics"]
+            //aspects: ["input"]
+            multisample:false
             Scene {
                 id:scene
             }
@@ -324,14 +328,17 @@ Item{
 
     Chilitags{
         id:chilitags
-        chiliobjects: [tag]
-
+        chiliobjects: [tag,forceTag]
     }
 
     ChilitagsObject{
         id: tag
     }
 
+    ChilitagsObject{
+        id:forceTag
+        name: "tag_1022"
+    }
 
 
 

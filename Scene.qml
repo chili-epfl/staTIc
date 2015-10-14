@@ -1,8 +1,12 @@
 import Qt3D 2.0
 import Qt3D.Renderer 2.0
 import MaterialSetter 1.0
-import QtQuick 2.3
+import QtQuick 2.3 as QQ2
+import QtPhysics.unofficial 1.0
+import PhysicsSetter 1.0
+
 import "qrc:/opengl/opengl"
+import "qrc:/ConcentratedForce"
 
 Entity {
     id: sceneRoot
@@ -14,6 +18,7 @@ Entity {
 
     Camera {
         id: camera
+        objectName: "camera"
         projectionType: CameraLens.FrustumProjection
         nearPlane : 0.1
         farPlane : 100000
@@ -45,14 +50,11 @@ Entity {
 
         }
 
-
     ]
 
     SceneLoader{
         id:sceneloader
-        onStatusChanged: {if (sceneloader.status===SceneLoader.Loaded){
-                eventhandler.sceneRoot=sceneroot;
-            }}
+        objectName: "sceneloader"
     }
 
     Transform {
@@ -65,6 +67,9 @@ Entity {
             id: sceneloadermatrix
             matrix: tag.transform
         }
+        /*Translate{
+           dz: 100
+        }*/
         Rotate{
             axis: Qt.vector3d(1, 0, 0)
             angle: 180
@@ -76,23 +81,54 @@ Entity {
         id: transparentMaterial
     }
 
-    MaterialSetter{
+    /*MaterialSetter{
         id:materialsetter
         sceneroot:scene
         entityName: "Scene"
         material: transparentMaterial
         onMaterialChanged: {if(sceneloader.status==SceneLoader.Loaded) materialsetter.onAnyChange();}
+    }*/
+    PhysicsBodyInfo{
+        id:bodyInfoScene
+        kinematic: true
+        //mass:1
     }
-    Connections{
+    PhysicsSetter{
+        id:physicsSetter
+        sceneroot: scene
+        entityName: "Model"
+        bodyInfo: bodyInfoScene
+    }
+
+    QQ2.Connections{
         target: sceneloader
-        onStatusChanged:{ if(sceneloader.status==SceneLoader.Loaded) materialsetter.onAnyChange(); }
+        onStatusChanged:{
+            if(sceneloader.status==SceneLoader.Loaded){
+                physicsSetter.onAnyChange();
+                eventhandler.sceneRoot=sceneroot;
+                //materialsetter.onAnyChange();
+            }
+        }
+
+    }
+    SphereMesh{
+        id:debugMesh
+        radius: 20
     }
 
     Entity {
         id:scene
         objectName: "Model"
         components: [ sceneloader, sceneloadertransform ]
+        //components: [ debugMesh, sceneloadertransform ]
+
     }
+
+    ConcentratedForce{
+        id:forceTool
+    }
+
+
 
 
 }
