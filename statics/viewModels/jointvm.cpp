@@ -52,10 +52,6 @@ void BeamSignalProxy::onEntityDestroyed(){
 }
 */
 
-
-
-
-
 JointVM::JointVM(Joint* joint,QObject* uiRoot,Qt3D::QEntity* sceneRoot,QObject* parent):
     AbstractElementViewModel(uiRoot,sceneRoot,parent)
 {

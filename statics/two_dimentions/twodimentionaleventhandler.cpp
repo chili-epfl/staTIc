@@ -26,7 +26,7 @@ void TwoDimentionalEventHandler::initViewModels(){
         }
     }
     for(Beam* beam: m_staticsModule->beams){
-        BeamVM* beamVM=new BeamVM(beam,m_uiRoot,m_sceneRoot,this);
+        BeamVM* beamVM=createBeamVM(beam);
         Qt3D::QEntity* entity= m_sceneRoot->findChild<Qt3D::QEntity*>(beam->objectName());
         if(entity){
             beamVM->append_3D_resources(entity,AbstractElementViewModel::Roles::PRIMARY);
@@ -65,6 +65,7 @@ JointVM* TwoDimentionalEventHandler::createJointVM(Joint* j){
 }
 
 void TwoDimentionalEventHandler::onAddedResource(Qt3D::QEntity* e){
+    //qDebug()<<e->id();
     m_Entity3D2ViewModel[e]=(AbstractElementViewModel*)QObject::sender();
     m_entityID2Entity3D[e->id()]=e;
 }

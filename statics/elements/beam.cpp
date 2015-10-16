@@ -8,7 +8,6 @@ Beam::Beam(QObject* parent):AbstractElement(parent)
 {
 }
 
-
 void Beam::setExtremes(QPair<Joint *, Joint *> extremes){
     if(m_extremes!=extremes){
         m_extremes=extremes;

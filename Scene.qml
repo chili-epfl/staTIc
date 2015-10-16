@@ -96,7 +96,7 @@ Entity {
     PhysicsSetter{
         id:physicsSetter
         sceneroot: scene
-        entityName: "Model"
+        entityName: "Scene"
         bodyInfo: bodyInfoScene
     }
 
@@ -122,10 +122,11 @@ Entity {
         components: [ sceneloader, sceneloadertransform ]
         //components: [ debugMesh, sceneloadertransform ]
 
-    }
+        /*Tools*/
+        ConcentratedForce{
+            id:forceTool
+        }
 
-    ConcentratedForce{
-        id:forceTool
     }
 
 

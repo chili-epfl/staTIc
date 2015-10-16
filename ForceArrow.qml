@@ -50,20 +50,7 @@ Entity{
     onChangeHighlighted: highlighted=val
 
     signal changeVisible (bool val)
-    onChangeVisible:
-        {
-        visible=val;
-        if(visible && !tooSmall){
-            //tail.components=[tail_mesh,material,tail_transform]
-            components= isPointingAtPosition ? [tip_mesh,material,tip_transform_TipOnPos] : [tip_mesh,material,tip_transform_TailOnPos]
-        }
-        else{
-            tail.components=[]
-            components=[]
-        }
-
-
-        }
+    onChangeVisible: visible=val;
 
     signal changePosition (vector3d pos)
     onChangePosition: position=pos
@@ -84,17 +71,6 @@ Entity{
             tooSmall=false
         else
             tooSmall=true
-    }
-
-    onTooSmallChanged:{
-        if(visible && !tooSmall){
-           //tail.components=[tail_mesh,material,tail_transform]
-           components= isPointingAtPosition ? [tip_mesh,material,tip_transform_TipOnPos] : [tip_mesh,material,tip_transform_TailOnPos]
-        }
-        else{
-           tail.components=[]
-           components=[]
-        }
     }
 
 
@@ -170,7 +146,7 @@ Entity{
     }
 
 
-    //components: isPointingAtPosition ? [tip_mesh,material,tip_transform_TipOnPos] : [tip_mesh,material,tip_transform_TailOnPos]
+    components: isPointingAtPosition ? [tip_mesh,material,tip_transform_TipOnPos] : [tip_mesh,material,tip_transform_TailOnPos]
 
 }
 

@@ -18,8 +18,8 @@ Force* TwoDimensionalStaticsModule::createForce(QVector3D applicationPoint, QVec
 
     connect(force,SIGNAL(vectorChanged(QVector3D)),this,SLOT(onForceUpdate()));
     connect(force,SIGNAL(applicationPointChanged(QVector3D)),this,SLOT(onForceUpdate()));
-    connect(force,SIGNAL(applicationElementChanged(QString)),this,SLOT(onForceUpdate()));
-
+    connect(force,SIGNAL(applicationElementChanged(AbstractElement*)),this,SLOT(onForceUpdate()));
+    connect(force,SIGNAL(destroyed(QObject*)),this,SLOT(onForceDeleted(QObject*)));
     solve();
 
     return force;
@@ -68,7 +68,10 @@ Joint* TwoDimensionalStaticsModule::createJoint(QVector3D position,
 void TwoDimensionalStaticsModule::onForceUpdate(){
     solve();
 }
-
+void TwoDimensionalStaticsModule::onForceDeleted(QObject* obj){
+    forces.removeOne((Force*)obj);
+    solve();
+}
 
 bool TwoDimensionalStaticsModule::readStructure(QString path){
 

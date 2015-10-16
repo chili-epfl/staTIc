@@ -20,9 +20,6 @@ public:
     virtual QList<Qt3D::QEntity*> getEntitiesByRole(Roles role);
     virtual Roles getEntitiyRole(Qt3D::QEntity* e);
 
-
-public slots:
-    virtual void onElementDestroyed()=0;
 signals:
     void resourceAdded(Qt3D::QEntity* e);
 protected:    

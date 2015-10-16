@@ -10,7 +10,7 @@ class ForceVM: public AbstractElementViewModel
 
 public:
     explicit ForceVM(Force* force,QObject* uiRoot,Qt3D::QEntity* sceneRoot,QObject* parent=0);
-
+    ~ForceVM();
     bool visibility(){return m_visible;}
     void setVisibility(bool val){if(val!=m_visible){m_visible=val;emit visibilityChanged(m_visible);}}
 
@@ -20,11 +20,9 @@ public:
     Force* force(){return m_force;}
 
 public slots:
-    void onElementDestroyed();
-
     /*Slots for signals from the model*/
     void onForceApplicationPointChanged(QVector3D val);
-    void onForceApplicationElementChanged(QString);
+    void onForceApplicationElementChanged(AbstractElement*);
     void onForceVectorChanged(QVector3D);
     /*------*/
 signals:

@@ -34,6 +34,7 @@ public:
 
 public slots:
     void onForceUpdate();
+    void onForceDeleted(QObject* obj);
 
 protected:
     bool readStructure(QString path);

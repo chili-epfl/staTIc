@@ -7,22 +7,26 @@ ForceVM::ForceVM(Force* force,QObject* uiRoot,Qt3D::QEntity* sceneRoot,QObject* 
     m_visible=true;
     m_hasTipOnApplicationPoint=true;
 
-    connect(m_force,SIGNAL(destroyed(QObject*)),this,SLOT(onElementDestroyed()));
-
+    connect(m_force,SIGNAL(destroyed(QObject*)),this,SLOT(deleteLater()));
     connect(m_force,SIGNAL(applicationPointChanged(QVector3D)),this,SLOT(onForceApplicationPointChanged(QVector3D)));
-    connect(m_force,SIGNAL(applicationElementChanged(QString)),this,SLOT(onForceApplicationElementChanged(QString)));
+    connect(m_force,SIGNAL(applicationElementChanged(AbstractElement*)),this,SLOT(onForceApplicationElementChanged(AbstractElement*)));
     connect(m_force,SIGNAL(vectorChanged(QVector3D)),this,SLOT(onForceVectorChanged(QVector3D)));
 
     initView();
 }
 
+ForceVM::~ForceVM(){
+    Q_FOREACH(Qt3D::QEntity* e, m_3DEntitiesRoles.keys()){
+        e->deleteLater();
+    }
+}
 
 
 void ForceVM::onForceApplicationPointChanged(QVector3D val){
     emit updateForcePosition(val);
 }
 
-void ForceVM::onForceApplicationElementChanged(QString val){
+void ForceVM::onForceApplicationElementChanged(AbstractElement* val){
 
 }
 
@@ -60,9 +64,3 @@ void  ForceVM::initView(){
 
 }
 
-void ForceVM::onElementDestroyed(){
- /*   Qt3D::QEntity *forceEntity=m_sceneRoot->findChild<Qt3D::QEntity*>(StaticsHelper::NameResolution(m_entity_name,
-                                                                                                    StaticsHelper::Roles::MODEL,StaticsHelper::Roles::ENTITY3D));
-    if(forceEntity)
-        forceEntity->deleteLater();*/
-}
