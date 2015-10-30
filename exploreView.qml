@@ -6,13 +6,15 @@ import QtQuick.Scene3D 2.0
 import Chilitags 1.0
 import QtPhysics.unofficial 1.0
 
-import StaticsModule2D 1.0
-import EventHandler2D 1.0
+import Frame3DDKernel 1.0
+import Frame3DDVMManager 1.0
 
 import MouseInterface3D 1.0
 
 Item{
-    id: root
+    id: applicationRoot
+    anchors.fill: parent
+    property alias currentViewFilter: viewFilterBar.selection
     signal exitView()
     signal loadStructure(string modelName,url modelFile,url staticsFile,url tagFile);
 
@@ -23,11 +25,9 @@ Item{
         tag.name=modelName
     }
 
-    anchors.fill: parent
     state: "AG"
     states:[State {
             name: "AG"
-
             StateChangeScript {
                 name: "stopcamera"
                 script: camDevice.start();
@@ -38,21 +38,21 @@ Item{
             StateChangeScript {
                 name: "stopcamera"
                 script: camDevice.stop();
-            }        }
+            }
+        }
     ]
 
-    StaticsModule2D{
+    Frame3DDKernel{
         id:staticsmodule
-        onStatusChanged: {if(status===StaticsModule2D.LOADED){
-                eventhandler.staticsModule2D=staticsmodule
+        onStatusChanged: {
+            if(status===Frame3DDKernel.LOADED){
+                vmManager.staticsModule=staticsmodule
             }
         }
     }
 
-    EventHandler2D{
-            id:eventhandler
-            camera:scene.camera
-            uiRoot: root
+    Frame3DDVMManager{
+            id:vmManager
     }
 
     /*UI*/
@@ -63,8 +63,8 @@ Item{
         state: "HIDDEN"
         ColumnLayout{
             Row{
-                ToolBarComponent{
-                    id:toolspace
+                ViewFilterBar{
+                    id:viewFilterBar
                 }
             }
             Row{
@@ -95,7 +95,7 @@ Item{
             },
             State {
                 name: "HIDDEN"
-                PropertyChanges { target: topmenu; y: -toolspace.height+10}
+                PropertyChanges { target: topmenu; y: -viewFilterBar.height+10}
                 PropertyChanges { target: ic_topmenu; rotation:180}
 
             }
@@ -108,7 +108,7 @@ Item{
         objectName: "Details_Tab"
         color: "transparent"
         anchors.verticalCenter: parent.verticalCenter
-        x:root.width-width
+        x:applicationRoot.width-width
         z:1
         width: 0.25*parent.width
         height: Math.min(0.5*parent.height,detailedViewJoint.count*0.3*width + 5)
@@ -118,7 +118,7 @@ Item{
                 name: "DetailsJoint"
                 PropertyChanges {
                     target: detailsview
-                    x: root.width-0.25*parent.width
+                    x: applicationRoot.width-0.25*parent.width
 
                 }
             },
@@ -126,14 +126,14 @@ Item{
                 name: "DetailsBeam"
                 PropertyChanges {
                     target: detailsview
-                    x: root.width-0.25*parent.width
+                    x: applicationRoot.width-0.25*parent.width
                 }
             },
             State {
                 name: "Closed"
                 PropertyChanges {
                     target: detailsview
-                    x: root.width-5
+                    x: applicationRoot.width-5
                 }
             }
 
@@ -157,7 +157,7 @@ Item{
         ColumnLayout{
             spacing: 0
             Rectangle{
-                color: (root.state=="AG")? "red": "yellow"
+                color: (applicationRoot.state=="AG")? "red": "yellow"
                 width: Math.max(captionVirtual.font.pixelSize,captionAG.font.pixelSize) +10
                 height: width
                 radius: 5
@@ -170,12 +170,12 @@ Item{
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        root.state="AG"
+                        applicationRoot.state="AG"
                     }
                 }
             }
             Rectangle{
-                color: (root.state=="V")? "red" : "yellow"
+                color: (applicationRoot.state=="V")? "red" : "yellow"
                 width: Math.max(captionVirtual.font.pixelSize,captionAG.font.pixelSize) +10
                 height: width
                 radius: 5
@@ -188,7 +188,7 @@ Item{
                 MouseArea{
                     anchors.fill: parent
                     onClicked: {
-                        root.state="V"
+                        applicationRoot.state="V"
                     }
                 }
             }
@@ -231,12 +231,12 @@ Item{
         anchors.fill: parent
         source:camDevice
         filters:[chilitags]
+
         Scene3D {
             anchors.fill: parent
             focus: true
             aspects: ["input","physics"]
-            //aspects: ["input"]
-            multisample:false
+            multisample:true
             Scene {
                 id:scene
             }

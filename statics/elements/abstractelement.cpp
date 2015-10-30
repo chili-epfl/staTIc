@@ -1,6 +1,7 @@
 #include "abstractelement.h"
 
-AbstractElement::AbstractElement(QString name,QObject *parent) : QObject(parent)
+AbstractElement::AbstractElement(QString name,QObject *parent) :
+    AbstractElement(parent)
 {
     this->setObjectName(name);
 }

@@ -1,6 +1,11 @@
 #include "concentratedforce.h"
+
 #include "statics/viewModels/jointvm.h"
-#include "statics/elements/force.h"
+#include "statics/viewModels/beamvm.h"
+
+#include "statics/elements/interiorpointload.h"
+#include "statics/elements/nodeload.h"
+#include "statics/abstractvmmanager.h"
 
 /*********************Support functions************************/
 QMatrix4x4 getTranformationMatrix(Qt3D::QEntity* entity,bool local){
@@ -29,18 +34,22 @@ QMatrix4x4 getTranformationMatrix(Qt3D::QEntity* entity,bool local){
 
 
 ConcentratedForce::ConcentratedForce(QObject* parent):
-    QObject(parent)
+    QObject(parent),
+    m_VMManager(Q_NULLPTR),
+    m_emittingBodyInfo(Q_NULLPTR),
+    m_pointLoad(Q_NULLPTR),
+    m_nodeLoad(Q_NULLPTR)
 {
-    m_UIManager=Q_NULLPTR;
-    m_attached_element=Q_NULLPTR;
-    m_force=Q_NULLPTR;
-    m_emittingBodyInfo=Q_NULLPTR;
+
 }
 
-void ConcentratedForce::setUiManager(AbstractEventHandler * UIManager){
-    if(UIManager!=m_UIManager){
-        m_UIManager=UIManager;
+void ConcentratedForce::setVMManager(AbstractVMManager * vmManager){
+    if(vmManager!=m_VMManager){
+        m_VMManager=vmManager;
     }
+}
+void ConcentratedForce::setRegisteredTargets(QStringList targets){
+    m_targets=targets;
 }
 
 void ConcentratedForce::setEmittingBodyInfo(Physics::PhysicsBodyInfo* emittingBodyInfo){
@@ -51,7 +60,6 @@ void ConcentratedForce::setEmittingBodyInfo(Physics::PhysicsBodyInfo* emittingBo
         if(m_emittingBodyInfo){
             connect(m_emittingBodyInfo,SIGNAL(collided(Physics::PhysicsCollisionEvent*)),this,SLOT(onCollition(Physics::PhysicsCollisionEvent*)));
             connect(m_emittingBodyInfo,SIGNAL(collitionsListChanged()),this,SLOT(checkCollitionAttachedElement()));
-
         }
      }
 }
@@ -61,14 +69,18 @@ void ConcentratedForce::checkCollitionAttachedElement(){
         Physics::PhysicsBodyInfo* sender_body_info=qobject_cast<Physics::PhysicsBodyInfo*>(QObject::sender());
         if(!sender_body_info->collitionTest(m_attached_element->id())){
             m_attached_element=Q_NULLPTR;
-            m_force->deleteLater();
-            qDebug()<<"Destroyed";
+            if(m_nodeLoad)
+                m_nodeLoad->deleteLater();
+            if(m_pointLoad)
+                m_pointLoad->deleteLater();
+            m_nodeLoad=Q_NULLPTR;
+            m_pointLoad=Q_NULLPTR;
         }
     }
 }
 
 void ConcentratedForce::onCollition(Physics::PhysicsCollisionEvent* e){
-    if(!m_UIManager) return;
+    if(!m_VMManager) return;
     Physics::PhysicsBodyInfo* sender_body_info=qobject_cast<Physics::PhysicsBodyInfo*>(QObject::sender());
     if(sender_body_info->entities().size()>1){
         qWarning()<<"Ambiguous sender";
@@ -77,25 +89,23 @@ void ConcentratedForce::onCollition(Physics::PhysicsCollisionEvent* e){
     Qt3D::QEntity* sender=sender_body_info->entities().at(0);
     if(!sender) return;
 
-    Qt3D::QEntity* targetEntity=m_UIManager->getEntity3D(e->target());
+    Qt3D::QEntity* targetEntity=m_VMManager->getEntity3D(e->target());
     if(targetEntity!=Q_NULLPTR && targetEntity==m_attached_element){
-        QMatrix4x4 M_sender=getTranformationMatrix(sender,true);
-        QVector3D force_dir(-1,0,0);
-        QVector3D force_dir_in_target=M_sender.mapVector(force_dir);
-        m_force->setVector(force_dir_in_target);
+        /*Update current status*/
     }
     else if(targetEntity!=Q_NULLPTR && m_attached_element==Q_NULLPTR){
         //The Object was not attached, and the force should be created
-        AbstractElementViewModel* targetVM=m_UIManager->getAssociatedVM(targetEntity);
+        AbstractElementViewModel* targetVM=m_VMManager->getAssociatedVM(targetEntity);
         if(targetVM->inherits("JointVM")) {
             JointVM* jointVM= static_cast<JointVM*>(targetVM);
-            if(jointVM->getEntitiyRole(targetEntity)!=AbstractElementViewModel::Roles::PRIMARY) return;
-            QMatrix4x4 M_sender=getTranformationMatrix(sender,true);
-            QVector3D force_dir(-1,0,0);
-            QVector3D force_dir_in_target=M_sender.mapVector(force_dir);
             Joint* joint=jointVM->joint();
-            m_force=m_UIManager->staticsModule()->createForce(joint->position(),force_dir_in_target,joint);
-            m_UIManager->createForceVM(m_force);
+            m_nodeLoad=m_VMManager->staticsModule()->createNodeLoad(QVector3D(0,-1,0),joint);
+            m_attached_element=targetEntity;
+        }
+        else if(targetEntity->inherits("BeamVM")){
+            BeamVM* beamVM=static_cast<BeamVM*>(targetVM);
+            Beam* beam=beamVM->beam();
+            m_pointLoad=m_VMManager->staticsModule()->createIPLoad(QVector3D(0,-1,0),beam);
             m_attached_element=targetEntity;
         }
     }

@@ -1,5 +1,7 @@
 #include "statics/two_dimentions/twodimensionalstaticsmodule.h"
-#include "staticshelper.h"
+#include "statics/elements/nodeload.h"
+#include "statics/elements/beam.h"
+#include "statics/elements/joint.h"
 
 TwoDimensionalStaticsModule::TwoDimensionalStaticsModule(QObject *parent )
     :AbstractStaticsModule(parent)
@@ -7,29 +9,13 @@ TwoDimensionalStaticsModule::TwoDimensionalStaticsModule(QObject *parent )
 
 }
 
-Force* TwoDimensionalStaticsModule::createForce(QVector3D applicationPoint, QVector3D force_vector,
-                                                AbstractElement* applicationElement){
-
-    Force* force=new Force(this);
-    force->setApplicationPoint(applicationPoint);
-    force->setVector(force_vector);
-    force->setApplicationElement(applicationElement);
-    forces.append(force);
-
-    connect(force,SIGNAL(vectorChanged(QVector3D)),this,SLOT(onForceUpdate()));
-    connect(force,SIGNAL(applicationPointChanged(QVector3D)),this,SLOT(onForceUpdate()));
-    connect(force,SIGNAL(applicationElementChanged(AbstractElement*)),this,SLOT(onForceUpdate()));
-    connect(force,SIGNAL(destroyed(QObject*)),this,SLOT(onForceDeleted(QObject*)));
-    solve();
-
-    return force;
-
-
-}
-Beam* TwoDimensionalStaticsModule::createBeam(Joint* extreme1,Joint* extreme2,QString name){
-
+Beam* TwoDimensionalStaticsModule::createBeam(Joint* extreme1,Joint* extreme2,QString name,
+                                 qreal Ax, qreal Asy, qreal Asz, qreal Jx,
+                                 qreal Iy, qreal Iz, qreal E, qreal G,
+                                 qreal p, qreal d){
     Beam* beam=new Beam(name,this);
     QPair<Joint*, Joint*> extremes;
+
     extremes.first=extreme1;
     extremes.second=extreme2;
 
@@ -39,39 +25,41 @@ Beam* TwoDimensionalStaticsModule::createBeam(Joint* extreme1,Joint* extreme2,QS
     connectedBeamsChange in the joint class*/
     beam->setExtremes(extremes);
 
-    beams.append(beam);
+    m_beams.append(beam);
 
+    connect(beam,SIGNAL(extremesChanged()),this,SLOT(update()));
     return beam;
 
 }
-
-Joint* TwoDimensionalStaticsModule::createJoint(QVector3D position,
-                                                QString supportType,QString name ){
+Joint* TwoDimensionalStaticsModule::createJoint(QVector3D position, QString name,
+                                    bool  support_X,bool support_Y,bool support_Z,
+                                    bool support_XX,bool support_YY,bool support_ZZ){
 
     Joint* joint=new Joint(name,this);
     joint->setPosition(position);
-    if(supportType.isEmpty())
-        joint->setSupportType(Joint::NOSUPPORT);
-    else if(supportType.compare("fixed",Qt::CaseInsensitive)==0){
-        joint->setSupportType(Joint::FIXED);
-    }
-    else if(supportType.compare("rolling",Qt::CaseInsensitive)==0){
-        joint->setSupportType(Joint::ROLLING);
-    }
-    joints.append(joint);
+    joint->setSupport( support_X,support_Y,support_Z, support_XX,support_YY,support_ZZ);
+    m_joints.append(joint);
+
+    connect(joint,SIGNAL(positionChanged(QVector3D)),this,SLOT(update()));
+    connect(joint,SIGNAL(reactionChanged(QVector3D)),this,SLOT(update()));
+    connect(joint,SIGNAL(supportChanged()),this,SLOT(update()));
 
     return joint;
-
-
 }
 
-void TwoDimensionalStaticsModule::onForceUpdate(){
-    solve();
+NodeLoad* TwoDimensionalStaticsModule::createNodeLoad(QVector3D force, Joint* joint,QString name){
+    NodeLoad* nodeLoad=new NodeLoad(name,this);
+    nodeLoad->setForce(force);
+    m_node_loads.append(nodeLoad);
+    connect(nodeLoad,SIGNAL(forceChanged()),this,SLOT(update()));
+    return nodeLoad;
 }
-void TwoDimensionalStaticsModule::onForceDeleted(QObject* obj){
-    forces.removeOne((Force*)obj);
-    solve();
+
+UniformlyDistributedLoad* TwoDimensionalStaticsModule::createUDLoad(QVector3D force, Beam* beam,QString name){
+    qWarning("TwoDimensionalStaticsModule doesn't support UniformlyDistributedLoad");
+    return Q_NULLPTR;
 }
+
 
 bool TwoDimensionalStaticsModule::readStructure(QString path){
 

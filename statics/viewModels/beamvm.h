@@ -9,35 +9,21 @@ class BeamVM : public AbstractElementViewModel
     Q_OBJECT
 
 public:
-    explicit BeamVM(Beam* beam,QObject* uiRoot,Qt3D::QEntity* sceneRoot,QObject* parent=0);
-
-    bool visibility(){return m_visible;}
-    void setVisibility(bool val){if(val!=m_visible){m_visible=val;emit visibilityChanged(m_visible);}}
+    explicit BeamVM(Beam* beam,Qt3D::QEntity* sceneRoot,QObject* parent=0);
+    ~BeamVM();
 
     Beam* beam(){return m_beam;}
 
-
 public slots:        
-    void onElementDestroyed();
 
     /*Slots for signals from the model*/
-    void onBeamExtremesChanged();
-    void onBeamAxialForceChanged(qreal val);
+    void onBeamAxialStressChanged();
     /*-----*/
 
-signals:
-    void updateForceMagnitude(qreal val);
-    void updateForceDirectionEx1(qreal val);
-    void updateForceDirectionEx2(qreal val);
-    void visibilityChanged(bool val);
-
 private:
-
     void initView();
-
-    bool m_visible;
     Beam* m_beam;
-
+    Qt3D::QEntity* m_component3D;
 };
 
 #endif // BEAMVM_H

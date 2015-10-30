@@ -10,6 +10,10 @@
         <file>DetailedViewJoint.qml</file>
         <file>TangibleForce.qml</file>
         <file>TangibleForce3DEntity.qml</file>
+        <file>BeamView.qml</file>
+        <file>JointView.qml</file>
+        <file>BeamView4JointView.qml</file>
+        <file>ViewFilterBar.qml</file>
     </qresource>
     <qresource prefix="/models">
         <file>models/Model1/Model1.png</file>
@@ -35,5 +39,4 @@
         <file>images/mainbanner.png</file>
         <file>images/woodbackground.png</file>
     </qresource>
-
 </RCC>

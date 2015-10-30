@@ -2,7 +2,7 @@
 #define CONTROLLER_H
 
 #include <QObject>
-#include "statics/abstracteventhandler.h"
+#include "statics/abstractvmmanager.h"
 
 #include "statics/two_dimentions/twodimensionalstaticsmodule.h"
 

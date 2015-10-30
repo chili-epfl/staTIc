@@ -5,43 +5,74 @@ QT += qml quick widgets 3dcore 3drenderer 3dinput multimedia
 CONFIG += c++11
 SOURCES += main.cpp \
     structureitemmodel.cpp \
-    statics/two_dimentions/twodimensionalstaticsmodule.cpp \
+    #statics/two_dimentions/twodimensionalstaticsmodule.cpp \
     statics/elements/joint.cpp \
     statics/elements/force.cpp \
     statics/abstractstaticsmodule.cpp \
     statics/elements/abstractelement.cpp \
     statics/elements/beam.cpp \
     materialsetter.cpp \
-    statics/abstracteventhandler.cpp \
-    statics/two_dimentions/twodimentionaleventhandler.cpp \
+    #statics/two_dimentions/twodimentionaleventhandler.cpp \
     statics/viewModels/abstractelementviewmodel.cpp \
     statics/viewModels/beamvm.cpp \
-    statics/viewModels/forcevm.cpp \
+    #statics/viewModels/forcevm.cpp \
     statics/viewModels/jointvm.cpp \
     staticshelper.cpp \
     statics/viewModels/jointvmitemmodel.cpp \
     physicssetter.cpp \
-    Tools/ConcentratedForce/concentratedforce.cpp
+    Tools/ConcentratedForce/concentratedforce.cpp \
+    statics/frame3dd/coordtrans.c \
+    statics/frame3dd/eig.c \
+    statics/frame3dd/frame3dd.c \
+    #statics/frame3dd/frame3dd_io.c \
+    statics/frame3dd/HPGmatrix.c \
+    #statics/frame3dd/HPGutil.c \
+    #statics/frame3dd/main.c \
+    statics/frame3dd/NRutil.c \
+    #statics/frame3dd/preframe.c \
+    statics/frame3dd/frame3ddkernel.cpp \
+    statics/elements/nodeload.cpp \
+    statics/elements/uniformlydistributedload.cpp \
+    statics/abstractvmmanager.cpp \
+    statics/frame3dd/frame3ddvmmanager.cpp \
+    qmlenginefactory.cpp \
+    statics/elements/interiorpointload.cpp
 
 HEADERS += \
     structureitemmodel.h \
-    statics/two_dimentions/twodimensionalstaticsmodule.h \
+    #statics/two_dimentions/twodimensionalstaticsmodule.h \
     statics/elements/joint.h \
     statics/elements/force.h \
     statics/abstractstaticsmodule.h \
     statics/elements/abstractelement.h \
     statics/elements/beam.h \
     materialsetter.h \
-    statics/abstracteventhandler.h \
-    statics/two_dimentions/twodimentionaleventhandler.h \
+    #statics/two_dimentions/twodimentionaleventhandler.h \
     statics/viewModels/abstractelementviewmodel.h \
     statics/viewModels/beamvm.h \
-    statics/viewModels/forcevm.h \
+    #statics/viewModels/forcevm.h \
     statics/viewModels/jointvm.h \
     staticshelper.h \
     statics/viewModels/jointvmitemmodel.h \
     physicssetter.h \
-    Tools/ConcentratedForce/concentratedforce.h
+    Tools/ConcentratedForce/concentratedforce.h \
+    statics/frame3dd/microstran/config.h \
+    statics/frame3dd/microstran/vec3.h \
+    statics/frame3dd/common.h \
+    statics/frame3dd/coordtrans.h \
+    statics/frame3dd/eig.h \
+    statics/frame3dd/frame3dd.h \
+    #statics/frame3dd/frame3dd_io.h \
+    statics/frame3dd/HPGmatrix.h \
+    #statics/frame3dd/HPGutil.h \
+    statics/frame3dd/NRutil.h \
+    statics/frame3dd/frame3ddkernel.h \
+    statics/elements/nodeload.h \
+    statics/elements/uniformlydistributedload.h \
+    statics/abstractvmmanager.h \
+    statics/frame3dd/frame3ddvmmanager.h \
+    qmlenginefactory.h \
+    statics/elements/interiorpointload.h
 
 RESOURCES += qml.qrc \
     Tools/tools.qrc

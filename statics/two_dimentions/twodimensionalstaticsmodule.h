@@ -3,7 +3,6 @@
 
 #include "statics/elements/joint.h"
 #include "statics/elements/beam.h"
-#include "statics/elements/force.h"
 #include "statics/abstractstaticsmodule.h"
 
 #include <QList>
@@ -24,17 +23,21 @@ public:
     AbstractElement* getElement(QString elementName);
     bool containsElement(QString elementName);*/
 
-    Force* createForce(QVector3D applicationPoint, QVector3D force_vector, AbstractElement* applicationElement=Q_NULLPTR);
-    Beam* createBeam(Joint* extreme1,Joint* extreme2,QString name=QString());
-    Joint* createJoint(QVector3D position, QString supportType=QString(),  QString name=QString() );
-
-    QList<Joint*> joints;
-    QList<Beam*> beams;
-    QList<Force*> forces;
+    virtual Beam* createBeam(Joint* extreme1,Joint* extreme2,QString name=QString(),
+                             qreal Ax=0, qreal Asy=0, qreal Asz=0, qreal Jx=0,
+                             qreal Iy=0, qreal Iz=0, qreal E=0, qreal G=0,
+                             qreal p=0, qreal d=0);
+    virtual Joint* createJoint(QVector3D position,QString name=QString(),
+                               bool  support_X=false,bool support_Y=false,bool support_Z=false,
+                               bool support_XX=false,bool support_YY=false,bool support_ZZ=false );
+    virtual NodeLoad* createNodeLoad(QVector3D force, Joint* joint,QString name=QString());
+    virtual UniformlyDistributedLoad* createUDLoad(QVector3D force, Beam* beam,QString name=QString());
+    
+    QList<Joint*> m_joints;
+    QList<Beam*> m_beams;
+    QList<NodeLoad*> m_node_loads;
 
 public slots:
-    void onForceUpdate();
-    void onForceDeleted(QObject* obj);
 
 protected:
     bool readStructure(QString path);

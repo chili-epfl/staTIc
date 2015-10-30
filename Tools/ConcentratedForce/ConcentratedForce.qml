@@ -6,8 +6,6 @@ import QuickConcentratedForce 1.0
 import QtQuick 2.3 as QQ2
 
 Entity {
-    objectName: "Force"
-
     //property matrix4x4 pose:forceTag.matrix
 //    property alias chilitag: forceTag
 

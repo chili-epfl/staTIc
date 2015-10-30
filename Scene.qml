@@ -10,6 +10,9 @@ import "qrc:/ConcentratedForce"
 
 Entity {
     id: sceneRoot
+    QQ2.Component.onCompleted: {
+        console.log(applicationRoot.currentViewFilter)
+    }
     property alias sceneroot: sceneRoot
     property alias camera: camera
 
@@ -56,6 +59,16 @@ Entity {
         id:sceneloader
         objectName: "sceneloader"
     }
+    QQ2.Connections{
+        target: sceneloader
+        onStatusChanged:{
+            if(sceneloader.status==SceneLoader.Loaded){
+                vmManager.sceneRoot=modelEntity;
+                //physicsSetter.onAnyChange();
+                //materialsetter.onAnyChange();
+            }
+        }
+    }
 
     Transform {
         id: sceneloadertransform
@@ -67,14 +80,10 @@ Entity {
             id: sceneloadermatrix
             matrix: tag.transform
         }
-        /*Translate{
-           dz: 100
-        }*/
         Rotate{
             axis: Qt.vector3d(1, 0, 0)
             angle: 180
         }
-
     }
 
     TransparentMaterial {
@@ -88,7 +97,7 @@ Entity {
         material: transparentMaterial
         onMaterialChanged: {if(sceneloader.status==SceneLoader.Loaded) materialsetter.onAnyChange();}
     }*/
-    PhysicsBodyInfo{
+    /*PhysicsBodyInfo{
         id:bodyInfoScene
         kinematic: true
         //mass:1
@@ -98,34 +107,25 @@ Entity {
         sceneroot: scene
         entityName: "Scene"
         bodyInfo: bodyInfoScene
-    }
+    }*/
 
-    QQ2.Connections{
-        target: sceneloader
-        onStatusChanged:{
-            if(sceneloader.status==SceneLoader.Loaded){
-                physicsSetter.onAnyChange();
-                eventhandler.sceneRoot=sceneroot;
-                //materialsetter.onAnyChange();
-            }
-        }
 
-    }
-    SphereMesh{
-        id:debugMesh
-        radius: 20
-    }
 
     Entity {
-        id:scene
+        id:modelEntity
         objectName: "Model"
         components: [ sceneloader, sceneloadertransform ]
-        //components: [ debugMesh, sceneloadertransform ]
+
+//        SphereMesh{
+//            id:debugMesh
+//            radius: 20
+//        }
+//        //components: [ debugMesh, sceneloadertransform ]
 
         /*Tools*/
-        ConcentratedForce{
-            id:forceTool
-        }
+//        ConcentratedForce{
+//            id:forceTool
+//        }
 
     }
 

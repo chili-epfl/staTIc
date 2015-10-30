@@ -9,7 +9,6 @@ class AbstractElement : public QObject
 {
     Q_OBJECT
 public:
-
     AbstractElement(QObject *parent = 0);
     AbstractElement(QString name, QObject *parent = 0);
 

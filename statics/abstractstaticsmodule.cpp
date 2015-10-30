@@ -1,8 +1,7 @@
 #include "abstractstaticsmodule.h"
-#include "abstracteventhandler.h"
+#include "abstractvmmanager.h"
 AbstractStaticsModule::AbstractStaticsModule(QObject* parent ):
     QObject(parent)
 {
-    m_status=NOT_LOADED;
-
+    m_status=NOT_LOADED;    
 }
