@@ -9,11 +9,13 @@ Entity{
     property vector3d position
     property vector3d reaction
 
+    property real reactionMagnitude: reaction.length()
+
     onPositionChanged: computeTransform()
     onReactionChanged:{
-        if(reaction.length()<10)
+        if(reactionMagnitude<10)
             forceRadius=forceRadii["small"]
-        else if (reaction.length()<20){
+        else if (reactionMagnitude<20){
             forceRadius=forceRadii["medium"]
         }
         else{
@@ -39,7 +41,7 @@ Entity{
             from:  0
             to: distanceFromJoint
             loops: QQ2.Animation.Infinite
-            running: visible && reaction.length() > 0
+            running: visible && reactionMagnitude > 0
     }
 
     function computeTransform(){
@@ -85,30 +87,30 @@ Entity{
     }
     components: [mesh,transform]
 
-    NodeInstantiator{
-        model:5
-        //asynchronous:true
-        delegate:
-            Entity{
-            id:reactionUnit
-            property int idx: index
-            SphereMesh{
-                enabled: visible && reaction.length() > 0
-                id:ruMesh
-                radius: forceRadius;
-            }
-            Transform{
-                id:ruTransform
-                Translate{
-                    dx:((idx)*step+animationValue)%distanceFromJoint
-                }
-                MatrixTransform{
-                    matrix: poseMatrix
-                }
-            }
-            components: [ruMesh,ruTransform]
-        }
-    }
+//    NodeInstantiator{
+//        model:5
+//        //asynchronous:true
+//        delegate:
+//            Entity{
+//            id:reactionUnit
+//            property int idx: index
+//            SphereMesh{
+//                enabled: visible && reactionMagnitude>0
+//                id:ruMesh
+//                radius: forceRadius;
+//            }
+//            Transform{
+//                id:ruTransform
+//                Translate{
+//                    dx:((idx)*step+animationValue)%distanceFromJoint
+//                }
+//                MatrixTransform{
+//                    matrix: poseMatrix
+//                }
+//            }
+//            components: [ruMesh,ruTransform]
+//        }
+//    }
 
 }
 

@@ -6,9 +6,6 @@ Entity{
 
     property bool visible:  applicationRoot.currentViewFilter=='JOINT' ? true : false
 
-    signal changeVisible (bool val)
-    onChangeVisible: visible=val;
-
     property vector3d extreme1
     property vector3d extreme2
 
@@ -76,29 +73,28 @@ Entity{
                                 0   ,   0, 0, 1)
         return matrix;
     }
-    NodeInstantiator{
-        model:nModels
-        //asynchronous:true
-        delegate:
-            Entity{
-            id:animationUnit
-            property int idx: index
-            SphereMesh{
-                enabled: visible
-                id:auMesh
-                radius: forceRadius;
-            }
-            Transform{
-                id:auTransform
-                Translate{
-                    dx:(idx*step+animationValue)%50
-                }
-                MatrixTransform{
-                    matrix: poseMatrix
-                }
-            }
-            components: [auMesh,auTransform]
-        }
-    }
+//    NodeInstantiator{
+//        model:nModels
+//        //asynchronous:true
+//        delegate:
+//            Entity{
+//            id:animationUnit
+//            property int idx: index
+//            SphereMesh{
+//                enabled: visible
+//                id:auMesh
+//                radius: forceRadius;            }
+//            Transform{
+//                id:auTransform
+//                Translate{
+//                    dx:(idx*step+animationValue)%50
+//                }
+//                MatrixTransform{
+//                    matrix: poseMatrix
+//                }
+//            }
+//            components: [auMesh,auTransform]
+//        }
+//    }
 
 }

@@ -1,9 +1,9 @@
 import Qt3D 2.0
 import Qt3D.Renderer 2.0
 import QtQuick 2.0 as QQ2
-
+import QtPhysics.unofficial 1.0
 Entity{
-
+    id:rootEntity
     property bool visible:  applicationRoot.currentViewFilter=='BEAM' ? true : false
 
     property vector3d extreme1
@@ -13,6 +13,20 @@ Entity{
 
     property int axialForceType: 0 //-1 compression,0 nul, 1 tension
     property real axialForce : 0
+
+    onAxialForceTypeChanged: {
+        animation.stop();
+        var prevAnimationValue=animationValue
+        if(axialForceType>0){
+            animation.from=prevAnimationValue
+            animation.to=length/2-step+prevAnimationValue
+        }
+        else{
+            animation.to=prevAnimationValue
+            animation.from=length/2-step+prevAnimationValue
+        }
+        animation.restart()
+    }
 
     onAxialForceChanged:{
         if(axialForce<10)
@@ -35,11 +49,12 @@ Entity{
     property var forceRadii: { "small": 1, "medium": 2, "big":3 }
 
     QQ2.NumberAnimation on animationValue{
-            duration: 10000
-            from: axialForceType>=0 ? 0 : length/2-step
-            to: axialForceType>=0 ? length/2-step : 0
-            loops: QQ2.Animation.Infinite
-            running: visible && axialForceType!==0
+        id:animation
+        duration: 10000
+        from: 0
+        to:  length/2-step
+        loops: QQ2.Animation.Infinite
+        running: visible && axialForceType!==0
     }
 
     onExtreme1Changed: computeTransform()
@@ -75,6 +90,8 @@ Entity{
         return matrix;
     }
 
+
+
     CylinderMesh{
         id:mesh
         radius: 0.5
@@ -88,53 +105,185 @@ Entity{
         }
     }
 
-
     components: [mesh,transform]
 
-
-    NodeInstantiator{
-        active:visible
-        model:nModels
-        //asynchronous:true
-        delegate:
-            Entity{
-            id:animationUnit
-            property int idx: index
-            SphereMesh{
-                enabled: !visible || idx > Math.round(length/2*step) ? false : true
-                id:auMesh
-                radius: forceRadius;
-            }
-            Transform{
-                id:auTransform
-                Translate{
-                    dy:(((idx)*step+animationValue)%Math.round(length/2-step)+step)
-                }
-            }
-            components: [auMesh,auTransform]
-        }
+    Entity{
+       id:physicBody
+       CylinderMesh{
+           enabled: false
+           id:pBodyMesh
+           radius: 10
+           length: rootEntity.length
+       }
+       PhysicsBodyInfo{
+           id:pBody
+           kinematic:true
+       }
+       components: [pBodyMesh,pBody]
     }
 
-    NodeInstantiator{
-        model:nModels
-        //asynchronous:true
-        delegate:
-            Entity{
-            id:animationUnit2
-            property int idx: index
-            SphereMesh{
-                enabled: !visible || idx > Math.round(length/(2*step)) ? false : true
-                id:auMesh2
-                radius: forceRadius;
-            }
-            Transform{
-                id:auTransform2
-                Translate{
-                    dy:(((idx)*step+animationValue)%Math.round(length/2-step)+step)*(-1)
-                }
-            }
-            components: [auMesh2,auTransform2]
+
+    //First sequence
+
+    Entity{
+        components: [SphereMesh{
+            enabled: !visible || 0 > Math.round(length/2*step) ? false : true
+            radius: forceRadius;
         }
+        , Transform{
+            Translate{
+                dy:(((0)*step+animationValue)%Math.round(length/2-step)+step)
+            }
+        }]
     }
+    Entity{
+        components: [SphereMesh{
+            enabled: !visible || 1 > Math.round(length/2*step) ? false : true
+            radius: forceRadius;
+        }
+        , Transform{
+            Translate{
+                dy:(((1)*step+animationValue)%Math.round(length/2-step)+step)
+            }
+        }]
+    }
+    Entity{
+        components: [SphereMesh{
+            enabled: !visible ||2 > Math.round(length/2*step) ? false : true
+            radius: forceRadius;
+        }
+        , Transform{
+            Translate{
+                dy:(((2)*step+animationValue)%Math.round(length/2-step)+step)
+            }
+        }]
+    }
+    Entity{
+        components: [SphereMesh{
+            enabled: !visible || 3 > Math.round(length/2*step) ? false : true
+            radius: forceRadius;
+        }
+        , Transform{
+            Translate{
+                dy:(((3)*step+animationValue)%Math.round(length/2-step)+step)
+            }
+        }]
+    }
+    Entity{
+        components: [SphereMesh{
+            enabled: !visible || 4 > Math.round(length/2*step) ? false : true
+            radius: forceRadius;
+        }
+        , Transform{
+            Translate{
+                dy:(((4)*step+animationValue)%Math.round(length/2-step)+step)
+            }
+        }]
+    }
+
+
+    //Second Sequence
+    Entity{
+        components: [SphereMesh{
+            enabled: !visible || 0 > Math.round(length/2*step) ? false : true
+            radius: forceRadius;
+        }
+        , Transform{
+            Translate{
+                dy:(((0)*step+animationValue)%Math.round(length/2-step)+step)*(-1)
+            }
+        }]
+    }
+    Entity{
+        components: [SphereMesh{
+            enabled: !visible || 1 > Math.round(length/2*step) ? false : true
+            radius: forceRadius;
+        }
+        , Transform{
+            Translate{
+                dy:(((1)*step+animationValue)%Math.round(length/2-step)+step)*(-1)
+            }
+        }]
+    }
+    Entity{
+        components: [SphereMesh{
+            enabled: !visible ||2 > Math.round(length/2*step) ? false : true
+            radius: forceRadius;
+        }
+        , Transform{
+            Translate{
+                dy:(((2)*step+animationValue)%Math.round(length/2-step)+step)*(-1)
+            }
+        }]
+    }
+    Entity{
+        components: [SphereMesh{
+            enabled: !visible || 3 > Math.round(length/2*step) ? false : true
+            radius: forceRadius;
+        }
+        , Transform{
+            Translate{
+                dy:(((3)*step+animationValue)%Math.round(length/2-step)+step)*(-1)
+            }
+        }]
+    }
+    Entity{
+        components: [SphereMesh{
+            enabled: !visible || 4 > Math.round(length/2*step) ? false : true
+            radius: forceRadius;
+        }
+        , Transform{
+            Translate{
+                dy:(((4)*step+animationValue)%Math.round(length/2-step)+step)*(-1)
+            }
+        }]
+    }
+
+
+
+//        NodeInstantiator{
+//            active:visible
+//            model:nModels
+//            //asynchronous:true
+//            delegate:
+//                Entity{
+//                id:animationUnit
+//                property int idx: index
+//                SphereMesh{
+//                    enabled: !visible || idx > Math.round(length/2*step) ? false : true
+//                    id:auMesh
+//                    radius: forceRadius;
+//                }
+//                Transform{
+//                    id:auTransform
+//                    Translate{
+//                        dy:(((idx)*step+animationValue)%Math.round(length/2-step)+step)
+//                    }
+//                 }
+//                components: [auMesh,auTransform]
+//            }
+//        }
+
+//        NodeInstantiator{
+//            model:nModels
+//            //asynchronous:true
+//            delegate:
+//                Entity{
+//                id:animationUnit2
+//                property int idx: index
+//                SphereMesh{
+//                    enabled: !visible || idx > Math.round(length/(2*step)) ? false : true
+//                    id:auMesh2
+//                    radius: forceRadius;
+//                }
+//                Transform{
+//                    id:auTransform2
+//                    Translate{
+//                        dy:(((idx)*step+animationValue)%Math.round(length/2-step)+step)*(-1)
+//                    }
+//                }
+//                components: [auMesh2,auTransform2]
+//            }
+//        }
 
 }

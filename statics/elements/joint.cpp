@@ -4,7 +4,10 @@
 Joint::Joint(QVector3D position,QString name,QObject* parent):
     AbstractElement(name,parent),
     m_pos(position),
-    m_reaction(),
+    m_reaction(0,0,0),
+    m_reaction_momentum(0,0,0),
+    m_displacement(0,0,0),
+    m_displacement_rot(0,0,0),
     m_support_X(0),
     m_support_Y(0),
     m_support_Z(0),

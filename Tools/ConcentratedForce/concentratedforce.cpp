@@ -38,7 +38,8 @@ ConcentratedForce::ConcentratedForce(QObject* parent):
     m_VMManager(Q_NULLPTR),
     m_emittingBodyInfo(Q_NULLPTR),
     m_pointLoad(Q_NULLPTR),
-    m_nodeLoad(Q_NULLPTR)
+    m_nodeLoad(Q_NULLPTR),
+    m_attached_element(Q_NULLPTR)
 {
 
 }
@@ -66,17 +67,17 @@ void ConcentratedForce::setEmittingBodyInfo(Physics::PhysicsBodyInfo* emittingBo
 
 void ConcentratedForce::checkCollitionAttachedElement(){
     if(m_attached_element){
-        Physics::PhysicsBodyInfo* sender_body_info=qobject_cast<Physics::PhysicsBodyInfo*>(QObject::sender());
-        if(!sender_body_info->collitionTest(m_attached_element->id())){
-            m_attached_element=Q_NULLPTR;
-            if(m_nodeLoad)
-                m_nodeLoad->deleteLater();
-            if(m_pointLoad)
-                m_pointLoad->deleteLater();
-            m_nodeLoad=Q_NULLPTR;
-            m_pointLoad=Q_NULLPTR;
+            Physics::PhysicsBodyInfo* sender_body_info=qobject_cast<Physics::PhysicsBodyInfo*>(QObject::sender());
+            if(!sender_body_info->collitionTest(m_attached_element->id())){
+                m_attached_element=Q_NULLPTR;
+                if(m_nodeLoad)
+                    m_nodeLoad->deleteLater();
+                if(m_pointLoad)
+                    m_pointLoad->deleteLater();
+                m_nodeLoad=Q_NULLPTR;
+                m_pointLoad=Q_NULLPTR;
+            }
         }
-    }
 }
 
 void ConcentratedForce::onCollition(Physics::PhysicsCollisionEvent* e){
@@ -94,6 +95,7 @@ void ConcentratedForce::onCollition(Physics::PhysicsCollisionEvent* e){
         /*Update current status*/
     }
     else if(targetEntity!=Q_NULLPTR && m_attached_element==Q_NULLPTR){
+        qDebug()<<targetEntity;
         //The Object was not attached, and the force should be created
         AbstractElementViewModel* targetVM=m_VMManager->getAssociatedVM(targetEntity);
         if(targetVM->inherits("JointVM")) {
@@ -102,7 +104,7 @@ void ConcentratedForce::onCollition(Physics::PhysicsCollisionEvent* e){
             m_nodeLoad=m_VMManager->staticsModule()->createNodeLoad(QVector3D(0,-1,0),joint);
             m_attached_element=targetEntity;
         }
-        else if(targetEntity->inherits("BeamVM")){
+        else if(targetVM->inherits("BeamVM")){
             BeamVM* beamVM=static_cast<BeamVM*>(targetVM);
             Beam* beam=beamVM->beam();
             m_pointLoad=m_VMManager->staticsModule()->createIPLoad(QVector3D(0,-1,0),beam);

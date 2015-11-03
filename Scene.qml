@@ -63,7 +63,7 @@ Entity {
         target: sceneloader
         onStatusChanged:{
             if(sceneloader.status==SceneLoader.Loaded){
-                vmManager.sceneRoot=modelEntity;
+                vmFrame3DDManager.sceneRoot=modelEntity;
                 //physicsSetter.onAnyChange();
                 //materialsetter.onAnyChange();
             }
@@ -123,10 +123,9 @@ Entity {
 //        //components: [ debugMesh, sceneloadertransform ]
 
         /*Tools*/
-//        ConcentratedForce{
-//            id:forceTool
-//        }
+        ConcentratedForce{
 
+        }
     }
 
 

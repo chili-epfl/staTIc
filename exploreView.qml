@@ -46,13 +46,13 @@ Item{
         id:staticsmodule
         onStatusChanged: {
             if(status===Frame3DDKernel.LOADED){
-                vmManager.staticsModule=staticsmodule
+                vmFrame3DDManager.staticsModule=staticsmodule
             }
         }
     }
 
     Frame3DDVMManager{
-            id:vmManager
+            id:vmFrame3DDManager
     }
 
     /*UI*/

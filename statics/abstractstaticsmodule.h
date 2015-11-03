@@ -47,7 +47,7 @@ public:
                                bool support_XX=false,bool support_YY=false,bool support_ZZ=false )=0;
     virtual NodeLoad* createNodeLoad(QVector3D force, Joint* joint,QString name=QString())=0;
     virtual UniformlyDistributedLoad* createUDLoad(QVector3D force, Beam* beam,QString name=QString())=0;
-    virtual InteriorPointLoad* createIPLoad(QVector3D force, Beam* beam,QString name=QString())=0;
+    virtual InteriorPointLoad* createIPLoad(QVector3D force, Beam* beam,qreal distance=-1,QString name=QString())=0;
 
 signals:
     void statusChanged();

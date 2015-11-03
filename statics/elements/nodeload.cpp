@@ -2,9 +2,9 @@
 
 NodeLoad::NodeLoad(Joint* joint,QString name,QObject* parent):
     AbstractElement(name,parent),
+    m_joint(joint),
     m_force(1,0,0),
-    m_momentum(0,0,0),
-    m_joint(joint)
+    m_momentum(0,0,0)
 {
 
 }

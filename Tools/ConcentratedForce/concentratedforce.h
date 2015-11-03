@@ -31,12 +31,9 @@ public slots:
 private:
     AbstractVMManager* m_VMManager;
     Physics::PhysicsBodyInfo* m_emittingBodyInfo;
-
     InteriorPointLoad* m_pointLoad;
     NodeLoad* m_nodeLoad;
-
     QStringList m_targets;
-
     Qt3D::QEntity* m_attached_element;
 };
 

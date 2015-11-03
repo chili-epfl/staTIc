@@ -4,8 +4,8 @@
 
 UniformlyDistributedLoad::UniformlyDistributedLoad(Beam* beam,QString name,QObject* parent):
    AbstractElement(name,parent),
-   m_force(1,0,0),
-   m_beam(beam)
+   m_beam(beam),
+   m_force(1,0,0)
 {
 }
 

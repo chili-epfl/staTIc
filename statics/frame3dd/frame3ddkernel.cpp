@@ -51,6 +51,10 @@ Frame3DDKernel::Frame3DDKernel(QObject* parent):
     m_shear(0),
     m_geom(0)
 {
+    m_lazyupdateTimer=new QTimer(this);
+    connect(m_lazyupdateTimer, SIGNAL(timeout()), this, SLOT(solve()));
+    m_lazyupdateTimer->setSingleShot(true);
+    m_lazyupdateTimer->setInterval(300);
 }
 
 bool Frame3DDKernel::readStructure(QString path){
@@ -251,6 +255,9 @@ void Frame3DDKernel::setStatus(Status status){
 }
 
 void Frame3DDKernel::update(){
+    if(!m_lazyupdateTimer->isActive()){
+        m_lazyupdateTimer->start();
+    }
 }
 /**/
 void Frame3DDKernel::solve(){
@@ -302,7 +309,7 @@ void Frame3DDKernel::solve(){
         struct_mass,	// mass of structural system
         total_mass,	// total structural mass and extra mass
         *f  = NULL,	// resonant frequencies
-        **V = NULL,	// resonant mode-shapes
+        **V = NULL,	// resonant mode-shapesIf singleShot is true, the timer will be activated only once.
         rms_resid=1.0,	// root mean square of residual displ. error
         error = 1.0,	// rms equilibrium error and reactions
         Cfreq = 0.0,	// frequency used for Guyan condensation
@@ -820,7 +827,7 @@ void Frame3DDKernel::assemble_loads (
 
       Q_FOREACH(UniformlyDistributedLoad* UDLoad,m_uniformly_distributed_loads){
           int i=1;
-          int application_beam_index=m_beams.indexOf(UDLoad->beam());
+          int application_beam_index=m_beams.indexOf(UDLoad->beam())+1;
           U[1][i][1] = (double) application_beam_index;
           U[1][i][2] = UDLoad->force().x();
           U[1][i][3] = UDLoad->force().y();
@@ -1061,95 +1068,83 @@ void Frame3DDKernel::assemble_loads (
 //      }			/* end trapezoidally distributed loads */
 
       /* internal element point loads -------------------------------- */
-      nP[1]=0;
-//      sfrv=fscanf(fp,"%d", &nP[lc] );
-//      if (sfrv != 1) sferr("nP value load data");
-//      if ( verbose ) {
-//        fprintf(stdout,"  number of concentrated frame element point loads ");
-//        dots(stdout,2);	fprintf(stdout," nP = %3d\n", nP[lc]);
-//      }
-//      if ( nP[lc] < 0 || nP[lc] > 10*nE ) {
-//        fprintf(stderr,"  number of concentrated frame element point loads ");
-//        dots(stderr,3);
-//        fprintf(stderr," nP = %3d\n", nP[lc]);
-//        sprintf(errMsg,"\n  error: valid ranges for nP is 0 ... %d \n", 10*nE );
-//        errorMsg(errMsg);
-//        exit(150);
-//      }
-//      for (i=1; i <= nP[lc]; i++) {	/* ! local element coordinates ! */
-//        sfrv=fscanf(fp,"%d", &n );
-//        if (sfrv != 1) sferr("frame element number value point load data");
-//        if ( n < 1 || n > nE ) {
-//            sprintf(errMsg,"\n   error in internal point loads: frame element number %d is out of range\n",n);
-//            errorMsg(errMsg);
-//            exit(151);
-//        }
-//        P[lc][i][1] = (double) n;
-//        for (l=2; l<=5; l++) {
-//            sfrv=fscanf(fp,"%f", &P[lc][i][l] );
-//            if (sfrv != 1) sferr("value in point load data");
-//        }
-//        a = P[lc][i][5];	b = L[n] - a;
+      nP[1]=m_interior_point_loads.size();
+      if ( nP[1] > 10*nE ) {
+        qDebug("Invalid number of concentrated frame element point loads");
+        return;
+      }
+      for (i=1; i <= nP[1]; i++) {	/* ! local element coordinates ! */
+        InteriorPointLoad* ipl=m_interior_point_loads.at(i-1);
+        n=m_beams.indexOf(ipl->beam())+1;
+        if ( n <= 0 ) {
+           qDebug("Error in internal point loads: wrong beam reference");
+           return;
+        }
+        P[1][i][1] = (double) n;
+        P[1][i][2] = ipl->force().x();
+        P[1][i][3] = ipl->force().y();
+        P[1][i][4] = ipl->force().z();
+        P[1][i][5] = ipl->distance();
 
-//        if ( a < 0 || L[n] < a || b < 0 || L[n] < b ) {
-//            sprintf(errMsg,"\n  error in point load data: Point load coord. out of range\n   Frame element number: %d  L: %lf  load coord.: %lf\n",
-//            n, L[n], P[lc][i][5] );
-//            errorMsg(errMsg);
-//            exit(152);
-//        }
+        a = P[1][i][5];	b = L[n] - a;
 
-//        if ( shear ) {
-//            Ksy = (12.0*E[n]*Iz[n]) / (G[n]*Asy[n]*Le[n]*Le[n]);
-//            Ksz = (12.0*E[n]*Iy[n]) / (G[n]*Asz[n]*Le[n]*Le[n]);
-//        } else	Ksy = Ksz = 0.0;
+        if ( a < 0 || L[n] < a || b < 0 || L[n] < b ) {
+            qDebug("Invalid distance for internal point load");
+            return;
+        }
 
-//        Ln = L[n];
+        if ( shear ) {
+            Ksy = (12.0*E[n]*Iz[n]) / (G[n]*Asy[n]*Le[n]*Le[n]);
+            Ksz = (12.0*E[n]*Iy[n]) / (G[n]*Asz[n]*Le[n]*Le[n]);
+        } else	Ksy = Ksz = 0.0;
 
-//        Nx1 = P[lc][i][2]*a/Ln;
-//        Nx2 = P[lc][i][2]*b/Ln;
+        Ln = L[n];
 
-//        Vy1 = (1./(1.+Ksz))    * P[lc][i][3]*b*b*(3.*a + b) / ( Ln*Ln*Ln ) +
-//            (Ksz/(1.+Ksz)) * P[lc][i][3]*b/Ln;
-//        Vy2 = (1./(1.+Ksz))    * P[lc][i][3]*a*a*(3.*b + a) / ( Ln*Ln*Ln ) +
-//            (Ksz/(1.+Ksz)) * P[lc][i][3]*a/Ln;
+        Nx1 = P[1][i][2]*a/Ln;
+        Nx2 = P[1][i][2]*b/Ln;
 
-//        Vz1 = (1./(1.+Ksy))    * P[lc][i][4]*b*b*(3.*a + b) / ( Ln*Ln*Ln ) +
-//            (Ksy/(1.+Ksy)) * P[lc][i][4]*b/Ln;
-//        Vz2 = (1./(1.+Ksy))    * P[lc][i][4]*a*a*(3.*b + a) / ( Ln*Ln*Ln ) +
-//            (Ksy/(1.+Ksy)) * P[lc][i][4]*a/Ln;
+        Vy1 = (1./(1.+Ksz))    * P[1][i][3]*b*b*(3.*a + b) / ( Ln*Ln*Ln ) +
+            (Ksz/(1.+Ksz)) * P[1][i][3]*b/Ln;
+        Vy2 = (1./(1.+Ksz))    * P[1][i][3]*a*a*(3.*b + a) / ( Ln*Ln*Ln ) +
+            (Ksz/(1.+Ksz)) * P[1][i][3]*a/Ln;
 
-//        Mx1 = Mx2 = 0.0;
+        Vz1 = (1./(1.+Ksy))    * P[1][i][4]*b*b*(3.*a + b) / ( Ln*Ln*Ln ) +
+            (Ksy/(1.+Ksy)) * P[1][i][4]*b/Ln;
+        Vz2 = (1./(1.+Ksy))    * P[1][i][4]*a*a*(3.*b + a) / ( Ln*Ln*Ln ) +
+            (Ksy/(1.+Ksy)) * P[1][i][4]*a/Ln;
 
-//        My1 = -(1./(1.+Ksy))  * P[lc][i][4]*a*b*b / ( Ln*Ln ) -
-//            (Ksy/(1.+Ksy))* P[lc][i][4]*a*b   / (2.*Ln);
-//        My2 =  (1./(1.+Ksy))  * P[lc][i][4]*a*a*b / ( Ln*Ln ) +
-//            (Ksy/(1.+Ksy))* P[lc][i][4]*a*b   / (2.*Ln);
+        Mx1 = Mx2 = 0.0;
 
-//        Mz1 =  (1./(1.+Ksz))  * P[lc][i][3]*a*b*b / ( Ln*Ln ) +
-//            (Ksz/(1.+Ksz))* P[lc][i][3]*a*b   / (2.*Ln);
-//        Mz2 = -(1./(1.+Ksz))  * P[lc][i][3]*a*a*b / ( Ln*Ln ) -
-//            (Ksz/(1.+Ksz))* P[lc][i][3]*a*b   / (2.*Ln);
+        My1 = -(1./(1.+Ksy))  * P[1][i][4]*a*b*b / ( Ln*Ln ) -
+            (Ksy/(1.+Ksy))* P[1][i][4]*a*b   / (2.*Ln);
+        My2 =  (1./(1.+Ksy))  * P[1][i][4]*a*a*b / ( Ln*Ln ) +
+            (Ksy/(1.+Ksy))* P[1][i][4]*a*b   / (2.*Ln);
 
-//        n1 = J1[n];	n2 = J2[n];
+        Mz1 =  (1./(1.+Ksz))  * P[1][i][3]*a*b*b / ( Ln*Ln ) +
+            (Ksz/(1.+Ksz))* P[1][i][3]*a*b   / (2.*Ln);
+        Mz2 = -(1./(1.+Ksz))  * P[1][i][3]*a*a*b / ( Ln*Ln ) -
+            (Ksz/(1.+Ksz))* P[1][i][3]*a*b   / (2.*Ln);
 
-//        coord_trans ( xyz, Ln, n1, n2,
-//            &t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[n] );
+        n1 = J1[n];	n2 = J2[n];
 
-//        /* {F} = [T]'{Q} */
-//        eqF_mech[lc][n][1]  += ( Nx1*t1 + Vy1*t4 + Vz1*t7 );
-//        eqF_mech[lc][n][2]  += ( Nx1*t2 + Vy1*t5 + Vz1*t8 );
-//        eqF_mech[lc][n][3]  += ( Nx1*t3 + Vy1*t6 + Vz1*t9 );
-//        eqF_mech[lc][n][4]  += ( Mx1*t1 + My1*t4 + Mz1*t7 );
-//        eqF_mech[lc][n][5]  += ( Mx1*t2 + My1*t5 + Mz1*t8 );
-//        eqF_mech[lc][n][6]  += ( Mx1*t3 + My1*t6 + Mz1*t9 );
+        coord_trans ( xyz, Ln, n1, n2,
+            &t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[n] );
 
-//        eqF_mech[lc][n][7]  += ( Nx2*t1 + Vy2*t4 + Vz2*t7 );
-//        eqF_mech[lc][n][8]  += ( Nx2*t2 + Vy2*t5 + Vz2*t8 );
-//        eqF_mech[lc][n][9]  += ( Nx2*t3 + Vy2*t6 + Vz2*t9 );
-//        eqF_mech[lc][n][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
-//        eqF_mech[lc][n][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
-//        eqF_mech[lc][n][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
-//      }					/* end element point loads */
+        /* {F} = [T]'{Q} */
+        eqF_mech[1][n][1]  += ( Nx1*t1 + Vy1*t4 + Vz1*t7 );
+        eqF_mech[1][n][2]  += ( Nx1*t2 + Vy1*t5 + Vz1*t8 );
+        eqF_mech[1][n][3]  += ( Nx1*t3 + Vy1*t6 + Vz1*t9 );
+        eqF_mech[1][n][4]  += ( Mx1*t1 + My1*t4 + Mz1*t7 );
+        eqF_mech[1][n][5]  += ( Mx1*t2 + My1*t5 + Mz1*t8 );
+        eqF_mech[1][n][6]  += ( Mx1*t3 + My1*t6 + Mz1*t9 );
+
+        eqF_mech[1][n][7]  += ( Nx2*t1 + Vy2*t4 + Vz2*t7 );
+        eqF_mech[1][n][8]  += ( Nx2*t2 + Vy2*t5 + Vz2*t8 );
+        eqF_mech[1][n][9]  += ( Nx2*t3 + Vy2*t6 + Vz2*t9 );
+        eqF_mech[1][n][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
+        eqF_mech[1][n][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
+        eqF_mech[1][n][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
+      }					/* end element point loads */
 
       /* thermal loads ----------------------------------------------- */
       nT[1]=0;
@@ -1200,7 +1195,7 @@ void Frame3DDKernel::assemble_loads (
 //        eqF_temp[lc][n][6]  += ( Mx1*t3 + My1*t6 + Mz1*t9 );
 
 //        eqF_temp[lc][n][7]  += ( Nx2*t1 + Vy2*t4 + Vz2*t7 );
-//        eqF_temp[lc][n][8]  += ( Nx2*t2 + Vy2*t5 + Vz2*t8 );
+//        eqF_temp[lc][n][8]  += ( Nx2*t2 qreal distance=-1+ Vy2*t5 + Vz2*t8 );
 //        eqF_temp[lc][n][9]  += ( Nx2*t3 + Vy2*t6 + Vz2*t9 );
 //        eqF_temp[lc][n][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
 //        eqF_temp[lc][n][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
@@ -1317,8 +1312,8 @@ Beam* Frame3DDKernel::createBeam(Joint* extreme1,Joint* extreme2,QString name,
         m_beams.append(beam);
         connect(beam,SIGNAL(parametersChanged()),this,SLOT(update()));
         connect(beam,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDeleted(QObject*)));
+        update();
         return beam;
-
     }
     return Q_NULLPTR;
 }
@@ -1332,6 +1327,7 @@ Joint* Frame3DDKernel::createJoint(QVector3D position, QString name,
     connect(joint,SIGNAL(connectedBeamsChanged()),this,SLOT(update()));//suspicious....
     connect(joint,SIGNAL(supportChanged()),this,SLOT(update()));
     connect(joint,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDeleted(QObject*)));
+    update();
     return joint;
 }
 
@@ -1343,7 +1339,9 @@ NodeLoad* Frame3DDKernel::createNodeLoad(QVector3D force, Joint* joint,QString n
         connect(nodeLoad,SIGNAL(forceChanged()),this,SLOT(update()));
         connect(nodeLoad,SIGNAL(momentumChanged()),this,SLOT(update()));
         connect(nodeLoad,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDeleted(QObject*)));
+        update();
         return nodeLoad;
+
     }
     return Q_NULLPTR;
 }
@@ -1355,39 +1353,34 @@ UniformlyDistributedLoad* Frame3DDKernel::createUDLoad(QVector3D force, Beam* be
         m_uniformly_distributed_loads.append(udLoad);
         connect(udLoad,SIGNAL(forceChanged()),this,SLOT(update()));
         connect(udLoad,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDeleted(QObject*)));
+        update();
         return udLoad;
     }
     return Q_NULLPTR;
 
 }
 
-InteriorPointLoad* Frame3DDKernel::createIPLoad(QVector3D force, Beam *beam, QString name){
+InteriorPointLoad* Frame3DDKernel::createIPLoad(QVector3D force, Beam *beam, qreal distance,QString name){
+    if(!force.isNull() && beam!=Q_NULLPTR){
+        if(distance<0)
+            distance=beam->length()/2;
+        InteriorPointLoad* ipLoad=new InteriorPointLoad(beam,distance,name,this);
+        ipLoad->setForce(force);
+        m_interior_point_loads.append(ipLoad);
+        connect(ipLoad,SIGNAL(forceChanged()),this,SLOT(update()));
+        connect(ipLoad,SIGNAL(distanceChanged()),this,SLOT(update()));
+        connect(ipLoad,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDeleted(QObject*)));
+        update();
+        return ipLoad;
+    }
     return Q_NULLPTR;
 }
 
 void Frame3DDKernel::onResourceDeleted(QObject* o){
-    Joint* j=qobject_cast<Joint*>(o);
-    if(j){
-        m_joints.removeAll(j);
-        update();
-        return;
-    }
-    Beam* b=qobject_cast<Beam*>(o);
-    if(b){
-        m_beams.removeAll(b);
-        update();
-        return;
-    }
-    NodeLoad* nl=qobject_cast<NodeLoad*>(o);
-    if(nl){
-        m_node_loads.removeAll(nl);
-        update();
-        return;
-    }
-    UniformlyDistributedLoad* udl=qobject_cast<UniformlyDistributedLoad*>(o);
-    if(udl){
-        m_uniformly_distributed_loads.removeAll(udl);
-        update();
-        return;
-    }
+    m_joints.removeAll((Joint*)o);
+    m_beams.removeAll((Beam*)o);
+    m_node_loads.removeAll((NodeLoad*)o);
+    m_uniformly_distributed_loads.removeAll((UniformlyDistributedLoad*)o);
+    m_interior_point_loads.removeAll((InteriorPointLoad*)o);
+    update();
 }

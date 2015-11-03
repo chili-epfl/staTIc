@@ -3,6 +3,20 @@
 
 Beam::Beam(Joint* extreme1, Joint* extreme2,QString name,QObject* parent):
     AbstractElement(name,parent),
+    m_axial_force_extreme_1(0),
+    m_axial_type_extreme_1(0),
+    m_axial_force_extreme_2(0),
+    m_axial_type_extreme_2(0),
+    m_shear_y_extreme_1(0),
+    m_shear_y_extreme_2(0),
+    m_shear_z_extreme_1(0),
+    m_shear_z_extreme_2(0),
+    m_axial_moment_extreme_1(0),
+    m_axial_moment_extreme_2(0),
+    m_y_moment_extreme_1(0),
+    m_y_moment_extreme_2(0),
+    m_z_moment_extreme_1(0),
+    m_z_moment_extreme_2(0),
     m_length(0),
     m_Ax(0),
     m_Asy(0),
@@ -177,7 +191,7 @@ void Beam::ForcesAndMoments(int& axial_type, qreal& Nx, qreal& Vy, qreal& Vz,
         Mz=m_z_moment_extreme_2;
     }
     else{
-        qWarning("Returning an average");
+        //qWarning("Returning an average");
         axial_type=m_axial_type_extreme_2;
         Nx=0.5*m_axial_force_extreme_1+0.5*m_axial_force_extreme_2;
         Vy=0.5*m_shear_y_extreme_1+0.5*m_shear_y_extreme_2;
@@ -202,6 +216,7 @@ void Beam::setSize(QSizeF size){
 }
 
 void Beam::setMaterial(QString material){
+    Q_UNUSED(material);
     //Default one is ideal truss
     set_parameters(6451.6,645.16,645.16,416231,416231,4162,200000,80000,0,0.0000000001);
 }

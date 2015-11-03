@@ -3,12 +3,12 @@
 
 #include <QVector>
 #include <QVector3D>
+#include <QTimer>
 #include "../abstractstaticsmodule.h"
 #include "../elements/nodeload.h"
 #include "../elements/uniformlydistributedload.h"
 #include "../elements/interiorpointload.h"
 #include "frame3dd.h"
-
 
 class Frame3DDKernel : public AbstractStaticsModule
 {
@@ -26,7 +26,7 @@ public:
                                bool support_XX=false,bool support_YY=false,bool support_ZZ=false );
     virtual NodeLoad* createNodeLoad(QVector3D force, Joint* joint,QString name=QString());
     virtual UniformlyDistributedLoad* createUDLoad(QVector3D force, Beam* beam,QString name=QString());
-    virtual InteriorPointLoad* createIPLoad(QVector3D force, Beam* beam,QString name=QString());
+    virtual InteriorPointLoad* createIPLoad(QVector3D force, Beam* beam,qreal distance=-1,QString name=QString());
     QVector<Joint*> joints(){return m_joints;}
     QVector<Beam*> beams(){return m_beams;}
 
@@ -35,9 +35,9 @@ protected slots:
     virtual void update();
 private slots:
     void onResourceDeleted(QObject* o);
+    void solve();
 private:
     void setStatus(Status status);
-    void solve();
     void assemble_loads(int nN, int nE, int nL, int DoF,
                                 vec3 *xyz,
                                 double *L, double *Le,
@@ -63,7 +63,7 @@ private:
     QVector<Beam*> m_beams;
     QVector<NodeLoad*> m_node_loads;
     QVector<UniformlyDistributedLoad*> m_uniformly_distributed_loads;
-
+    QVector<InteriorPointLoad*> m_interior_point_loads;
     QVector3D m_gravity;
 
     int m_shear;
@@ -72,6 +72,7 @@ private:
     int m_dx;
 
     qreal m_relative_equilibrium_error;
+    QTimer* m_lazyupdateTimer;
 
 };
 

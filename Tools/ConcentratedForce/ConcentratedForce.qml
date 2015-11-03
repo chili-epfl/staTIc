@@ -17,6 +17,7 @@ Entity {
        Transform{
          id:collitionTransform
          Rotate{
+
              axis: Qt.vector3d(1, 0, 0)
              angle: -180
          }
@@ -37,11 +38,14 @@ Entity {
 
        QuickConcentratedForce{
             id: quickCF
-            uiManager:eventhandler
+            vmManager:vmFrame3DDManager
             emittingBodyInfo:sphereBody
        }
 
        components:[collitionSphere,sphereBody,collitionTransform]
+
+
+
 
 }
 

@@ -8,7 +8,9 @@ JointVMItemModel::JointVMItemModel(QObject* parent):
 
 }
 
-JointVMItemModel::JointVMItemModel(const JointVMItemModel &other){
+JointVMItemModel::JointVMItemModel(const JointVMItemModel &other):
+    QAbstractListModel(other.parent())
+{
       for(int i=0;i<other.m_types.size();i++){
           m_types.append(other.m_types[i]);
           m_additionalDescriptions.append(other.m_additionalDescriptions[i]);
@@ -18,6 +20,7 @@ JointVMItemModel::JointVMItemModel(const JointVMItemModel &other){
 
 
 int JointVMItemModel::rowCount(const QModelIndex &parent) const{
+    Q_UNUSED(parent);
     return m_types.size();
 }
 

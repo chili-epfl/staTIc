@@ -24,12 +24,8 @@ SOURCES += main.cpp \
     statics/frame3dd/coordtrans.c \
     statics/frame3dd/eig.c \
     statics/frame3dd/frame3dd.c \
-    #statics/frame3dd/frame3dd_io.c \
     statics/frame3dd/HPGmatrix.c \
-    #statics/frame3dd/HPGutil.c \
-    #statics/frame3dd/main.c \
     statics/frame3dd/NRutil.c \
-    #statics/frame3dd/preframe.c \
     statics/frame3dd/frame3ddkernel.cpp \
     statics/elements/nodeload.cpp \
     statics/elements/uniformlydistributedload.cpp \
@@ -62,9 +58,7 @@ HEADERS += \
     statics/frame3dd/coordtrans.h \
     statics/frame3dd/eig.h \
     statics/frame3dd/frame3dd.h \
-    #statics/frame3dd/frame3dd_io.h \
     statics/frame3dd/HPGmatrix.h \
-    #statics/frame3dd/HPGutil.h \
     statics/frame3dd/NRutil.h \
     statics/frame3dd/frame3ddkernel.h \
     statics/elements/nodeload.h \

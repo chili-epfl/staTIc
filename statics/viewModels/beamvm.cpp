@@ -30,6 +30,7 @@ void BeamVM::initView(){
     Qt3D::QEntity* beamView= qobject_cast<Qt3D::QEntity*>(beamView_component.create(new QQmlContext(QQmlEngine::contextForObject(m_sceneRoot))));
     m_component3D=beamView;
 
+    m_component3D->setObjectName(this->objectName());
     Joint* extreme1;
     Joint* extreme2;
     m_beam->extremes(extreme1,extreme2);

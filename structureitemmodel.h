@@ -16,7 +16,7 @@ public:
     StructureItemModel(QObject * parent = 0);
     //QModelIndex index(int row, int column, const QModelIndex &parent) const ;
     //QModelIndex parent(const QModelIndex &child)const{return QModelIndex();} ;
-    int rowCount(const QModelIndex &parent)const{return m_fileNames.size();} ;
+    int rowCount(const QModelIndex &parent)const{Q_UNUSED(parent);return m_fileNames.size();} ;
     //int columnCount(const QModelIndex &parent)const{return 0;} ;
     QVariant data(const QModelIndex &index, int role)const;
     void setSource(QString source);
