@@ -20,8 +20,8 @@ public:
     Qt3D::QEntity* sceneRoot(){return m_sceneRoot;}
     virtual void setSceneRoot(Qt3D::QEntity* sceneRoot);
 
-    virtual BeamVM* createBeamVM(Beam* b)=0;
-    virtual JointVM* createJointVM(Joint* j)=0;
+    virtual BeamVM* createBeamVM(BeamPtr b)=0;
+    virtual JointVM* createJointVM(JointPtr j)=0;
 
     virtual AbstractStaticsModule* staticsModule()=0;
 

@@ -3,6 +3,10 @@
 #include <QTextStream>
 #include "../elements/joint.h"
 #include "../elements/beam.h"
+#include "../elements/nodeload.h"
+#include "../elements/interiorpointload.h"
+#include "../elements/uniformlydistributedload.h"
+
 #include <QDebug>
 
 #include <math.h>
@@ -103,7 +107,7 @@ bool Frame3DDKernel::readStructure(QString path){
             qWarning(line_parts[3].toStdString().c_str());
             return false;
         }
-        Joint* joint=createJoint(QVector3D(x,y,z),line_parts[0]);
+        createJoint(QVector3D(x,y,z),line_parts[0]);
     }
 
     int DoF=6*number_nodes;
@@ -222,10 +226,30 @@ bool Frame3DDKernel::readStructure(QString path){
             qWarning()<<joint_index_2;
             return false;
         }
-        Joint* first=m_joints.at(joint_index_1);
-        Joint* second=m_joints.at(joint_index_2);
-        Beam* beam=createBeam(first,second,line_parts[0]);
-
+        JointPtr first=m_joints.at(joint_index_1);
+        JointPtr second=m_joints.at(joint_index_2);
+        JointPtr tmp;
+        //Reordering
+        if(first->position().x()>second->position().x()){
+            tmp=first;
+            first=second;
+            second=tmp;
+        }
+        else if(first->position().x()==second->position().x()){
+            if(first->position().y()>second->position().y()){
+                tmp=first;
+                first=second;
+                second=tmp;
+            }
+            else if(first->position().y()==second->position().y()){
+                if(first->position().z()>second->position().z()){
+                    tmp=first;
+                    first=second;
+                    second=tmp;
+                }
+            }
+        }
+        BeamPtr beam=createBeam(first,second,line_parts[0]);
 
         qreal area_x=line_parts[3].toInt(&ok);
         if(!ok){
@@ -255,9 +279,9 @@ void Frame3DDKernel::setStatus(Status status){
 }
 
 void Frame3DDKernel::update(){
-    if(!m_lazyupdateTimer->isActive()){
+//    if(!m_lazyupdateTimer->isActive()){
         m_lazyupdateTimer->start();
-    }
+//    }
 }
 /**/
 void Frame3DDKernel::solve(){
@@ -433,7 +457,7 @@ void Frame3DDKernel::solve(){
 
     /*Set node data*/
     for(i=0; i<nN;i++){
-        Joint* joint=m_joints.at(i);
+        JointPtr joint=m_joints.at(i);
         xyz[i+1].x=joint->position().x();
         xyz[i+1].y=joint->position().y();
         xyz[i+1].z=joint->position().z();
@@ -449,7 +473,7 @@ void Frame3DDKernel::solve(){
     for (i=1; i<=DoF; i++)	r[i] = 0;
     nR=0;
     for(i=0;i<m_joints.size();i++){
-        Joint* joint=m_joints.at(i);
+        JointPtr joint=m_joints.at(i);
         bool X,Y,Z,XX,YY,ZZ;
         joint->support(X,Y,Z,XX,YY,ZZ);
         if(X || Y || Z || XX || YY || ZZ){
@@ -465,7 +489,15 @@ void Frame3DDKernel::solve(){
     sumR=0;	for (i=1;i<=DoF;i++) sumR += r[i];
     for (i=1; i<=DoF; i++)	if (r[i]) q[i] = 0;	else q[i] = 1;
 
-    nE=m_beams.size();
+    QVector<BeamPtr> active_beams;
+    Q_FOREACH(BeamPtr beam,m_beams){
+        if(beam->enable()){
+            active_beams.append(beam);
+        }
+    }
+
+
+    nE=active_beams.size();
 
                    /* allocate memory for frame elements ... */
     L   = dvector(1,nE);	/* length of each element		*/
@@ -488,13 +520,13 @@ void Frame3DDKernel::solve(){
 
     /*Set beam data*/
     for(i=0;i<nE;i++){
-        Beam* beam=m_beams.at(i);
+        BeamPtr beam=active_beams.at(i);
         L[i+1]=beam->length();
         Le[i+1]=beam->length();
-        Joint* e1,*e2;
+        WeakJointPtr e1,e2;
         beam->extremes(e1,e2);
-        N1[i+1]=m_joints.indexOf(e1)+1;
-        N2[i+1]=m_joints.indexOf(e2)+1;
+        N1[i+1]=m_joints.indexOf(e1.toStrongRef())+1;
+        N2[i+1]=m_joints.indexOf(e2.toStrongRef())+1;
         qreal beam_Ax,beam_Asy,beam_Asz,beam_Jx,beam_Iy,beam_Iz,beam_E,beam_G,beam_p,beam_d;
         beam->parameters(beam_Ax,beam_Asy,beam_Asz,beam_Jx,beam_Iy,beam_Iz,beam_E,beam_G,beam_p,beam_d);
         Ax[i+1]=beam_Ax;
@@ -571,7 +603,7 @@ void Frame3DDKernel::solve(){
             d, gX, gY, gZ, r, shear,
             nF, nU, nW, nP, nT, nD,
             Q, F_temp, F_mech, F, U, W, P, T,
-            Dp, eqF_mech, eqF_temp );
+            Dp, eqF_mech, eqF_temp,active_beams );
 
     total_mass = struct_mass = 0.0;
     nM=0;
@@ -687,7 +719,7 @@ void Frame3DDKernel::solve(){
         if ( geom )	compute_reaction_forces( R,F,K, D, DoF, r );
 
         update_statics( nN,nE,nL, lc, DoF, N1,N2,
-                        F,D,R, r,Q, rms_resid, ok );
+                        F,D,R, r,Q, rms_resid, ok,active_beams);
 
         /*  dealocate Broyden secant stiffness matrix, Ks */
         // if ( geom )	free_dmatrix(Ks, 1, DoF, 1, DoF );
@@ -746,7 +778,8 @@ void Frame3DDKernel::assemble_loads (
         double **F_temp, double **F_mech, double *Fo,
         float ***U, float ***W, float ***P, float ***T, float **Dp,
         double ***eqF_mech, // equivalent mech loads, global coord
-        double ***eqF_temp // equivalent temp loads, global coord
+        double ***eqF_temp, // equivalent temp loads, global coord
+        QVector<BeamPtr> active_beams
 ){
     float	hy, hz;			/* section dimensions in local coords */
 
@@ -811,8 +844,8 @@ void Frame3DDKernel::assemble_loads (
       /* node point loads -------------------------------------------- */
       nF[1]=m_node_loads.size();
 
-      Q_FOREACH(NodeLoad* nodeload, m_node_loads){
-          int application_joint_index=m_joints.indexOf(nodeload->joint());
+      Q_FOREACH(NodeLoadPtr nodeload, m_node_loads){
+          int application_joint_index=m_joints.indexOf(nodeload->joint().toStrongRef());
           F_mech[1][6*application_joint_index+1]+=nodeload->force().x();//I added a plus...
           F_mech[1][6*application_joint_index+2]+=nodeload->force().y();
           F_mech[1][6*application_joint_index+3]+=nodeload->force().z();
@@ -825,13 +858,17 @@ void Frame3DDKernel::assemble_loads (
 
       nU[1]=m_uniformly_distributed_loads.size();
 
-      Q_FOREACH(UniformlyDistributedLoad* UDLoad,m_uniformly_distributed_loads){
+      Q_FOREACH(UniformlyDistributedLoadPtr UDLoad,m_uniformly_distributed_loads){
           int i=1;
-          int application_beam_index=m_beams.indexOf(UDLoad->beam())+1;
+          int application_beam_index=active_beams.indexOf(UDLoad->beam().toStrongRef())+1;
+          if(application_beam_index<=0){
+              qDebug("UDLoad on disabled beam");
+              return ;
+          }
           U[1][i][1] = (double) application_beam_index;
-          U[1][i][2] = UDLoad->force().x();
-          U[1][i][3] = UDLoad->force().y();
-          U[1][i][4] = UDLoad->force().z();
+          U[1][i][2] = UDLoad->forceLocal().x();
+          U[1][i][3] = UDLoad->forceLocal().y();
+          U[1][i][4] = UDLoad->forceLocal().z();
 
           Nx1 = Nx2 = U[1][i][2]*Le[application_beam_index] / 2.0;
           Vy1 = Vy2 = U[1][i][3]*Le[application_beam_index] / 2.0;
@@ -1074,16 +1111,16 @@ void Frame3DDKernel::assemble_loads (
         return;
       }
       for (i=1; i <= nP[1]; i++) {	/* ! local element coordinates ! */
-        InteriorPointLoad* ipl=m_interior_point_loads.at(i-1);
-        n=m_beams.indexOf(ipl->beam())+1;
+        InteriorPointLoadPtr ipl=m_interior_point_loads.at(i-1);
+        n=active_beams.indexOf(ipl->beam().toStrongRef())+1;
         if ( n <= 0 ) {
            qDebug("Error in internal point loads: wrong beam reference");
            return;
         }
         P[1][i][1] = (double) n;
-        P[1][i][2] = ipl->force().x();
-        P[1][i][3] = ipl->force().y();
-        P[1][i][4] = ipl->force().z();
+        P[1][i][2] = ipl->forceLocal().x();
+        P[1][i][3] = ipl->forceLocal().y();
+        P[1][i][4] = ipl->forceLocal().z();
         P[1][i][5] = ipl->distance();
 
         a = P[1][i][5];	b = L[n] - a;
@@ -1241,7 +1278,7 @@ void Frame3DDKernel::update_statics(
         int nN, int nE, int nL, int lc, int DoF,
         int *J1, int *J2,
         double *F, double *D, double *R, int *r, double **Q,
-        double err, int ok
+        double err, int ok,QVector<BeamPtr> active_beams
 ){
     double	disp;
     int	i,j,n;
@@ -1259,7 +1296,7 @@ void Frame3DDKernel::update_statics(
     for (j=1; j<= nN; j++) {
         disp = 0.0;
         for ( i=5; i>=0; i-- ) disp += fabs( D[6*j-i] );
-        Joint* joint=m_joints.at(j-1);
+        JointPtr joint=m_joints.at(j-1);
         if ( disp > 0.0 ) {
             joint->setDisplacement(QVector3D(D[6*j-5],D[6*j-4],D[6*j-3]));
             joint->setDisplacementRot(QVector3D(D[6*j-2],D[6*j-1],D[6*j]));
@@ -1270,7 +1307,7 @@ void Frame3DDKernel::update_statics(
     }
     /*      Nx          Vy         Vz   Txx        Myy        Mzz*/;
     for (n=1; n<= nE; n++) {
-        Beam* beam=m_beams.at(n-1);
+        BeamPtr beam=active_beams.at(n-1);
 
         int axial_type;
         if (fabs(Q[n][1]) < 0.0001)
@@ -1290,7 +1327,7 @@ void Frame3DDKernel::update_statics(
 
     /*Reactions Fx          Fy          Fz  Mxx         Myy         Mzz*/
     for (j=1; j<=nN; j++) {
-        Joint* joint=m_joints.at(j-1);
+        JointPtr joint=m_joints.at(j-1);
         i = 6*(j-1);
         if ( r[i+1] || r[i+2] || r[i+3] ||
              r[i+4] || r[i+5] || r[i+6] ) {
@@ -1302,85 +1339,227 @@ void Frame3DDKernel::update_statics(
     return;
 }
 
-Beam* Frame3DDKernel::createBeam(Joint* extreme1,Joint* extreme2,QString name,
+BeamPtr Frame3DDKernel::createBeam(JointPtr extreme1,JointPtr extreme2,QString name,
                                  qreal Ax, qreal Asy, qreal Asz, qreal Jx,
                                  qreal Iy, qreal Iz, qreal E, qreal G,
                                  qreal p, qreal d){
-    if(extreme1!=Q_NULLPTR && extreme2!=Q_NULLPTR){
-        Beam* beam=new Beam(extreme1,extreme2,name,this);
+    if(!extreme1.isNull() && !extreme2.isNull() && extreme1!=extreme2){
+        BeamPtr beam(new Beam(extreme1,extreme2,name,this));
         beam->set_parameters(Ax,Asy,Asz,Jx,Iy,Iz,E,G,p,d);
         m_beams.append(beam);
-        connect(beam,SIGNAL(parametersChanged()),this,SLOT(update()));
-        connect(beam,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDeleted(QObject*)));
+        connect(beam.data(),SIGNAL(parametersChanged()),this,SLOT(update()));
+        connect(beam.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
         update();
         return beam;
     }
-    return Q_NULLPTR;
+    return BeamPtr();
 }
-Joint* Frame3DDKernel::createJoint(QVector3D position, QString name,
+JointPtr Frame3DDKernel::createJoint(QVector3D position, QString name,
                                     bool  support_X,bool support_Y,bool support_Z,
                                     bool support_XX,bool support_YY,bool support_ZZ){
 
-    Joint* joint=new Joint(position,name,this);
+    JointPtr joint(new Joint(position,name,this));
     joint->setSupport(support_X,support_Y,support_Z, support_XX,support_YY,support_ZZ);
     m_joints.append(joint);
-    connect(joint,SIGNAL(connectedBeamsChanged()),this,SLOT(update()));//suspicious....
-    connect(joint,SIGNAL(supportChanged()),this,SLOT(update()));
-    connect(joint,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDeleted(QObject*)));
+    connect(joint.data(),SIGNAL(connectedBeamsChanged()),this,SLOT(update()));//suspicious....
+    connect(joint.data(),SIGNAL(supportChanged()),this,SLOT(update()));
+    connect(joint.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
     update();
     return joint;
 }
 
-NodeLoad* Frame3DDKernel::createNodeLoad(QVector3D force, Joint* joint,QString name){
-    if(!force.isNull() && joint!=Q_NULLPTR){
-        NodeLoad* nodeLoad=new NodeLoad(joint,name,this);
+NodeLoadPtr Frame3DDKernel::createNodeLoad(QVector3D force, JointPtr joint,QString name){
+    if(!force.isNull() && !joint.isNull()){
+        NodeLoadPtr nodeLoad(new NodeLoad(joint,name,this));
         nodeLoad->setForce(force);
         m_node_loads.append(nodeLoad);
-        connect(nodeLoad,SIGNAL(forceChanged()),this,SLOT(update()));
-        connect(nodeLoad,SIGNAL(momentumChanged()),this,SLOT(update()));
-        connect(nodeLoad,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDeleted(QObject*)));
+        connect(nodeLoad.data(),SIGNAL(forceChanged()),this,SLOT(update()));
+        connect(nodeLoad.data(),SIGNAL(momentumChanged()),this,SLOT(update()));
+        connect(nodeLoad.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
         update();
         return nodeLoad;
 
     }
-    return Q_NULLPTR;
+    return NodeLoadPtr();
 }
 
-UniformlyDistributedLoad* Frame3DDKernel::createUDLoad(QVector3D force, Beam* beam,QString name){
-    if(!force.isNull() && beam!=Q_NULLPTR){
-        UniformlyDistributedLoad* udLoad=new UniformlyDistributedLoad(beam,name, this);
+UniformlyDistributedLoadPtr Frame3DDKernel::createUDLoad(QVector3D force, BeamPtr beam,QString name){
+    if(!force.isNull() && !beam.isNull()){
+        UniformlyDistributedLoadPtr udLoad(new UniformlyDistributedLoad(beam,name, this));
         udLoad->setForce(force);
         m_uniformly_distributed_loads.append(udLoad);
-        connect(udLoad,SIGNAL(forceChanged()),this,SLOT(update()));
-        connect(udLoad,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDeleted(QObject*)));
+        connect(udLoad.data(),SIGNAL(forceChanged()),this,SLOT(update()));
+        connect(udLoad.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
         update();
         return udLoad;
     }
-    return Q_NULLPTR;
+    return UniformlyDistributedLoadPtr();
 
 }
 
-InteriorPointLoad* Frame3DDKernel::createIPLoad(QVector3D force, Beam *beam, qreal distance,QString name){
-    if(!force.isNull() && beam!=Q_NULLPTR){
+InteriorPointLoadPtr Frame3DDKernel::createIPLoad(QVector3D force, BeamPtr beam, qreal distance,QString name){
+    if(!force.isNull() && !beam.isNull()){
         if(distance<0)
             distance=beam->length()/2;
-        InteriorPointLoad* ipLoad=new InteriorPointLoad(beam,distance,name,this);
+        InteriorPointLoadPtr ipLoad(new InteriorPointLoad(beam,distance,name,this));
         ipLoad->setForce(force);
         m_interior_point_loads.append(ipLoad);
-        connect(ipLoad,SIGNAL(forceChanged()),this,SLOT(update()));
-        connect(ipLoad,SIGNAL(distanceChanged()),this,SLOT(update()));
-        connect(ipLoad,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDeleted(QObject*)));
+        connect(ipLoad.data(),SIGNAL(forceChanged()),this,SLOT(update()));
+        connect(ipLoad.data(),SIGNAL(distanceChanged()),this,SLOT(update()));
+        connect(ipLoad.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
         update();
         return ipLoad;
     }
-    return Q_NULLPTR;
+    return InteriorPointLoadPtr();
 }
 
-void Frame3DDKernel::onResourceDeleted(QObject* o){
-    m_joints.removeAll((Joint*)o);
-    m_beams.removeAll((Beam*)o);
-    m_node_loads.removeAll((NodeLoad*)o);
-    m_uniformly_distributed_loads.removeAll((UniformlyDistributedLoad*)o);
-    m_interior_point_loads.removeAll((InteriorPointLoad*)o);
+bool Frame3DDKernel::splitBeam(BeamPtr beam, qreal offset,JointPtr &new_joint){
+    if(beam.isNull() && offset>0 && offset<=beam->length()){
+        WeakJointPtr extreme1_w, extreme2_w;
+        beam->extremes(extreme1_w,extreme2_w);
+        JointPtr extreme1=extreme1_w.toStrongRef();
+        JointPtr extreme2=extreme2_w.toStrongRef();
+        //TODO:2D?? constarints
+        QVector3D direction=extreme2->position()-extreme1->position();
+        direction.normalize();
+        QVector3D new_joint_position=extreme1->position()+(direction*offset);
+        new_joint=createJoint(new_joint_position);
+
+        BeamPtr segment_1,segment_2;
+
+        segment_1=createBeam(extreme1,new_joint,beam->objectName()+QString("Part_1"));
+        segment_1->cloneProperties(beam);
+
+        segment_2=createBeam(new_joint,extreme2,beam->objectName()+QString("Part_2"));
+        segment_2->cloneProperties(beam);
+
+        beam->addPart(segment_1);
+        beam->addPart(segment_2);
+
+        return true;
+    }
+    return false;
+}
+
+bool Frame3DDKernel::unifyBeam(BeamPtr beam){
+    if(!beam.isNull() && m_beams.contains(beam)){
+        Q_FOREACH(WeakBeamPtr b,beam->subParts()){
+             unifyBeam_recursive_step(b.toStrongRef());
+         }
+         beam->unify();
+         return true;
+    }
+    return false;
+}
+
+void Frame3DDKernel::unifyBeam_recursive_step(BeamPtr beam){
+    if(!beam.isNull()){
+        Q_FOREACH(WeakBeamPtr b,beam->subParts()){
+            unifyBeam_recursive_step(b);
+        }
+        m_beams.removeAll(beam);
+    }
+}
+
+void Frame3DDKernel::onKillRequest(){
+    QObject* sender=QObject::sender();
+    Joint* j=qobject_cast<Joint*>(sender);
+    if(j!=Q_NULLPTR){
+        JointPtr _ptr;
+        Q_FOREACH(JointPtr item, m_joints){
+            if(item.data()==j){
+                _ptr=item;
+                break;
+            }
+        }
+        if(!_ptr.isNull())
+            m_joints.removeAll(_ptr);
+        return;
+    }
+    Beam* b=qobject_cast<Beam*>(sender);
+    if(b!=Q_NULLPTR){
+        BeamPtr _ptr;
+        Q_FOREACH(BeamPtr item, m_beams){
+            if(item.data()==b){
+                _ptr=item;
+                break;
+            }
+        }
+        if(!_ptr.isNull())
+            m_beams.removeAll(_ptr);
+        return;
+    }
+    NodeLoad* nl=qobject_cast<NodeLoad*>(sender);
+    if(nl!=Q_NULLPTR ){
+        NodeLoadPtr _ptr;
+        Q_FOREACH(NodeLoadPtr item, m_node_loads){
+            if(item.data()==nl){
+                _ptr=item;
+                break;
+            }
+        }
+        if(!_ptr.isNull())
+            m_node_loads.removeAll(_ptr);
+        return;
+    }
+    UniformlyDistributedLoad* udl=qobject_cast<UniformlyDistributedLoad*>(sender);
+    if(udl!=Q_NULLPTR){
+        UniformlyDistributedLoadPtr _ptr;
+        Q_FOREACH(UniformlyDistributedLoadPtr item, m_uniformly_distributed_loads){
+            if(item.data()==udl){
+                _ptr=item;
+                break;
+            }
+        }
+        if(!_ptr.isNull())
+            m_uniformly_distributed_loads.removeAll(_ptr);
+        return;
+    }
+    InteriorPointLoad* ipl=qobject_cast<InteriorPointLoad*>(sender);
+    if(ipl!=Q_NULLPTR) {
+            InteriorPointLoadPtr _ptr;
+            Q_FOREACH(InteriorPointLoadPtr item, m_interior_point_loads){
+                if(item.data()==ipl){
+                    _ptr=item;
+                    break;
+                }
+            }
+            if(!_ptr.isNull())
+                m_interior_point_loads.removeAll(_ptr);
+            return;
+        }
     update();
 }
+
+void Frame3DDKernel::removeBeam(BeamPtr item){
+    m_beams.removeAll(item);
+    update();
+}
+
+
+void Frame3DDKernel::removeJoint(JointPtr item){
+    m_joints.removeAll(item);
+    update();
+}
+
+
+void Frame3DDKernel::removeIPLoad(InteriorPointLoadPtr item){
+    m_interior_point_loads.removeAll(item);
+    update();
+}
+
+
+void Frame3DDKernel::removeNodeLoad(NodeLoadPtr item){
+    m_node_loads.removeAll(item);
+    update();
+}
+
+
+void Frame3DDKernel::removeUDLoad(UniformlyDistributedLoadPtr item){
+    m_uniformly_distributed_loads.removeAll(item);
+    update();
+}
+
+
+
+

@@ -82,6 +82,7 @@ Entity{
         result.m34=center.z;
         poseMatrix=result;
     }
+
     function ssc(v){
         var matrix=Qt.matrix4x4(0, -v.z, v.y, 0,
                                 v.z, 0, -v.x, 0,

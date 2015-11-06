@@ -20,3 +20,11 @@ Model1:
 tag_1022:
     -tag: 1022
      size: 60
+
+tag_82:
+    -tag: 82
+     size: 12
+
+tag_87:
+    -tag: 87
+     size: 12

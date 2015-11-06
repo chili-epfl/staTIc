@@ -19,16 +19,16 @@ void Frame3DDVMManager::setStaticsModule(Frame3DDKernel *staticsModule){
 void Frame3DDVMManager::initViewModels(){
     if(m_sceneRoot==Q_NULLPTR || m_staticsModule==Q_NULLPTR) return;
 
-    Q_FOREACH(Joint* joint,m_staticsModule->joints()){
+    Q_FOREACH(JointPtr joint,m_staticsModule->joints()){
         createJointVM(joint);
     }
-    Q_FOREACH(Beam* beam,m_staticsModule->beams()){
+    Q_FOREACH(BeamPtr beam,m_staticsModule->beams()){
         createBeamVM(beam);
     }
 }
 
-BeamVM* Frame3DDVMManager::createBeamVM(Beam* b){
-    if(b){
+BeamVM* Frame3DDVMManager::createBeamVM(BeamPtr b){
+    if(!b.isNull()){
         BeamVM* beamVm=new BeamVM(b,m_sceneRoot,this);
         Q_FOREACH(Qt3D::QEntity* e,beamVm->getEntities()){
             m_Entity3D2ViewModel[e]=beamVm;
@@ -39,8 +39,8 @@ BeamVM* Frame3DDVMManager::createBeamVM(Beam* b){
     return Q_NULLPTR;
 }
 
-JointVM* Frame3DDVMManager::createJointVM(Joint* j){
-    if(j){
+JointVM* Frame3DDVMManager::createJointVM(JointPtr j){
+    if(!j.isNull()){
         JointVM* jointVm=new JointVM(j,m_sceneRoot,this);
         Q_FOREACH(Qt3D::QEntity* e,jointVm->getEntities()){
             m_Entity3D2ViewModel[e]=jointVm;

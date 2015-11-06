@@ -7,6 +7,7 @@ import PhysicsSetter 1.0
 
 import "qrc:/opengl/opengl"
 import "qrc:/ConcentratedForce"
+import "qrc:/Scaffold"
 
 Entity {
     id: sceneRoot
@@ -124,6 +125,10 @@ Entity {
 
         /*Tools*/
         ConcentratedForce{
+
+        }
+
+        Scaffold{
 
         }
     }

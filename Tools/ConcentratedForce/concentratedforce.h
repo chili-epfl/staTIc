@@ -7,7 +7,9 @@
 #include "statics/abstractvmmanager.h"
 
 class InteriorPointLoad;
+typedef QWeakPointer<InteriorPointLoad> WeakInteriorPointLoadPtr;
 class NodeLoad;
+typedef QWeakPointer<NodeLoad> WeakNodeLoadPtr;
 
 class ConcentratedForce: public QObject
 {
@@ -28,11 +30,15 @@ public:
 public slots:
     void onCollition(Physics::PhysicsCollisionEvent* e);
     void checkCollitionAttachedElement();
+private slots:
+    void reset();
+
 private:
+
     AbstractVMManager* m_VMManager;
     Physics::PhysicsBodyInfo* m_emittingBodyInfo;
-    InteriorPointLoad* m_pointLoad;
-    NodeLoad* m_nodeLoad;
+    WeakInteriorPointLoadPtr m_pointLoad;
+    WeakNodeLoadPtr m_nodeLoad;
     QStringList m_targets;
     Qt3D::QEntity* m_attached_element;
 };

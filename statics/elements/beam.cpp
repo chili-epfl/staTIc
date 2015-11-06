@@ -1,8 +1,9 @@
 #include "beam.h"
 #include "statics/elements/joint.h"
 
-Beam::Beam(Joint* extreme1, Joint* extreme2,QString name,QObject* parent):
+Beam::Beam(JointPtr extreme1, JointPtr extreme2,QString name,QObject* parent):
     AbstractElement(name,parent),
+    m_enable(true),
     m_axial_force_extreme_1(0),
     m_axial_type_extreme_1(0),
     m_axial_force_extreme_2(0),
@@ -32,14 +33,14 @@ Beam::Beam(Joint* extreme1, Joint* extreme2,QString name,QObject* parent):
     m_extreme1=extreme1;
     m_extreme2=extreme2;
     m_length=extreme1->position().distanceToPoint(extreme2->position());
-    m_extreme1->addConnectedBeam(this);
-    m_extreme2->addConnectedBeam(this);
+//    m_extreme1->addConnectedBeam(this);
+//    m_extreme2->addConnectedBeam(this);
 
-    connect(m_extreme1,SIGNAL(destroyed(QObject*)),this,SLOT(deleteLater()));
-    connect(m_extreme2,SIGNAL(destroyed(QObject*)),this,SLOT(deleteLater()));
+    connect(m_extreme1.data(),SIGNAL(destroyed(QObject*)),this,SIGNAL(killMe()));
+    connect(m_extreme2.data(),SIGNAL(destroyed(QObject*)),this,SIGNAL(killMe()));
 }
 
-void Beam::extremes(Joint*& e1,Joint*& e2){
+void Beam::extremes(WeakJointPtr& e1,WeakJointPtr& e2){
     e1=m_extreme1;
     e2=m_extreme2;
 }
@@ -59,7 +60,12 @@ void Beam::parameters(qreal& Ax, qreal& Asy, qreal& Asz,
     d=m_d;
 }
 
-
+void Beam::setEnable(bool enable){
+    if(m_enable!=enable){
+        m_enable=enable;
+        emit enableChanged(m_enable);
+    }
+}
 
 void Beam::set_parameters(qreal Ax, qreal Asy, qreal Asz,
                           qreal Jx, qreal Iy, qreal Iz,
@@ -219,4 +225,38 @@ void Beam::setMaterial(QString material){
     Q_UNUSED(material);
     //Default one is ideal truss
     set_parameters(6451.6,645.16,645.16,416231,416231,4162,200000,80000,0,0.0000000001);
+}
+
+void Beam::cloneProperties(BeamPtr beam){
+    m_size=beam->m_size;
+    m_Ax=beam->m_Ax;
+    m_Asy=beam->m_Asy;
+    m_Asz=beam->m_Asz;
+    m_Jx=beam->m_Jx;
+    m_Iy=beam->m_Iy;
+    m_Iz=beam->m_Iz;
+    m_E=beam->m_E;
+    m_G=beam->m_G;
+    m_p=beam->m_p;
+    m_d=beam->m_d;
+}
+
+void Beam::split(){
+    setEnable(false);
+    emit hasBeenSplit();
+}
+
+void Beam::unify(){
+    setEnable(true);
+    emit hasBeenUnified();
+}
+
+void Beam::addPart(BeamPtr beam){
+    m_sub_parts.append(beam.toWeakRef());
+}
+
+void Beam::removePart(BeamPtr beam){
+    if(m_sub_parts.contains(beam.toWeakRef())){
+           m_sub_parts.removeAll(beam.toWeakRef());
+    }
 }

@@ -7,38 +7,36 @@
 #include "statics/elements/nodeload.h"
 #include "statics/abstractvmmanager.h"
 
-/*********************Support functions************************/
-QMatrix4x4 getTranformationMatrix(Qt3D::QEntity* entity,bool local){
-    if(!entity) return  QMatrix4x4();
-    Qt3D::QTransform* entity_transform=NULL;
-    for(Qt3D::QComponent* component: entity->components()){
-        if(component->isEnabled()){
-            if(component->inherits("Qt3D::QTransform")){
-                entity_transform=qobject_cast<Qt3D::QTransform*>(component);
-            }
-        }
-    }
-    if(local)
-        if(entity_transform!=NULL)
-            return entity_transform->matrix();
-        else
-            return QMatrix4x4();
-    else{
-        if(entity_transform!=NULL){
-            return getTranformationMatrix(entity->parentEntity(),false)*entity_transform->matrix();
-        }
-        else return getTranformationMatrix(entity->parentEntity(),false);
-    }
-}
-/**********************************************************************/
+//********************Support functions************************/
+//QMatrix4x4 getTranformationMatrix(Qt3D::QEntity* entity,bool local){
+//    if(!entity) return  QMatrix4x4();
+//    Qt3D::QTransform* entity_transform=NULL;
+//    for(Qt3D::QComponent* component: entity->components()){
+//        if(component->isEnabled()){
+//            if(component->inherits("Qt3D::QTransform")){
+//                entity_transform=qobject_cast<Qt3D::QTransform*>(component);
+//            }
+//        }
+//    }
+//    if(local)
+//        if(entity_transform!=NULL)
+//            return entity_transform->matrix();
+//        else
+//            return QMatrix4x4();
+//    else{
+//        if(entity_transform!=NULL){
+//            return getTranformationMatrix(entity->parentEntity(),false)*entity_transform->matrix();
+//        }
+//        else return getTranformationMatrix(entity->parentEntity(),false);
+//    }
+//}
+///*********************************************************************
 
 
 ConcentratedForce::ConcentratedForce(QObject* parent):
     QObject(parent),
     m_VMManager(Q_NULLPTR),
     m_emittingBodyInfo(Q_NULLPTR),
-    m_pointLoad(Q_NULLPTR),
-    m_nodeLoad(Q_NULLPTR),
     m_attached_element(Q_NULLPTR)
 {
 
@@ -69,13 +67,14 @@ void ConcentratedForce::checkCollitionAttachedElement(){
     if(m_attached_element){
             Physics::PhysicsBodyInfo* sender_body_info=qobject_cast<Physics::PhysicsBodyInfo*>(QObject::sender());
             if(!sender_body_info->collitionTest(m_attached_element->id())){
+                this->disconnect(m_attached_element);
                 m_attached_element=Q_NULLPTR;
-                if(m_nodeLoad)
-                    m_nodeLoad->deleteLater();
-                if(m_pointLoad)
-                    m_pointLoad->deleteLater();
-                m_nodeLoad=Q_NULLPTR;
-                m_pointLoad=Q_NULLPTR;
+                if(!m_nodeLoad.isNull())
+                    m_VMManager->staticsModule()->removeNodeLoad(m_nodeLoad.toStrongRef());
+                if(!m_pointLoad.isNull())
+                    m_VMManager->staticsModule()->removeIPLoad(m_pointLoad.toStrongRef());
+                m_nodeLoad.clear();
+                m_pointLoad.clear();
             }
         }
 }
@@ -95,22 +94,33 @@ void ConcentratedForce::onCollition(Physics::PhysicsCollisionEvent* e){
         /*Update current status*/
     }
     else if(targetEntity!=Q_NULLPTR && m_attached_element==Q_NULLPTR){
-        qDebug()<<targetEntity;
         //The Object was not attached, and the force should be created
         AbstractElementViewModel* targetVM=m_VMManager->getAssociatedVM(targetEntity);
         if(targetVM->inherits("JointVM")) {
             JointVM* jointVM= static_cast<JointVM*>(targetVM);
-            Joint* joint=jointVM->joint();
-            m_nodeLoad=m_VMManager->staticsModule()->createNodeLoad(QVector3D(0,-1,0),joint);
+            WeakJointPtr joint=jointVM->joint();
+            m_nodeLoad=m_VMManager->staticsModule()->createNodeLoad(QVector3D(0,-1,0),joint.toStrongRef());
             m_attached_element=targetEntity;
+            connect(m_attached_element,SIGNAL(destroyed(QObject*)),this,SLOT(reset()));
         }
         else if(targetVM->inherits("BeamVM")){
             BeamVM* beamVM=static_cast<BeamVM*>(targetVM);
-            Beam* beam=beamVM->beam();
-            m_pointLoad=m_VMManager->staticsModule()->createIPLoad(QVector3D(0,-1,0),beam);
+            WeakBeamPtr beam=beamVM->beam();
+            m_pointLoad=m_VMManager->staticsModule()->createIPLoad(QVector3D(0,-1,0),beam.toStrongRef());
             m_attached_element=targetEntity;
+            connect(m_attached_element,SIGNAL(destroyed(QObject*)),this,SLOT(reset()));
         }
     }
+}
+
+void ConcentratedForce::reset(){
+    m_attached_element=Q_NULLPTR;
+    if(!m_nodeLoad.isNull())
+        m_VMManager->staticsModule()->removeNodeLoad(m_nodeLoad.toStrongRef());
+    if(!m_pointLoad.isNull())
+        m_VMManager->staticsModule()->removeIPLoad(m_pointLoad.toStrongRef());
+    m_nodeLoad.clear();
+    m_pointLoad.clear();
 }
 
 

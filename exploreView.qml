@@ -328,17 +328,14 @@ Item{
 
     Chilitags{
         id:chilitags
-        chiliobjects: [tag,forceTag]
+        chiliobjects: [tag]
     }
 
     ChilitagsObject{
         id: tag
     }
 
-    ChilitagsObject{
-        id:forceTag
-        name: "tag_1022"
-    }
+
 
 
 

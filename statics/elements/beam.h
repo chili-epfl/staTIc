@@ -5,15 +5,18 @@
 #include<QSizeF>
 #include "statics/elements/abstractelement.h"
 
+
 class Joint;
+typedef QSharedPointer<Joint> JointPtr;
+typedef QWeakPointer<Joint> WeakJointPtr;
 
 class Beam : public AbstractElement
 {
     Q_OBJECT
 public:
-    Beam(Joint* extreme1, Joint* extreme2,QString name=QString(),QObject* parent=0);
+    Beam(JointPtr extreme1, JointPtr extreme2,QString name=QString(),QObject* parent=0);
 
-    void extremes(Joint*& e1,Joint*& e2);
+    void extremes(WeakJointPtr& e1,WeakJointPtr& e2);
 
     void parameters(qreal& Ax, qreal& Asy, qreal& Asz, qreal& Jx, qreal& Iy, qreal& Iz, qreal& E, qreal& G, qreal& p, qreal& d);
     void set_parameters(qreal Ax, qreal Asy, qreal Asz, qreal Jx, qreal Iy, qreal Iz, qreal E, qreal G, qreal p, qreal d);
@@ -30,10 +33,30 @@ public:
 
     qreal length(){return m_length;}
 
+    void cloneProperties(QSharedPointer<Beam> beam);
+
+    void split();
+    void unify();
+
+    bool enable() {return m_enable;}
+    void setEnable(bool enable);
+
+    QList<QWeakPointer<Beam> > subParts(){return m_sub_parts;}
+    void addPart(QSharedPointer<Beam> beam);
+    void removePart(QSharedPointer<Beam> beam);
+
 signals:
     void parametersChanged();
     void stressChanged();
+
+    void enableChanged(bool);
+
+    void hasBeenSplit();
+    void hasBeenUnified();
+
 private:
+    bool m_enable;
+
     qreal m_axial_force_extreme_1;
     int m_axial_type_extreme_1;//-1 compression, 0 nul,1 tension
 
@@ -58,7 +81,10 @@ private:
 
     QSizeF m_size;
 
-    Joint* m_extreme1,*m_extreme2;
+    WeakJointPtr m_extreme1,m_extreme2;
+
+    QList<QWeakPointer<Beam> > m_sub_parts;
+
     qreal m_length;
 
     qreal m_Ax,	/* cross section area of each element	*/
@@ -73,6 +99,9 @@ private:
         m_d;	/* element mass density			*/
 
 };
+
+typedef QSharedPointer<Beam> BeamPtr;
+typedef QWeakPointer<Beam> WeakBeamPtr;
 
 #endif // BEAM_H
 

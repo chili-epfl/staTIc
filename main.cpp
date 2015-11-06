@@ -11,6 +11,8 @@
 #include "materialsetter.h"
 #include "physicssetter.h"
 #include "Tools/ConcentratedForce/concentratedforce.h"
+#include "Tools/Scaffold/scaffold.h"
+
 #include "qmlenginefactory.h"
 int main(int argc, char *argv[])
 {
@@ -28,6 +30,7 @@ int main(int argc, char *argv[])
 
     /*Tools*/
     qmlRegisterType<ConcentratedForce>("QuickConcentratedForce", 1, 0, "QuickConcentratedForce");
+    qmlRegisterType<Scaffold>("QuickScaffold", 1, 0, "QuickScaffold");
 
     QmlEngineFactory::setEngine(&engine);
 

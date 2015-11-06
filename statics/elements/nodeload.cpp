@@ -1,12 +1,13 @@
 #include "nodeload.h"
+#include "joint.h"
 
-NodeLoad::NodeLoad(Joint* joint,QString name,QObject* parent):
+NodeLoad::NodeLoad(JointPtr joint,QString name,QObject* parent):
     AbstractElement(name,parent),
-    m_joint(joint),
     m_force(1,0,0),
     m_momentum(0,0,0)
 {
-
+    m_joint=joint.toWeakRef();
+    connect(m_joint.data(),SIGNAL(destroyed(QObject*)),this,SIGNAL(killMe()));
 }
 
 void NodeLoad::setForce(QVector3D force){

@@ -7,6 +7,8 @@
 #include "statics/elements/abstractelement.h"
 
 class Beam;
+typedef QSharedPointer<Beam> BeamPtr;
+typedef QWeakPointer<Beam> WeakBeamPtr;
 
 class Joint:public AbstractElement
 {
@@ -31,11 +33,11 @@ class Joint:public AbstractElement
     QVector3D displacement() {return m_displacement;}
     QVector3D displacementRot(){return m_displacement_rot;}
 
-    QList<Beam*> connectedBeams(){return m_connected_beams;}
-    void addConnectedBeam(Beam* b);
+    QList<WeakBeamPtr> connectedBeams(){return m_connected_beams;}
+    void addConnectedBeam(BeamPtr b);
 
 public slots:
-    void onBeamDestroyed(QObject* o);
+    void onBeamDestroyed();
 
 signals:
     void reactionChanged();
@@ -52,9 +54,15 @@ private:
     QVector3D m_displacement;
     QVector3D m_displacement_rot;
 
-    QList<Beam*> m_connected_beams;
+    QList<WeakBeamPtr> m_connected_beams;
 
     bool  m_support_X,m_support_Y,m_support_Z,m_support_XX,m_support_YY,m_support_ZZ;
 };
+
+typedef QSharedPointer<Joint> JointPtr;
+typedef QWeakPointer<Joint> WeakJointPtr;
+
+
+
 
 #endif // JOINT_H

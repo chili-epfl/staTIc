@@ -13,8 +13,8 @@ public:
     Frame3DDKernel* staticsModule(){return m_staticsModule;}
     void setStaticsModule(Frame3DDKernel* staticsModule);
 
-    BeamVM* createBeamVM(Beam* b);
-    JointVM* createJointVM(Joint* j);
+    BeamVM* createBeamVM(BeamPtr b);
+    JointVM* createJointVM(JointPtr j);
 
     Qt3D::QEntity* getEntity3D(Qt3D::QNodeId id);
     AbstractElementViewModel* getAssociatedVM(Qt3D::QNodeId id);

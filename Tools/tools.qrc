@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>ConcentratedForce/ConcentratedForce.qml</file>
+        <file>Scaffold/Scaffold.qml</file>
     </qresource>
 </RCC>

@@ -18,15 +18,20 @@ Joint::Joint(QVector3D position,QString name,QObject* parent):
 
 }
 
-void Joint::addConnectedBeam(Beam* b){
-    m_connected_beams.append(b);
-    connect(b,SIGNAL(destroyed(QObject*)),this,SLOT(onBeamDestroyed(QObject*)));
+void Joint::addConnectedBeam(BeamPtr b){
+    m_connected_beams.append(b.toWeakRef());
+    connect(b.data(),SIGNAL(destroyed(QObject*)),this,SLOT(onBeamDestroyed()));
     emit connectedBeamsChanged();
 }
 
-void Joint::onBeamDestroyed(QObject* o){
-    Beam* beam=static_cast<Beam*>(o);
-    m_connected_beams.removeAll(beam);
+void Joint::onBeamDestroyed(){
+    QList<WeakBeamPtr> newlist;
+    Q_FOREACH(WeakBeamPtr b, m_connected_beams){
+        if(!b.isNull()){
+            newlist.append(b);
+        }
+    }
+    m_connected_beams=newlist;
     emit connectedBeamsChanged();
 }
 

@@ -7,7 +7,7 @@ SOURCES += main.cpp \
     structureitemmodel.cpp \
     #statics/two_dimentions/twodimensionalstaticsmodule.cpp \
     statics/elements/joint.cpp \
-    statics/elements/force.cpp \
+    #statics/elements/force.cpp \
     statics/abstractstaticsmodule.cpp \
     statics/elements/abstractelement.cpp \
     statics/elements/beam.cpp \
@@ -32,13 +32,14 @@ SOURCES += main.cpp \
     statics/abstractvmmanager.cpp \
     statics/frame3dd/frame3ddvmmanager.cpp \
     qmlenginefactory.cpp \
-    statics/elements/interiorpointload.cpp
+    statics/elements/interiorpointload.cpp \
+    Tools/Scaffold/scaffold.cpp
 
 HEADERS += \
     structureitemmodel.h \
     #statics/two_dimentions/twodimensionalstaticsmodule.h \
     statics/elements/joint.h \
-    statics/elements/force.h \
+    #statics/elements/force.h \
     statics/abstractstaticsmodule.h \
     statics/elements/abstractelement.h \
     statics/elements/beam.h \
@@ -66,7 +67,8 @@ HEADERS += \
     statics/abstractvmmanager.h \
     statics/frame3dd/frame3ddvmmanager.h \
     qmlenginefactory.h \
-    statics/elements/interiorpointload.h
+    statics/elements/interiorpointload.h \
+    Tools/Scaffold/scaffold.h
 
 RESOURCES += qml.qrc \
     Tools/tools.qrc
