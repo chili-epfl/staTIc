@@ -34,10 +34,14 @@ BeamVM* Frame3DDVMManager::createBeamVM(BeamPtr b){
             m_Entity3D2ViewModel[e]=beamVm;
             m_entityID2Entity3D[e->id()]=e;
         }
+        connect(beamVm,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDestroyed(QObject*)));
+        connect(beamVm,SIGNAL(resourcesUpdated()),this,SLOT(onResourcesUpdate()));
         return beamVm;
     }
     return Q_NULLPTR;
 }
+
+
 
 JointVM* Frame3DDVMManager::createJointVM(JointPtr j){
     if(!j.isNull()){
@@ -46,6 +50,8 @@ JointVM* Frame3DDVMManager::createJointVM(JointPtr j){
             m_Entity3D2ViewModel[e]=jointVm;
             m_entityID2Entity3D[e->id()]=e;
         }
+        connect(jointVm,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDestroyed(QObject*)));
+        connect(jointVm,SIGNAL(resourcesUpdated()),this,SLOT(onResourcesUpdate()));
         return jointVm;
     }
     return Q_NULLPTR;
@@ -67,4 +73,33 @@ AbstractElementViewModel* Frame3DDVMManager::getAssociatedVM(Qt3D::QEntity* e){
     if(!e) return Q_NULLPTR;
     if(!m_Entity3D2ViewModel.contains(e)) return Q_NULLPTR;
     return m_Entity3D2ViewModel[e];
+}
+
+void Frame3DDVMManager::onResourceDestroyed(QObject * o){
+    Q_FOREACH(Qt3D::QEntity* e, m_Entity3D2ViewModel.keys()){
+        if(m_Entity3D2ViewModel[e]==o){
+            m_Entity3D2ViewModel.remove(e);
+            m_entityID2Entity3D.remove(e->id());
+        }
+    }
+}
+
+void Frame3DDVMManager::onResourcesUpdate(){
+    QHash<Qt3D::QEntity*,AbstractElementViewModel*> previous_map=m_Entity3D2ViewModel;
+    AbstractElementViewModel* sender=qobject_cast<AbstractElementViewModel*>(QObject::sender());
+    Q_FOREACH(Qt3D::QEntity* e, sender->getEntities()){
+        if(previous_map.contains(e)){
+            previous_map.remove(e);
+        }
+        else{
+            m_Entity3D2ViewModel[e]=sender;
+            m_entityID2Entity3D[e->id()]=e;
+        }
+    }
+    Q_FOREACH(Qt3D::QEntity* e,previous_map.keys()){
+        if(m_Entity3D2ViewModel[e]==sender){
+            m_Entity3D2ViewModel.remove(e);
+            m_entityID2Entity3D.remove(e->id());
+        }
+    }
 }

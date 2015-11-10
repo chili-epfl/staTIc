@@ -30,6 +30,7 @@ private slots:
     void onAnchorsChanged();
     void checkCollitionAttachedElement1();
     void checkCollitionAttachedElement2();
+    void reactivate();
 
 signals:
     void extreme1Changed();
@@ -41,10 +42,15 @@ private:
     AbstractVMManager* m_VMManager;
     Qt3D::QEntity* m_attached_element_e1,*m_attached_element_e2;
 
+    BeamVM* m_new_beamVM;
+
     /*Anchors*/
     WeakAbstractElementPtr m_anchor_1,m_anchor_2;
     int m_anchor_1_offset,m_anchor_2_offset;
+    QVector3D m_extreme_pos1,m_extreme_pos2;
 
+    QTimer* m_refractory_timer;
+    bool m_active;
 };
 
 #endif // SCAFFOLD_H

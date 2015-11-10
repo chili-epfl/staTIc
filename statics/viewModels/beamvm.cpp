@@ -1,6 +1,7 @@
 #include "beamvm.h"
 #include "statics/elements/beam.h"
 #include "statics/elements/joint.h"
+#include "statics/abstractvmmanager.h"
 
 #include <QQmlContext>
 #include <QQmlComponent>
@@ -17,12 +18,13 @@ BeamVM::BeamVM(BeamPtr beam,Qt3D::QEntity* sceneRoot,QObject* parent):
     initView();
     connect(m_beam.data(),SIGNAL(stressChanged()),this,SLOT(onBeamAxialStressChanged()));
     connect(m_beam.data(),SIGNAL(enableChanged(bool)),this,SLOT(onEnableChanged()));
+    connect(m_beam.data(),SIGNAL(hasBeenSplit()),this,SLOT(onBeamSplit()));
+
 }
 BeamVM::~BeamVM(){
     if(m_component3D)
         m_component3D->deleteLater();
 }
-
 
 void BeamVM::initView(){
     BeamPtr beam_str_ref=m_beam.toStrongRef();
@@ -42,7 +44,6 @@ void BeamVM::initView(){
 
     append_3D_resources(m_component3D);
     m_component3D->setParent(m_sceneRoot);
-
 }
 
 
@@ -60,11 +61,23 @@ void BeamVM::onBeamAxialStressChanged(){
 void BeamVM::onEnableChanged(){
     BeamPtr beam_str_ref=m_beam.toStrongRef();
     if(!beam_str_ref->enable() && m_component3D!=Q_NULLPTR){
+        remove_3D_resources(m_component3D);
         m_component3D->deleteLater();
         m_component3D=Q_NULLPTR;
     }
-    else if(!beam_str_ref->enable() && m_component3D!=Q_NULLPTR){
+    else if(beam_str_ref->enable() && m_component3D==Q_NULLPTR){
         initView();
+    }
+}
+
+void BeamVM::onBeamSplit(){
+    BeamPtr beam_str_ref=m_beam.toStrongRef();
+    AbstractVMManager* parent_vm=qobject_cast<AbstractVMManager*>(this->parent());
+    if(!parent_vm) return;
+    Q_FOREACH(WeakBeamPtr b,beam_str_ref->subParts()){
+        if(!b.isNull()){
+            parent_vm->createBeamVM(b.toStrongRef());
+        }
     }
 }
 

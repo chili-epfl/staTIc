@@ -247,6 +247,7 @@ void Beam::split(){
 }
 
 void Beam::unify(){
+    m_sub_parts.clear();
     setEnable(true);
     emit hasBeenUnified();
 }
@@ -259,4 +260,8 @@ void Beam::removePart(BeamPtr beam){
     if(m_sub_parts.contains(beam.toWeakRef())){
            m_sub_parts.removeAll(beam.toWeakRef());
     }
+}
+
+void Beam::setParentBeam(QSharedPointer<Beam> parent){
+    m_parent_beam=parent;
 }

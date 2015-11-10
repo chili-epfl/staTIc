@@ -19,6 +19,7 @@ public slots:
     /*Slots for signals from the model*/
     void onBeamAxialStressChanged();
     void onEnableChanged();
+    void onBeamSplit();
     /*-----*/
 
 private:

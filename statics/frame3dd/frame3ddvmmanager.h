@@ -22,10 +22,13 @@ public:
 
 protected slots:
     void initViewModels();
-
 signals:
     void staticsModuleChanged();
+private slots:
+    void onResourceDestroyed(QObject*);
+    void onResourcesUpdate();
 private:
+
     Frame3DDKernel* m_staticsModule;
     QHash<Qt3D::QEntity*, AbstractElementViewModel*> m_Entity3D2ViewModel;
     QHash<Qt3D::QNodeId, Qt3D::QEntity* > m_entityID2Entity3D;

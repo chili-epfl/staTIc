@@ -87,6 +87,96 @@ Entity{
     }
     components: [mesh,transform]
 
+
+    Entity{
+        components: [
+        SphereMesh{
+            enabled: visible && reactionMagnitude>0
+            id:ruMesh
+            radius: forceRadius;
+        },
+        Transform{
+            Translate{
+                dx:((0)*step+animationValue)%distanceFromJoint
+            }
+            MatrixTransform{
+                matrix: poseMatrix
+            }
+        }
+        ]
+    }
+
+    Entity{
+        components: [
+        SphereMesh{
+            enabled: visible && reactionMagnitude>0
+            radius: forceRadius;
+        },
+        Transform{
+            Translate{
+                dx:((1)*step+animationValue)%distanceFromJoint
+            }
+            MatrixTransform{
+                matrix: poseMatrix
+            }
+        }
+        ]
+    }
+    Entity{
+        components: [
+        SphereMesh{
+            enabled: visible && reactionMagnitude>0
+            radius: forceRadius;
+        },
+        Transform{
+            Translate{
+                dx:((2)*step+animationValue)%distanceFromJoint
+            }
+            MatrixTransform{
+                matrix: poseMatrix
+            }
+        }
+        ]
+    }
+    Entity{
+        components: [
+        SphereMesh{
+            enabled: visible && reactionMagnitude>0
+            radius: forceRadius;
+        },
+        Transform{
+            Translate{
+                dx:((3)*step+animationValue)%distanceFromJoint
+            }
+            MatrixTransform{
+                matrix: poseMatrix
+            }
+        }
+        ]
+    }
+    Entity{
+        components: [
+        SphereMesh{
+            enabled: visible && reactionMagnitude>0
+            radius: forceRadius;
+        },
+        Transform{
+            Translate{
+                dx:((4)*step+animationValue)%distanceFromJoint
+            }
+            MatrixTransform{
+                matrix: poseMatrix
+            }
+        }
+        ]
+    }
+
+
+
+
+
+
+
 //    NodeInstantiator{
 //        model:5
 //        //asynchronous:true

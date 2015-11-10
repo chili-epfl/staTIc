@@ -45,6 +45,9 @@ public:
     void addPart(QSharedPointer<Beam> beam);
     void removePart(QSharedPointer<Beam> beam);
 
+    void setParentBeam(QSharedPointer<Beam> parent);
+    QWeakPointer<Beam> parentBeam(){return m_parent_beam;}
+
 signals:
     void parametersChanged();
     void stressChanged();
@@ -84,7 +87,7 @@ private:
     WeakJointPtr m_extreme1,m_extreme2;
 
     QList<QWeakPointer<Beam> > m_sub_parts;
-
+    QWeakPointer<Beam> m_parent_beam;
     qreal m_length;
 
     qreal m_Ax,	/* cross section area of each element	*/

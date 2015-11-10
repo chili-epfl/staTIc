@@ -1345,10 +1345,12 @@ BeamPtr Frame3DDKernel::createBeam(JointPtr extreme1,JointPtr extreme2,QString n
                                  qreal p, qreal d){
     if(!extreme1.isNull() && !extreme2.isNull() && extreme1!=extreme2){
         BeamPtr beam(new Beam(extreme1,extreme2,name,this));
+        extreme1->addConnectedBeam(beam);
+        extreme2->addConnectedBeam(beam);
         beam->set_parameters(Ax,Asy,Asz,Jx,Iy,Iz,E,G,p,d);
         m_beams.append(beam);
-        connect(beam.data(),SIGNAL(parametersChanged()),this,SLOT(update()));
         connect(beam.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
+        connect(beam.data(),SIGNAL(parametersChanged()),this,SLOT(update()));
         update();
         return beam;
     }
@@ -1361,9 +1363,9 @@ JointPtr Frame3DDKernel::createJoint(QVector3D position, QString name,
     JointPtr joint(new Joint(position,name,this));
     joint->setSupport(support_X,support_Y,support_Z, support_XX,support_YY,support_ZZ);
     m_joints.append(joint);
-    connect(joint.data(),SIGNAL(connectedBeamsChanged()),this,SLOT(update()));//suspicious....
-    connect(joint.data(),SIGNAL(supportChanged()),this,SLOT(update()));
     connect(joint.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
+    connect(joint.data(),SIGNAL(supportChanged()),this,SLOT(update()));
+    connect(joint.data(),SIGNAL(connectedBeamsChanged()),this,SLOT(update()));//suspicious....
     update();
     return joint;
 }
@@ -1373,9 +1375,9 @@ NodeLoadPtr Frame3DDKernel::createNodeLoad(QVector3D force, JointPtr joint,QStri
         NodeLoadPtr nodeLoad(new NodeLoad(joint,name,this));
         nodeLoad->setForce(force);
         m_node_loads.append(nodeLoad);
+        connect(nodeLoad.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
         connect(nodeLoad.data(),SIGNAL(forceChanged()),this,SLOT(update()));
         connect(nodeLoad.data(),SIGNAL(momentumChanged()),this,SLOT(update()));
-        connect(nodeLoad.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
         update();
         return nodeLoad;
 
@@ -1388,8 +1390,8 @@ UniformlyDistributedLoadPtr Frame3DDKernel::createUDLoad(QVector3D force, BeamPt
         UniformlyDistributedLoadPtr udLoad(new UniformlyDistributedLoad(beam,name, this));
         udLoad->setForce(force);
         m_uniformly_distributed_loads.append(udLoad);
-        connect(udLoad.data(),SIGNAL(forceChanged()),this,SLOT(update()));
         connect(udLoad.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
+        connect(udLoad.data(),SIGNAL(forceChanged()),this,SLOT(update()));
         update();
         return udLoad;
     }
@@ -1414,7 +1416,8 @@ InteriorPointLoadPtr Frame3DDKernel::createIPLoad(QVector3D force, BeamPtr beam,
 }
 
 bool Frame3DDKernel::splitBeam(BeamPtr beam, qreal offset,JointPtr &new_joint){
-    if(beam.isNull() && offset>0 && offset<=beam->length()){
+    if(!beam.isNull() && offset>0 && offset<=beam->length()){
+        qDebug()<<"Splitting";
         WeakJointPtr extreme1_w, extreme2_w;
         beam->extremes(extreme1_w,extreme2_w);
         JointPtr extreme1=extreme1_w.toStrongRef();
@@ -1429,12 +1432,15 @@ bool Frame3DDKernel::splitBeam(BeamPtr beam, qreal offset,JointPtr &new_joint){
 
         segment_1=createBeam(extreme1,new_joint,beam->objectName()+QString("Part_1"));
         segment_1->cloneProperties(beam);
+        segment_1->setParentBeam(beam);
 
         segment_2=createBeam(new_joint,extreme2,beam->objectName()+QString("Part_2"));
         segment_2->cloneProperties(beam);
+        segment_2->setParentBeam(beam);
 
         beam->addPart(segment_1);
         beam->addPart(segment_2);
+        beam->split();
 
         return true;
     }
@@ -1443,9 +1449,19 @@ bool Frame3DDKernel::splitBeam(BeamPtr beam, qreal offset,JointPtr &new_joint){
 
 bool Frame3DDKernel::unifyBeam(BeamPtr beam){
     if(!beam.isNull() && m_beams.contains(beam)){
+        WeakJointPtr e1,e2,e_mid;
         Q_FOREACH(WeakBeamPtr b,beam->subParts()){
-             unifyBeam_recursive_step(b.toStrongRef());
+            WeakJointPtr e1_sub,e2_sub;
+            b.toStrongRef()->extremes(e1_sub,e2_sub);
+            if(e1==e1_sub || e2==e1_sub){
+                e_mid=e2_sub;
+            }
+            else{
+                e_mid=e1_sub;
+            }
+            unifyBeam_recursive_step(b.toStrongRef());
          }
+         m_joints.removeAll(e_mid);
          beam->unify();
          return true;
     }
@@ -1454,9 +1470,20 @@ bool Frame3DDKernel::unifyBeam(BeamPtr beam){
 
 void Frame3DDKernel::unifyBeam_recursive_step(BeamPtr beam){
     if(!beam.isNull()){
+        WeakJointPtr e1,e2,e_mid;
+        beam->extremes(e1,e2);
         Q_FOREACH(WeakBeamPtr b,beam->subParts()){
+            WeakJointPtr e1_sub,e2_sub;
+            b.toStrongRef()->extremes(e1_sub,e2_sub);
+            if(e1==e1_sub || e2==e1_sub){
+                e_mid=e2_sub;
+            }
+            else{
+                e_mid=e1_sub;
+            }
             unifyBeam_recursive_step(b);
         }
+        m_joints.removeAll(e_mid);
         m_beams.removeAll(beam);
     }
 }

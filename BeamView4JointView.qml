@@ -73,6 +73,90 @@ Entity{
                                 0   ,   0, 0, 1)
         return matrix;
     }
+
+    Entity{
+        components: [
+        SphereMesh{
+            enabled: visible
+            radius: forceRadius;
+            },
+        Transform{
+            Translate{
+                dx:(0*step+animationValue)%50
+            }
+            MatrixTransform{
+                matrix: poseMatrix
+            }
+        }
+        ]
+    }
+
+    Entity{
+        components: [
+        SphereMesh{
+            enabled: visible
+            radius: forceRadius;
+            },
+        Transform{
+            Translate{
+                dx:(1*step+animationValue)%50
+            }
+            MatrixTransform{
+                matrix: poseMatrix
+            }
+        }
+        ]
+    }
+    Entity{
+        components: [
+        SphereMesh{
+            enabled: visible
+            radius: forceRadius;
+            },
+        Transform{
+            Translate{
+                dx:(2*step+animationValue)%50
+            }
+            MatrixTransform{
+                matrix: poseMatrix
+            }
+        }
+        ]
+    }
+    Entity{
+        components: [
+        SphereMesh{
+            enabled: visible
+            radius: forceRadius;
+            },
+        Transform{
+            Translate{
+                dx:(3*step+animationValue)%50
+            }
+            MatrixTransform{
+                matrix: poseMatrix
+            }
+        }
+        ]
+    }
+    Entity{
+        components: [
+        SphereMesh{
+            enabled: visible
+            radius: forceRadius;
+            },
+        Transform{
+            Translate{
+                dx:(4*step+animationValue)%50
+            }
+            MatrixTransform{
+                matrix: poseMatrix
+            }
+        }
+        ]
+    }
+
+
 //    NodeInstantiator{
 //        model:nModels
 //        //asynchronous:true

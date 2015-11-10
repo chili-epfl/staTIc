@@ -4,6 +4,7 @@ import QtQuick 2.0 as QQ2
 import QtPhysics.unofficial 1.0
 Entity{
     id:rootEntity
+    objectName: "Beam"
     property bool visible:  applicationRoot.currentViewFilter=='BEAM' ? true : false
 
     property vector3d extreme1
