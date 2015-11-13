@@ -51,7 +51,7 @@ void JointVM::onConnectedBeamChanged(){
 
 void JointVM::initView(){
     JointPtr joint_str_ref=m_joint.toStrongRef();
-    QQmlComponent jointView_component(QQmlEngine::contextForObject(m_sceneRoot)->engine(),QUrl("qrc:/JointView.qml"));
+    QQmlComponent jointView_component(QQmlEngine::contextForObject(m_sceneRoot)->engine(),QUrl("qrc:/element_views/Element_Views/JointView.qml"));
     Qt3D::QEntity *jointView;
     jointView = qobject_cast<Qt3D::QEntity*>(jointView_component.create(new QQmlContext(QQmlEngine::contextForObject(m_sceneRoot))));
     m_component3D=jointView;
@@ -68,7 +68,7 @@ void JointVM::initView(){
 
 void JointVM::createEntityForBeam(BeamPtr b){
     JointPtr joint_str_ref=m_joint.toStrongRef();
-    QQmlComponent beamView_component(QQmlEngine::contextForObject(m_sceneRoot)->engine(),QUrl("qrc:/BeamView4JointView.qml"));
+    QQmlComponent beamView_component(QQmlEngine::contextForObject(m_sceneRoot)->engine(),QUrl("qrc:/element_views/Element_Views/BeamView4JointView.qml"));
     Qt3D::QEntity *beamView;
     beamView = qobject_cast<Qt3D::QEntity*>(beamView_component.create(new QQmlContext(QQmlEngine::contextForObject(m_sceneRoot))));
     m_beamsMap[beamView]=b.toWeakRef();

@@ -30,7 +30,7 @@ Entity {
               angle: -180
           }
           MatrixTransform{
-             matrix: sceneloadermatrix.matrix.inverted().times(extreme1Tag.transform)
+             matrix: structure_tag.transform.inverted().times(extreme1Tag.transform)
           }
           Rotate{
               axis: Qt.vector3d(1, 0, 0)
@@ -62,7 +62,7 @@ Entity {
               angle: -180
           }
           MatrixTransform{
-             matrix: sceneloadermatrix.matrix.inverted().times(extreme2Tag.transform)
+             matrix: structure_tag.transform.inverted().times(extreme2Tag.transform)
           }
           Rotate{
               axis: Qt.vector3d(1, 0, 0)

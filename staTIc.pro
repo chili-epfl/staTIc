@@ -4,22 +4,21 @@ QT += qml quick widgets 3dcore 3drenderer 3dinput multimedia
 
 CONFIG += c++11
 SOURCES += main.cpp \
-    structureitemmodel.cpp \
     #statics/two_dimentions/twodimensionalstaticsmodule.cpp \
     statics/elements/joint.cpp \
     #statics/elements/force.cpp \
     statics/abstractstaticsmodule.cpp \
     statics/elements/abstractelement.cpp \
     statics/elements/beam.cpp \
-    materialsetter.cpp \
+    #materialsetter.cpp \
     #statics/two_dimentions/twodimentionaleventhandler.cpp \
     statics/viewModels/abstractelementviewmodel.cpp \
     statics/viewModels/beamvm.cpp \
     #statics/viewModels/forcevm.cpp \
     statics/viewModels/jointvm.cpp \
-    staticshelper.cpp \
-    statics/viewModels/jointvmitemmodel.cpp \
-    physicssetter.cpp \
+    #staticshelper.cpp \
+    #statics/viewModels/jointvmitemmodel.cpp \
+    #physicssetter.cpp \
     Tools/ConcentratedForce/concentratedforce.cpp \
     statics/frame3dd/coordtrans.c \
     statics/frame3dd/eig.c \
@@ -31,27 +30,30 @@ SOURCES += main.cpp \
     statics/elements/uniformlydistributedload.cpp \
     statics/abstractvmmanager.cpp \
     statics/frame3dd/frame3ddvmmanager.cpp \
-    qmlenginefactory.cpp \
+    #qmlenginefactory.cpp \
     statics/elements/interiorpointload.cpp \
-    Tools/Scaffold/scaffold.cpp
+    Tools/Scaffold/scaffold.cpp \
+    Tools/BeamRemover/beamremover.cpp \
+    scenariolistmodel.cpp \
+    #statics/elements/force.cpp \
+
 
 HEADERS += \
-    structureitemmodel.h \
     #statics/two_dimentions/twodimensionalstaticsmodule.h \
     statics/elements/joint.h \
     #statics/elements/force.h \
     statics/abstractstaticsmodule.h \
     statics/elements/abstractelement.h \
     statics/elements/beam.h \
-    materialsetter.h \
+    #materialsetter.h \
     #statics/two_dimentions/twodimentionaleventhandler.h \
     statics/viewModels/abstractelementviewmodel.h \
     statics/viewModels/beamvm.h \
     #statics/viewModels/forcevm.h \
     statics/viewModels/jointvm.h \
-    staticshelper.h \
-    statics/viewModels/jointvmitemmodel.h \
-    physicssetter.h \
+    #staticshelper.h \
+    #statics/viewModels/jointvmitemmodel.h \
+    #physicssetter.h \
     Tools/ConcentratedForce/concentratedforce.h \
     statics/frame3dd/microstran/config.h \
     statics/frame3dd/microstran/vec3.h \
@@ -66,12 +68,14 @@ HEADERS += \
     statics/elements/uniformlydistributedload.h \
     statics/abstractvmmanager.h \
     statics/frame3dd/frame3ddvmmanager.h \
-    qmlenginefactory.h \
+    #qmlenginefactory.h \
     statics/elements/interiorpointload.h \
-    Tools/Scaffold/scaffold.h
+    Tools/Scaffold/scaffold.h \
+    Tools/BeamRemover/beamremover.h \
+    scenariolistmodel.h \
 
-RESOURCES += qml.qrc \
-    Tools/tools.qrc
+
+RESOURCES += qml.qrc
 
 INCLUDEPATH+= /home/chili/QTProjects/qml-chilitags/src
 
@@ -128,3 +132,4 @@ android {
     LIBS += -L/home/chili/chilitags/build-linux/install/lib
     LIBS += -L/home/chili/Downloads/bullet3-2.83.5/build-linux/install/lib
 }
+

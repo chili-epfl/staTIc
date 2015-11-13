@@ -3,5 +3,6 @@
         <file>ConcentratedForce/ConcentratedForce.qml</file>
         <file>Scaffold/Scaffold.qml</file>
         <file>Scaffold/Anchor.qml</file>
+        <file>BeamRemover/BeamRemover.qml</file>
     </qresource>
 </RCC>

@@ -2,7 +2,7 @@ import QtQuick 2.3
 import QtQuick.Controls 1.3
 import QtQuick.Window 2.0
 import QtQuick.Layouts 1.1
-import StructureItemModel 1.0
+import ScenarioListModel 1.0
 
 ApplicationWindow {
     function pt2px(pt){return pt*0.3759*Screen.pixelDensity}
@@ -15,30 +15,23 @@ ApplicationWindow {
         anchors.fill: parent
         fillMode: Image.Tile
         id:background
-        source: "qrc:/images/images/woodbackground.png"
+        source: "qrc:/images/Images/woodbackground.png"
     }
 
-    /*Two variables hold the related files of the selected structure*/
-    property string currentStructure_modelName: "";
-    property url currentStructure_modelFile: "";
-    property url currentStructure_staticsFile: "";
-    property url currentStructure_tagFile: "";
-
     Loader{
-        id:windowloader
+        id:scenarioLoader
         property bool valid: item !== null
         anchors.fill: parent
         onLoaded: {
             intromenu.visible=false;
             intromenu.enabled=false;
-            item.loadStructure(currentStructure_modelName,currentStructure_modelFile,currentStructure_staticsFile,currentStructure_tagFile);
         }
     }
 
     Connections {
         ignoreUnknownSignals: true
-        target: windowloader.valid? windowloader.item : null
-        onPageExit: { intromenu.visible=true;intromenu.enabled=true;windowloader.source=""}
+        target: scenarioLoader.valid ? scenarioLoader.item : null
+        onPageExit: { intromenu.visible=true;intromenu.enabled=true;scenarioLoader.source=""}
     }
 
     /*Item conteining all the item for the intro menu.*/
@@ -47,6 +40,8 @@ ApplicationWindow {
         anchors.margins:10
         id:intromenu
         spacing: 5
+
+        /*Banner*/
         Item{
             id:banner
             Layout.preferredWidth: parent.width
@@ -56,10 +51,11 @@ ApplicationWindow {
                 anchors.centerIn: parent
                 anchors.fill: parent
                 fillMode: Image.PreserveAspectFit
-                source:"qrc:/images/images/mainbanner.png"
+                source:"qrc:/images/Images/mainbanner.png"
             }
         }
 
+        /*Scenario List*/
         Rectangle {
             id:gridRect
             color:"transparent"
@@ -70,33 +66,33 @@ ApplicationWindow {
             Component{
                 id:modelDelegate
                 Rectangle{
-                color: "#55FFFF99"
-                width: gridRect.height; height:gridRect.height
-                ColumnLayout{
-                    Item{
-                        Layout.alignment: Qt.AlignCenter
-                        Layout.preferredHeight:  gridRect.height-2*caption.font.pixelSize;
-                        Layout.preferredWidth: gridRect.height;
-                    Image {
-                        anchors.fill: parent
-                        anchors.margins: 10
-                        fillMode: Image.PreserveAspectFit
-                        source: decoration;
-                    }
-                    }
-                    Item{
-                        Layout.alignment: Qt.AlignCenter
-                        Layout.preferredHeight:caption.font.pixelSize
-                        Layout.minimumWidth: gridRect.height
-                        Text { id:caption ; text: display; font.pixelSize: pt2px(11);
-                            anchors.centerIn: parent
+                    color: "#55FFFF99"
+                    width: gridRect.height; height:gridRect.height
+                    ColumnLayout{
+                        Item{
+                            Layout.alignment: Qt.AlignCenter
+                            Layout.preferredHeight:  gridRect.height-2*caption.font.pixelSize;
+                            Layout.preferredWidth: gridRect.height;
+                            Image {
+                                anchors.fill: parent
+                                anchors.margins: 10
+                                fillMode: Image.PreserveAspectFit
+                                source: decoration;
+                            }
+                        }
+                        Item{
+                            Layout.alignment: Qt.AlignCenter
+                            Layout.preferredHeight:caption.font.pixelSize
+                            Layout.minimumWidth: gridRect.height
+                            Text { id:caption ; text: display; font.pixelSize: pt2px(11);
+                                anchors.centerIn: parent
+                            }
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: gridview.currentIndex = index
                         }
                     }
-                    MouseArea {
-                        anchors.fill: parent
-                        onClicked: gridview.currentIndex = index
-                    }
-                }
                 }
             }
 
@@ -105,10 +101,8 @@ ApplicationWindow {
                 id: gridview
                 clip:true
                 spacing: 10
-                //cellHeight: height/2
-                //cellWidth: width/4
                 anchors.fill: parent
-                model: StructureItemModel{ source:":/models/models" }
+                model: ScenarioListModel{ source:":/scenarios/Scenarios" }
                 highlight: Rectangle { color: "lightsteelblue"; radius: 2 }
                 delegate:modelDelegate
 
@@ -116,10 +110,10 @@ ApplicationWindow {
                     anchors.fill: parent
                     onClicked: gridview.currentIndex = -1
                 }
-                onCurrentIndexChanged: console.log(currentIndex)
-
             }
         }
+
+        /*Button*/
         Item{
             Layout.preferredWidth: parent.width
             Layout.preferredHeight: parent.height*0.1
@@ -127,17 +121,14 @@ ApplicationWindow {
                 text: "Button"
                 onClicked: {
                     if(gridview.currentIndex !=-1){
-                        currentStructure_modelName= gridview.model.get(gridview.currentIndex,"Name");
-                        currentStructure_modelFile= gridview.model.get(gridview.currentIndex,"ModelFile");
-                        currentStructure_staticsFile= gridview.model.get(gridview.currentIndex,"StaticsFile");
-                        currentStructure_tagFile= gridview.model.get(gridview.currentIndex,"TagFile");
-                        windowloader.source="exploreView.qml"
-                        }
+                        scenarioLoader.source=gridview.model.get(gridview.currentIndex,"ScenarioQML");
                     }
+                }
                 anchors.right: parent.right
                 anchors.rightMargin: 10
             }
         }
+
     }
 
 

@@ -3,40 +3,44 @@
         <file>main.qml</file>
         <file>exploreView.qml</file>
         <file>Scene.qml</file>
-        <file>ForceArrow.qml</file>
-        <file>ToolBarComponent.qml</file>
-        <file>FreeBodyDiagram.qml</file>
-        <file>test_main.qml</file>
-        <file>DetailedViewJoint.qml</file>
-        <file>TangibleForce.qml</file>
-        <file>TangibleForce3DEntity.qml</file>
-        <file>BeamView.qml</file>
-        <file>JointView.qml</file>
-        <file>BeamView4JointView.qml</file>
-        <file>ViewFilterBar.qml</file>
-    </qresource>
-    <qresource prefix="/models">
-        <file>models/Model1/Model1.png</file>
-        <file>models/Model1/Model1.yml</file>
-        <file>models/Model1/Model1.lol</file>
-        <file>models/Model1/Model1.dae</file>
     </qresource>
     <qresource prefix="/icons">
-        <file>icons/ic_keyboard_arrow_up_black_36px.svg</file>
-        <file>icons/arrow.obj</file>
-        <file>icons/arrow_ble.obj</file>
-        <file>icons/Force_Icon.svg</file>
-        <file>icons/Selector_Icon.svg</file>
-        <file>icons/Delete_Icon.svg</file>
+        <file>Icons/ic_keyboard_arrow_up_black_36px.svg</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file>Images/mainbanner.png</file>
+        <file>Images/woodbackground.png</file>
+        <file>Images/camera_icon.png</file>
+    </qresource>
+    <qresource prefix="/element_views">
+        <file>Element_Views/AnimationUnitDy.qml</file>
+        <file>Element_Views/BeamView.qml</file>
+        <file>Element_Views/BeamView4JointView.qml</file>
+        <file>Element_Views/JointView.qml</file>
+        <file>Element_Views/tiny_arrow.mtl</file>
+        <file>Element_Views/tiny_arrow.obj</file>
+        <file>Element_Views/AnimationUnitDx.qml</file>
     </qresource>
     <qresource prefix="/opengl">
-        <file>opengl/phongalpha.frag</file>
-        <file>opengl/phongalpha.vert</file>
-        <file>opengl/TransparentMaterial.qml</file>
+        <file>Opengl/phongalpha.frag</file>
+        <file>Opengl/phongalpha.vert</file>
+        <file>Opengl/TransparentMaterial.qml</file>
     </qresource>
-    <qresource prefix="/detailedviews"/>
-    <qresource prefix="/images">
-        <file>images/mainbanner.png</file>
-        <file>images/woodbackground.png</file>
+    <qresource prefix="/scenarios">
+        <file>Scenarios/Scenario_1/Model1.dae</file>
+        <file>Scenarios/Scenario_1/Model1.lol</file>
+        <file>Scenarios/Scenario_1/Model1.png</file>
+        <file>Scenarios/Scenario_1/Model1.yml</file>
+        <file>Scenarios/Scenario_1/Scenario_1.qml</file>
+        <file>Scenarios/Scenario_1/Scenario1Scene3D.qml</file>
+    </qresource>
+    <qresource prefix="/ui">
+        <file>UI/ViewFilterBar.qml</file>
+    </qresource>
+    <qresource prefix="/tools">
+        <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>
+        <file>Tools/Scaffold/Scaffold.qml</file>
+        <file>Tools/Scaffold/Anchor.qml</file>
+        <file>Tools/BeamRemover/BeamRemover.qml</file>
     </qresource>
 </RCC>

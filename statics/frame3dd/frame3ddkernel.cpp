@@ -64,8 +64,10 @@ Frame3DDKernel::Frame3DDKernel(QObject* parent):
 bool Frame3DDKernel::readStructure(QString path){
 
     QFile inputFile(path);
-    if (!inputFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    if (!inputFile.open(QIODevice::ReadOnly | QIODevice::Text)){
+        qDebug()<<"Failed to open structure file";
         return false;
+    }
 
     QTextStream inputStream(&inputFile);
 

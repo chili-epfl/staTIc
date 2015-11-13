@@ -29,7 +29,7 @@ BeamVM::~BeamVM(){
 void BeamVM::initView(){
     BeamPtr beam_str_ref=m_beam.toStrongRef();
     if(!beam_str_ref->enable()) return;
-    QQmlComponent beamView_component(QQmlEngine::contextForObject(m_sceneRoot)->engine(),QUrl("qrc:/BeamView.qml"));
+    QQmlComponent beamView_component(QQmlEngine::contextForObject(m_sceneRoot)->engine(),QUrl("qrc:/element_views/Element_Views/BeamView.qml"));
     Qt3D::QEntity* beamView= qobject_cast<Qt3D::QEntity*>(beamView_component.create(new QQmlContext(QQmlEngine::contextForObject(m_sceneRoot))));
     m_component3D=beamView;
 

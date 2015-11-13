@@ -307,7 +307,7 @@ void Scaffold::onAnchorsChanged(){
             m_active=false;
             m_refractory_timer->start();
 
-            QQmlComponent anchor_component(QQmlEngine::contextForObject(m_VMManager->sceneRoot())->engine(),QUrl("qrc:/Scaffold/Anchor.qml"));
+            QQmlComponent anchor_component(QQmlEngine::contextForObject(m_VMManager->sceneRoot())->engine(),QUrl("qrc:/tools/Tools/Scaffold/Anchor.qml"));
 
             m_attached_element_e1= qobject_cast<Qt3D::QEntity*>(anchor_component.create(new QQmlContext(QQmlEngine::contextForObject(m_VMManager->sceneRoot()))));
             m_attached_element_e1->setProperty("position",m_extreme_pos1);
