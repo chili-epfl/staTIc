@@ -15,46 +15,35 @@ Entity{
     property int axialForceType: 0 //-1 compression,0 nul, 1 tension
     property real axialForce : 0
 
+    property real scaleFactor: 2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 1
+
     onAxialForceTypeChanged: {
         animation.stop();
         var prevAnimationValue=animationValue
         if(axialForceType>0){
             animation.from=prevAnimationValue
-            animation.to=length/2-step+prevAnimationValue
+            animation.to=length/2+prevAnimationValue
         }
         else{
             animation.to=prevAnimationValue
-            animation.from=length/2-step+prevAnimationValue
+            animation.from=length/2+prevAnimationValue
         }
         animation.restart()
     }
 
-    onAxialForceChanged:{
-        if(axialForce<10)
-            forceRadius=forceRadii["small"]
-        else if (axialForce<20){
-            forceRadius=forceRadii["medium"]
-        }
-        else{
-            forceRadius=forceRadii["big"]
-        }
-    }
 
     property int nModels: 20
     property matrix4x4 poseMatrix
 
     property int animationValue: 0
     property int step: 10
-    property int module: Math.round((length/2-step)+step)
-
-    property int forceRadius: forceRadii["small"]
-    property var forceRadii: { "small": 1, "medium": 2, "big":3 }
+    property int module: Math.round(length/2 - step)
 
     QQ2.NumberAnimation on animationValue{
         id:animation
         duration: 10000
         from: 0
-        to:  length/2-step
+        to:  length/2
         loops: QQ2.Animation.Infinite
         running: visible && axialForceType!==0
     }
@@ -142,6 +131,7 @@ Entity{
         animationValue: parent.animationValue
         module: parent.module
         direction: 1
+        scaleFactor: parent.scaleFactor
         rotate: parent.axialForceType < 0
     }
     AnimationUnitDy{
@@ -151,6 +141,7 @@ Entity{
         animationValue: parent.animationValue
         module: parent.module
         direction: 1
+        scaleFactor: parent.scaleFactor
         rotate: parent.axialForceType < 0
     }
     AnimationUnitDy{
@@ -160,6 +151,7 @@ Entity{
         animationValue: parent.animationValue
         module: parent.module
         direction: 1
+        scaleFactor: parent.scaleFactor
         rotate: parent.axialForceType < 0
     }
     AnimationUnitDy{
@@ -169,6 +161,7 @@ Entity{
         animationValue: parent.animationValue
         module: parent.module
         direction: 1
+        scaleFactor: parent.scaleFactor
         rotate: parent.axialForceType < 0
     }
     AnimationUnitDy{
@@ -178,9 +171,9 @@ Entity{
         animationValue: parent.animationValue
         module: parent.module
         direction: 1
+        scaleFactor: parent.scaleFactor
         rotate: parent.axialForceType < 0
     }
-
 
     AnimationUnitDy{
         unitId: 0
@@ -189,6 +182,7 @@ Entity{
         animationValue: parent.animationValue
         module: parent.module
         direction: -1
+        scaleFactor: parent.scaleFactor
         rotate: parent.axialForceType > 0
     }
     AnimationUnitDy{
@@ -198,6 +192,7 @@ Entity{
         animationValue: parent.animationValue
         module: parent.module
         direction: -1
+        scaleFactor: parent.scaleFactor
         rotate: parent.axialForceType > 0
     }
     AnimationUnitDy{
@@ -207,6 +202,7 @@ Entity{
         animationValue: parent.animationValue
         module: parent.module
         direction: -1
+        scaleFactor: parent.scaleFactor
         rotate: parent.axialForceType > 0
     }
     AnimationUnitDy{
@@ -216,6 +212,7 @@ Entity{
         animationValue: parent.animationValue
         module: parent.module
         direction: -1
+        scaleFactor: parent.scaleFactor
         rotate: parent.axialForceType > 0
     }
     AnimationUnitDy{
@@ -225,159 +222,89 @@ Entity{
         animationValue: parent.animationValue
         module: parent.module
         direction: -1
+        scaleFactor: parent.scaleFactor
         rotate: parent.axialForceType > 0
     }
 
-
-
-//    Entity{
-//        components: [SphereMesh{
-//            enabled: !visible || 1 > Math.round(length/2*step) ? false : true
-//            radius: forceRadius;
-//        }
-//        , Transform{
-//            Translate{
-//                dy:(((1)*step+animationValue)%Math.round(length/2-step)+step)
-//            }
-//        }]
-//    }
-//    Entity{
-//        components: [SphereMesh{
-//            enabled: !visible ||2 > Math.round(length/2*step) ? false : true
-//            radius: forceRadius;
-//        }
-//        , Transform{
-//            Translate{
-//                dy:(((2)*step+animationValue)%Math.round(length/2-step)+step)
-//            }
-//        }]
-//    }
-//    Entity{
-//        components: [SphereMesh{
-//            enabled: !visible || 3 > Math.round(length/2*step) ? false : true
-//            radius: forceRadius;
-//        }
-//        , Transform{
-//            Translate{
-//                dy:(((3)*step+animationValue)%Math.round(length/2-step)+step)
-//            }
-//        }]
-//    }
-//    Entity{
-//        components: [SphereMesh{
-//            enabled: !visible || 4 > Math.round(length/2*step) ? false : true
-//            radius: forceRadius;
-//        }
-//        , Transform{
-//            Translate{
-//                dy:(((4)*step+animationValue)%Math.round(length/2-step)+step)
-//            }
-//        }]
+//    property int oscillator : 0
+//    property real randomFactor: 1
+//    QQ2.SequentialAnimation{
+//           running: true
+//           loops: QQ2.Animation.Infinite
+//           QQ2.NumberAnimation{
+//               target: rootEntity
+//               property: "oscillator"
+//               duration: 200
+//               from: -1
+//               to:  0
+//           }
+////           QQ2.NumberAnimation{
+////               target: rootEntity
+////               property: "oscillator"
+////               duration: 200
+////               from: 1
+////               to:  -1
+////           }
 //    }
 
 
-//    //Second Sequence
 //    Entity{
-//        components: [SphereMesh{
-//            enabled: !visible || 0 > Math.round(length/2*step) ? false : true
-//            radius: forceRadius;
-//        }
-//        , Transform{
-//            Translate{
-//                dy:(((0)*step+animationValue)%Math.round(length/2-step)+step)*(-1)
-//            }
-//        }]
-//    }
-//    Entity{
-//        components: [SphereMesh{
-//            enabled: !visible || 1 > Math.round(length/2*step) ? false : true
-//            radius: forceRadius;
-//        }
-//        , Transform{
-//            Translate{
-//                dy:(((1)*step+animationValue)%Math.round(length/2-step)+step)*(-1)
-//            }
-//        }]
-//    }
-//    Entity{
-//        components: [SphereMesh{
-//            enabled: !visible ||2 > Math.round(length/2*step) ? false : true
-//            radius: forceRadius;
-//        }
-//        , Transform{
-//            Translate{
-//                dy:(((2)*step+animationValue)%Math.round(length/2-step)+step)*(-1)
-//            }
-//        }]
-//    }
-//    Entity{
-//        components: [SphereMesh{
-//            enabled: !visible || 3 > Math.round(length/2*step) ? false : true
-//            radius: forceRadius;
-//        }
-//        , Transform{
-//            Translate{
-//                dy:(((3)*step+animationValue)%Math.round(length/2-step)+step)*(-1)
-//            }
-//        }]
-//    }
-//    Entity{
-//        components: [SphereMesh{
-//            enabled: !visible || 4 > Math.round(length/2*step) ? false : true
-//            radius: forceRadius;
-//        }
-//        , Transform{
-//            Translate{
-//                dy:(((4)*step+animationValue)%Math.round(length/2-step)+step)*(-1)
-//            }
-//        }]
-//    }
 
+//        MatrixTransform{
+//            id:removeRotationTransform
+//            matrix:Qt.matrix4x4(structureLoaderTransform.matrix.m11,structureLoaderTransform.matrix.m12,structureLoaderTransform.matrix.m13,0,
+//                                structureLoaderTransform.matrix.m21,structureLoaderTransform.matrix.m22,structureLoaderTransform.matrix.m23,0,
+//                                structureLoaderTransform.matrix.m31,structureLoaderTransform.matrix.m32,structureLoaderTransform.matrix.m33,0,
+//                                structureLoaderTransform.matrix.m41,structureLoaderTransform.matrix.m42,structureLoaderTransform.matrix.m43,1).inverted()
+//        }
 
+//        components: [removeRotationTransform]
 
-//        NodeInstantiator{
-//            active:visible
-//            model:nModels
-//            //asynchronous:true
-//            delegate:
-//                Entity{
-//                id:AnimationUnitDy
-//                property int idx: index
-//                SphereMesh{
-//                    enabled: !visible || idx > Math.round(length/2*step) ? false : true
-//                    id:auMesh
-//                    radius: forceRadius;
+//        Entity{
+//            components: [SphereMesh{
+//                    enabled: true
+//                    radius: 1;
 //                }
-//                Transform{
-//                    id:auTransform
+//                , Transform{
 //                    Translate{
-//                        dy:(((idx)*step+animationValue)%Math.round(length/2-step)+step)
+//                        dx: oscillator==0 ?  Math.random()*randomFactor :  -Math.random()*randomFactor;
+//                        dy:(1*step);
 //                    }
-//                 }
-//                components: [auMesh,auTransform]
-//            }
+//                }]
 //        }
 
-//        NodeInstantiator{
-//            model:nModels
-//            //asynchronous:true
-//            delegate:
-//                Entity{
-//                id:AnimationUnitDy2
-//                property int idx: index
-//                SphereMesh{
-//                    enabled: !visible || idx > Math.round(length/(2*step)) ? false : true
-//                    id:auMesh2
-//                    radius: forceRadius;
+//        Entity{
+//            components: [SphereMesh{
+//                    enabled: true
+//                    radius: 1;
 //                }
-//                Transform{
-//                    id:auTransform2
+//                , Transform{
 //                    Translate{
-//                        dy:(((idx)*step+animationValue)%Math.round(length/2-step)+step)*(-1)
+//                        dx: oscillator==0 ? -Math.random()*randomFactor :  Math.random()*randomFactor;
+//                        dy:(2*step);
 //                    }
-//                }
-//                components: [auMesh2,auTransform2]
-//            }
+//                }]
 //        }
+
+//        Entity{
+//            components: [SphereMesh{
+//                    enabled: true
+//                    radius: 1;
+//                }
+//                , Transform{
+//                    Translate{
+//                        dx: oscillator==0 ?  Math.random()*randomFactor :  -Math.random()*randomFactor;
+//                        dy:(3*step);
+//                    }
+//                }]
+//        }
+
+
+//    }
+
+
+
+
+
 
 }

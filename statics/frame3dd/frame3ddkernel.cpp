@@ -59,6 +59,8 @@ Frame3DDKernel::Frame3DDKernel(QObject* parent):
     connect(m_lazyupdateTimer, SIGNAL(timeout()), this, SLOT(solve()));
     m_lazyupdateTimer->setSingleShot(true);
     m_lazyupdateTimer->setInterval(300);
+    m_maxForce=0;
+    m_minForce=0;
 }
 
 bool Frame3DDKernel::readStructure(QString path){
@@ -1308,6 +1310,7 @@ void Frame3DDKernel::update_statics(
         }
     }
     /*      Nx          Vy         Vz   Txx        Myy        Mzz*/;
+    float maxF=0,minF=100000;
     for (n=1; n<= nE; n++) {
         BeamPtr beam=active_beams.at(n-1);
 
@@ -1325,6 +1328,13 @@ void Frame3DDKernel::update_statics(
         if ( Q[n][7] <= -0.0001 ) axial_type=-1;//compression
         beam->setForcesAndMoments(axial_type,Q[n][7],Q[n][8],Q[n][9],Q[n][10],Q[n][11],Q[n][12],1);
         qDebug()<<beam->objectName()<<" "<<  Q[n][7];
+
+        if( maxF < (fabs(Q[n][7])+fabs(Q[n][1]))*0.5 ){
+            maxF=(fabs(Q[n][7])+fabs(Q[n][1]))*0.5;
+        }
+        if( minF > (fabs(Q[n][7])+fabs(Q[n][1]))*0.5 ){
+            minF=(fabs(Q[n][7])+fabs(Q[n][1]))*0.5;
+        }
     }
 
     /*Reactions Fx          Fy          Fz  Mxx         Myy         Mzz*/
@@ -1336,7 +1346,19 @@ void Frame3DDKernel::update_statics(
             joint->setReaction(QVector3D(R[6*j-5],R[6*j-4],R[6*j-3]));
             joint->setReactionMomentum(QVector3D(R[6*j-2],R[6*j-1],R[6*j]));
         }
+        if( maxF < joint->reaction().length() ){
+            maxF= joint->reaction().length();
+        }
+        if( minF > joint->reaction().length() ){
+            minF=joint->reaction().length();
+        }
     }
+
+    m_maxForce=maxF;
+    m_minForce=minF;
+    emit maxForceChanged();
+    emit minForceChanged();
+
     m_relative_equilibrium_error=err;
     return;
 }

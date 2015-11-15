@@ -11,6 +11,8 @@
         <file>Images/mainbanner.png</file>
         <file>Images/woodbackground.png</file>
         <file>Images/camera_icon.png</file>
+        <file>Images/wood_joint.png</file>
+        <file>Images/wood_beam.png</file>
     </qresource>
     <qresource prefix="/element_views">
         <file>Element_Views/AnimationUnitDy.qml</file>

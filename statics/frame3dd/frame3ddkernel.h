@@ -16,6 +16,9 @@ class Frame3DDKernel : public AbstractStaticsModule
 public:
     Frame3DDKernel(QObject* parent=0);
 
+    virtual qreal maxForce(){return m_maxForce;}
+    virtual qreal minForce(){return m_minForce;}
+
     //virtual Force* createForce(QVector3D applicationPoint, QVector3D force_vector, AbstractElement* applicationElement=Q_NULLPTR);
     virtual BeamPtr createBeam(JointPtr extreme1,JointPtr extreme2,QString name=QString(),
                              qreal Ax=0, qreal Asy=0, qreal Asz=0, qreal Jx=0,
@@ -80,6 +83,9 @@ private:
     int m_geom;
     int m_exagg_static;
     int m_dx;
+
+    float m_maxForce;
+    float m_minForce;
 
     qreal m_relative_equilibrium_error;
     QTimer* m_lazyupdateTimer;

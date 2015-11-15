@@ -59,7 +59,6 @@ Entity {
         SceneLoader{
             id:structureLoader
             objectName: "structureLoader"
-
         }
 
         Transform {
@@ -79,17 +78,13 @@ Entity {
 
         components: [ structureLoader, structureLoaderTransform ]
 
-
         /*Tools*/
         ConcentratedForce{
 
         }
-
         Scaffold{
 
         }
-
-
 
     }
 

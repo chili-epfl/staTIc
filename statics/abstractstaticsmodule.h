@@ -32,6 +32,9 @@ class AbstractStaticsModule : public QObject
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(Stability stability READ stability NOTIFY stabilityChanged)
 
+    Q_PROPERTY(qreal maxForce READ maxForce NOTIFY maxForceChanged)
+    Q_PROPERTY(qreal minForce READ minForce NOTIFY minForceChanged)
+
 public:
 
     enum Status{NOT_LOADED,LOADED};
@@ -44,6 +47,9 @@ public:
 
     Status status(){return m_status;}
     Stability stability(){return m_stability;}
+
+    virtual qreal maxForce()=0;
+    virtual qreal minForce()=0;
 
     virtual BeamPtr createBeam(JointPtr extreme1,JointPtr extreme2,QString name=QString(),
                              qreal Ax=0, qreal Asy=0, qreal Asz=0, qreal Jx=0,
@@ -67,6 +73,8 @@ public:
 signals:
     void statusChanged();
     void stabilityChanged();
+    void minForceChanged();
+    void maxForceChanged();
 
 protected:
     virtual bool readStructure(QString path) =0;

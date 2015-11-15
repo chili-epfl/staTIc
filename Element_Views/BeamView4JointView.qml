@@ -13,25 +13,15 @@ Entity{
     property int axialForceType: 0 //-1 compression,0 nul, 1 tension
     property real axialForce : 0
 
-    onAxialForceChanged:{
-        if(axialForce<10)
-            forceRadius=forceRadii["small"]
-        else if (axialForce<20){
-            forceRadius=forceRadii["medium"]
-        }
-        else{
-            forceRadius=forceRadii["big"]
-        }
-    }
+    property real scaleFactor: 2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 1
+
 
     property int nModels: 5
     property matrix4x4 poseMatrix
 
     property int animationValue: 0
     property int step: 10
-    property int forceRadius: forceRadii["small"]
 
-    property var forceRadii: { "small": 1, "medium": 2, "big":3 }
 
     QQ2.NumberAnimation on animationValue{
             duration: 10000
@@ -91,6 +81,7 @@ Entity{
             animationValue: root.animationValue
             module: 50
             direction: 1
+            scaleFactor: root.scaleFactor
             rotate: root.axialForceType < 0
         }
 
@@ -101,6 +92,7 @@ Entity{
             animationValue: root.animationValue
             module: 50
             direction: 1
+            scaleFactor: root.scaleFactor
             rotate: root.axialForceType < 0
         }
         AnimationUnitDx{
@@ -110,6 +102,7 @@ Entity{
             animationValue: root.animationValue
             module: 50
             direction: 1
+            scaleFactor: root.scaleFactor
             rotate: root.axialForceType < 0
         }
         AnimationUnitDx{
@@ -119,6 +112,7 @@ Entity{
             animationValue: root.animationValue
             module: 50
             direction: 1
+            scaleFactor: root.scaleFactor
             rotate: root.axialForceType < 0
         }
         AnimationUnitDx{
@@ -128,6 +122,7 @@ Entity{
             animationValue: root.animationValue
             module: 50
             direction: 1
+            scaleFactor: root.scaleFactor
             rotate: root.axialForceType < 0
         }
 

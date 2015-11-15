@@ -24,12 +24,12 @@ Rectangle{
         id:icon_model
         ListElement {
             name: "BEAM"
-            //imageSource: "qrc:/icons/Icons/Selector_Icon.svg"
+            imageSource: "qrc:/images/Images/wood_beam.png"
         }
 
         ListElement {
             name: "JOINT"
-            //imageSource: "qrc:/icons/Icons/Force_Icon.svg"
+            imageSource: "qrc:/images/Images/wood_joint.png"
         }
     }
 
@@ -54,7 +54,7 @@ Rectangle{
                     anchors.fill: parent
                     fillMode: Image.PreserveAspectFit
                     anchors.margins: 10
-                    //source: imageSource
+                    source: imageSource
 
                 }
                 MouseArea {

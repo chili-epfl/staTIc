@@ -11,16 +11,11 @@ Entity{
 
     property real reactionMagnitude: reaction.length()
 
+    property real scaleFactor: 2*(reactionMagnitude-minForce)/(maxForce-minForce) + 1
+
+
     onPositionChanged: computeTransform()
     onReactionChanged:{
-        if(reactionMagnitude<10)
-            forceRadius=forceRadii["small"]
-        else if (reactionMagnitude<20){
-            forceRadius=forceRadii["medium"]
-        }
-        else{
-            forceRadius=forceRadii["big"]
-        }
         computeTransform();
     }
 
@@ -28,10 +23,6 @@ Entity{
 
     property int animationValue: 0
     property int step: 10
-
-    property int forceRadius: forceRadii["small"]
-
-    property var forceRadii: { "small": 1, "medium": 2, "big":3 }
 
     property int distanceFromJoint: 50
 
@@ -104,6 +95,7 @@ Entity{
             animationValue: root.animationValue
             module: distanceFromJoint
             direction: 1
+            scaleFactor: root.scaleFactor
             rotate: false
         }
 
@@ -114,6 +106,7 @@ Entity{
             animationValue: root.animationValue
             module: distanceFromJoint
             direction: 1
+            scaleFactor: root.scaleFactor
             rotate: false
         }
         AnimationUnitDx{
@@ -123,6 +116,7 @@ Entity{
             animationValue: root.animationValue
             module: distanceFromJoint
             direction: 1
+            scaleFactor: root.scaleFactor
             rotate: false
         }
         AnimationUnitDx{
@@ -132,6 +126,7 @@ Entity{
             animationValue: root.animationValue
             module: distanceFromJoint
             direction: 1
+            scaleFactor: root.scaleFactor
             rotate: false
         }
         AnimationUnitDx{
@@ -141,6 +136,7 @@ Entity{
             animationValue: root.animationValue
             module: distanceFromJoint
             direction: 1
+            scaleFactor: root.scaleFactor
             rotate: false
         }
 

@@ -18,8 +18,12 @@ Item{
     anchors.fill: parent
     property alias currentViewFilter: viewFilterBar.selection
 
+    property alias maxForce : staticsmodule.maxForce
+    property alias minForce : staticsmodule.minForce
+
     state: "LoadingCamera"
     property  int initState : 0
+
     states: [
         State {
             name: "LoadingCamera"
