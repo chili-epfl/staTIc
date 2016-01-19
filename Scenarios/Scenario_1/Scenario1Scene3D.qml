@@ -72,7 +72,7 @@ Entity {
             matrix: {
                 var m = Qt.matrix4x4();
                 m.rotate(-180, Qt.vector3d(1, 0, 0))
-                m*=structure_tag.transform
+                m=m.times(structure_tag.transform)
                 m.rotate(180, Qt.vector3d(1, 0, 0))
                 return m;
             }

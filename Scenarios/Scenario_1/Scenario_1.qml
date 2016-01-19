@@ -203,6 +203,16 @@ Item{
                            Math.sqrt(4*(parent.width+parent.height)*(parent.width+parent.height)
                                      -16*(1-0.8)*(parent.width*parent.height))) //80% of screen
              border.color: "#80000000"
+             Scene3D {
+                 anchors.fill: parent
+                 focus: true
+                 //aspects: ["input","physics"]
+                 aspects:["input"]
+                 multisample:true
+                 Scenario1Scene3D {
+                     id:scene3D
+                 }
+             }
              Rectangle{
                 anchors.centerIn: parent
                 width: parent.width -2*parent.border.width
@@ -226,15 +236,7 @@ Item{
 
              }
          }
-         Scene3D {
-             anchors.fill: parent
-             focus: true
-             aspects: ["input","physics"]
-             multisample:true
-             Scenario1Scene3D {
-                 id:scene3D
-             }
-         }
+
      }
 
      Chilitags{
@@ -251,7 +253,7 @@ Item{
 
      BackgroundSubtraction{
         id:backgroundsubtraction
-        onEntropyChanged: console.log(entropy)
+        //onEntropyChanged: console.log(entropy)
      }
 
 }

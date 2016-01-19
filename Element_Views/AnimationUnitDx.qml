@@ -14,23 +14,25 @@ Entity{
         id:transform
         matrix: {
             var m = Qt.matrix4x4();
-            m.scale(scaleFactor)
+            m.translate(Qt.vector3d((((unitId)*step+animationValue)%module)*direction
+                                    , 0, 0));
             if(rotate)
                 m.rotate(90, Qt.vector3d(0, 0, 1))
             else
                 m.rotate(-90, Qt.vector3d(0, 0, 1))
+            m.scale(scaleFactor)
 
-            m.translate(Qt.vector3d((((unitId)*step+animationValue)%module)*direction
-                                    , 0, 0));
             return m;
         }
     }
+
     GoochMaterial { id: gooch
         diffuse: Qt.rgba( 1.0, 0.75, 1.0, 1.0 )
         specular: Qt.rgba( 0.2, 0.2, 0.2, 1.0 )
         alpha: 0.2
         beta: 0.6
     }
+
     components: [
         transform,
         unitMesh,gooch

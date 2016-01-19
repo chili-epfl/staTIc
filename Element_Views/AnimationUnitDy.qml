@@ -14,11 +14,10 @@ Entity{
         id:transform
         matrix: {
             var m = Qt.matrix4x4();
-            m.scale(scaleFactor)
+            m.translate(Qt.vector3d(0, (((unitId)*step+animationValue)%module)*direction, 0));
             if(rotate)
                 m.rotate(180, Qt.vector3d(0, 0, 1))
-
-            m.translate(Qt.vector3d(0, (((unitId)*step+animationValue)%module)*direction, 0));
+            m.scale(scaleFactor)
             return m;
         }
     }

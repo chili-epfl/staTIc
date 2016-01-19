@@ -93,6 +93,7 @@ Entity{
         length: parent.length
         enabled:  false
     }
+
     Transform{
         id:transform
         matrix: poseMatrix
@@ -127,9 +128,6 @@ Entity{
                    console.log("click")
                    break;
                }
-           }
-           QQ2.Component.onCompleted: {
-                console.log(mouseInput.controller)
            }
        }
 

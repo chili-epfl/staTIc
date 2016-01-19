@@ -76,6 +76,7 @@ void JointVM::createEntityForBeam(BeamPtr b){
     beamView->setProperty("extreme1",joint_str_ref->scaledPosition());
     WeakJointPtr e1,e2;
     b->extremes(e1,e2);
+
     if(m_joint!=e1){
         beamView->setProperty("extreme2",e1.toStrongRef()->scaledPosition());
     }else{

@@ -17,8 +17,7 @@ Entity{
 
 
     property int nModels: 5
-    property matrix4x4 poseMatrix
-
+    property matrix4x4 poseMatrix: Qt.matrix4x4()
     property int animationValue: 0
     property int step: 10
 
@@ -39,7 +38,7 @@ Entity{
         var a=Qt.vector3d(1,0,0);
         var b=extreme2.minus(extreme1).normalized();
         var axb=a.crossProduct(b);
-        var result=Qt.matrix4x4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+        var result=Qt.matrix4x4();
         if(axb.x!==0 || axb.y!==0 || axb.z!==0){
             var tmp_ssc=ssc(axb);
             result=result.plus(tmp_ssc).plus(tmp_ssc.times(tmp_ssc).times((1-a.dotProduct(b))/Math.pow(axb.length(),2)));
@@ -48,15 +47,14 @@ Entity{
             if(b.x===-1){
                 result.m11=-1;
                 result.m22=-1;
+            }else{
+                //Hack
+                result.translate(0,0,0.00001);
             }
         }
-//        var center=extreme1.plus(extreme2).times(0.5);
-//        result.m14=center.x;
-//        result.m24=center.y;
-//        result.m34=center.z;
-
         poseMatrix=result;
     }
+
     function ssc(v){
         var matrix=Qt.matrix4x4(0, -v.z, v.y, 0,
                                 v.z, 0, -v.x, 0,
@@ -126,12 +124,12 @@ Entity{
             rotate: root.axialForceType < 0
         }
 
+        Transform{
+            id:transform
+            matrix: poseMatrix
+        }
 
-
-        components: [
-            Transform{
-                matrix: poseMatrix
-            }]
+        components: [transform]
     }
 
 //    Entity{

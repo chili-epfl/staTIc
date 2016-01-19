@@ -143,7 +143,7 @@ void Beam::setForcesAndMoments(int axial_type,qreal Nx, qreal Vy, qreal Vz,
     if(updated)
         emit stressChanged();
 
-    qDebug()<<this->objectName();
+    /*qDebug()<<this->objectName();
     qDebug()<<"Axial stress extreme 1:"<<m_axial_stress_extreme1;
     qDebug()<<"Shear stress extreme 1:"<<m_shear_stress_y_extreme1;
     qDebug()<<"Shear stress extreme 1:"<<m_shear_stress_z_extreme1;
@@ -162,7 +162,7 @@ void Beam::setForcesAndMoments(int axial_type,qreal Nx, qreal Vy, qreal Vz,
     qDebug()<<"Axial shear z extreme 2:"<<m_shear_z_extreme_2;
     qDebug()<<"Torque extreme 2:"<<m_axial_moment_extreme_2;
     qDebug()<<"Momentum y extreme 2:"<<m_y_moment_extreme_2;
-    qDebug()<<"Momentum z extreme 2:"<<m_z_moment_extreme_2;
+    qDebug()<<"Momentum z extreme 2:"<<m_z_moment_extreme_2;*/
 
 
 
