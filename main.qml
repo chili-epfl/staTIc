@@ -70,7 +70,7 @@ ApplicationWindow {
                     width: gridRect.height; height:gridRect.height
                     ColumnLayout{
                         Item{
-                            Layout.alignment: Qt.AlignCenter
+                            //Layout.alignment: Qt.AlignCenter
                             Layout.preferredHeight:  gridRect.height-2*caption.font.pixelSize;
                             Layout.preferredWidth: gridRect.height;
                             Image {
@@ -81,7 +81,7 @@ ApplicationWindow {
                             }
                         }
                         Item{
-                            Layout.alignment: Qt.AlignCenter
+                            //Layout.alignment: Qt.AlignCenter
                             Layout.preferredHeight:caption.font.pixelSize
                             Layout.minimumWidth: gridRect.height
                             Text { id:caption ; text: display; font.pixelSize: pt2px(11);

@@ -1,5 +1,5 @@
-import Qt3D 2.0
-import Qt3D.Renderer 2.0
+import Qt3D.Core 2.0
+import Qt3D.Render 2.0
 
 Entity{
     property Mesh unitMesh
@@ -12,15 +12,14 @@ Entity{
     property real scaleFactor: 1
     Transform{
         id:transform
-        Scale{
-         scale: scaleFactor
-        }
-        Rotate{
-            axis: Qt.vector3d(0,0,1)
-            angle: rotate ? 180 : 0
-        }
-        Translate{
-            dy:(((unitId)*step+animationValue)%module)*direction
+        matrix: {
+            var m = Qt.matrix4x4();
+            m.scale(scaleFactor)
+            if(rotate)
+                m.rotate(180, Qt.vector3d(0, 0, 1))
+
+            m.translate(Qt.vector3d(0, (((unitId)*step+animationValue)%module)*direction, 0));
+            return m;
         }
     }
 

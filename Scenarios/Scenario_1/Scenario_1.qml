@@ -7,7 +7,7 @@ import Chilitags 1.0
 
 import BackgroundSubtraction 1.0
 
-import Qt3D.Renderer 2.0
+import Qt3D.Render 2.0
 
 import Frame3DDKernel 1.0
 import Frame3DDVMManager 1.0

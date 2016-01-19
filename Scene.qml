@@ -1,4 +1,4 @@
-import Qt3D 2.0
+import Qt3D.Core 2.0
 import Qt3D.Renderer 2.0
 import MaterialSetter 1.0
 import QtQuick 2.3 as QQ2

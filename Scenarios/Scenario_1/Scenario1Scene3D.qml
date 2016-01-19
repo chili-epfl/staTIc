@@ -1,5 +1,5 @@
-import Qt3D 2.0
-import Qt3D.Renderer 2.0
+import Qt3D.Core 2.0
+import Qt3D.Render 2.0
 import Qt3D.Input 2.0
 
 import QtQuick 2.3 as QQ2
@@ -69,16 +69,12 @@ Entity {
 
         Transform {
             id: structureLoaderTransform
-            Rotate{
-                axis: Qt.vector3d(1, 0, 0)
-                angle: -180
-            }
-            MatrixTransform{
-                matrix: structure_tag.transform
-            }
-            Rotate{
-                axis: Qt.vector3d(1, 0, 0)
-                angle: 180
+            matrix: {
+                var m = Qt.matrix4x4();
+                m.rotate(-180, Qt.vector3d(1, 0, 0))
+                m*=structure_tag.transform
+                m.rotate(180, Qt.vector3d(1, 0, 0))
+                return m;
             }
         }
 

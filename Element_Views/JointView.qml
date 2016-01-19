@@ -1,5 +1,5 @@
-import Qt3D 2.0
-import Qt3D.Renderer 2.0
+import Qt3D.Core 2.0
+import Qt3D.Render 2.0
 import QtQuick 2.3 as QQ2
 
 Entity{
@@ -70,11 +70,12 @@ Entity{
 
     Transform{
         id:transform
-        Translate{
-            dx:position.x
-            dy:position.y
-            dz:position.z
+        matrix: {
+            var m = Qt.matrix4x4();
+            m.translate(position.x,position.y,position.z);
+            return m;
         }
+
     }
     components: [mesh,transform]
 
@@ -142,10 +143,9 @@ Entity{
 
 
 
-        components: [  Transform{
-                MatrixTransform{
-                    matrix: poseMatrix
-                }
+        components: [
+            Transform{
+                matrix: poseMatrix
             }]
     }
 

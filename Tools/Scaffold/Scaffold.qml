@@ -1,5 +1,5 @@
-import Qt3D 2.0
-import Qt3D.Renderer 2.0
+import Qt3D.Core 2.0
+import Qt3D.Render 2.0
 import Chilitags 1.0
 import QtPhysics.unofficial 1.0
 import QuickScaffold 1.0
@@ -25,18 +25,14 @@ Entity {
         }
         Transform{
           id:extreme1Transform
-          Rotate{
+          matrix: {
+              var m = Qt.matrix4x4();
+              m.rotate(-180, Qt.vector3d(1, 0, 0))
+              m*=structure_tag.transform.inverted().times(extreme1Tag.transform)
+              m.rotate(180, Qt.vector3d(1, 0, 0))
+              return m;
+          }
 
-              axis: Qt.vector3d(1, 0, 0)
-              angle: -180
-          }
-          MatrixTransform{
-             matrix: structure_tag.transform.inverted().times(extreme1Tag.transform)
-          }
-          Rotate{
-              axis: Qt.vector3d(1, 0, 0)
-              angle: 180
-          }
         }
         PhysicsBodyInfo{
             id:extreme1Body
@@ -58,18 +54,14 @@ Entity {
         }
         Transform{
           id:extreme2Transform
-          Rotate{
+          matrix: {
+              var m = Qt.matrix4x4();
+              m.rotate(-180, Qt.vector3d(1, 0, 0))
+              m*=structure_tag.transform.inverted().times(extreme2Tag.transform)
+              m.rotate(180, Qt.vector3d(1, 0, 0))
+              return m;
+          }
 
-              axis: Qt.vector3d(1, 0, 0)
-              angle: -180
-          }
-          MatrixTransform{
-             matrix: structure_tag.transform.inverted().times(extreme2Tag.transform)
-          }
-          Rotate{
-              axis: Qt.vector3d(1, 0, 0)
-              angle: 180
-          }
         }
         PhysicsBodyInfo{
             id:extreme2Body

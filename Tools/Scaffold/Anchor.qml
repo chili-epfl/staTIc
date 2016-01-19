@@ -1,5 +1,5 @@
-import Qt3D 2.0
-import Qt3D.Renderer 2.0
+import Qt3D.Core 2.0
+import Qt3D.Render 2.0
 import QtPhysics.unofficial 1.0
 
 
@@ -13,8 +13,10 @@ Entity {
     }
     Transform{
         id: transform
-        Translate{
-            translation: position
+        matrix: {
+            var m = Qt.matrix4x4();
+            m.translate(position)
+            return m;
         }
     }
     PhysicsBodyInfo{
