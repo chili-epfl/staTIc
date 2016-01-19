@@ -20,6 +20,7 @@ class Joint:public AbstractElement
     void support(bool  &support_X,bool &support_Y,bool &support_Z, bool &support_XX,bool &support_YY,bool &support_ZZ);
 
     QVector3D position(){return m_pos;}
+    QVector3D scaledPosition();
 
     void setReaction(QVector3D reaction);
     QVector3D reaction(){return m_reaction;}

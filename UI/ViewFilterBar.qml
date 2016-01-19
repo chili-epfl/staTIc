@@ -8,7 +8,8 @@ Rectangle{
     width: icon_model.count*(74)
     height: 84
     radius:5
-
+    color: "#606060"
+    border.color: "#F0F0F0"
     state:"BEAM"
 
     states:[
@@ -62,7 +63,7 @@ Rectangle{
                     onClicked: {layoutView.currentIndex = index;root.state=name;}
                 }
             }
-            highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
+            highlight: Rectangle { color: "lightsteelblue"; radius: 5 ; border.color: "red"}
         }
 }
 

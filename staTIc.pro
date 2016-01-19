@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += qml quick widgets 3dcore 3drenderer 3dinput multimedia
+QT += qml quick widgets 3dcore 3drender 3dinput multimedia
 
 CONFIG += c++11
 SOURCES += main.cpp \
@@ -36,6 +36,9 @@ SOURCES += main.cpp \
     Tools/BeamRemover/beamremover.cpp \
     scenariolistmodel.cpp \
     #statics/elements/force.cpp \
+    AR/backgroundsubtraction.cpp \
+    AR/backgroundsubtractionfilter.cpp \
+    AR/deformingbeammesh.cpp
 
 
 HEADERS += \
@@ -73,6 +76,9 @@ HEADERS += \
     Tools/Scaffold/scaffold.h \
     Tools/BeamRemover/beamremover.h \
     scenariolistmodel.h \
+    AR/backgroundsubtraction.h \
+    AR/backgroundsubtractionfilter.h \
+    AR/deformingbeammesh.h
 
 
 RESOURCES += qml.qrc
@@ -85,7 +91,7 @@ QML_IMPORT_PATH =
 # Default rules for deployment.
 include(deployment.pri)
 
-LIBS += -lopencv_core
+LIBS += -lopencv_core -lopencv_video -lopencv_imgproc
 #-lopencv_highgui -lopencv_imgproc
 #-lopencv_video -lopencv_calib3d
 LIBS += -lLinearMath -lBulletDynamics -lBulletCollision -lBulletSoftBody

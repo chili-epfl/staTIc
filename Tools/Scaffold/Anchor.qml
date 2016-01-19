@@ -7,8 +7,9 @@ Entity {
     objectName: "Anchor"
     property vector3d position
     SphereMesh{
+        enabled: false
         id:mesh
-        radius: 10
+        radius: 20
     }
     Transform{
         id: transform

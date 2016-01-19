@@ -28,8 +28,8 @@ public:
     QStringList registeredTargets(){return m_targets;}
     void setRegisteredTargets(QStringList targets);
 public slots:
-    void onCollition(Physics::PhysicsCollisionEvent* e);
-    void checkCollitionAttachedElement();
+    void onCollision(Physics::PhysicsCollisionEvent* e);
+    void checkCollisionAttachedElement();
 private slots:
     void reset();
 
@@ -40,7 +40,7 @@ private:
     WeakInteriorPointLoadPtr m_pointLoad;
     WeakNodeLoadPtr m_nodeLoad;
     QStringList m_targets;
-    Qt3D::QEntity* m_attached_element;
+    Qt3DCore::QEntity* m_attached_element;
 };
 
 #endif // CONCENTRATEDFORCE_H

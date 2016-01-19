@@ -1,5 +1,7 @@
 import Qt3D 2.0
 import Qt3D.Renderer 2.0
+import Qt3D.Input 2.0
+
 import QtQuick 2.3 as QQ2
 import QtPhysics.unofficial 1.0
 
@@ -33,6 +35,10 @@ Entity {
 
     Configuration  {
         controlledCamera: camera
+    }
+
+    MouseController {
+        id: mouseController
     }
 
     components: [
@@ -76,15 +82,16 @@ Entity {
             }
         }
 
-        components: [ structureLoader, structureLoaderTransform ]
+        components: [ structureLoaderTransform ]
 
         /*Tools*/
         ConcentratedForce{
 
         }
-        Scaffold{
 
-        }
+        /*Scaffold{
+
+        }*/
 
     }
 

@@ -16,6 +16,7 @@ public:
 
     void setDistance(qreal distance);
     qreal distance(){return m_distance;}
+    qreal scaleDistance();
 
     void setForce(QVector3D force);
     QVector3D force(){return m_force;}

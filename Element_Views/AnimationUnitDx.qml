@@ -23,10 +23,15 @@ Entity{
             dx:(((unitId)*step+animationValue)%module)*direction
         }
     }
-
+    GoochMaterial { id: gooch
+        diffuse: Qt.rgba( 1.0, 0.75, 1.0, 1.0 )
+        specular: Qt.rgba( 0.2, 0.2, 0.2, 1.0 )
+        alpha: 0.2
+        beta: 0.6
+    }
     components: [
         transform,
-        unitMesh
+        unitMesh,gooch
     ]
 }
 

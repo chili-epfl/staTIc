@@ -13,13 +13,13 @@
 const int discrete_step = 10;
 
 /*********************Support functions************************/
-QMatrix4x4 getTranformationMatrix(Qt3D::QEntity* entity,bool local){
+QMatrix4x4 getTranformationMatrix(Qt3DCore::QEntity* entity,bool local){
     if(!entity) return  QMatrix4x4();
-    Qt3D::QTransform* entity_transform=NULL;
-    for(Qt3D::QComponent* component: entity->components()){
+    Qt3DCore::QTransform* entity_transform=NULL;
+    for(Qt3DCore::QComponent* component: entity->components()){
         if(component->isEnabled()){
-            if(component->inherits("Qt3D::QTransform")){
-                entity_transform=qobject_cast<Qt3D::QTransform*>(component);
+            if(component->inherits("Qt3DCore::QTransform")){
+                entity_transform=qobject_cast<Qt3DCore::QTransform*>(component);
             }
         }
     }
@@ -70,9 +70,9 @@ void Scaffold::setExtreme1(Physics::PhysicsBodyInfo* extreme1){
         if(m_extreme1)
             disconnect(m_extreme1);
         m_extreme1=extreme1;
-        connect(m_extreme1,SIGNAL(collitionsListChanged()),
-                this,SLOT(checkCollitionAttachedElement1()));
-        connect(m_extreme1,SIGNAL(collided(Physics::PhysicsCollisionEvent*)),this,SLOT(onCollitionExtreme1(Physics::PhysicsCollisionEvent*)));
+        connect(m_extreme1,SIGNAL(collisionsListChanged()),
+                this,SLOT(checkCollisionAttachedElement1()));
+        connect(m_extreme1,SIGNAL(collided(Physics::PhysicsCollisionEvent*)),this,SLOT(onCollisionExtreme1(Physics::PhysicsCollisionEvent*)));
         emit extreme1Changed();
     }
 }
@@ -83,30 +83,30 @@ void Scaffold::setExtreme2(Physics::PhysicsBodyInfo * extreme2){
         if(m_extreme2)
             disconnect(m_extreme2);
         m_extreme2=extreme2;
-        connect(m_extreme2,SIGNAL(collitionsListChanged()),
-                this,SLOT(checkCollitionAttachedElement2()));
-        connect(m_extreme2,SIGNAL(collided(Physics::PhysicsCollisionEvent*)),this,SLOT(onCollitionExtreme2(Physics::PhysicsCollisionEvent*)));
+        connect(m_extreme2,SIGNAL(collisionsListChanged()),
+                this,SLOT(checkCollisionAttachedElement2()));
+        connect(m_extreme2,SIGNAL(collided(Physics::PhysicsCollisionEvent*)),this,SLOT(onCollisionExtreme2(Physics::PhysicsCollisionEvent*)));
 
         emit extreme2Changed();
     }
 }
 
-void Scaffold::checkCollitionAttachedElement1(){
+void Scaffold::checkCollisionAttachedElement1(){
     if(!m_active) return;
     if(m_new_beamVM){
         Physics::PhysicsBodyInfo* sender_body_info=qobject_cast<Physics::PhysicsBodyInfo*>(QObject::sender());
-        if(sender_body_info->collitionTest(m_attached_element_e1->id()))
+        if(sender_body_info->collisionTest(m_attached_element_e1->id()))
            return;
         if(sender_body_info)
         reset();
     }
 }
 
-void Scaffold::checkCollitionAttachedElement2(){
+void Scaffold::checkCollisionAttachedElement2(){
     if(!m_active) return;
     if(m_new_beamVM){
         Physics::PhysicsBodyInfo* sender_body_info=qobject_cast<Physics::PhysicsBodyInfo*>(QObject::sender());
-        if(!sender_body_info->collitionTest(m_attached_element_e2->id()))
+        if(!sender_body_info->collisionTest(m_attached_element_e2->id()))
             reset();
     }
 }
@@ -158,7 +158,7 @@ void Scaffold::setVMManager(AbstractVMManager * vmManager){
     }
 }
 
-void Scaffold::onCollitionExtreme1(Physics::PhysicsCollisionEvent* e){
+void Scaffold::onCollisionExtreme1(Physics::PhysicsCollisionEvent* e){
     if(!m_active) return;
     if(!m_VMManager) return;
 
@@ -170,10 +170,10 @@ void Scaffold::onCollitionExtreme1(Physics::PhysicsCollisionEvent* e){
         qWarning()<<"Ambiguous sender";
         return;
     }
-    Qt3D::QEntity* sender=sender_body_info->entities().at(0);
+    Qt3DCore::QEntity* sender=sender_body_info->entities().at(0);
     if(!sender) return;
 
-    Qt3D::QEntity* targetEntity=m_VMManager->getEntity3D(e->target());
+    Qt3DCore::QEntity* targetEntity=m_VMManager->getEntity3D(e->target());
     if(targetEntity!=Q_NULLPTR && targetEntity==m_attached_element_e1){
         /*Update current status*/
     }
@@ -218,7 +218,7 @@ void Scaffold::onCollitionExtreme1(Physics::PhysicsCollisionEvent* e){
     }
 }
 
-void Scaffold::onCollitionExtreme2(Physics::PhysicsCollisionEvent* e){
+void Scaffold::onCollisionExtreme2(Physics::PhysicsCollisionEvent* e){
     if(!m_active) return;
     if(!m_VMManager) return;
     if(m_new_beamVM) return;
@@ -227,10 +227,10 @@ void Scaffold::onCollitionExtreme2(Physics::PhysicsCollisionEvent* e){
         qWarning()<<"Ambiguous sender";
         return;
     }
-    Qt3D::QEntity* sender=sender_body_info->entities().at(0);
+    Qt3DCore::QEntity* sender=sender_body_info->entities().at(0);
     if(!sender) return;
 
-    Qt3D::QEntity* targetEntity=m_VMManager->getEntity3D(e->target());
+    Qt3DCore::QEntity* targetEntity=m_VMManager->getEntity3D(e->target());
 
     if(targetEntity!=Q_NULLPTR && targetEntity==m_attached_element_e2){
         /*Update current status*/
@@ -298,9 +298,8 @@ void Scaffold::onAnchorsChanged(){
                 return;
             }
         }
-        BeamPtr new_beam=m_VMManager->staticsModule()->createBeam(e1,e2,"Scaffold");
+        BeamPtr new_beam=m_VMManager->staticsModule()->createBeam(e1,e2,QSizeF(15,25),12400,4600,0.50e-9,"Scaffold");
         if(!new_beam.isNull()){
-            new_beam->setMaterial("Wood");
             m_new_beamVM=m_VMManager->createBeamVM(new_beam);
             m_VMManager->createJointVM(e1);
             m_VMManager->createJointVM(e2);
@@ -309,11 +308,11 @@ void Scaffold::onAnchorsChanged(){
 
             QQmlComponent anchor_component(QQmlEngine::contextForObject(m_VMManager->sceneRoot())->engine(),QUrl("qrc:/tools/Tools/Scaffold/Anchor.qml"));
 
-            m_attached_element_e1= qobject_cast<Qt3D::QEntity*>(anchor_component.create(new QQmlContext(QQmlEngine::contextForObject(m_VMManager->sceneRoot()))));
+            m_attached_element_e1= qobject_cast<Qt3DCore::QEntity*>(anchor_component.create(new QQmlContext(QQmlEngine::contextForObject(m_VMManager->sceneRoot()))));
             m_attached_element_e1->setProperty("position",m_extreme_pos1);
             m_attached_element_e1->setParent(m_VMManager->sceneRoot());
 
-            m_attached_element_e2= qobject_cast<Qt3D::QEntity*>(anchor_component.create(new QQmlContext(QQmlEngine::contextForObject(m_VMManager->sceneRoot()))));
+            m_attached_element_e2= qobject_cast<Qt3DCore::QEntity*>(anchor_component.create(new QQmlContext(QQmlEngine::contextForObject(m_VMManager->sceneRoot()))));
             m_attached_element_e2->setProperty("position",m_extreme_pos2);
             m_attached_element_e2->setParent(m_VMManager->sceneRoot());
         }

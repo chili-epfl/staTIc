@@ -51,7 +51,7 @@ QString readLine(QTextStream* inputStream){
 
 Frame3DDKernel::Frame3DDKernel(QObject* parent):
     AbstractStaticsModule(parent),
-    m_gravity(0,-9,0),
+    m_gravity(0,-9800,0),
     m_shear(0),
     m_geom(0)
 {
@@ -74,14 +74,20 @@ bool Frame3DDKernel::readStructure(QString path){
     QTextStream inputStream(&inputFile);
 
     QString line=readLine(&inputStream);
-
+    /*Model to real scale factor*/
     bool ok;
+    m_modelScale=line.split(separator).at(0).toDouble(&ok);
+    if(!ok){
+        qWarning("Fail to read model scale factor");
+        return false;
+    }
+    /*Get number of nodes*/
+    line=readLine(&inputStream);
     int number_nodes=line.split(separator).at(0).toInt(&ok);
     if(!ok){
         qWarning("Fail to read number of nodes");
         return false;
     }
-    /*Get number of nodes*/
     m_joints.reserve(number_nodes);
 
     /*Read node data*/
@@ -204,7 +210,7 @@ bool Frame3DDKernel::readStructure(QString path){
     for(int i=0;i<number_beams;i++){
         line=readLine(&inputStream);
         QStringList line_parts=line.split(separator);
-        if(line_parts.size()!=6){
+        if(line_parts.size()!=8){
             qWarning("Issue reading element line:");
             qWarning(line.toStdString().c_str());
             return false;
@@ -253,22 +259,40 @@ bool Frame3DDKernel::readStructure(QString path){
                 }
             }
         }
-        BeamPtr beam=createBeam(first,second,line_parts[0]);
 
-        qreal area_x=line_parts[3].toInt(&ok);
+        qreal area_x=line_parts[3].toDouble(&ok);
         if(!ok){
             qWarning("Fail to convert area x element");
             qWarning(line_parts[3].toStdString().c_str());
             return false;
         }
-        qreal area_y=line_parts[4].toInt(&ok);
+        qreal area_y=line_parts[4].toDouble(&ok);
         if(!ok){
             qWarning("Fail to convert area y element");
             qWarning(line_parts[4].toStdString().c_str());
             return false;
         }
-        beam->setSize(QSizeF(area_x,area_y));
-        beam->setMaterial(line_parts[5]);
+        qreal E=line_parts[5].toDouble(&ok);
+        if(!ok){
+            qWarning("Fail to convert Young modulus");
+            qWarning(line_parts[5].toStdString().c_str());
+            return false;
+        }
+        qreal G=line_parts[6].toDouble(&ok);
+        if(!ok){
+            qWarning("Fail to convert Shear modulus");
+            qWarning(line_parts[6].toStdString().c_str());
+            return false;
+        }
+        qreal d=line_parts[7].toDouble(&ok);
+        if(!ok){
+            qWarning("Fail to convert density");
+            qWarning(line_parts[7].toStdString().c_str());
+            return false;
+        }
+
+        BeamPtr beam=createBeam(first,second,QSizeF(area_x,area_y),E,G,d,line_parts[0]);
+
     }
     solve();
     setStatus(Status::LOADED);
@@ -766,6 +790,359 @@ void Frame3DDKernel::solve(){
 
 }
 
+//void Frame3DDKernel::write_internal_forces (
+//        int lc, int nL, float dx,
+//        vec3 *xyz,
+//        double **Q, int nN, int nE, double *L, int *J1, int *J2,
+//        float *Ax,float *Asy,float *Asz,float *Jx,float *Iy,float *Iz,
+//        float *E, float *G, float *p,
+//        float *d, float gX, float gY, float gZ,
+//        int nU, float **U, int nW, float **W, int nP, float **P,
+//        double *D, int shear, double error
+//){
+//    double	t1, t2, t3, t4, t5, t6, t7, t8, t9, /* coord transformation */
+//        u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12; /* displ. */
+
+//    double	xx1,xx2, wx1,wx2,	/* trapz load data, local x dir */
+//        xy1,xy2, wy1,wy2,	/* trapz load data, local y dir */
+//        xz1,xz2, wz1,wz2;	/* trapz load data, local z dir */
+
+//    double	wx=0, wy=0, wz=0, // distributed loads in local coords at x[i]
+//        wx_=0,wy_=0,wz_=0,// distributed loads in local coords at x[i-1]
+//        wxg=0,wyg=0,wzg=0,// gravity loads in local x, y, z coord's
+//        tx=0.0, tx_=0.0;  // distributed torque about local x coord
+
+//    double	xp;		/* location of internal point loads	*/
+
+//    double	*x, dx_, dxnx,	/* distance along frame element		*/
+//        *Nx,		/* axial force within frame el.		*/
+//        *Vy, *Vz,	/* shear forces within frame el.	*/
+//        *Tx,		/* torsional moment within frame el.	*/
+//        *My, *Mz, 	/* bending moments within frame el.	*/
+//        *Sy, *Sz,	/* transverse slopes of frame el.	*/
+//        *Dx, *Dy, *Dz,	/* frame el. displ. in local x,y,z, dir's */
+//        *Rx;		/* twist rotation about the local x-axis */
+
+//    double	maxNx, maxVy, maxVz, 	/*  maximum internal forces	*/
+//        maxTx, maxMy, maxMz,	/*  maximum internal moments	*/
+//        maxDx, maxDy, maxDz,	/*  maximum element displacements */
+//        maxRx, maxSy, maxSz;	/*  maximum element rotations	*/
+
+//    double	minNx, minVy, minVz, 	/*  minimum internal forces	*/
+//        minTx, minMy, minMz,	/*  minimum internal moments	*/
+//        minDx, minDy, minDz,	/*  minimum element displacements */
+//        minRx, minSy, minSz;	/*  minimum element rotations	*/
+
+//    int	n, m,		/* frame element number			*/
+//        cU=0, cW=0, cP=0, /* counters for U, W, and P loads	*/
+//        i, nx,		/* number of sections alont x axis	*/
+//        n1,n2,i1,i2;	/* starting and stopping node no's	*/
+
+//    if (dx == -1.0)	return;	// skip calculation of internal forces and displ
+
+//    for ( m=1; m <= nE; m++ ) {	// loop over all frame elements
+
+//        n1 = J1[m];	n2 = J2[m]; // node 1 and node 2 of elmnt m
+
+//        nx = floor(L[m]/dx);	// number of x-axis increments
+//        if (nx < 1) nx = 1;	// at least one x-axis increment
+
+//    // allocate memory for interior force data for frame element "m"
+//        x  = dvector(0,nx);
+//        Nx = dvector(0,nx);
+//        Vy = dvector(0,nx);
+//        Vz = dvector(0,nx);
+//        Tx = dvector(0,nx);
+//        My = dvector(0,nx);
+//        Mz = dvector(0,nx);
+//        Sy = dvector(0,nx);
+//        Sz = dvector(0,nx);
+//        Rx = dvector(0,nx);
+//        Dx = dvector(0,nx);
+//        Dy = dvector(0,nx);
+//        Dz = dvector(0,nx);
+
+
+//    // the local x-axis for frame element "m" starts at 0 and ends at L[m]
+//        for (i=0; i<nx; i++)	x[i] = i*dx;
+//        x[nx] = L[m];
+//        dxnx = x[nx]-x[nx-1];	// length of the last x-axis increment
+
+
+//    // find interior axial force, shear forces, torsion and bending moments
+
+//        coord_trans ( xyz, L[m], n1, n2,
+//            &t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[m] );
+
+//        // distributed gravity load in local x, y, z coordinates
+//        wxg = d[m]*Ax[m]*(t1*gX + t2*gY + t3*gZ);
+//        wyg = d[m]*Ax[m]*(t4*gX + t5*gY + t6*gZ);
+//        wzg = d[m]*Ax[m]*(t7*gX + t8*gY + t9*gZ);
+
+//        // add uniformly-distributed loads to gravity load
+//        for (n=1; n<=nE && cU<nU; n++) {
+//            if ( (int) U[n][1] == m ) { // load n on element m
+//                wxg += U[n][2];
+//                wyg += U[n][3];
+//                wzg += U[n][4];
+//                ++cU;
+//            }
+//        }
+
+//        // interior forces for frame element "m" at (x=0)
+//        Nx[0] = -Q[m][1];	// positive Nx is tensile
+//        Vy[0] = -Q[m][2];	// positive Vy in local y direction
+//        Vz[0] = -Q[m][3];	// positive Vz in local z direction
+//        Tx[0] = -Q[m][4];	// positive Tx r.h.r. about local x axis
+//        My[0] =  Q[m][5];	// positive My -> positive x-z curvature
+//        Mz[0] = -Q[m][6];	// positive Mz -> positive x-y curvature
+
+//        dx_ = dx;
+//        for (i=1; i<=nx; i++) {	/*  accumulate interior span loads */
+
+//            // start with gravitational plus uniform loads
+//            wx = wxg;
+//            wy = wyg;
+//            wz = wzg;
+
+//            if (i==1) {
+//                wx_ = wxg;
+//                wy_ = wyg;
+//                wz_ = wzg;
+//                tx_ = tx;
+//            }
+
+//            // add trapezoidally-distributed loads
+//            for (n=1; n<=10*nE && cW<nW; n++) {
+//                if ( (int) W[n][1] == m ) { // load n on element m
+//                if (i==nx) ++cW;
+//                xx1 = W[n][2];  xx2 = W[n][3];
+//                wx1 = W[n][4];  wx2 = W[n][5];
+//                xy1 = W[n][6];  xy2 = W[n][7];
+//                wy1 = W[n][8];  wy2 = W[n][9];
+//                xz1 = W[n][10]; xz2 = W[n][11];
+//                wz1 = W[n][12]; wz2 = W[n][13];
+
+//                if ( x[i]>xx1 && x[i]<=xx2 )
+//                    wx += wx1+(wx2-wx1)*(x[i]-xx1)/(xx2-xx1);
+//                if ( x[i]>xy1 && x[i]<=xy2 )
+//                    wy += wy1+(wy2-wy1)*(x[i]-xy1)/(xy2-xy1);
+//                if ( x[i]>xz1 && x[i]<=xz2 )
+//                    wz += wz1+(wz2-wz1)*(x[i]-xz1)/(xz2-xz1);
+//                }
+//            }
+
+//            // trapezoidal integration of distributed loads
+//            // for axial forces, shear forces and torques
+//            if (i==nx)	dx_ = dxnx;
+//            Nx[i] = Nx[i-1] - 0.5*(wx+wx_)*dx_;
+//            Vy[i] = Vy[i-1] - 0.5*(wy+wy_)*dx_;
+//            Vz[i] = Vz[i-1] - 0.5*(wz+wz_)*dx_;
+//            Tx[i] = Tx[i-1] - 0.5*(tx+tx_)*dx_;
+
+//            // update distributed loads at x[i-1]
+//            wx_ = wx;
+//            wy_ = wy;
+//            wz_ = wz;
+//            tx_ = tx;
+
+//            // add interior point loads
+//            for (n=1; n<=10*nE && cP<nP; n++) {
+//                if ( (int) P[n][1] == m ) { // load n on element m
+//                if (i==nx) ++cP;
+//                xp = P[n][5];
+//                if ( x[i] <= xp && xp < x[i]+dx ) {
+//                    Nx[i] -= P[n][2] * 0.5 * (1.0 - (xp-x[i])/dx);
+//                    Vy[i] -= P[n][3] * 0.5 * (1.0 - (xp-x[i])/dx);
+//                    Vz[i] -= P[n][4] * 0.5 * (1.0 - (xp-x[i])/dx);
+
+//                }
+//                if ( x[i]-dx <= xp && xp < x[i] ) {
+//                    Nx[i] -= P[n][2] * 0.5 * (1.0 - (x[i]-dx-xp)/dx);
+//                    Vy[i] -= P[n][3] * 0.5 * (1.0 - (x[i]-dx-xp)/dx);
+//                    Vz[i] -= P[n][4] * 0.5 * (1.0 - (x[i]-dx-xp)/dx);
+//                }
+//                }
+//            }
+//        }
+//        // linear correction of forces for bias in trapezoidal integration
+//        for (i=1; i<=nx; i++) {
+//            Nx[i] -= (Nx[nx]-Q[m][7])  * i/nx;
+//            Vy[i] -= (Vy[nx]-Q[m][8])  * i/nx;
+//            Vz[i] -= (Vz[nx]-Q[m][9])  * i/nx;
+//            Tx[i] -= (Tx[nx]-Q[m][10]) * i/nx;
+//        }
+//        // trapezoidal integration of shear force for bending momemnt
+//        dx_ = dx;
+//        for (i=1; i<=nx; i++) {
+//            if (i==nx)	dx_ = dxnx;
+//            My[i] = My[i-1] - 0.5*(Vz[i]+Vz[i-1])*dx_;
+//            Mz[i] = Mz[i-1] - 0.5*(Vy[i]+Vy[i-1])*dx_;
+
+//        }
+//        // linear correction of moments for bias in trapezoidal integration
+//        for (i=1; i<=nx; i++) {
+//            My[i] -= (My[nx]+Q[m][11]) * i/nx;
+//            Mz[i] -= (Mz[nx]-Q[m][12]) * i/nx;
+//        }
+
+//    // find interior transverse displacements
+
+//        i1 = 6*(n1-1);	i2 = 6*(n2-1);
+
+//        /* compute end deflections in local coordinates */
+
+//        u1  = t1*D[i1+1] + t2*D[i1+2] + t3*D[i1+3];
+//        u2  = t4*D[i1+1] + t5*D[i1+2] + t6*D[i1+3];
+//        u3  = t7*D[i1+1] + t8*D[i1+2] + t9*D[i1+3];
+
+//        u4  = t1*D[i1+4] + t2*D[i1+5] + t3*D[i1+6];
+//        u5  = t4*D[i1+4] + t5*D[i1+5] + t6*D[i1+6];
+//        u6  = t7*D[i1+4] + t8*D[i1+5] + t9*D[i1+6];
+
+//        u7  = t1*D[i2+1] + t2*D[i2+2] + t3*D[i2+3];
+//        u8  = t4*D[i2+1] + t5*D[i2+2] + t6*D[i2+3];
+//        u9  = t7*D[i2+1] + t8*D[i2+2] + t9*D[i2+3];
+
+//        u10 = t1*D[i2+4] + t2*D[i2+5] + t3*D[i2+6];
+//        u11 = t4*D[i2+4] + t5*D[i2+5] + t6*D[i2+6];
+//        u12 = t7*D[i2+4] + t8*D[i2+5] + t9*D[i2+6];
+
+
+//        // rotations and displacements for frame element "m" at (x=0)
+//        Dx[0] =  u1;	// displacement in  local x dir  at node N1
+//        Dy[0] =  u2;	// displacement in  local y dir  at node N1
+//        Dz[0] =  u3;	// displacement in  local z dir  at node N1
+//        Rx[0] =  u4;	// rotationin about local x axis at node N1
+//        Sy[0] =  u6;	// slope in  local y  direction  at node N1
+//        Sz[0] = -u5;	// slope in  local z  direction  at node N1
+
+//        // axial displacement along frame element "m"
+//        dx_ = dx;
+//        for (i=1; i<=nx; i++) {
+//            if (i==nx)	dx_ = dxnx;
+//            Dx[i] = Dx[i-1] + 0.5*(Nx[i-1]+Nx[i])/(E[m]*Ax[m])*dx_;
+//        }
+//        // linear correction of axial displacement for bias in trapezoidal integration
+//        for (i=1; i<=nx; i++) {
+//            Dx[i] -= (Dx[nx]-u7) * i/nx;
+//        }
+
+//        // torsional rotation along frame element "m"
+//        dx_ = dx;
+//        for (i=1; i<=nx; i++) {
+//            if (i==nx)	dx_ = dxnx;
+//            Rx[i] = Rx[i-1] + 0.5*(Tx[i-1]+Tx[i])/(G[m]*Jx[m])*dx_;
+//        }
+//        // linear correction of torsional rot'n for bias in trapezoidal integration
+//        for (i=1; i<=nx; i++) {
+//            Rx[i] -= (Rx[nx]-u10) * i/nx;
+//        }
+
+//        // transverse slope along frame element "m"
+//        dx_ = dx;
+//        for (i=1; i<=nx; i++) {
+//            if (i==nx)	dx_ = dxnx;
+//            Sy[i] = Sy[i-1] + 0.5*(Mz[i-1]+Mz[i])/(E[m]*Iz[m])*dx_;
+//            Sz[i] = Sz[i-1] + 0.5*(My[i-1]+My[i])/(E[m]*Iy[m])*dx_;
+//        }
+//        // linear correction for bias in trapezoidal integration
+//        for (i=1; i<=nx; i++) {
+//            Sy[i] -= (Sy[nx]-u12) * i/nx;
+//            Sz[i] -= (Sz[nx]+u11) * i/nx;
+//        }
+//        if ( shear ) {		// add-in slope due to shear deformation
+//            for (i=0; i<=nx; i++) {
+//                Sy[i] += Vy[i]/(G[m]*Asy[m]);
+//                Sz[i] += Vz[i]/(G[m]*Asz[m]);
+//            }
+//        }
+//        // displacement along frame element "m"
+//        dx_ = dx;
+//        for (i=1; i<=nx; i++) {
+//            if (i==nx)	dx_ = dxnx;
+//            Dy[i] = Dy[i-1] + 0.5*(Sy[i-1]+Sy[i])*dx_;
+//            Dz[i] = Dz[i-1] + 0.5*(Sz[i-1]+Sz[i])*dx_;
+//        }
+//        // linear correction for bias in trapezoidal integration
+//        for (i=1; i<=nx; i++) {
+//            Dy[i] -= (Dy[nx]-u8) * i/nx;
+//            Dz[i] -= (Dz[nx]-u9) * i/nx;
+//        }
+
+//    // initialize the maximum and minimum element forces and displacements
+//        maxNx = minNx = Nx[0]; maxVy = minVy = Vy[0]; maxVz = minVz = Vz[0];  	//  maximum internal forces
+//        maxTx = minTx = Tx[0]; maxMy = minMy = My[0]; maxMz = minMz = Mz[0]; 	//  maximum internal moments
+//        maxDx = minDx = Dx[0]; maxDy = minDy = Dy[0]; maxDz = minDz = Dz[0]; 	//  maximum element displacements
+//        maxRx =	minRx = Rx[0]; maxSy = minSy = Sy[0]; maxSz = minSz = Sz[0];	//  maximum element rotations
+
+//    // find maximum and minimum internal element forces
+//        for (i=1; i<=nx; i++) {
+//            maxNx = (Nx[i] > maxNx) ? Nx[i] : maxNx;
+//            minNx = (Nx[i] < minNx) ? Nx[i] : minNx;
+//            maxVy = (Vy[i] > maxVy) ? Vy[i] : maxVy;
+//            minVy = (Vy[i] < minVy) ? Vy[i] : minVy;
+//            maxVz = (Vz[i] > maxVz) ? Vz[i] : maxVz;
+//            minVz = (Vz[i] < minVz) ? Vz[i] : minVz;
+
+//            maxTx = (Tx[i] > maxTx) ? Tx[i] : maxTx;
+//            minTx = (Tx[i] < minTx) ? Tx[i] : minTx;
+//            maxMy = (My[i] > maxMy) ? My[i] : maxMy;
+//            minMy = (My[i] < minMy) ? My[i] : minMy;
+//            maxMz = (Mz[i] > maxMz) ? Mz[i] : maxMz;
+//            minMz = (Mz[i] < minMz) ? Mz[i] : minMz;
+//        }
+
+//    // find maximum and minimum internal element displacements
+//        for (i=1; i<=nx; i++) {
+//            maxDx = (Dx[i] > maxDx) ? Dx[i] : maxDx;
+//            minDx = (Dx[i] < minDx) ? Dx[i] : minDx;
+//            maxDy = (Dy[i] > maxDy) ? Dy[i] : maxDy;
+//            minDy = (Dy[i] < minDy) ? Dy[i] : minDy;
+//            maxDz = (Dz[i] > maxDz) ? Dz[i] : maxDz;
+//            minDz = (Dz[i] < minDz) ? Dz[i] : minDz;
+//            maxRx = (Rx[i] > maxRx) ? Rx[i] : maxRx;
+//            minRx = (Rx[i] < minRx) ? Rx[i] : minRx;
+//            maxSy = (Sy[i] > maxSy) ? Sy[i] : maxSy;
+//            minSy = (Sy[i] < minSy) ? Sy[i] : minSy;
+//            maxSz = (Sz[i] > maxSz) ? Sz[i] : maxSz;
+//            minSz = (Sz[i] < minSz) ? Sz[i] : minSz;
+//        }
+
+//    // write results to the internal frame element force output data file
+//        QList<QVector4D> segments;
+////        fprintf(fpif,"#.x                \tNx        \tVy        \tVz        \tTx       \tMy        \tMz        \tDx        \tDy        \tDz        \tRx\t~\n");
+//        for (i=0; i<=nx; i++) {
+//            segments.push_back(QVector4D(Dx[i], Dy[i], Dz[i], Rx[i]));
+////            fprintf(fpif,"%14.6e\t", x[i] );
+////            fprintf(fpif,"%14.6e\t%14.6e\t%14.6e\t",
+////                        Nx[i], Vy[i], Vz[i] );
+////            fprintf(fpif,"%14.6e\t%14.6e\t%14.6e\t",
+////                        Tx[i], My[i], Mz[i] );
+////            fprintf(fpif,"%14.6e\t%14.6e\t%14.6e\t%14.6e\n",
+////                        Dx[i], Dy[i], Dz[i], Rx[i] );
+//        }
+//        m_beams[m-1]->setStressSegment(segments);
+
+//    // free memory
+//        free_dvector(x,0,nx);
+//        free_dvector(Nx,0,nx);
+//        free_dvector(Vy,0,nx);
+//        free_dvector(Vz,0,nx);
+//        free_dvector(Tx,0,nx);
+//        free_dvector(My,0,nx);
+//        free_dvector(Mz,0,nx);
+//        free_dvector(Rx,0,nx);
+//        free_dvector(Sy,0,nx);
+//        free_dvector(Sz,0,nx);
+//        free_dvector(Dx,0,nx);
+//        free_dvector(Dy,0,nx);
+//        free_dvector(Dz,0,nx);
+
+//    }				// end of loop over all frame elements
+//}
+
+
 void Frame3DDKernel::assemble_loads (
         int nN, int nE, int nL, int DoF,
         vec3 *xyz,
@@ -972,7 +1349,7 @@ void Frame3DDKernel::assemble_loads (
 //        if ( W[lc][i][ 6] > W[lc][i][7] ) {
 //          sprintf(errMsg,"\n   error in y-axis trapezoidal loads, load case: %d , element %d , load %d\n starting location = %f > ending location = %f \n",
 //          lc, n, i, W[lc][i][6], W[lc][i][7] );
-//          errorMsg(errMsg);
+//          errorMsg(errMsg);https://www.google.ch/search?client=ubuntu&channel=fs&q=Tessellation+not+supported+with+OpenGL+3+without+GL_ARB_tessellation_shader&ie=utf-8&oe=utf-8&gfe_rd=cr&ei=H0p5Vs6dLqmF8QebgIe4Cg#safe=off&channel=fs&q=%22GL_ARB_tessellation_shader%22+ubuntu+install
 //          exit(143);
 //        }
 //        if ( W[lc][i][ 7] > Ln ) {
@@ -1320,14 +1697,14 @@ void Frame3DDKernel::update_statics(
         if ( Q[n][1] >=  0.0001 ) axial_type=-1;//compression
         if ( Q[n][1] <= -0.0001 ) axial_type=1;//tension
 
-        beam->setForcesAndMoments(axial_type,Q[n][1],Q[n][2],Q[n][3],Q[n][4],Q[n][5],Q[n][6],0);
+        beam->setForcesAndMoments(axial_type,Q[n][1],Q[n][2],Q[n][3],Q[n][4],Q[n][5],Q[n][6],1);
 
         if (fabs(Q[n][7]) < 0.0001)
             axial_type=0;
         if ( Q[n][7] >=  0.0001 ) axial_type=1;//tension
         if ( Q[n][7] <= -0.0001 ) axial_type=-1;//compression
-        beam->setForcesAndMoments(axial_type,Q[n][7],Q[n][8],Q[n][9],Q[n][10],Q[n][11],Q[n][12],1);
-        qDebug()<<beam->objectName()<<" "<<  Q[n][7];
+        beam->setForcesAndMoments(axial_type,Q[n][7],Q[n][8],Q[n][9],Q[n][10],Q[n][11],Q[n][12],2);
+        //qDebug()<<beam->objectName()<<" "<<  Q[n][1];
 
         if( maxF < (fabs(Q[n][7])+fabs(Q[n][1]))*0.5 ){
             maxF=(fabs(Q[n][7])+fabs(Q[n][1]))*0.5;
@@ -1358,20 +1735,21 @@ void Frame3DDKernel::update_statics(
     m_minForce=minF;
     emit maxForceChanged();
     emit minForceChanged();
-
     m_relative_equilibrium_error=err;
+    emit updated();
     return;
 }
 
-BeamPtr Frame3DDKernel::createBeam(JointPtr extreme1,JointPtr extreme2,QString name,
-                                 qreal Ax, qreal Asy, qreal Asz, qreal Jx,
-                                 qreal Iy, qreal Iz, qreal E, qreal G,
-                                 qreal p, qreal d){
+BeamPtr Frame3DDKernel::createBeam(JointPtr extreme1,JointPtr extreme2,QSizeF size,qreal E,
+                                   qreal G, qreal d,QString name){
     if(!extreme1.isNull() && !extreme2.isNull() && extreme1!=extreme2){
         BeamPtr beam(new Beam(extreme1,extreme2,name,this));
         extreme1->addConnectedBeam(beam);
         extreme2->addConnectedBeam(beam);
-        beam->set_parameters(Ax,Asy,Asz,Jx,Iy,Iz,E,G,p,d);
+        beam->setSize(size);
+        beam->setYoungModulus(E);
+        beam->setShearModulus(G);
+        beam->setDensity(d);
         m_beams.append(beam);
         connect(beam.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
         connect(beam.data(),SIGNAL(parametersChanged()),this,SLOT(update()));
@@ -1452,14 +1830,15 @@ bool Frame3DDKernel::splitBeam(BeamPtr beam, qreal offset,JointPtr &new_joint){
         QVector3D new_joint_position=extreme1->position()+(direction*offset);
         new_joint=createJoint(new_joint_position);
 
-        BeamPtr segment_1,segment_2;
+        BeamPtr segment_1,segment_2;       
 
-        segment_1=createBeam(extreme1,new_joint,beam->objectName()+QString("Part_1"));
-        segment_1->cloneProperties(beam);
+        qreal dummy,E,G,d;
+
+        beam->parameters(dummy,dummy,dummy,dummy,dummy,dummy,E,G,dummy,d);
+        segment_1=createBeam(extreme1,new_joint,beam->size(),E,G,d,beam->objectName()+QString("Part_1"));
         segment_1->setParentBeam(beam);
 
-        segment_2=createBeam(new_joint,extreme2,beam->objectName()+QString("Part_2"));
-        segment_2->cloneProperties(beam);
+        segment_2=createBeam(new_joint,extreme2,beam->size(),E,G,d,beam->objectName()+QString("Part_2"));
         segment_2->setParentBeam(beam);
 
         beam->addPart(segment_1);

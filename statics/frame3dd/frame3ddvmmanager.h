@@ -16,23 +16,26 @@ public:
     BeamVM* createBeamVM(BeamPtr b);
     JointVM* createJointVM(JointPtr j);
 
-    Qt3D::QEntity* getEntity3D(Qt3D::QNodeId id);
-    AbstractElementViewModel* getAssociatedVM(Qt3D::QNodeId id);
-    AbstractElementViewModel* getAssociatedVM(Qt3D::QEntity*);
+    Qt3DCore::QEntity* getEntity3D(Qt3DCore::QNodeId id);
+    AbstractElementViewModel* getAssociatedVM(Qt3DCore::QNodeId id);
+    AbstractElementViewModel* getAssociatedVM(Qt3DCore::QEntity*);
 
 protected slots:
     void initViewModels();
 signals:
     void staticsModuleChanged();
+    void scaleFactorsUpdated();
 private slots:
     void onResourceDestroyed(QObject*);
     void onResourcesUpdate();
+    void updateScaleFactors();
 private:
 
     Frame3DDKernel* m_staticsModule;
-    QHash<Qt3D::QEntity*, AbstractElementViewModel*> m_Entity3D2ViewModel;
-    QHash<Qt3D::QNodeId, Qt3D::QEntity* > m_entityID2Entity3D;
+    QHash<Qt3DCore::QEntity*, AbstractElementViewModel*> m_Entity3D2ViewModel;
+    QHash<Qt3DCore::QNodeId, Qt3DCore::QEntity* > m_entityID2Entity3D;
 
+    QList<qreal> m_previousStresses;
 };
 
 #endif // FRAME3DDVMMANAGER_H

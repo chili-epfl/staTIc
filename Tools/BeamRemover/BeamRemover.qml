@@ -18,11 +18,11 @@ Entity {
     }
     /*Graphical rapresentation*/
     SphereMesh{
-        id:collitionSphere
+        id:collisionSphere
         radius:10
     }
     Transform{
-        id:collitionTransform
+        id:collisionTransform
         Rotate{
             axis: Qt.vector3d(1, 0, 0)
             angle: -180
@@ -37,17 +37,17 @@ Entity {
     }
 
     PhysicsBodyInfo{
-        id:collitionBody
+        id:collisionBody
         kinematic:true
-        inputTransform: collitionTransform;
+        inputTransform: collisionTransform;
     }
 
     QuickBeamRemover{
         id: quickBR
         vmManager:vmFrame3DDManager
-        emittingBodyInfo:collitionBody
+        emittingBodyInfo:collisionBody
     }
 
-    components:[collitionSphere,collitionBody,collitionTransform]
+    components:[collisionSphere,collisionBody,collisionTransform]
 
 }

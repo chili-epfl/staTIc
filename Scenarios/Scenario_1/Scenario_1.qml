@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.1
 import QtQuick.Scene3D 2.0
 import Chilitags 1.0
 
+import BackgroundSubtraction 1.0
 
 import Qt3D.Renderer 2.0
 
@@ -118,52 +119,52 @@ Item{
 
 
      /*UI*/
-     Item{
-         id:topmenu
-         anchors.horizontalCenter: parent.horizontalCenter
-         y:0 ; z:1
-         state: "HIDDEN"
-         ColumnLayout{
-             Row{
-                 ViewFilterBar{
-                     id:viewFilterBar
-                 }
-             }
-             Row{
-                 Layout.alignment: Qt.AlignCenter
-                 Image {
-                     id: ic_topmenu
-                     source: "qrc:/icons/Icons/ic_keyboard_arrow_up_black_36px.svg"
-                     MouseArea{
-                         anchors.fill: parent
-                         onClicked: {
-                             if(topmenu.state=="DISPLAYED")
-                                 topmenu.state="HIDDEN"
-                             else
-                                 topmenu.state="DISPLAYED"
-                         }
-                     }
-                 }
+//     Item{
+//         id:topmenu
+//         anchors.horizontalCenter: parent.horizontalCenter
+//         y:0 ; z:1
+//         state: "DISPLAYED"
+//         ColumnLayout{
+//             Row{
+//                 ViewFilterBar{
+//                     id:viewFilterBar
+//                 }
+//             }
+//             Row{
+//                 Layout.alignment: Qt.AlignCenter
+//                 Image {
+//                     id: ic_topmenu
+//                     source: "qrc:/icons/Icons/ic_keyboard_arrow_up_black_36px.svg"
+//                     MouseArea{
+//                         anchors.fill: parent
+//                         onClicked: {
+//                             if(topmenu.state=="DISPLAYED")
+//                                 topmenu.state="HIDDEN"
+//                             else
+//                                 topmenu.state="DISPLAYED"
+//                         }
+//                     }
+//                 }
 
-             }
+//             }
 
-         }
-         states: [
-             State {
-                 name: "DISPLAYED"
-                 PropertyChanges { target: topmenu; y: 5}
-                 PropertyChanges { target: ic_topmenu; rotation:0}
+//         }
+//         states: [
+//             State {
+//                 name: "DISPLAYED"
+//                 PropertyChanges { target: topmenu; y: 5}
+//                 PropertyChanges { target: ic_topmenu; rotation:0}
 
-             },
-             State {
-                 name: "HIDDEN"
-                 PropertyChanges { target: topmenu; y: -viewFilterBar.height+10}
-                 PropertyChanges { target: ic_topmenu; rotation:180}
+//             },
+//             State {
+//                 name: "HIDDEN"
+//                 PropertyChanges { target: topmenu; y: -viewFilterBar.height+10}
+//                 PropertyChanges { target: ic_topmenu; rotation:180}
 
-             }
-         ]
-         Behavior on y {animation: NumberAnimation{duration: 250}}
-     }
+//             }
+//         ]
+//         Behavior on y {animation: NumberAnimation{duration: 250}}
+//     }
 
 
      /*3D Rendering*/
@@ -173,15 +174,58 @@ Item{
          imageCapture.resolution: "640x480" //Android sets the viewfinder resolution as the capture one
          viewfinder.resolution:"640x480"
 
+         focus {
+                     focusMode: Camera.FocusMacro
+                     focusPointMode: Camera.FocusPointAuto
+                 }
+         imageProcessing {
+                 whiteBalanceMode: Camera.WhiteBalanceAuto
+         }
+         exposure.exposureMode: Camera.ExposureAction
+         exposure.manualAperture: -1
+         exposure.manualShutterSpeed: -1
      }
+
 
      VideoOutput{
          z: 0
          anchors.centerIn: parent
          anchors.fill: parent
-         source:camDevice
-         filters:[chilitags]
 
+         source:camDevice
+         filters:[backgroundsubtraction,chilitags]
+
+
+         Rectangle{
+             anchors.fill: parent
+             color:"#00000000"
+             border.width: 0.125*(2*(parent.width+parent.height)-
+                           Math.sqrt(4*(parent.width+parent.height)*(parent.width+parent.height)
+                                     -16*(1-0.8)*(parent.width*parent.height))) //80% of screen
+             border.color: "#80000000"
+             Rectangle{
+                anchors.centerIn: parent
+                width: parent.width -2*parent.border.width
+                height:parent.height -2*parent.border.width
+                color: "transparent"
+                border.color: "#F0F0F0"
+                radius:5
+
+                ViewFilterBar{
+                    id:viewFilterBar
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+
+                InfoBox{
+                    width:Math.max(parent.width/3,pt2px(142))//5cm
+                    anchors.bottom: parent.bottom
+                    anchors.right: parent.right
+                    anchors.top: parent.top
+                    anchors.margins: pt2px(20)
+                }
+
+             }
+         }
          Scene3D {
              anchors.fill: parent
              focus: true
@@ -197,10 +241,17 @@ Item{
          id:chilitags
          tagConfigurationFile:":/scenarios/Scenarios/Scenario_1/Model1.yml"
          chiliobjects: [structure_tag]
+         pause: backgroundsubtraction.entropy > .01 ? false : true
      }
 
      ChilitagsObject{
          id: structure_tag
          name:"Model1"
      }
+
+     BackgroundSubtraction{
+        id:backgroundsubtraction
+        onEntropyChanged: console.log(entropy)
+     }
+
 }

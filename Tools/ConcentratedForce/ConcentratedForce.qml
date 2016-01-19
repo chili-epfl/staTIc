@@ -13,15 +13,16 @@ Entity {
     }
     ChilitagsObject{
         id:forceTag
-        name: "tag_1022"
+        name: "tag_7"
     }
     /*Graphical rapresentation*/
     SphereMesh{
-        id:collitionSphere
-        radius:20
+        id:collisionSphere
+        enabled: false
+        radius:15
     }
     Transform{
-        id:collitionTransform
+        id:collisionTransform
         Rotate{
             axis: Qt.vector3d(1, 0, 0)
             angle: -180
@@ -38,7 +39,7 @@ Entity {
     PhysicsBodyInfo{
         id:sphereBody
         kinematic:true
-        inputTransform: collitionTransform;
+        inputTransform: collisionTransform;
     }
 
     QuickConcentratedForce{
@@ -47,7 +48,7 @@ Entity {
         emittingBodyInfo:sphereBody
     }
 
-    components:[collitionSphere,sphereBody,collitionTransform]
+    components:[collisionSphere,sphereBody,collisionTransform]
 
 }
 

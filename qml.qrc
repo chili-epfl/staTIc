@@ -27,6 +27,11 @@
         <file>Opengl/phongalpha.frag</file>
         <file>Opengl/phongalpha.vert</file>
         <file>Opengl/TransparentMaterial.qml</file>
+        <file>Opengl/robustwireframe.frag</file>
+        <file>Opengl/robustwireframe.geom</file>
+        <file>Opengl/robustwireframe.vert</file>
+        <file>Opengl/WireframeEffect.qml</file>
+        <file>Opengl/WireframeMaterial.qml</file>
     </qresource>
     <qresource prefix="/scenarios">
         <file>Scenarios/Scenario_1/Model1.dae</file>
@@ -38,6 +43,7 @@
     </qresource>
     <qresource prefix="/ui">
         <file>UI/ViewFilterBar.qml</file>
+        <file>UI/InfoBox.qml</file>
     </qresource>
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>

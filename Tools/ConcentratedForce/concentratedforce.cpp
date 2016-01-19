@@ -8,13 +8,13 @@
 #include "statics/abstractvmmanager.h"
 
 //********************Support functions************************/
-//QMatrix4x4 getTranformationMatrix(Qt3D::QEntity* entity,bool local){
+//QMatrix4x4 getTranformationMatrix(Qt3DCore::QEntity* entity,bool local){
 //    if(!entity) return  QMatrix4x4();
-//    Qt3D::QTransform* entity_transform=NULL;
-//    for(Qt3D::QComponent* component: entity->components()){
+//    Qt3DCore::QTransform* entity_transform=NULL;
+//    for(Qt3DCore::QComponent* component: entity->components()){
 //        if(component->isEnabled()){
-//            if(component->inherits("Qt3D::QTransform")){
-//                entity_transform=qobject_cast<Qt3D::QTransform*>(component);
+//            if(component->inherits("Qt3DCore::QTransform")){
+//                entity_transform=qobject_cast<Qt3DCore::QTransform*>(component);
 //            }
 //        }
 //    }
@@ -57,17 +57,16 @@ void ConcentratedForce::setEmittingBodyInfo(Physics::PhysicsBodyInfo* emittingBo
             disconnect(m_emittingBodyInfo);
         m_emittingBodyInfo=emittingBodyInfo;
         if(m_emittingBodyInfo){
-            connect(m_emittingBodyInfo,SIGNAL(collided(Physics::PhysicsCollisionEvent*)),this,SLOT(onCollition(Physics::PhysicsCollisionEvent*)));
-            connect(m_emittingBodyInfo,SIGNAL(collitionsListChanged()),this,SLOT(checkCollitionAttachedElement()));
+            connect(m_emittingBodyInfo,SIGNAL(collisionsListChanged()),this,SLOT(checkCollisionAttachedElement()));
+            connect(m_emittingBodyInfo,SIGNAL(collided(Physics::PhysicsCollisionEvent*)),this,SLOT(onCollision(Physics::PhysicsCollisionEvent*)));
         }
      }
 }
 
-void ConcentratedForce::checkCollitionAttachedElement(){
+void ConcentratedForce::checkCollisionAttachedElement(){
     if(m_attached_element){
             Physics::PhysicsBodyInfo* sender_body_info=qobject_cast<Physics::PhysicsBodyInfo*>(QObject::sender());
-            if(!sender_body_info->collitionTest(m_attached_element->id())){
-                this->disconnect(m_attached_element);
+            if(!sender_body_info->collisionTest(m_attached_element->id())){
                 m_attached_element=Q_NULLPTR;
                 if(!m_nodeLoad.isNull())
                     m_VMManager->staticsModule()->removeNodeLoad(m_nodeLoad.toStrongRef());
@@ -79,17 +78,17 @@ void ConcentratedForce::checkCollitionAttachedElement(){
         }
 }
 
-void ConcentratedForce::onCollition(Physics::PhysicsCollisionEvent* e){
+void ConcentratedForce::onCollision(Physics::PhysicsCollisionEvent* e){
     if(!m_VMManager) return;
     Physics::PhysicsBodyInfo* sender_body_info=qobject_cast<Physics::PhysicsBodyInfo*>(QObject::sender());
     if(sender_body_info->entities().size()>1){
         qWarning()<<"Ambiguous sender";
         return;
     }
-    Qt3D::QEntity* sender=sender_body_info->entities().at(0);
+    Qt3DCore::QEntity* sender=sender_body_info->entities().at(0);
     if(!sender) return;
 
-    Qt3D::QEntity* targetEntity=m_VMManager->getEntity3D(e->target());
+    Qt3DCore::QEntity* targetEntity=m_VMManager->getEntity3D(e->target());
     if(targetEntity!=Q_NULLPTR && targetEntity==m_attached_element){
         /*Update current status*/
     }
@@ -106,7 +105,7 @@ void ConcentratedForce::onCollition(Physics::PhysicsCollisionEvent* e){
         else if(targetVM->inherits("BeamVM")){
             BeamVM* beamVM=static_cast<BeamVM*>(targetVM);
             WeakBeamPtr beam=beamVM->beam();
-            m_pointLoad=m_VMManager->staticsModule()->createIPLoad(QVector3D(0,-1,0),beam.toStrongRef());
+            m_pointLoad=m_VMManager->staticsModule()->createIPLoad(QVector3D(0,-500,0),beam.toStrongRef());
             m_attached_element=targetEntity;
             connect(m_attached_element,SIGNAL(destroyed(QObject*)),this,SLOT(reset()));
         }

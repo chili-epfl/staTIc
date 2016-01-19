@@ -1,11 +1,13 @@
 import Qt3D 2.0
 import Qt3D.Renderer 2.0
+import Qt3D.Input 2.0
+
 import QtQuick 2.0 as QQ2
 import QtPhysics.unofficial 1.0
 Entity{
     id:rootEntity
     objectName: "Beam"
-    property bool visible:  applicationRoot.currentViewFilter=='BEAM' ? true : false
+    property bool visible:  applicationRoot.currentViewFilter=='BEAM' && backgroundsubtraction.entropy < .10 ? true : false
 
     property vector3d extreme1
     property vector3d extreme2
@@ -15,7 +17,8 @@ Entity{
     property int axialForceType: 0 //-1 compression,0 nul, 1 tension
     property real axialForce : 0
 
-    property real scaleFactor: 2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 1
+    //property real scaleFactor:2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 1
+    property real scaleFactor:3
 
     onAxialForceTypeChanged: {
         animation.stop();
@@ -111,7 +114,28 @@ Entity{
            id:pBody
            kinematic:true
        }
-       components: [pBodyMesh,pBody]
+       MouseInput {
+           id:mouseInput
+           controller: mouseController
+           onClicked: {
+               //Signal not implemented yet
+               console.log("click")
+
+           }
+           onReleased: {
+               console.log("click")
+               switch (mouse.button) {
+               case Qt.LeftButton:
+                   console.log("click")
+                   break;
+               }
+           }
+           QQ2.Component.onCompleted: {
+                console.log(mouseInput.controller)
+           }
+       }
+
+       components: [pBodyMesh,pBody,mouseInput]
     }
 
 

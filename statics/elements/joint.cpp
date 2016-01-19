@@ -1,6 +1,6 @@
 #include "joint.h"
 #include "beam.h"
-
+#include "statics/abstractstaticsmodule.h"
 Joint::Joint(QVector3D position,QString name,QObject* parent):
     AbstractElement(name,parent),
     m_pos(position),
@@ -62,7 +62,12 @@ void Joint::support(bool  &support_X,bool &support_Y,bool &support_Z,
     support_YY=m_support_YY;
     support_ZZ=m_support_ZZ;
 
-}    void addConnectedBeam(Beam* b);
+}
+
+QVector3D Joint::scaledPosition()
+{
+    return m_pos*AbstractStaticsModule::modelScale();
+}
 
 
 void Joint::setDisplacement(QVector3D displacement){

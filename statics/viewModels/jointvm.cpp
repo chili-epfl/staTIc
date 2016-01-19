@@ -6,7 +6,7 @@
 #include <QQmlComponent>
 #include <QQmlEngine>
 
-JointVM::JointVM(JointPtr joint,Qt3D::QEntity* sceneRoot,QObject* parent):
+JointVM::JointVM(JointPtr joint,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     AbstractElementViewModel(sceneRoot,parent),
     m_component3D(Q_NULLPTR)
 {
@@ -39,7 +39,7 @@ void JointVM::onConnectedBeamChanged(){
         }
     }
 
-    Q_FOREACH(Qt3D::QEntity* e,m_beamsMap.keys()){
+    Q_FOREACH(Qt3DCore::QEntity* e,m_beamsMap.keys()){
         if(m_beamsMap[e].isNull()){
             m_beamsMap.remove(e);
             e->deleteLater();
@@ -52,11 +52,11 @@ void JointVM::onConnectedBeamChanged(){
 void JointVM::initView(){
     JointPtr joint_str_ref=m_joint.toStrongRef();
     QQmlComponent jointView_component(QQmlEngine::contextForObject(m_sceneRoot)->engine(),QUrl("qrc:/element_views/Element_Views/JointView.qml"));
-    Qt3D::QEntity *jointView;
-    jointView = qobject_cast<Qt3D::QEntity*>(jointView_component.create(new QQmlContext(QQmlEngine::contextForObject(m_sceneRoot))));
+    Qt3DCore::QEntity *jointView;
+    jointView = qobject_cast<Qt3DCore::QEntity*>(jointView_component.create(new QQmlContext(QQmlEngine::contextForObject(m_sceneRoot))));
     m_component3D=jointView;
 
-    m_component3D->setProperty("position",joint_str_ref->position());
+    m_component3D->setProperty("position",joint_str_ref->scaledPosition());
 
     onReactionChanged();
     onConnectedBeamChanged();
@@ -69,17 +69,17 @@ void JointVM::initView(){
 void JointVM::createEntityForBeam(BeamPtr b){
     JointPtr joint_str_ref=m_joint.toStrongRef();
     QQmlComponent beamView_component(QQmlEngine::contextForObject(m_sceneRoot)->engine(),QUrl("qrc:/element_views/Element_Views/BeamView4JointView.qml"));
-    Qt3D::QEntity *beamView;
-    beamView = qobject_cast<Qt3D::QEntity*>(beamView_component.create(new QQmlContext(QQmlEngine::contextForObject(m_sceneRoot))));
+    Qt3DCore::QEntity *beamView;
+    beamView = qobject_cast<Qt3DCore::QEntity*>(beamView_component.create(new QQmlContext(QQmlEngine::contextForObject(m_sceneRoot))));
     m_beamsMap[beamView]=b.toWeakRef();
 
-    beamView->setProperty("extreme1",joint_str_ref->position());
+    beamView->setProperty("extreme1",joint_str_ref->scaledPosition());
     WeakJointPtr e1,e2;
     b->extremes(e1,e2);
     if(m_joint!=e1){
-        beamView->setProperty("extreme2",e1.toStrongRef()->position());
+        beamView->setProperty("extreme2",e1.toStrongRef()->scaledPosition());
     }else{
-        beamView->setProperty("extreme2",e2.toStrongRef()->position());
+        beamView->setProperty("extreme2",e2.toStrongRef()->scaledPosition());
     }
 
 
@@ -99,8 +99,8 @@ void JointVM::onConnectedBeamStressChanged(){
     QObject* sender=QObject::sender();
     Beam* beam=qobject_cast<Beam*>(sender);
     if(!beam) return;
-    Qt3D::QEntity* component3D=Q_NULLPTR;
-    Q_FOREACH(Qt3D::QEntity* e, m_beamsMap.keys()){
+    Qt3DCore::QEntity* component3D=Q_NULLPTR;
+    Q_FOREACH(Qt3DCore::QEntity* e, m_beamsMap.keys()){
         if(m_beamsMap[e].data()==beam){
             component3D=e;
             break;

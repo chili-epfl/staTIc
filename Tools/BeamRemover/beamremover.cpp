@@ -22,32 +22,32 @@ void BeamRemover::setEmittingBodyInfo(Physics::PhysicsBodyInfo* emittingBodyInfo
             disconnect(m_emittingBodyInfo);
         m_emittingBodyInfo=emittingBodyInfo;
         if(m_emittingBodyInfo){
-            connect(m_emittingBodyInfo,SIGNAL(collided(Physics::PhysicsCollisionEvent*)),this,SLOT(onCollition(Physics::PhysicsCollisionEvent*)));
-            connect(m_emittingBodyInfo,SIGNAL(collitionsListChanged()),this,SLOT(checkCollitionAttachedElement()));
+            connect(m_emittingBodyInfo,SIGNAL(collided(Physics::PhysicsCollisionEvent*)),this,SLOT(onCollision(Physics::PhysicsCollisionEvent*)));
+            connect(m_emittingBodyInfo,SIGNAL(collisionsListChanged()),this,SLOT(checkCollisionAttachedElement()));
         }
      }
 }
 
-void BeamRemover::checkCollitionAttachedElement(){
+void BeamRemover::checkCollisionAttachedElement(){
     if(m_attached_element){
             Physics::PhysicsBodyInfo* sender_body_info=qobject_cast<Physics::PhysicsBodyInfo*>(QObject::sender());
-            if(!sender_body_info->collitionTest(m_attached_element->id())){
+            if(!sender_body_info->collisionTest(m_attached_element->id())){
                 reset();
             }
         }
 }
 
-void BeamRemover::onCollition(Physics::PhysicsCollisionEvent* e){
+void BeamRemover::onCollision(Physics::PhysicsCollisionEvent* e){
     if(!m_VMManager) return;
     Physics::PhysicsBodyInfo* sender_body_info=qobject_cast<Physics::PhysicsBodyInfo*>(QObject::sender());
     if(sender_body_info->entities().size()>1){
         qWarning()<<"Ambiguous sender";
         return;
     }
-    Qt3D::QEntity* sender=sender_body_info->entities().at(0);
+    Qt3DCore::QEntity* sender=sender_body_info->entities().at(0);
     if(!sender) return;
 
-    Qt3D::QEntity* targetEntity=m_VMManager->getEntity3D(e->target());
+    Qt3DCore::QEntity* targetEntity=m_VMManager->getEntity3D(e->target());
     if(targetEntity!=Q_NULLPTR && m_attached_element==Q_NULLPTR){
         AbstractElementViewModel* targetVM=m_VMManager->getAssociatedVM(targetEntity);
         if(targetVM->inherits("BeamVM")){

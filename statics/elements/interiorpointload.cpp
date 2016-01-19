@@ -1,7 +1,7 @@
 #include "interiorpointload.h"
 #include "statics/elements/beam.h"
 #include "statics/elements/joint.h"
-
+#include "statics/abstractstaticsmodule.h"
 #include <QMatrix4x4>
 
 InteriorPointLoad::InteriorPointLoad(BeamPtr beam,qreal distance,
@@ -23,6 +23,11 @@ void InteriorPointLoad::setDistance(qreal distance){
         m_distance=distance;
         emit distanceChanged();
     }
+}
+
+qreal InteriorPointLoad::scaleDistance()
+{
+    return m_distance*AbstractStaticsModule::modelScale();
 }
 
 void InteriorPointLoad::setForce(QVector3D force){

@@ -9,7 +9,7 @@ class BeamVM : public AbstractElementViewModel
     Q_OBJECT
 
 public:
-    explicit BeamVM(BeamPtr beam,Qt3D::QEntity* sceneRoot,QObject* parent=0);
+    explicit BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent=0);
     ~BeamVM();
 
     WeakBeamPtr beam(){return m_beam;}
@@ -20,12 +20,13 @@ public slots:
     void onBeamAxialStressChanged();
     void onEnableChanged();
     void onBeamSplit();
+    void onScaleFactorUpdated();
     /*-----*/
 
 private:
     void initView();
     WeakBeamPtr m_beam;
-    Qt3D::QEntity* m_component3D;
+    Qt3DCore::QEntity* m_component3D;
 };
 
 #endif // BEAMVM_H

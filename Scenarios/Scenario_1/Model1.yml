@@ -1,30 +1,29 @@
 %YAML:1.0
 Model1:
-    - tag: 22
-      size: 12
-      translation: [5., 72., 0.]
-      rotation: [0., 0., 90.]
-    - tag: 23
-      size: 12
-      translation: [5., 90., 0.]
-      rotation: [0., 0., 90.]
-    - tag: 24
-      size: 12
-      translation: [5., 107., 0.]
-      rotation: [0., 0., 90.]
-    - tag: 25
-      size: 12
-      translation: [5., 145., 0.]
+    - tag: 1
+      size: 21
+      translation: [-250, 250., 0.]
+    - tag: 2
+      size: 21
+      translation: [0., 0., 0.]
+      rotation: [0., 0., 45.]
+    - tag: 3
+      size: 21
+      translation: [-10., 244., 0.]
+      rotation: [0., 0., 0.]
+    - tag: 4
+      size: 21
+      translation: [230., 250., 0.]
       rotation: [0., 0., 90.]
 
-tag_1022:
-    -tag: 1022
-     size: 60
-
-tag_82:
-    -tag: 82
+tag_5:
+    -tag: 5
      size: 12
 
-tag_87:
-    -tag: 87
+tag_6:
+    -tag: 6
      size: 12
+
+tag_7:
+    -tag: 7
+     size: 16

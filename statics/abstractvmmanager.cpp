@@ -6,7 +6,7 @@ AbstractVMManager::AbstractVMManager(QObject *parent) : QObject(parent)
 }
 
 
-void AbstractVMManager::setSceneRoot(Qt3D::QEntity* sceneRoot){
+void AbstractVMManager::setSceneRoot(Qt3DCore::QEntity* sceneRoot){
     if(m_sceneRoot!=sceneRoot){
         m_sceneRoot=sceneRoot;
         emit sceneRootChanged();

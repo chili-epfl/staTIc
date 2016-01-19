@@ -6,7 +6,7 @@
 #include <QQmlContext>
 #include <QQmlComponent>
 #include <QQmlEngine>
-BeamVM::BeamVM(BeamPtr beam,Qt3D::QEntity* sceneRoot,QObject* parent):
+BeamVM::BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     AbstractElementViewModel(sceneRoot,parent),
     m_component3D(Q_NULLPTR)
 {
@@ -30,15 +30,15 @@ void BeamVM::initView(){
     BeamPtr beam_str_ref=m_beam.toStrongRef();
     if(!beam_str_ref->enable()) return;
     QQmlComponent beamView_component(QQmlEngine::contextForObject(m_sceneRoot)->engine(),QUrl("qrc:/element_views/Element_Views/BeamView.qml"));
-    Qt3D::QEntity* beamView= qobject_cast<Qt3D::QEntity*>(beamView_component.create(new QQmlContext(QQmlEngine::contextForObject(m_sceneRoot))));
+    Qt3DCore::QEntity* beamView= qobject_cast<Qt3DCore::QEntity*>(beamView_component.create(new QQmlContext(QQmlEngine::contextForObject(m_sceneRoot))));
     m_component3D=beamView;
 
     m_component3D->setObjectName(this->objectName());
     WeakJointPtr extreme1,extreme2;
     beam_str_ref->extremes(extreme1,extreme2);
 
-    m_component3D->setProperty("extreme1",extreme1.toStrongRef()->position());
-    m_component3D->setProperty("extreme2",extreme2.toStrongRef()->position());
+    m_component3D->setProperty("extreme1",extreme1.toStrongRef()->scaledPosition());
+    m_component3D->setProperty("extreme2",extreme2.toStrongRef()->scaledPosition());
 
     onBeamAxialStressChanged();
 
@@ -79,6 +79,10 @@ void BeamVM::onBeamSplit(){
             parent_vm->createBeamVM(b.toStrongRef());
         }
     }
+}
+
+void BeamVM::onScaleFactorUpdated(){
+
 }
 
 

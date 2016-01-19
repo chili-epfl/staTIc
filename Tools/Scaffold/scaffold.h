@@ -25,11 +25,11 @@ public:
     void setVMManager(AbstractVMManager*);
 
 private slots:
-    void onCollitionExtreme1(Physics::PhysicsCollisionEvent* e);
-    void onCollitionExtreme2(Physics::PhysicsCollisionEvent* e);
+    void onCollisionExtreme1(Physics::PhysicsCollisionEvent* e);
+    void onCollisionExtreme2(Physics::PhysicsCollisionEvent* e);
     void onAnchorsChanged();
-    void checkCollitionAttachedElement1();
-    void checkCollitionAttachedElement2();
+    void checkCollisionAttachedElement1();
+    void checkCollisionAttachedElement2();
     void reactivate();
 
 signals:
@@ -40,7 +40,7 @@ private:
 
     Physics::PhysicsBodyInfo* m_extreme1,*m_extreme2;
     AbstractVMManager* m_VMManager;
-    Qt3D::QEntity* m_attached_element_e1,*m_attached_element_e2;
+    Qt3DCore::QEntity* m_attached_element_e1,*m_attached_element_e2;
 
     BeamVM* m_new_beamVM;
 

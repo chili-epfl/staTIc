@@ -16,11 +16,12 @@ Entity {
     Entity{
         ChilitagsObject{
             id:extreme1Tag
-            name: "tag_82"
+            name: "tag_5"
         }
         SphereMesh{
+            enabled: false
             id:extreme1Mesh
-            radius: 10
+            radius: 20
         }
         Transform{
           id:extreme1Transform
@@ -48,11 +49,12 @@ Entity {
     Entity{
         ChilitagsObject{
             id:extreme2Tag
-            name: "tag_87"
+            name: "tag_6"
         }
         SphereMesh{
+            enabled: false
             id:extreme2Mesh
-            radius: 10
+            radius: 20
         }
         Transform{
           id:extreme2Transform

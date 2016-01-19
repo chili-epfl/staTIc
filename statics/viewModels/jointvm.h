@@ -9,7 +9,7 @@ class JointVM:public AbstractElementViewModel
     Q_OBJECT
 
 public:
-    explicit JointVM(JointPtr joint,Qt3D::QEntity* sceneRoot,QObject* parent=0);
+    explicit JointVM(JointPtr joint,Qt3DCore::QEntity* sceneRoot,QObject* parent=0);
     ~JointVM();
     WeakJointPtr joint(){return m_joint;}
 
@@ -24,9 +24,9 @@ private:
     void createEntityForBeam(BeamPtr b);
     void initView();
 
-    Qt3D::QEntity* m_component3D;
+    Qt3DCore::QEntity* m_component3D;
     /*A map between the beams and the relative entity*/
-    QHash<Qt3D::QEntity*,WeakBeamPtr> m_beamsMap;
+    QHash<Qt3DCore::QEntity*,WeakBeamPtr> m_beamsMap;
     WeakJointPtr m_joint;
 };
 

@@ -23,15 +23,15 @@ public:
     void setEmittingBodyInfo(Physics::PhysicsBodyInfo*);
 
 public slots:
-    void onCollition(Physics::PhysicsCollisionEvent* e);
-    void checkCollitionAttachedElement();
+    void onCollision(Physics::PhysicsCollisionEvent* e);
+    void checkCollisionAttachedElement();
 private slots:
     void reset();
 private:
     AbstractVMManager* m_VMManager;
     Physics::PhysicsBodyInfo* m_emittingBodyInfo;
 
-    Qt3D::QEntity* m_attached_element;
+    Qt3DCore::QEntity* m_attached_element;
     WeakBeamPtr m_beam;
 
 };
