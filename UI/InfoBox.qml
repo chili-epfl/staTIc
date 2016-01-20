@@ -1,23 +1,11 @@
 import QtQuick 2.0
 import QtGraphicalEffects 1.0
- import QtQuick.Controls.Styles 1.4
- import QtQuick.Controls 1.2
+import QtQuick.Controls.Styles 1.4
+import QtQuick.Controls 1.2
+import QtQuick.Scene3D 2.0
+
 Rectangle {
     id:root
-
-//    state:"DISPLAYED"
-
-//    states: [
-//        State {
-//            name: "DISPLAYED"
-//            PropertyChanges { target: root; visible:true}
-//        },
-//        State {
-//            name: "HIDDEN"
-//            PropertyChanges { target: root; visible:false}
-
-//        }
-//    ]
     color: "transparent"
     radius:5
     LinearGradient {
@@ -46,6 +34,14 @@ Rectangle {
         MouseArea{
             anchors.fill: parent
             onClicked: root.visible=false;
+        }
+    }
+    Scene3D {
+        anchors.fill: parent
+        focus: true
+        aspects: "input"
+        InfoBoxScene3D {
+
         }
     }
 

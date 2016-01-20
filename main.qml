@@ -4,12 +4,12 @@ import QtQuick.Window 2.0
 import QtQuick.Layouts 1.1
 import ScenarioListModel 1.0
 
-ApplicationWindow {
+Item {
     function pt2px(pt){return pt*0.3759*Screen.pixelDensity}
     id: applicationWindow
     visible: true
-    width: 2560
-    height: 1600
+    //width: 2560
+    //height: 1600
 
     Image{
         anchors.fill: parent

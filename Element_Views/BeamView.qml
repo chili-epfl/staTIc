@@ -4,9 +4,9 @@ import Qt3D.Input 2.0
 
 import QtQuick 2.0 as QQ2
 import QtPhysics.unofficial 1.0
+
 Entity{
     id:rootEntity
-    objectName: "Beam"
     property bool visible:  applicationRoot.currentViewFilter=='BEAM' && backgroundsubtraction.entropy < .10 ? true : false
 
     property vector3d extreme1
@@ -103,6 +103,7 @@ Entity{
 
     Entity{
        id:physicBody
+
        CylinderMesh{
            enabled: false
            id:pBodyMesh
@@ -113,26 +114,25 @@ Entity{
            id:pBody
            kinematic:true
        }
-       MouseInput {
-           id:mouseInput
-           controller: mouseController
-           onClicked: {
-               //Signal not implemented yet
-               console.log("click")
 
-           }
-           onReleased: {
-               console.log("click")
-               switch (mouse.button) {
-               case Qt.LeftButton:
-                   console.log("click")
-                   break;
-               }
-           }
+       components: [pBodyMesh,pBody]
+    }
+
+    Entity{
+       SphereMesh{
+           enabled: true
+           id:objectPickerMesh
+           radius: 10
        }
 
-       components: [pBodyMesh,pBody,mouseInput]
+       property ObjectPicker objectPicker: ObjectPicker {
+                   hoverEnabled: false
+                   //onClicked: infobox.color="red"
+       }
+
+       components: [objectPickerMesh,objectPicker]
     }
+
 
 
     //First sequence

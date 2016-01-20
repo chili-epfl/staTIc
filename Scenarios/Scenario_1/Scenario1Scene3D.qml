@@ -33,13 +33,13 @@ Entity {
         viewCenter: Qt.vector3d( 0.0, 0.0, -1.0 )
     }
 
-    Configuration  {
-        controlledCamera: camera
-    }
+//    Configuration  {
+//        controlledCamera: camera
+//    }
 
-    MouseController {
-        id: mouseController
-    }
+//    MouseController {
+//        id: mouseController
+//    }
 
     components: [
 
@@ -58,9 +58,7 @@ Entity {
 
 
     Entity {
-
         id:structureEntity
-        objectName: "Structure"
 
         SceneLoader{
             id:structureLoader
@@ -69,8 +67,8 @@ Entity {
 
         Transform {
             id: structureLoaderTransform
-            matrix: {
-                var m = Qt.matrix4x4();
+            matrix:{
+                var m=Qt.matrix4x4()
                 m.rotate(-180, Qt.vector3d(1, 0, 0))
                 m=m.times(structure_tag.transform)
                 m.rotate(180, Qt.vector3d(1, 0, 0))
@@ -79,6 +77,7 @@ Entity {
         }
 
         components: [ structureLoaderTransform ]
+
 
         /*Tools*/
         ConcentratedForce{

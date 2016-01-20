@@ -1,6 +1,9 @@
-#include <QApplication>
-#include <QQmlApplicationEngine>
+//#include <QApplication>
+//#include <QQmlApplicationEngine>
 #include <QtQml>
+
+#include <QApplication>
+#include <QQuickView>
 
 #include "AR/backgroundsubtraction.h"
 
@@ -19,8 +22,12 @@
 
 int main(int argc, char *argv[])
 {
+//    QApplication app(argc, argv);
+//    QQmlApplicationEngine engine;
     QApplication app(argc, argv);
-    QQmlApplicationEngine engine;
+
+    QQuickView view;
+
     qRegisterMetaType<cv::Mat>("cv::Mat");
 
     qmlRegisterType<BackgroundSubtraction>("BackgroundSubtraction", 1, 0, "BackgroundSubtraction");
@@ -40,9 +47,14 @@ int main(int argc, char *argv[])
     qmlRegisterType<Scaffold>("QuickScaffold", 1, 0, "QuickScaffold");
     qmlRegisterType<BeamRemover>("QuickBeamRemover", 1, 0, "QuickBeamRemover");
 
-    engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
+//    engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
+
+    view.resize(2560, 1600);
+    view.setResizeMode(QQuickView::SizeRootObjectToView);
+    view.setSource(QUrl("qrc:/main.qml"));
+    view.show();
 
     //Frame3DDKernel* k=new Frame3DDKernel();
     //k->setSource(QString(":/models/models/Model1/Model1.lol"));
-    return app.exec();
+   return app.exec();
 }

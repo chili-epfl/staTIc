@@ -44,7 +44,7 @@ Entity {
         emittingBodyInfo:sphereBody
     }
 
-    components:[collisionSphere,sphereBody,collisionTransform]
+    //components:[collisionSphere,sphereBody,collisionTransform]
 
 }
 

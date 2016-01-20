@@ -195,7 +195,6 @@ Item{
          source:camDevice
          filters:[backgroundsubtraction,chilitags]
 
-
          Rectangle{
              anchors.fill: parent
              color:"#00000000"
@@ -227,6 +226,7 @@ Item{
                 }
 
                 InfoBox{
+                    id:infobox
                     width:Math.max(parent.width/3,pt2px(142))//5cm
                     anchors.bottom: parent.bottom
                     anchors.right: parent.right
