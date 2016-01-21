@@ -78,9 +78,9 @@ Effect {
                     ]
 
                     shaderProgram: ShaderProgram {
-                        vertexShaderCode:   loadSource("qrc:/shaders/robustwireframe.vert")
-                        geometryShaderCode: loadSource("qrc:/shaders/robustwireframe.geom")
-                        fragmentShaderCode: loadSource("qrc:/shaders/robustwireframe.frag")
+                        vertexShaderCode:   loadSource("qrc:/opengl/Opengl/robustwireframe.vert")
+                        geometryShaderCode: loadSource("qrc:/opengl/Opengl/robustwireframe.geom")
+                        fragmentShaderCode: loadSource("qrc:/opengl/Opengl/robustwireframe.frag")
                     }
                 }
             ]

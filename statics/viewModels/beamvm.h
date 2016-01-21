@@ -21,6 +21,7 @@ public slots:
     void onEnableChanged();
     void onBeamSplit();
     void onScaleFactorUpdated();
+    void onSegmentsChanged();
     /*-----*/
 
 private:
@@ -28,5 +29,7 @@ private:
     WeakBeamPtr m_beam;
     Qt3DCore::QEntity* m_component3D;
 };
+
+typedef QList<QVector4D> QVector4List;
 
 #endif // BEAMVM_H

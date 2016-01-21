@@ -69,6 +69,13 @@ private:
                         int *J1, int *J2, double *F, double *D,
                         double *R, int *r, double **Q, double err,
                          int ok, QVector<BeamPtr> active_beams);
+    void write_internal_forces(int lc, int nL, float dx, vec3 *xyz,
+                               double **Q, int nN, int nE, double *L, int *J1,
+                               int *J2, float *Ax, float *Asy, float *Asz, float *Jx,
+                               float *Iy, float *Iz, float *E, float *G, float *p,
+                               float *d, float gX, float gY, float gZ, int nU,
+                               float **U, int nW, float **W, int nP, float **P,
+                               double *D, int shear, double error);
 
     QVector<JointPtr> m_joints;
     QVector<BeamPtr> m_beams;

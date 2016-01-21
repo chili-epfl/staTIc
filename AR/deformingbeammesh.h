@@ -12,7 +12,7 @@ class DeformingBeamMesh: public Qt3DRender::QGeometryRenderer
     Q_PROPERTY(QSizeF size READ size WRITE setSize NOTIFY sizeChanged)
     Q_PROPERTY(int keyframes READ keyframes WRITE setKeyframes NOTIFY keyframesChanged)
     Q_PROPERTY(QList<QVector4D> displacements READ displacements WRITE setDisplacements NOTIFY displacementsChanged)
-
+    Q_PROPERTY(int exagerate READ exagerate WRITE setExagerate NOTIFY exagerateChanged)
 public:
     DeformingBeamMesh(Qt3DCore::QNode * parent = 0);
 
@@ -21,13 +21,14 @@ public:
     void setSize(QSizeF size);
     void setKeyframes(int n_frames);
     void setDisplacements(QList<QVector4D> displacements);
+    void setExagerate(int val);
 
     qreal length(){return m_length;}
     int segments(){return m_segments;}
     QSizeF size(){return m_size;}
     int keyframes(){return m_keyFrames;}
     QList<QVector4D> displacements(){return m_displacements;}
-
+    int exagerate(){return m_exagerate;}
 
 signals:
     void lengthChanged();
@@ -35,7 +36,7 @@ signals:
     void sizeChanged();
     void keyframesChanged();
     void displacementsChanged();
-
+    void exagerateChanged();
 private:
     void init();
     void generateGeometry();
@@ -47,6 +48,8 @@ private:
     qreal m_length;
     QSizeF m_size;
     int m_keyFrames;
+    int m_exagerate;
+
     QList<QVector4D> m_displacements;
 
     Qt3DRender::QGeometry *customGeometry;

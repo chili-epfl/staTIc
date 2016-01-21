@@ -1,5 +1,3 @@
-//#include <QApplication>
-//#include <QQmlApplicationEngine>
 #include <QtQml>
 
 #include <QApplication>
@@ -9,15 +7,15 @@
 
 #include "scenariolistmodel.h"
 
-//#include "statics/two_dimentions/twodimensionalstaticsmodule.h"
-//#include "statics/two_dimentions/twodimentionaleventhandler.h"
 #include "statics/frame3dd/frame3ddkernel.h"
 #include "statics/frame3dd/frame3ddvmmanager.h"
 
-//#include "physicssetter.h"
 #include "Tools/ConcentratedForce/concentratedforce.h"
 #include "Tools/Scaffold/scaffold.h"
 #include "Tools/BeamRemover/beamremover.h"
+
+#include "AR/deformingbeammesh.h"
+
 #include <opencv2/core.hpp>
 
 int main(int argc, char *argv[])
@@ -46,6 +44,9 @@ int main(int argc, char *argv[])
     qmlRegisterType<ConcentratedForce>("QuickConcentratedForce", 1, 0, "QuickConcentratedForce");
     qmlRegisterType<Scaffold>("QuickScaffold", 1, 0, "QuickScaffold");
     qmlRegisterType<BeamRemover>("QuickBeamRemover", 1, 0, "QuickBeamRemover");
+
+
+    qmlRegisterType<DeformingBeamMesh>("DeformingBeamMesh", 1, 0, "DeformingBeamMesh");
 
 //    engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
 

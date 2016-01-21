@@ -6,6 +6,8 @@
 #include <QQmlContext>
 #include <QQmlComponent>
 #include <QQmlEngine>
+
+
 BeamVM::BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     AbstractElementViewModel(sceneRoot,parent),
     m_component3D(Q_NULLPTR)
@@ -19,6 +21,7 @@ BeamVM::BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     connect(m_beam.data(),SIGNAL(stressChanged()),this,SLOT(onBeamAxialStressChanged()));
     connect(m_beam.data(),SIGNAL(enableChanged(bool)),this,SLOT(onEnableChanged()));
     connect(m_beam.data(),SIGNAL(hasBeenSplit()),this,SLOT(onBeamSplit()));
+    connect(m_beam.data(),SIGNAL(segmentsChanged()),this,SLOT(onSegmentsChanged()));
 
 }
 BeamVM::~BeamVM(){
@@ -33,15 +36,16 @@ void BeamVM::initView(){
     Qt3DCore::QEntity* beamView= qobject_cast<Qt3DCore::QEntity*>(beamView_component.create(new QQmlContext(QQmlEngine::contextForObject(m_sceneRoot))));
     m_component3D=beamView;
 
-    m_component3D->setObjectName(this->objectName());
+    m_component3D->setObjectName(beam_str_ref->objectName());
     WeakJointPtr extreme1,extreme2;
     beam_str_ref->extremes(extreme1,extreme2);
 
     m_component3D->setProperty("extreme1",extreme1.toStrongRef()->scaledPosition());
     m_component3D->setProperty("extreme2",extreme2.toStrongRef()->scaledPosition());
+    m_component3D->setProperty("beamSize",beam_str_ref->size());
 
     onBeamAxialStressChanged();
-
+    onSegmentsChanged();
     append_3D_resources(m_component3D);
     m_component3D->setParent(m_sceneRoot);
 }
@@ -83,6 +87,14 @@ void BeamVM::onBeamSplit(){
 
 void BeamVM::onScaleFactorUpdated(){
 
+}
+
+void BeamVM::onSegmentsChanged(){
+    BeamPtr beam_str_ref=m_beam.toStrongRef();
+    if(m_component3D){
+       QVector4List segments= beam_str_ref->stress_segments();
+       m_component3D->setProperty("segments",QVariant::fromValue(segments));
+    }
 }
 
 

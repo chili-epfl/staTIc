@@ -6,6 +6,8 @@
     </qresource>
     <qresource prefix="/icons">
         <file>Icons/ic_keyboard_arrow_up_black_36px.svg</file>
+        <file>Icons/pause.svg</file>
+        <file>Icons/play.svg</file>
     </qresource>
     <qresource prefix="/images">
         <file>Images/mainbanner.png</file>
@@ -45,6 +47,7 @@
         <file>UI/ViewFilterBar.qml</file>
         <file>UI/InfoBox.qml</file>
         <file>UI/InfoBoxScene3D.qml</file>
+        <file>UI/CameraController.qml</file>
     </qresource>
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>

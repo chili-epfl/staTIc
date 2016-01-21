@@ -5,7 +5,7 @@
 #include<QSizeF>
 #include<QVector4D>
 #include "statics/elements/abstractelement.h"
-
+#include <QDebug>
 class Joint;
 typedef QSharedPointer<Joint> JointPtr;
 typedef QWeakPointer<Joint> WeakJointPtr;
@@ -47,7 +47,7 @@ public:
     void setEnable(bool enable);
 
     QList<QVector4D> stress_segments(){return m_stress_segments;}
-    void setStressSegment(QList<QVector4D> segments){m_stress_segments=segments;}
+    void setStressSegment(QList<QVector4D> segments){m_stress_segments=segments;emit segmentsChanged();}
 
 
     /*Splitting stuff*/
@@ -66,6 +66,7 @@ signals:
 
     void hasBeenSplit();
     void hasBeenUnified();
+    void segmentsChanged();
 
 private:
 

@@ -8,6 +8,7 @@ DeformingBeamMesh::DeformingBeamMesh(Qt3DCore::QNode * parent):
     m_length(20),
     m_size(10,10),
     m_keyFrames(20),
+    m_exagerate(1),
     customGeometry(0),
     vertexDataBuffer(0),
     normalDataBuffer(0),
@@ -17,8 +18,8 @@ DeformingBeamMesh::DeformingBeamMesh(Qt3DCore::QNode * parent):
     indexAttribute(0)
 {
     m_displacements.append(QVector4D(0,0,0,0));
-    m_displacements.append(QVector4D(0,2,0,0));
-    m_displacements.append(QVector4D(0,2,0,0));
+    m_displacements.append(QVector4D(0,0,2,0));
+    m_displacements.append(QVector4D(0,0,2,0));
     m_displacements.append(QVector4D(0,0,0,0));
 }
 
@@ -64,6 +65,15 @@ void DeformingBeamMesh::setDisplacements(QList<QVector4D> displacements)
         m_displacements=displacements;
         update();
         emit displacementsChanged();
+    }
+}
+
+void DeformingBeamMesh::setExagerate(int val)
+{
+    if(val>0 && val!=m_exagerate){
+        m_exagerate=val;
+        update();
+        emit exagerateChanged();
     }
 }
 
@@ -206,7 +216,25 @@ void DeformingBeamMesh::generateGeometry(){
     Q_FOREACH(const QVector3D& v, _initial_vertices){//TDO:Intrpolate
         int disp_index=(m_displacements.size()-1)*(quads_counter/4)/(m_segments);
         disp=m_displacements[disp_index];
-        _final_vertices.push_back(v+disp.toVector3D());
+
+        //From opengl to Frame3DD
+        QVector2D _v(-v.z(),v.y());
+        float cos_theta=cos(disp.w());
+        float sin_theta=sin(disp.w());
+        //Clock wise rotation because of frame3dd
+        QVector3D v_rot(v.x(), cos_theta*_v.x()+sin_theta*_v.y(),-sin_theta*_v.x()+cos_theta*_v.y());
+
+//        /*3D case to be tested*/
+//        QVector3D v_final=v_rot+m_exagerate*disp.toVector3D();
+//        //Back to Opengl
+//        _final_vertices.push_back(QVector3D(v_final.x(),v_final.z(),-v_final.y()));
+
+        /*2D case:y is vertical displacement*/
+        QVector3D v_final(v_rot.x(),v_rot.z(),-v_rot.y());
+        v_final+=m_exagerate*disp.toVector3D();
+        //Back to Opengl
+        _final_vertices.push_back(v_final);
+
         quads_counter++;
     }
 
@@ -218,9 +246,9 @@ void DeformingBeamMesh::generateGeometry(){
 
         for(int vertexId=0;vertexId<_initial_vertices.size();vertexId++){
 
-            _middle_vertices.push_back(ratio*_initial_vertices[vertexId]
+            _middle_vertices.push_back((1-ratio)*_initial_vertices[vertexId]
                                        +
-                                       (1-ratio)*_final_vertices[vertexId]);
+                                       ratio*_final_vertices[vertexId]);
         }
 
     }
@@ -230,10 +258,11 @@ void DeformingBeamMesh::generateGeometry(){
     Q_FOREACH(const QVector3D& v, _initial_vertices){
         vertices.push_back(v);
     }
-    Q_FOREACH(const QVector3D& v, _final_vertices){
+
+    Q_FOREACH(const QVector3D& v, _middle_vertices){
         vertices.push_back(v);
     }
-    Q_FOREACH(const QVector3D& v, _middle_vertices){
+    Q_FOREACH(const QVector3D& v, _final_vertices){
         vertices.push_back(v);
     }
 

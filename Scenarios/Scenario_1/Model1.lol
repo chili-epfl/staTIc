@@ -8,7 +8,7 @@
 #m,2,3,CD
 #m,0,2,AC
 
-#Scale factor between tangible model and real model(affect only the position of the joints)
+#Scale factor between tangible model and real model(real models are in the order of meters)(affect only the position of the joints)
 0.1
 
 #Number of nodes

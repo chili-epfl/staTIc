@@ -37,7 +37,7 @@ void main()
            + int(gl_in[1].gl_Position.z < 0) * int(2)
            + int(gl_in[2].gl_Position.z < 0);
 
-    if(gs_in[0].batchId == state)
+    if (gs_in[0].batchId != state)
         return;
 
     // If all vertices are behind us, cull the primitive

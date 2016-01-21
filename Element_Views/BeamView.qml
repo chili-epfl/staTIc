@@ -7,12 +7,17 @@ import QtPhysics.unofficial 1.0
 
 Entity{
     id:rootEntity
-    property bool visible:  applicationRoot.currentViewFilter=='BEAM' && backgroundsubtraction.entropy < .10 ? true : false
+    property bool visible:  applicationRoot.currentViewFilter=='BEAM'
+                            && backgroundsubtraction.entropy < .10
+                            && (infobox.current_item == null || infobox.current_item == rootEntity) ? true : false
 
     property vector3d extreme1
     property vector3d extreme2
 
+    property var segments
+
     property real length: extreme1.minus(extreme2).length()
+    property size beamSize
 
     property int axialForceType: 0 //-1 compression,0 nul, 1 tension
     property real axialForce : 0
@@ -120,16 +125,69 @@ Entity{
 
     Entity{
        SphereMesh{
-           enabled: true
+           enabled: false
            id:objectPickerMesh
            radius: 10
        }
 
        property ObjectPicker objectPicker: ObjectPicker {
                    hoverEnabled: false
-                   //onClicked: infobox.color="red"
+                   onClicked: {
+                       infobox.current_item=rootEntity
+                   }
        }
 
+       Entity{
+           components: [
+           SphereMesh{
+               id:extreme1Ref
+               radius: 5
+               enabled: infobox.current_item == rootEntity ? true: false
+            },
+            PhongMaterial{
+                   ambient:"#980000"
+                   diffuse:"black"
+                   specular:"black"
+                   shininess:0
+            },
+            Transform{
+                translation:Qt.vector3d(0,length/2,0)
+            } ]
+       }
+
+       Entity{
+           components: [
+           SphereMesh{
+               id:extreme2Ref
+               radius: 5
+               enabled: infobox.current_item == rootEntity ? true: false
+            },
+            PhongMaterial{
+                   ambient:"#479800"
+                   diffuse:"black"
+                   specular:"black"
+                   shininess:0
+            },
+            Transform{
+                translation:Qt.vector3d(0,-length/2,0)
+            } ]
+       }
+       Entity{
+           components: [
+           SphereMesh{
+               id:extreme3Ref
+               radius: 5
+               enabled: infobox.current_item == rootEntity ? true: false
+            },
+            PhongMaterial{
+                   ambient:"#001a98"
+                   diffuse:"black"
+                   specular:"black"
+            },
+            Transform{
+                translation:Qt.vector3d(20,0,0)
+            } ]
+       }
        components: [objectPickerMesh,objectPicker]
     }
 
@@ -245,86 +303,5 @@ Entity{
         scaleFactor: parent.scaleFactor
         rotate: parent.axialForceType > 0
     }
-
-//    property int oscillator : 0
-//    property real randomFactor: 1
-//    QQ2.SequentialAnimation{
-//           running: true
-//           loops: QQ2.Animation.Infinite
-//           QQ2.NumberAnimation{
-//               target: rootEntity
-//               property: "oscillator"
-//               duration: 200
-//               from: -1
-//               to:  0
-//           }
-////           QQ2.NumberAnimation{
-////               target: rootEntity
-////               property: "oscillator"
-////               duration: 200
-////               from: 1
-////               to:  -1
-////           }
-//    }
-
-
-//    Entity{
-
-//        MatrixTransform{
-//            id:removeRotationTransform
-//            matrix:Qt.matrix4x4(structureLoaderTransform.matrix.m11,structureLoaderTransform.matrix.m12,structureLoaderTransform.matrix.m13,0,
-//                                structureLoaderTransform.matrix.m21,structureLoaderTransform.matrix.m22,structureLoaderTransform.matrix.m23,0,
-//                                structureLoaderTransform.matrix.m31,structureLoaderTransform.matrix.m32,structureLoaderTransform.matrix.m33,0,
-//                                structureLoaderTransform.matrix.m41,structureLoaderTransform.matrix.m42,structureLoaderTransform.matrix.m43,1).inverted()
-//        }
-
-//        components: [removeRotationTransform]
-
-//        Entity{
-//            components: [SphereMesh{
-//                    enabled: true
-//                    radius: 1;
-//                }
-//                , Transform{
-//                    Translate{
-//                        dx: oscillator==0 ?  Math.random()*randomFactor :  -Math.random()*randomFactor;
-//                        dy:(1*step);
-//                    }
-//                }]
-//        }
-
-//        Entity{
-//            components: [SphereMesh{
-//                    enabled: true
-//                    radius: 1;
-//                }
-//                , Transform{
-//                    Translate{
-//                        dx: oscillator==0 ? -Math.random()*randomFactor :  Math.random()*randomFactor;
-//                        dy:(2*step);
-//                    }
-//                }]
-//        }
-
-//        Entity{
-//            components: [SphereMesh{
-//                    enabled: true
-//                    radius: 1;
-//                }
-//                , Transform{
-//                    Translate{
-//                        dx: oscillator==0 ?  Math.random()*randomFactor :  -Math.random()*randomFactor;
-//                        dy:(3*step);
-//                    }
-//                }]
-//        }
-
-
-//    }
-
-
-
-
-
 
 }
