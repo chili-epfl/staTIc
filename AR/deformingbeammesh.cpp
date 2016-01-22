@@ -1,6 +1,5 @@
 #include "deformingbeammesh.h"
 
-
 DeformingBeamMesh::DeformingBeamMesh(Qt3DCore::QNode * parent):
     QGeometryRenderer(parent),
     m_init(false),
@@ -213,9 +212,19 @@ void DeformingBeamMesh::generateGeometry(){
     QVector4D disp;
     int quads_counter=0;
 
-    Q_FOREACH(const QVector3D& v, _initial_vertices){//TDO:Intrpolate
-        int disp_index=(m_displacements.size()-1)*(quads_counter/4)/(m_segments);
-        disp=m_displacements[disp_index];
+    Q_FOREACH(const QVector3D& v, _initial_vertices){
+        double disp_index=(double)(m_displacements.size()-1)*(quads_counter/4)/(m_segments);
+        int disp_index_floor=floor(disp_index);
+        double dummy;
+        double fract=modf(disp_index,&dummy);
+
+        if(fract < 0.01){
+            disp=m_displacements[disp_index_floor];
+        }
+        else{
+            disp=(1-fract)*m_displacements[disp_index_floor]+(fract)*m_displacements[disp_index_floor+1];
+        }
+
 
         //From opengl to Frame3DD
         QVector2D _v(-v.z(),v.y());
