@@ -14,15 +14,21 @@ Rectangle {
          if(current_item){
             segments=Qt.binding(function(){return current_item.segments;})
             title.text="Beam "+ current_item.objectName;
+
 //            materialInfo.val=Qt.binding(function(){return current_item.material;})
 //            sizeInfo.val=Qt.binding(function(){return current_item.size;})
 //            statusInfo.val=Qt.binding(function(){return current_item.status;})
 //            weightInfo.val=Qt.binding(function(){return current_item.weight;})
 //            priceInfo.val=Qt.binding(function(){return current_item.price;})
-            infoboxscene3d.deformableMeshLength=Qt.binding(function(){return current_item.length/10;})
-            infoboxscene3d.deformableMeshSize=Qt.binding(function(){return current_item.beamSize/10;})
-            visible=true;
+            infoboxscene3d.beamSize=Qt.binding(function(){
+                return current_item.beamSize;
 
+            })
+             infoboxscene3d.beamLength=Qt.binding(function(){
+                 return current_item.length;
+
+             })
+            visible=true;
          }
     }
 
@@ -95,6 +101,7 @@ Rectangle {
                 multisample: true
                 InfoBoxScene3D {
                     id:infoboxscene3d
+                    exagerate:exagerateSlider.value
                 }
             }
             Item{
@@ -173,6 +180,76 @@ Rectangle {
                     anchors.fill: parent
                     onClicked: parent.state=="play"? parent.state="pause" : parent.state="play"
                 }
+            }
+            Image {
+                id: plusButton
+                source: "qrc:/icons/Icons/plus.png"
+                width: 75
+                height: 75
+                anchors.margins: 30
+                anchors.bottom: minusButton.top
+                anchors.left: parent.left
+                MouseArea{
+                    anchors.fill: parent
+                    onPressed: infoboxscene3d.zoom=1
+                    onReleased: infoboxscene3d.zoom=0
+                    onCanceled: infoboxscene3d.zoom=0
+                }
+            }
+            Image {
+                id: minusButton
+                source: "qrc:/icons/Icons/minus.png"
+                width: 75
+                height: 75
+                anchors.margins: 30
+                anchors.bottom: parent.bottom
+                anchors.left: parent.left
+                MouseArea{
+                    anchors.fill: parent
+                    onPressed: infoboxscene3d.zoom=-1
+                    onReleased: infoboxscene3d.zoom=0
+                    onCanceled: infoboxscene3d.zoom=0
+                }
+            }
+            Image {
+                id: resizeButton
+                source: "qrc:/icons/Icons/resize.png"
+                width: 75
+                height: 75
+                anchors.margins: 30
+                anchors.top: parent.top
+                anchors.right: parent.right
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: infoboxscene3d.resize=true
+                }
+            }
+            Switch {
+                id:controlSwitch
+                anchors.margins: 30
+                anchors.bottom: parent.bottom
+                anchors.horizontalCenter:  parent.horizontalCenter
+                height: 35
+            }
+            Image {
+                id: moveIcon
+                source: "qrc:/icons/Icons/move.png"
+                width: 35
+                height: 35
+                anchors.rightMargin:  10
+                anchors.margins: 30
+                anchors.bottom: parent.bottom
+                anchors.right: controlSwitch.left
+            }
+            Image {
+                id: panIcon
+                source: "qrc:/icons/Icons/pan.png"
+                width: 35
+                height: 35
+                anchors.margins: 30
+                anchors.leftMargin: 10
+                anchors.bottom: parent.bottom
+                anchors.left: controlSwitch.right
             }
         }
         Rectangle{

@@ -10,7 +10,7 @@ Entity {
     property real linearSpeed: 10.0
     property real orbitSpeed: -180.0
     property real lookSpeed: 180.0
-    property bool firstPersonMode: true
+    property bool firstPersonMode: false
 
     QtObject {
         id: d
@@ -110,6 +110,7 @@ Entity {
         },
         LogicComponent {
             onFrameUpdate: {
+                //root.camera.translate(Qt.vector3d(0, 0, -zoom).times(dt))
                 // The time difference since the last frame is passed in as the
                 // argument dt. It is a floating point value in units of seconds.
                 if (d.leftMouseButtonPressed) {

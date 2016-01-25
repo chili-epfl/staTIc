@@ -193,7 +193,7 @@ Item{
          anchors.fill: parent
 
          source:camDevice
-         filters:[backgroundsubtraction,chilitags]
+         filters:[chilitags]
 
          Rectangle{
              anchors.fill: parent

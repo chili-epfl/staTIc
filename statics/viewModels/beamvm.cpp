@@ -42,7 +42,7 @@ void BeamVM::initView(){
 
     m_component3D->setProperty("extreme1",extreme1.toStrongRef()->scaledPosition());
     m_component3D->setProperty("extreme2",extreme2.toStrongRef()->scaledPosition());
-    m_component3D->setProperty("beamSize",beam_str_ref->size());
+    m_component3D->setProperty("beamSize",beam_str_ref->scaledSize());
 
     onBeamAxialStressChanged();
     onSegmentsChanged();

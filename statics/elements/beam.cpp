@@ -219,6 +219,11 @@ void Beam::setSize(QSizeF size){
     }
 }
 
+QSizeF Beam::scaledSize()
+{
+    return m_size*AbstractStaticsModule::modelScale();
+}
+
 
 void Beam::setYoungModulus(qreal E)
 {
@@ -244,7 +249,7 @@ void Beam::setDensity(qreal d)
     }
 }
 
-qreal Beam::scaleLength()
+qreal Beam::scaledLength()
 {
     return m_length*AbstractStaticsModule::modelScale();
 }

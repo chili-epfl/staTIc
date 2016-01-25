@@ -29,6 +29,7 @@ public:
 
     void setSize(QSizeF size);
     QSizeF size(){return m_size;}
+    QSizeF scaledSize();
 
     //Getter in parameters(.....)
     void setYoungModulus(qreal E);
@@ -36,7 +37,7 @@ public:
     void setDensity(qreal d);
 
     qreal length(){return m_length;}
-    qreal scaleLength();
+    qreal scaledLength();
 
     void cloneProperties(QSharedPointer<Beam> beam);
 

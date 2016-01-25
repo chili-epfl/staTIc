@@ -9,16 +9,46 @@ Entity {
     property var segments: []
     property matrix4x4 syncPose
     property bool play: true
-    property alias deformableMeshLength: deformingMesh.length
-    property alias deformableMeshSize: deformingMesh.size
+
+    property real beamLength
+    property size beamSize
+
+    property int zoom: 0
+    property bool resize: false
+
+    property alias exagerate: deformingMesh.exagerate
+
+    onResizeChanged: {
+        resizeAnimation.start();
+        resize=false;
+    }
+
+    QQ2.NumberAnimation {
+        id:resizeAnimation
+        target: deformingMeshTransformation;
+        property: "scale";
+        duration: 500;
+        to: 1
+        running: false
+        alwaysRunToEnd: true
+    }
+
+    QQ2.NumberAnimation{
+        target:deformingMeshTransformation
+        properties: "scale"
+        duration: 5000
+        to: zoom > 0 ? 10 : -0.1
+        running: zoom!=0 ? true : false
+        alwaysRunToEnd: false
+    }
 
     Camera {
         id: camera
         projectionType: CameraLens.PerspectiveProjection
         fieldOfView: 45
         nearPlane : 0.1
-        farPlane : 1000.0
-        position: Qt.vector3d( 0.0, 0.0, (0.7*(deformingMesh.length+10)+0.3*0.7*(deformingMesh.length+10))/Math.tan(fieldOfView/2) )
+        farPlane : 10000
+        position: Qt.vector3d( 0.0, 0.0, (0.8*(deformingMesh.length))/Math.tan(fieldOfView/2) )
         upVector: Qt.vector3d( 0.0, 1.0, 0.0 )
         viewCenter: Qt.vector3d( 0.0, 0.0, 0.0 )
     }
@@ -43,8 +73,9 @@ Entity {
             segments: 50
             keyframes: 20
             displacements: sceneRoot.segments
-            length: 60
-            exagerate:exagerateSlider.value
+            size: beamSize
+            length: beamLength
+            exagerate:1
         }
         Transform{
             id:deformingMeshTransformation
@@ -108,8 +139,8 @@ Entity {
         //Extreme planes
         PlaneMesh{
             id:planeMesh
-            width: deformingMesh.size.width*2
-            height: deformingMesh.size.height*2
+            width: deformingMesh.size.height*1.5
+            height: deformingMesh.size.width*1.5
         }
         PhongMaterial{
             id:planeMaterial
@@ -165,7 +196,7 @@ Entity {
         //Extreme balls
         SphereMesh{
             id:extremeSphere
-            radius: 2
+            radius: Math.min(deformingMesh.size.height,deformingMesh.size.width)/3
         }
         Entity{
             property var material: PhongMaterial{
@@ -175,7 +206,7 @@ Entity {
                 shininess:0
             }
             property var transform: Transform{
-                translation:Qt.vector3d(-10,0,0)
+                translation:Qt.vector3d(-extremeSphere.radius-0.05*deformingMesh.length,0,0)
             }
             components: [extremeSphere,material,transform]
         }
@@ -187,7 +218,7 @@ Entity {
                 shininess:0
             }
             property var transform: Transform{
-                translation:Qt.vector3d(deformingMesh.length+10,0,0)
+                translation:Qt.vector3d(extremeSphere.radius+(1.05)*deformingMesh.length,0,0)
             }
             components: [extremeSphere,material,transform]
         }
@@ -199,7 +230,7 @@ Entity {
                 shininess:0
             }
             property var transform: Transform{
-                translation:Qt.vector3d(deformingMesh.length/2,10,0)
+                translation:Qt.vector3d(deformingMesh.length/2,extremeSphere.radius+(1.1)*deformingMesh.size.height/2,0)
             }
             components: [extremeSphere,material,transform]
         }
@@ -207,8 +238,8 @@ Entity {
         Entity{
             components: [
                 CylinderMesh{
-                    radius: 0.3
-                    length: deformingMesh.length+20
+                    radius: 0.1*extremeSphere.radius
+                    length: (1.1)*deformingMesh.length
                 },
                 PhongMaterial{
                     ambient:"black"
