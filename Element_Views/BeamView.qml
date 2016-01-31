@@ -7,6 +7,9 @@ import QtPhysics.unofficial 1.0
 
 Entity{
     id:rootEntity
+
+    readonly property string type: "beam"
+
     property bool visible:  applicationRoot.currentViewFilter=='BEAM'
                             && backgroundsubtraction.entropy < .10
                             && (infobox.current_item == null || infobox.current_item == rootEntity) ? true : false
@@ -24,6 +27,7 @@ Entity{
 
     //property real scaleFactor:2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 1
     property real scaleFactor:3
+
 
     onAxialForceTypeChanged: {
         animation.stop();
@@ -133,63 +137,65 @@ Entity{
        property ObjectPicker objectPicker: ObjectPicker {
                    hoverEnabled: false
                    onClicked: {
-                       infobox.current_item=rootEntity
+                       if(rootEntity.visible)
+                        infobox.current_item=rootEntity
                    }
        }
+       components: [objectPickerMesh,objectPicker]
+    }
 
-       Entity{
-           components: [
-           SphereMesh{
-               id:extreme1Ref
-               radius: 5
-               enabled: infobox.current_item == rootEntity ? true: false
+    Entity{
+        components: [
+            SphereMesh{
+                id:extreme1Ref
+                radius: 5
+                enabled: infobox.current_item == rootEntity ? true: false
             },
             PhongMaterial{
-                   ambient:"#980000"
-                   diffuse:"black"
-                   specular:"black"
-                   shininess:0
+                ambient:"#980000"
+                diffuse:"black"
+                specular:"black"
+                shininess:0
             },
             Transform{
                 translation:Qt.vector3d(0,length/2,0)
             } ]
-       }
+    }
 
-       Entity{
-           components: [
-           SphereMesh{
-               id:extreme2Ref
-               radius: 5
-               enabled: infobox.current_item == rootEntity ? true: false
+    Entity{
+        components: [
+            SphereMesh{
+                id:extreme2Ref
+                radius: 5
+                enabled: infobox.current_item == rootEntity ? true: false
             },
             PhongMaterial{
-                   ambient:"#479800"
-                   diffuse:"black"
-                   specular:"black"
-                   shininess:0
+                ambient:"#479800"
+                diffuse:"black"
+                specular:"black"
+                shininess:0
             },
             Transform{
                 translation:Qt.vector3d(0,-length/2,0)
             } ]
-       }
-       Entity{
-           components: [
-           SphereMesh{
-               id:extreme3Ref
-               radius: 5
-               enabled: infobox.current_item == rootEntity ? true: false
+    }
+    Entity{
+        components: [
+            SphereMesh{
+                id:extreme3Ref
+                radius: 5
+                enabled: infobox.current_item == rootEntity ? true: false
             },
             PhongMaterial{
-                   ambient:"#001a98"
-                   diffuse:"black"
-                   specular:"black"
+                ambient:"#001a98"
+                diffuse:"black"
+                specular:"black"
             },
             Transform{
                 translation:Qt.vector3d(20,0,0)
             } ]
-       }
-       components: [objectPickerMesh,objectPicker]
     }
+
 
 
 

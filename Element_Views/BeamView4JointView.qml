@@ -3,15 +3,57 @@ import Qt3D.Render 2.0
 import QtQuick 2.0 as QQ2
 
 Entity{
-
     id:root
-    property bool visible:  applicationRoot.currentViewFilter=='JOINT' ? true : false
+    property bool visible:  parent.visible
 
-    property vector3d extreme1
+    property vector3d extreme1 //Always the joint extreme
     property vector3d extreme2
 
+    /*Coarse representation */
     property int axialForceType: 0 //-1 compression,0 nul, 1 tension
     property real axialForce : 0
+
+    /*Fine one. Remeber these are in local reference system*/
+    property real axialForce_extreme1
+    property real shearYForce_extreme1
+    property real shearZForce_extreme1
+    onAxialForce_extreme1Changed: lazyUpdate.start()
+    onShearYForce_extreme1Changed: lazyUpdate.start()
+    onShearZForce_extreme1Changed: lazyUpdate.start()
+
+    property real axialForce_extreme2
+    property real shearYForce_extreme2
+    property real shearZForce_extreme2
+    property bool flip_extremes: false
+
+    property vector3d globalForceExtreme1
+
+    QQ2.Timer{
+        id:lazyUpdate
+        running: false
+        interval: 300
+        onTriggered: updateGlobalForceExtreme1()
+    }
+
+    function updateGlobalForceExtreme1(){
+            var ab=extreme2.minus(extreme1).normalized();
+            var shearY;
+            var shearZ;
+            if(flip_extremes){
+                shearY=poseMatrix.times(Qt.vector3d(0,shearYForce_extreme1,0))
+                shearZ=poseMatrix.times(Qt.vector3d(0,0,shearZForce_extreme1))
+                ab=ab.times(axialForce_extreme1);
+            }
+            else{
+                shearY=poseMatrix.times(Qt.vector3d(0,shearYForce_extreme1,0).times(-1))
+                shearZ=poseMatrix.times(Qt.vector3d(0,0,shearZForce_extreme1).times(-1))
+                ab=ab.times(axialForce_extreme1).times(-1);
+            }
+            globalForceExtreme1=ab.plus(shearY).plus(shearZ);
+    }
+
+
+
 
     property real scaleFactor: 2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 1
 

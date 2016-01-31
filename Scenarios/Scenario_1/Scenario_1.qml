@@ -189,11 +189,11 @@ Item{
 
      VideoOutput{
          z: 0
+         id:viewFinder
          anchors.centerIn: parent
          anchors.fill: parent
-
-         source:camDevice
-         filters:[chilitags]
+         source: camDevice
+         filters:[backgroundsubtraction,chilitags]
 
          Rectangle{
              anchors.fill: parent

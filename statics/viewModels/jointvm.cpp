@@ -45,6 +45,12 @@ void JointVM::onConnectedBeamChanged(){
             e->deleteLater();
         }
     }
+    QVariantList connected_beam;
+
+    Q_FOREACH(Qt3DCore::QEntity* e,m_beamsMap.keys()){
+        connected_beam.append(QVariant::fromValue(e));
+    }
+    m_component3D->setProperty("connected_beams",connected_beam);
 
 }
 
@@ -56,6 +62,7 @@ void JointVM::initView(){
     jointView = qobject_cast<Qt3DCore::QEntity*>(jointView_component.create(new QQmlContext(QQmlEngine::contextForObject(m_sceneRoot))));
     m_component3D=jointView;
 
+    m_component3D->setObjectName(joint_str_ref->objectName());
     m_component3D->setProperty("position",joint_str_ref->scaledPosition());
 
     onReactionChanged();
@@ -63,7 +70,6 @@ void JointVM::initView(){
 
     m_component3D->setParent(m_sceneRoot);
     append_3D_resources(m_component3D);
-
 }
 
 void JointVM::createEntityForBeam(BeamPtr b){
@@ -73,13 +79,22 @@ void JointVM::createEntityForBeam(BeamPtr b){
     beamView = qobject_cast<Qt3DCore::QEntity*>(beamView_component.create(new QQmlContext(QQmlEngine::contextForObject(m_sceneRoot))));
     m_beamsMap[beamView]=b.toWeakRef();
 
+    beamView->setObjectName(b->objectName());
     beamView->setProperty("extreme1",joint_str_ref->scaledPosition());
     WeakJointPtr e1,e2;
     b->extremes(e1,e2);
 
+
+    int extreme_of_joint,extreme_not_on_joint;
     if(m_joint!=e1){
+        beamView->setProperty("flip_extremes",true);
+        extreme_of_joint=2;
+        extreme_not_on_joint=1;
         beamView->setProperty("extreme2",e1.toStrongRef()->scaledPosition());
     }else{
+        beamView->setProperty("flip_extremes",false);
+        extreme_of_joint=1;
+        extreme_not_on_joint=2;
         beamView->setProperty("extreme2",e2.toStrongRef()->scaledPosition());
     }
 
@@ -90,10 +105,22 @@ void JointVM::createEntityForBeam(BeamPtr b){
     beamView->setProperty("axialForceType",axial_type);
     beamView->setProperty("axialForce",fabs(axial_force));
 
+    qreal shearY,shearZ;
+    b->ForcesAndMoments(axial_type,axial_force,shearY,shearZ,dummy,dummy,dummy,extreme_of_joint);
+    beamView->setProperty("axialForce_extreme1",axial_force);
+    beamView->setProperty("shearYForce_extreme1",shearY);
+    beamView->setProperty("shearZForce_extreme1",shearZ);
+
+    b->ForcesAndMoments(axial_type,axial_force,shearY,shearZ,dummy,dummy,dummy,extreme_not_on_joint);
+    beamView->setProperty("axialForce_extreme2",axial_force);
+    beamView->setProperty("shearYForce_extreme2",shearY);
+    beamView->setProperty("shearZForce_extreme2",shearZ);
+
 
     connect(b.data(),SIGNAL(stressChanged()),this,SLOT(onConnectedBeamStressChanged()));
     //if the beam is destroyed, the notification will arrive through ConnectedBeamsChanged
     beamView->setParent(m_component3D);
+
 }
 
 void JointVM::onConnectedBeamStressChanged(){
@@ -114,6 +141,30 @@ void JointVM::onConnectedBeamStressChanged(){
     component3D->setProperty("axialForceType",axial_type);
     component3D->setProperty("axialForce",fabs(axial_force));
 
+    WeakJointPtr e1,e2;
+    beam->extremes(e1,e2);
+    int extreme_of_joint,extreme_not_on_joint;
+    if(m_joint!=e1){
+        component3D->setProperty("flip_extremes",true);
+        extreme_of_joint=2;
+        extreme_not_on_joint=1;
+    }else{
+        component3D->setProperty("flip_extremes",false);
+        extreme_of_joint=1;
+        extreme_not_on_joint=2;
+    }
+
+    qreal shearY,shearZ;
+
+    beam->ForcesAndMoments(axial_type,axial_force,shearY,shearZ,dummy,dummy,dummy,extreme_of_joint);
+    component3D->setProperty("axialForce_extreme1",axial_force);
+    component3D->setProperty("shearYForce_extreme1",shearY);
+    component3D->setProperty("shearZForce_extreme1",shearZ);
+
+    beam->ForcesAndMoments(axial_type,axial_force,shearY,shearZ,dummy,dummy,dummy,extreme_not_on_joint);
+    component3D->setProperty("axialForce_extreme2",axial_force);
+    component3D->setProperty("shearYForce_extreme2",shearY);
+    component3D->setProperty("shearZForce_extreme2",shearZ);
 }
 
 

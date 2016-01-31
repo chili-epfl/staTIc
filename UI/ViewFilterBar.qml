@@ -15,9 +15,17 @@ Rectangle{
     states:[
         State {
             name: "BEAM"
+            PropertyChanges {
+                target: infobox
+                current_item: null
+            }
         },
         State{
             name:"JOINT"
+            PropertyChanges {
+                target: infobox
+                current_item: null
+            }
         }
     ]
 

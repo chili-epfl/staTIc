@@ -4,7 +4,13 @@ import QtQuick 2.3 as QQ2
 
 Entity{
     id:root
-    property bool visible: applicationRoot.currentViewFilter=='JOINT' ? true : false
+    readonly property string type: "joint"
+
+    property var connected_beams: []
+
+    property bool visible:  applicationRoot.currentViewFilter=='JOINT'
+                            && backgroundsubtraction.entropy < .10
+                            && (infobox.current_item == null || infobox.current_item == root) ? true : false
 
     property vector3d position
     property vector3d reaction
@@ -15,6 +21,7 @@ Entity{
 
 
     onPositionChanged: computeTransform()
+
     onReactionChanged:{
         computeTransform();
     }
@@ -78,6 +85,24 @@ Entity{
 
     }
     components: [mesh,transform]
+
+    Entity{
+       SphereMesh{
+           enabled: false
+           id:objectPickerMesh
+           radius: 10
+       }
+
+       property ObjectPicker objectPicker: ObjectPicker {
+                   hoverEnabled: false
+                   onClicked: {
+                       if(root.visible)
+                            infobox.current_item=root
+                   }
+       }
+       components: [objectPickerMesh,objectPicker]
+    }
+
 
 
 

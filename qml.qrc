@@ -13,6 +13,9 @@
         <file>Icons/pan.png</file>
         <file>Icons/plus.png</file>
         <file>Icons/resize.png</file>
+        <file>Icons/resize_pressed.png</file>
+        <file>Icons/plus_pressed.png</file>
+        <file>Icons/minus_pressed.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>Images/mainbanner.png</file>
@@ -20,6 +23,8 @@
         <file>Images/camera_icon.png</file>
         <file>Images/wood_joint.png</file>
         <file>Images/wood_beam.png</file>
+        <file>Images/coordinate_system.png</file>
+        <file>Images/coordinate_system_pressed.png</file>
     </qresource>
     <qresource prefix="/element_views">
         <file>Element_Views/AnimationUnitDy.qml</file>
@@ -51,8 +56,15 @@
     <qresource prefix="/ui">
         <file>UI/ViewFilterBar.qml</file>
         <file>UI/InfoBox.qml</file>
-        <file>UI/InfoBoxScene3D.qml</file>
+        <file>UI/InfoBoxScene3DBeam.qml</file>
         <file>UI/CameraController.qml</file>
+        <file>UI/InfoBoxScene3DJoint.qml</file>
+        <file>UI/InfoBoxBeam.qml</file>
+        <file>UI/InfoBoxJoint.qml</file>
+        <file>UI/arrowR0_70L0_5.obj</file>
+        <file>UI/arrowR0_70L0_5.mtl</file>
+        <file>UI/arrowR0_70L1.obj</file>
+        <file>UI/arrowR0_70L1.mtl</file>
     </qresource>
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>

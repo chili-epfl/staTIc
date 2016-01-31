@@ -59,6 +59,8 @@ void BeamVM::onBeamAxialStressChanged(){
         beam_str_ref->ForcesAndMoments(axial_type,axial_force,dummy,dummy,dummy,dummy,dummy,-1);
         m_component3D->setProperty("axialForceType",axial_type);
         m_component3D->setProperty("axialForce",fabs(axial_force));
+
+
     }
 }
 

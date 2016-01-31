@@ -4,18 +4,17 @@ import Qt3D.Render 2.0
 import QtQuick 2.0 as QQ2
 import DeformingBeamMesh 1.0
 import "qrc:/opengl/Opengl/"
+
 Entity {
     id: sceneRoot
-    property var segments: []
-    property matrix4x4 syncPose
-    property bool play: true
-
-    property real beamLength
-    property size beamSize
 
     property int zoom: 0
     property bool resize: false
 
+    property var segments: []
+    property bool play: true
+    property real beamLength
+    property size beamSize
     property alias exagerate: deformingMesh.exagerate
 
     onResizeChanged: {
@@ -31,15 +30,6 @@ Entity {
         to: 1
         running: false
         alwaysRunToEnd: true
-    }
-
-    QQ2.NumberAnimation{
-        target:deformingMeshTransformation
-        properties: "scale"
-        duration: 5000
-        to: zoom > 0 ? 10 : -0.1
-        running: zoom!=0 ? true : false
-        alwaysRunToEnd: false
     }
 
     Camera {
@@ -68,6 +58,16 @@ Entity {
     }
 
     Entity{
+        id:beamRelatedEntity
+        QQ2.NumberAnimation{
+            target:deformingMeshTransformation
+            properties: "scale"
+            duration: 5000
+            to: zoom > 0 ? 10 : -0.1
+            running: zoom!=0 ? true : false
+            alwaysRunToEnd: false
+        }
+
         DeformingBeamMesh{
             id:deformingMesh;
             segments: 50
@@ -251,6 +251,5 @@ Entity {
                 }
             ]
         }
-
     }
 }
