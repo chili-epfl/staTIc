@@ -16,6 +16,7 @@ Entity {
     property real beamLength
     property size beamSize
     property alias exagerate: deformingMesh.exagerate
+    property alias panMode: cameraController.panMode
 
     onResizeChanged: {
         resizeAnimation.start();
@@ -54,6 +55,7 @@ Entity {
     ]
 
     CameraController{
+        id:cameraController
         camera: camera
     }
 

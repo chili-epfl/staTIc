@@ -203,6 +203,25 @@ void Beam::ForcesAndMoments(int& axial_type, qreal& Nx, qreal& Vy, qreal& Vz,
 
 }
 
+void Beam::stress(qreal &axial, qreal &shearY, qreal &shearZ, qreal &torsion, int extreme)
+{
+    if(extreme==1){
+        axial=m_axial_stress_extreme1;
+        shearY=m_shear_stress_y_extreme1;
+        shearZ=m_shear_stress_z_extreme1;
+        torsion=m_torsional_stess_extreme1;
+    }
+    else if(extreme==2){
+        axial=m_axial_stress_extreme2;
+        shearY=m_shear_stress_y_extreme2;
+        shearZ=m_shear_stress_z_extreme2;
+        torsion=m_torsional_stess_extreme2;
+    }
+    else{
+        qCritical("Wrong extreme value");
+    }
+}
+
 void Beam::setSize(QSizeF size){
     if(m_size!=size){
         m_size=size;

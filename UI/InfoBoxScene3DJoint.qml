@@ -129,15 +129,16 @@ Entity {
 
         PhongMaterial{
             id:color_current_force
-            property real h:0.33-0.33*equilibrium_distance
-            ambient:Qt.hsla(h,1,0.32)
+//            property real h:0.33-0.23*equilibrium_distance
+            //ambient:Qt.hsla(h,1,0.32)
+            ambient:Qt.hsla(300/360,1,0.5)
             diffuse:"grey"
             specular:"#000000"
             shininess:0
 
-            QQ2.Behavior on h {
-                QQ2.NumberAnimation{duration: 1000}
-            }
+//            QQ2.Behavior on h {
+//                QQ2.NumberAnimation{duration: 1000}
+//            }
 
         }
 
@@ -180,11 +181,24 @@ Entity {
         }
 
         Entity{
+            PhongMaterial{
+                id:color_centre_current_force
+                property real h:0.33-0.23*equilibrium_distance
+                ambient:Qt.hsla(h,1,0.32)
+                diffuse:"grey"
+                specular:"#000000"
+                shininess:0
+
+                QQ2.Behavior on h {
+                    QQ2.NumberAnimation{duration: 1000}
+                }
+
+            }
             SphereMesh{
                 id:centre_mesh
                 radius: axis_mesh.radius*5
             }
-            components: [centre_mesh,color_current_force]
+            components: [centre_mesh,color_centre_current_force]
         }
 
         Entity{

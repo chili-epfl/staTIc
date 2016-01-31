@@ -25,7 +25,7 @@ public:
 
     void ForcesAndMoments(int& axial_type, qreal& Nx, qreal& Vy, qreal& Vz,
                           qreal& Tx,qreal& My,qreal& Mz,int extreme=0);
-
+    void stress(qreal& axial,qreal& shearY,qreal& shearZ, qreal& torsion, int extreme);
 
     void setSize(QSizeF size);
     QSizeF size(){return m_size;}

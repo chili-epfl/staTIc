@@ -10,6 +10,7 @@ Entity{
     property int direction:1
     property bool rotate: false
     property real scaleFactor: 1
+    property bool isReaction: false
     Transform{
         id:transform
         matrix: {
@@ -26,16 +27,25 @@ Entity{
         }
     }
 
-    GoochMaterial { id: gooch
-        diffuse: Qt.rgba( 1.0, 0.75, 1.0, 1.0 )
-        specular: Qt.rgba( 0.2, 0.2, 0.2, 1.0 )
-        alpha: 0.2
-        beta: 0.6
+    PhongMaterial{
+        id:material
+        property real h: {
+            if(isReaction)
+                return 240/360;
+            else if(rotate)
+                return 120/360
+            else if(!rotate)
+                return 0/360
+        }
+        ambient:Qt.hsla(h,1,0.5)
+        diffuse:"grey"
+        specular:"black"
+        shininess:0
     }
 
     components: [
         transform,
-        unitMesh,gooch
+        unitMesh,material
     ]
 }
 

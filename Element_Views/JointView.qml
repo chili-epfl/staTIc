@@ -103,15 +103,11 @@ Entity{
        components: [objectPickerMesh,objectPicker]
     }
 
-
-
-
     Mesh{
         id:tiny_arrow
         enabled: visible && reactionMagnitude>0
         source:"qrc:/element_views/Element_Views/tiny_arrow.obj"
     }
-
 
     Entity{
         AnimationUnitDx{
@@ -123,6 +119,7 @@ Entity{
             direction: 1
             scaleFactor: root.scaleFactor
             rotate: false
+            isReaction: true
         }
 
         AnimationUnitDx{
@@ -134,6 +131,8 @@ Entity{
             direction: 1
             scaleFactor: root.scaleFactor
             rotate: false
+            isReaction: true
+
         }
         AnimationUnitDx{
             unitId: 2
@@ -144,6 +143,8 @@ Entity{
             direction: 1
             scaleFactor: root.scaleFactor
             rotate: false
+            isReaction: true
+
         }
         AnimationUnitDx{
             unitId: 3
@@ -154,6 +155,8 @@ Entity{
             direction: 1
             scaleFactor: root.scaleFactor
             rotate: false
+            isReaction: true
+
         }
         AnimationUnitDx{
             unitId: 4
@@ -164,6 +167,7 @@ Entity{
             direction: 1
             scaleFactor: root.scaleFactor
             rotate: false
+            isReaction: true
         }
 
 

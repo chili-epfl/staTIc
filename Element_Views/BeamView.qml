@@ -28,20 +28,23 @@ Entity{
     //property real scaleFactor:2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 1
     property real scaleFactor:3
 
+    property real relativeAxialStress: 0
 
-    onAxialForceTypeChanged: {
-        animation.stop();
-        var prevAnimationValue=animationValue
-        if(axialForceType>0){
-            animation.from=prevAnimationValue
-            animation.to=length/2+prevAnimationValue
-        }
-        else{
-            animation.to=prevAnimationValue
-            animation.from=length/2+prevAnimationValue
-        }
-        animation.restart()
-    }
+    onRelativeAxialStressChanged: console.log(relativeAxialStress)
+
+//    onAxialForceTypeChanged: {
+//        animation.stop();
+//        var prevAnimationValue=animationValue
+//        if(axialForceType>0){
+//            animation.from=prevAnimationValue
+//            animation.to=length/2+prevAnimationValue
+//        }
+//        else{
+//            animation.to=prevAnimationValue
+//            animation.from=length/2+prevAnimationValue
+//        }
+//        animation.restart()
+//    }
 
 
     property int nModels: 20
@@ -50,15 +53,6 @@ Entity{
     property int animationValue: 0
     property int step: 10
     property int module: Math.round(length/2 - step)
-
-    QQ2.NumberAnimation on animationValue{
-        id:animation
-        duration: 10000
-        from: 0
-        to:  length/2
-        loops: QQ2.Animation.Infinite
-        running: visible && axialForceType!==0
-    }
 
     onExtreme1Changed: computeTransform()
     onExtreme2Changed: computeTransform()
@@ -95,7 +89,6 @@ Entity{
     }
 
 
-
     CylinderMesh{
         id:mesh
         radius: 0.5
@@ -110,6 +103,59 @@ Entity{
 
     components: [mesh,transform]
 
+    Entity{
+        enabled: visible
+        SphereMesh{
+            id:overview_mesh
+            radius: 5
+        }
+        PhongAlphaMaterial{
+            id:overview_material
+            property real s: relativeAxialStress > 0.0001 ? Math.min(relativeAxialStress+0.15,1) : relativeAxialStress
+            property real h: axialForceType>0 ? (0)/360 : (120)/360
+            ambient:Qt.hsla(h,s,0.5)
+            diffuse:"grey"
+            specular:"black"
+            shininess:0
+            alpha:0.85
+            QQ2.Behavior on ambient{
+                QQ2.ColorAnimation{
+                    duration: 500
+                }
+            }
+        }
+        Transform{
+            id:overview_scale
+            property real delta: 0.3*Math.min(relativeAxialStress,1)
+            scale3D:Qt.vector3d(1-axialForceType*(delta),1+axialForceType*(delta),1-axialForceType*(delta));
+            QQ2.Behavior on scale3D{
+                QQ2.Vector3dAnimation{
+                    duration: 500
+                }
+            }
+        }
+        components: [overview_material,overview_mesh,overview_scale]
+        Entity{
+            Transform{
+                id:overview_shift_pos
+                translation:Qt.vector3d(0,10,0);
+
+            }
+            components: [overview_shift_pos,overview_mesh,overview_material]
+        }
+        Entity{
+            Transform{
+                id:overview_shift_neg
+                translation:Qt.vector3d(0,-10,0);
+
+            }
+            components: [overview_shift_neg,overview_mesh,overview_material]
+        }
+    }
+
+
+
+    /*-----Physical body----*/
     Entity{
        id:physicBody
 
@@ -126,7 +172,7 @@ Entity{
 
        components: [pBodyMesh,pBody]
     }
-
+    /*-----Object Picker----*/
     Entity{
        SphereMesh{
            enabled: false
@@ -143,7 +189,7 @@ Entity{
        }
        components: [objectPickerMesh,objectPicker]
     }
-
+    /*-----Reference bodies----*/
     Entity{
         components: [
             SphereMesh{
@@ -161,7 +207,6 @@ Entity{
                 translation:Qt.vector3d(0,length/2,0)
             } ]
     }
-
     Entity{
         components: [
             SphereMesh{
@@ -196,118 +241,124 @@ Entity{
             } ]
     }
 
-
-
+//    QQ2.NumberAnimation on animationValue{
+//        id:animation
+//        duration: 10000
+//        from: 0
+//        to:  length/2
+//        loops: QQ2.Animation.Infinite
+//        running: visible && axialForceType!==0
+//    }
 
     //First sequence
 
-    Mesh{
-        id:tiny_arrow
-        enabled: visible
-        source:"qrc:/element_views/Element_Views/tiny_arrow.obj"
-    }
+//    Mesh{
+//        id:tiny_arrow
+//        enabled: visible
+//        source:"qrc:/element_views/Element_Views/tiny_arrow.obj"
+//    }
 
 
-    AnimationUnitDy{
-        unitId: 0
-        unitMesh: tiny_arrow
-        step: parent.step
-        animationValue: parent.animationValue
-        module: parent.module
-        direction: 1
-        scaleFactor: parent.scaleFactor
-        rotate: parent.axialForceType < 0
-    }
-    AnimationUnitDy{
-        unitId: 1
-        unitMesh: tiny_arrow
-        step: parent.step
-        animationValue: parent.animationValue
-        module: parent.module
-        direction: 1
-        scaleFactor: parent.scaleFactor
-        rotate: parent.axialForceType < 0
-    }
-    AnimationUnitDy{
-        unitId: 2
-        unitMesh: tiny_arrow
-        step: parent.step
-        animationValue: parent.animationValue
-        module: parent.module
-        direction: 1
-        scaleFactor: parent.scaleFactor
-        rotate: parent.axialForceType < 0
-    }
-    AnimationUnitDy{
-        unitId: 3
-        unitMesh: tiny_arrow
-        step: parent.step
-        animationValue: parent.animationValue
-        module: parent.module
-        direction: 1
-        scaleFactor: parent.scaleFactor
-        rotate: parent.axialForceType < 0
-    }
-    AnimationUnitDy{
-        unitId: 4
-        unitMesh: tiny_arrow
-        step: parent.step
-        animationValue: parent.animationValue
-        module: parent.module
-        direction: 1
-        scaleFactor: parent.scaleFactor
-        rotate: parent.axialForceType < 0
-    }
+//    AnimationUnitDy{
+//        unitId: 0
+//        unitMesh: tiny_arrow
+//        step: parent.step
+//        animationValue: parent.animationValue
+//        module: parent.module
+//        direction: 1
+//        scaleFactor: parent.scaleFactor
+//        rotate: parent.axialForceType < 0
+//    }
+//    AnimationUnitDy{
+//        unitId: 1
+//        unitMesh: tiny_arrow
+//        step: parent.step
+//        animationValue: parent.animationValue
+//        module: parent.module
+//        direction: 1
+//        scaleFactor: parent.scaleFactor
+//        rotate: parent.axialForceType < 0
+//    }
+//    AnimationUnitDy{
+//        unitId: 2
+//        unitMesh: tiny_arrow
+//        step: parent.step
+//        animationValue: parent.animationValue
+//        module: parent.module
+//        direction: 1
+//        scaleFactor: parent.scaleFactor
+//        rotate: parent.axialForceType < 0
+//    }
+//    AnimationUnitDy{
+//        unitId: 3
+//        unitMesh: tiny_arrow
+//        step: parent.step
+//        animationValue: parent.animationValue
+//        module: parent.module
+//        direction: 1
+//        scaleFactor: parent.scaleFactor
+//        rotate: parent.axialForceType < 0
+//    }
+//    AnimationUnitDy{
+//        unitId: 4
+//        unitMesh: tiny_arrow
+//        step: parent.step
+//        animationValue: parent.animationValue
+//        module: parent.module
+//        direction: 1
+//        scaleFactor: parent.scaleFactor
+//        rotate: parent.axialForceType < 0
+//    }
 
-    AnimationUnitDy{
-        unitId: 0
-        unitMesh: tiny_arrow
-        step: parent.step
-        animationValue: parent.animationValue
-        module: parent.module
-        direction: -1
-        scaleFactor: parent.scaleFactor
-        rotate: parent.axialForceType > 0
-    }
-    AnimationUnitDy{
-        unitId: 1
-        unitMesh: tiny_arrow
-        step: parent.step
-        animationValue: parent.animationValue
-        module: parent.module
-        direction: -1
-        scaleFactor: parent.scaleFactor
-        rotate: parent.axialForceType > 0
-    }
-    AnimationUnitDy{
-        unitId: 2
-        unitMesh: tiny_arrow
-        step: parent.step
-        animationValue: parent.animationValue
-        module: parent.module
-        direction: -1
-        scaleFactor: parent.scaleFactor
-        rotate: parent.axialForceType > 0
-    }
-    AnimationUnitDy{
-        unitId: 3
-        unitMesh: tiny_arrow
-        step: parent.step
-        animationValue: parent.animationValue
-        module: parent.module
-        direction: -1
-        scaleFactor: parent.scaleFactor
-        rotate: parent.axialForceType > 0
-    }
-    AnimationUnitDy{
-        unitId: 4
-        unitMesh: tiny_arrow
-        step: parent.step
-        animationValue: parent.animationValue
-        module: parent.module
-        direction: -1
-        scaleFactor: parent.scaleFactor
-        rotate: parent.axialForceType > 0
-    }
+//    AnimationUnitDy{
+//        unitId: 0
+//        unitMesh: tiny_arrow
+//        step: parent.step
+//        animationValue: parent.animationValue
+//        module: parent.module
+//        direction: -1
+//        scaleFactor: parent.scaleFactor
+//        rotate: parent.axialForceType > 0
+//    }
+//    AnimationUnitDy{
+//        unitId: 1
+//        unitMesh: tiny_arrow
+//        step: parent.step
+//        animationValue: parent.animationValue
+//        module: parent.module
+//        direction: -1
+//        scaleFactor: parent.scaleFactor
+//        rotate: parent.axialForceType > 0
+//    }
+//    AnimationUnitDy{
+//        unitId: 2
+//        unitMesh: tiny_arrow
+//        step: parent.step
+//        animationValue: parent.animationValue
+//        module: parent.module
+//        direction: -1
+//        scaleFactor: parent.scaleFactor
+//        rotate: parent.axialForceType > 0
+//    }
+//    AnimationUnitDy{
+//        unitId: 3
+//        unitMesh: tiny_arrow
+//        step: parent.step
+//        animationValue: parent.animationValue
+//        module: parent.module
+//        direction: -1
+//        scaleFactor: parent.scaleFactor
+//        rotate: parent.axialForceType > 0
+//    }
+//    AnimationUnitDy{
+//        unitId: 4
+//        unitMesh: tiny_arrow
+//        step: parent.step
+//        animationValue: parent.animationValue
+//        module: parent.module
+//        direction: -1
+//        scaleFactor: parent.scaleFactor
+//        rotate: parent.axialForceType > 0
+//    }
 
 }

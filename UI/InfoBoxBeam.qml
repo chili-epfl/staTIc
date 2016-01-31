@@ -225,12 +225,17 @@ Rectangle {
                 }
             }
 
-            /*Switch {
+            Switch {
                 id:controlSwitch
                 anchors.margins: 30
                 anchors.bottom: parent.bottom
                 anchors.horizontalCenter:  parent.horizontalCenter
                 height: 35
+                checked: true
+                onCheckedChanged: {
+                    infoboxscene3d.panMode=checked;
+                }
+
             }
             Image {
                 id: moveIcon
@@ -251,7 +256,7 @@ Rectangle {
                 anchors.leftMargin: 10
                 anchors.bottom: parent.bottom
                 anchors.left: controlSwitch.right
-            }*/
+            }
         }
 
 
