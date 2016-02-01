@@ -8,7 +8,8 @@ import "qrc:/opengl/Opengl/"
 Entity {
     id: sceneRoot
 
-    property int zoom: 0
+    //property int zoom: 0
+    property alias zoom: cameraController.zoom
     property bool resize: false
 
     property var segments: []
@@ -19,19 +20,21 @@ Entity {
     property alias panMode: cameraController.panMode
 
     onResizeChanged: {
-        resizeAnimation.start();
+        camera.position=Qt.vector3d( 0.0, 0.0, (0.8*(deformingMesh.length))/Math.tan(camera.fieldOfView/2) )
+        camera.upVector= Qt.vector3d( 0.0, 1.0, 0.0 )
+        camera.viewCenter= Qt.vector3d( 0.0, 0.0, 0.0 )
         resize=false;
     }
 
-    QQ2.NumberAnimation {
-        id:resizeAnimation
-        target: deformingMeshTransformation;
-        property: "scale";
-        duration: 500;
-        to: 1
-        running: false
-        alwaysRunToEnd: true
-    }
+//    QQ2.NumberAnimation {
+//        id:resizeAnimation
+//        target: deformingMeshTransformation;
+//        property: "scale";
+//        duration: 500;
+//        to: 1
+//        running: false
+//        alwaysRunToEnd: true
+//    }
 
     Camera {
         id: camera
@@ -61,14 +64,14 @@ Entity {
 
     Entity{
         id:beamRelatedEntity
-        QQ2.NumberAnimation{
-            target:deformingMeshTransformation
-            properties: "scale"
-            duration: 5000
-            to: zoom > 0 ? 10 : -0.1
-            running: zoom!=0 ? true : false
-            alwaysRunToEnd: false
-        }
+//        QQ2.NumberAnimation{
+//            target:deformingMeshTransformation
+//            properties: "scale"
+//            duration: 5000
+//            to: zoom > 0 ? 10 : -0.1
+//            running: zoom!=0 ? true : false
+//            alwaysRunToEnd: false
+//        }
 
         DeformingBeamMesh{
             id:deformingMesh;
