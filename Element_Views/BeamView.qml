@@ -30,8 +30,6 @@ Entity{
 
     property real relativeAxialStress: 0
 
-    onRelativeAxialStressChanged: console.log(relativeAxialStress)
-
 //    onAxialForceTypeChanged: {
 //        animation.stop();
 //        var prevAnimationValue=animationValue
@@ -112,7 +110,7 @@ Entity{
         PhongAlphaMaterial{
             id:overview_material
             property real s: relativeAxialStress > 0.0001 ? Math.min(relativeAxialStress+0.15,1) : relativeAxialStress
-            property real h: axialForceType>0 ? (0)/360 : (120)/360
+            property real h: axialForceType>0 ? (0)/360 : (240)/360
             ambient:Qt.hsla(h,s,0.5)
             diffuse:"grey"
             specular:"black"
@@ -158,9 +156,9 @@ Entity{
     /*-----Physical body----*/
     Entity{
        id:physicBody
-
+       objectName: rootEntity.objectName
        CylinderMesh{
-           enabled: false
+           enabled: true
            id:pBodyMesh
            radius: 10
            length: rootEntity.length
@@ -169,8 +167,12 @@ Entity{
            id:pBody
            kinematic:true
        }
+       PhongAlphaMaterial{
+           id:transparentMaterial
+           alpha:0.2
+       }
 
-       components: [pBodyMesh,pBody]
+       components: [pBodyMesh,pBody,transparentMaterial]
     }
     /*-----Object Picker----*/
     Entity{

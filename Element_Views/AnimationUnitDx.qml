@@ -31,9 +31,9 @@ Entity{
         id:material
         property real h: {
             if(isReaction)
-                return 240/360;
+                return 120/360;
             else if(rotate)
-                return 120/360
+                return 240/360
             else if(!rotate)
                 return 0/360
         }
