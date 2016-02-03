@@ -14,7 +14,6 @@ Rectangle {
         forceListModel.clear()
         if(current_item != null && current_item.connected_beams){
             title.text="Joint "+ current_item.objectName;
-            infoboxScene3D.nbeams=current_item.connected_beams.length
             for(var i=0;i<current_item.connected_beams.length;i++){
                 forceListModel.append({isAdded:true,
                                        beam:current_item.connected_beams[i],
@@ -42,7 +41,7 @@ Rectangle {
                         max:max.plus(forceListModel.get(current_item.connected_beams.length).joint.reaction)
         }
         infoboxScene3D.currentForce=sum
-        infoboxScene3D.maxForceLength=max.length();
+        infoboxScene3D.maxForce=max;
     }
     function computeMaxForce(index){
         if (index==current_item.connected_beams.length) return Qt.vector3d(0,0,0);
