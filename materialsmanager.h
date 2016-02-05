@@ -20,17 +20,17 @@ private:
         qreal price;
         qreal density;
         qreal young;
-        qreal e;
+        qreal g;
         void set(QString _name,
         QUrl _texture_img,
         qreal _price,
-        qreal _density, qreal _young, qreal _e){
+        qreal _density, qreal _young, qreal _g){
             name=_name;
             texture_img=_texture_img;
             price=_price;
             density=_density;
             young=_young;
-            e=_e;
+            g=_g;
         }
     };
     QList<Material> m_materials;

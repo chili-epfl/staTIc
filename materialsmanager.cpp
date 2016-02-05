@@ -48,9 +48,9 @@ MaterialsManager::MaterialsManager(QObject *parent):
                         material.young=property[1].toFloat(&ok);
                         if(!ok) qDebug()<<"Convertion error:"<<part;
                     }
-                    else if(property[0]=="E") {
+                    else if(property[0]=="G") {
                         bool ok;
-                        material.e=property[1].toFloat(&ok);
+                        material.g=property[1].toFloat(&ok);
                         if(!ok) qDebug()<<"Convertion error:"<<part;
                     }
                     else if(property[0]=="TextureImage") {
@@ -60,7 +60,7 @@ MaterialsManager::MaterialsManager(QObject *parent):
                 }
 
             }while(!line.isNull());
-            if(material.name.isEmpty() || material.density==0 || material.e==0,
+            if(material.name.isEmpty() || material.density==0 || material.g==0,
                     material.young==0){
                 qDebug()<<"Invalid material:"<< it.filePath();
             }
@@ -100,7 +100,13 @@ QVariant MaterialsManager::data(const QModelIndex &index, int role) const
 QVariant MaterialsManager::get(int index, QString info) const
 {
     if(index<0 || index>=m_materials.size()) return QVariant();
-    if(info.compare("Price",Qt::CaseInsensitive)==0){
+    if(info.compare("G",Qt::CaseInsensitive)==0){
+        return m_materials[index].g;
+    }
+    else if(info.compare("Young",Qt::CaseInsensitive)==0){
+        return m_materials[index].young;
+    }
+    else if(info.compare("Price",Qt::CaseInsensitive)==0){
         return m_materials[index].price;
     }
     else if(info.compare("Density",Qt::CaseInsensitive)==0){
