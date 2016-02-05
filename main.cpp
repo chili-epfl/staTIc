@@ -6,6 +6,7 @@
 #include "AR/backgroundsubtraction.h"
 
 #include "scenariolistmodel.h"
+#include "materialsmanager.h"
 
 #include "statics/frame3dd/frame3ddkernel.h"
 #include "statics/frame3dd/frame3ddvmmanager.h"
@@ -31,6 +32,8 @@ int main(int argc, char *argv[])
     qmlRegisterType<BackgroundSubtraction>("BackgroundSubtraction", 1, 0, "BackgroundSubtraction");
 
     qmlRegisterType<ScenarioListModel>("ScenarioListModel", 1, 0, "ScenarioListModel");
+    qmlRegisterType<MaterialsManager>("MaterialsManager", 1, 0, "MaterialsManager");
+
     //qmlRegisterType<TwoDimensionalStaticsModule>("StaticsModule2D", 1, 0, "StaticsModule2D");
     //qmlRegisterType<TwoDimentionalEventHandler>("EventHandler2D", 1, 0, "EventHandler2D");
     qmlRegisterType<Frame3DDKernel>("Frame3DDKernel",1,0,"Frame3DDKernel");

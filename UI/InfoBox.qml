@@ -6,17 +6,13 @@ import QtQuick.Layouts 1.1
 Rectangle {
     id:root
     property var current_item
-
+    state: "designer"
     states: [
         State {
             name: "beam"
             PropertyChanges {
                 target: loader
                 source:"qrc:/ui/UI/InfoBoxBeam.qml"
-            }
-            PropertyChanges{
-                target: root
-                visible:true
             }
         },
         State {
@@ -25,41 +21,34 @@ Rectangle {
                 target: loader
                 source:"qrc:/ui/UI/InfoBoxJoint.qml"
             }
-            PropertyChanges{
-                target: root
-                visible:true
-            }
         },
         State {
-            name: "null"
+            name: "designer"
             PropertyChanges {
                 target: loader
-                source:""
-            }
-            PropertyChanges{
-                target: root
-                visible:false
+                source:"qrc:/ui/UI/InfoBoxDesigner.qml"
             }
         }
     ]
 
     onCurrent_itemChanged: {
-         if(current_item != null){
-            if(current_item.type==="beam"){
+        if(applicationRoot.currentViewFilter=='DESIGNER'){
+            state="designer"
+        }
+        else if(current_item != null){
+            if(applicationRoot.currentViewFilter=='BEAM' && current_item.type==="beam"){
                 state="beam";
             }
-            else if(current_item.type==="joint"){
+            else if(applicationRoot.currentViewFilter=='JOINT' && current_item.type==="joint"){
                 state="joint"
             }
-         }
-         else{
-             state="null"
          }
     }
 
     color:"transparent"
     radius:5
-    visible:false
+    visible:applicationRoot.currentViewFilter=='DESIGNER'?
+                true : current_item!=null
 
     Rectangle{
         //close button
@@ -87,6 +76,7 @@ Rectangle {
         id:loader
         anchors.fill:parent
         onLoaded: item.current_item=current_item
+        onSourceChanged: console.log(source)
     }
 
 }

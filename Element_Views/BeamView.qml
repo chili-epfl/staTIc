@@ -105,7 +105,7 @@ Entity{
         enabled: visible
         SphereMesh{
             id:overview_mesh
-            radius: 5
+            radius: 10
         }
         PhongAlphaMaterial{
             id:overview_material
@@ -124,31 +124,31 @@ Entity{
         }
         Transform{
             id:overview_scale
-            property real delta: 0.3*Math.min(relativeAxialStress,1)
+            property real delta: 1*Math.min(relativeAxialStress,1)
             scale3D:Qt.vector3d(1-axialForceType*(delta),1+axialForceType*(delta),1-axialForceType*(delta));
             QQ2.Behavior on scale3D{
                 QQ2.Vector3dAnimation{
-                    duration: 500
+                    duration: 1000
                 }
             }
         }
         components: [overview_material,overview_mesh,overview_scale]
-        Entity{
-            Transform{
-                id:overview_shift_pos
-                translation:Qt.vector3d(0,10,0);
+//        Entity{
+//            Transform{
+//                id:overview_shift_pos
+//                translation:Qt.vector3d(0,10,0);
 
-            }
-            components: [overview_shift_pos,overview_mesh,overview_material]
-        }
-        Entity{
-            Transform{
-                id:overview_shift_neg
-                translation:Qt.vector3d(0,-10,0);
+//            }
+//            components: [overview_shift_pos,overview_mesh,overview_material]
+//        }
+//        Entity{
+//            Transform{
+//                id:overview_shift_neg
+//                translation:Qt.vector3d(0,-10,0);
 
-            }
-            components: [overview_shift_neg,overview_mesh,overview_material]
-        }
+//            }
+//            components: [overview_shift_neg,overview_mesh,overview_material]
+//        }
     }
 
 

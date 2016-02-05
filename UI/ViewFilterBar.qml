@@ -10,7 +10,7 @@ Rectangle{
     radius:5
     color: "#606060"
     border.color: "#F0F0F0"
-    state:"BEAM"
+    state:"DESIGNER"
 
     states:[
         State {
@@ -26,11 +26,22 @@ Rectangle{
                 target: infobox
                 current_item: null
             }
+        },
+        State{
+            name:"DESIGNER"
+            PropertyChanges {
+                target: infobox
+                current_item: null
+            }
         }
     ]
 
     ListModel {
         id:icon_model
+        ListElement {
+            name: "DESIGNER"
+            imageSource: "qrc:/images/Images/designer.png"
+        }
         ListElement {
             name: "BEAM"
             imageSource: "qrc:/images/Images/wood_beam.png"
@@ -40,6 +51,7 @@ Rectangle{
             name: "JOINT"
             imageSource: "qrc:/images/Images/wood_joint.png"
         }
+
     }
 
     Item{

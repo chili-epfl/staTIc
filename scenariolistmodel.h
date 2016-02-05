@@ -22,7 +22,6 @@ public:
 
 private:
     QString m_source;
-
     QVector<QString> m_scenariosNames;
     QMap<QString, QUrl> m_scenariosQml;
     QMap<QString, QUrl> m_scenariosThumbs;

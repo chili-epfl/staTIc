@@ -38,7 +38,11 @@ SOURCES += main.cpp \
     #statics/elements/force.cpp \
     AR/backgroundsubtraction.cpp \
     AR/backgroundsubtractionfilter.cpp \
-    AR/deformingbeammesh.cpp
+    AR/deformingbeammesh.cpp \
+    AR/arucodetector.cpp \
+    AR/arucodetectorthread.cpp \
+    AR/arucoobject.cpp \
+    materialsmanager.cpp
 
 
 HEADERS += \
@@ -78,12 +82,16 @@ HEADERS += \
     scenariolistmodel.h \
     AR/backgroundsubtraction.h \
     AR/backgroundsubtractionfilter.h \
-    AR/deformingbeammesh.h
+    AR/deformingbeammesh.h \
+    AR/arucodetector.h \
+    AR/arucodetectorthread.h \
+    AR/arucoobject.h \
+    materialsmanager.h
 
 
 RESOURCES += qml.qrc
 
-INCLUDEPATH+= /home/chili/QTProjects/qml-chilitags/src
+INCLUDEPATH+= /home/chili/QTProjects/qml-chilitags/src $$[QT_INSTALL_HEADERS]/QtPhysicsUnofficial
 
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
@@ -96,7 +104,7 @@ LIBS += -lopencv_core -lopencv_video -lopencv_imgproc
 #-lopencv_video -lopencv_calib3d
 LIBS += -lLinearMath -lBulletDynamics -lBulletCollision -lBulletSoftBody
 
-LIBS += -lQtPhysicsUnofficialFrontend
+LIBS += -lQtPhysicsUnofficial
 
 android {
     #INCLUDEPATH += $(ANDROID_STANDALONE_TOOLCHAIN)/sysroot/usr/include

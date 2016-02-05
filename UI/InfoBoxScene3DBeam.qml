@@ -7,7 +7,6 @@ import "qrc:/opengl/Opengl/"
 
 Entity {
     id: sceneRoot
-
     //property int zoom: 0
     property alias zoom: cameraController.zoom
     property bool resize: false

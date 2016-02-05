@@ -31,7 +31,6 @@ QVariant ScenarioListModel::get(int index, QString info)const{
     if (index<0 || index>=m_scenariosNames.size()) return QVariant();
     if(info.compare("ScenarioQML",Qt::CaseInsensitive)==0){
         return m_scenariosQml[m_scenariosNames[index]];
-
     }
     return QVariant();
 

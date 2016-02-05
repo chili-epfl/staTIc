@@ -16,6 +16,10 @@
         <file>Icons/resize_pressed.png</file>
         <file>Icons/plus_pressed.png</file>
         <file>Icons/minus_pressed.png</file>
+        <file>Icons/AR_ON.png</file>
+        <file>Icons/AR_OFF.png</file>
+        <file>Icons/apply_pressed.png</file>
+        <file>Icons/apply.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>Images/mainbanner.png</file>
@@ -25,6 +29,7 @@
         <file>Images/wood_beam.png</file>
         <file>Images/coordinate_system.png</file>
         <file>Images/coordinate_system_pressed.png</file>
+        <file>Images/designer.png</file>
     </qresource>
     <qresource prefix="/element_views">
         <file>Element_Views/AnimationUnitDy.qml</file>
@@ -65,11 +70,38 @@
         <file>UI/arrowR0_70L0_5.mtl</file>
         <file>UI/arrowR0_70L1.obj</file>
         <file>UI/arrowR0_70L1.mtl</file>
+        <file>UI/half_sphere.obj</file>
+        <file>UI/InfoBoxDesigner.qml</file>
     </qresource>
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>
         <file>Tools/Scaffold/Scaffold.qml</file>
         <file>Tools/Scaffold/Anchor.qml</file>
         <file>Tools/BeamRemover/BeamRemover.qml</file>
+    </qresource>
+    <qresource prefix="/materials">
+        <file>statics/Materials/test.png</file>
+        <file>statics/Materials/material1.material</file>
+        <file>statics/Materials/material1 (copy).material</file>
+        <file>statics/Materials/material1 (another copy).material</file>
+        <file>statics/Materials/material1 (4th copy).material</file>
+        <file>statics/Materials/material1 (3rd copy).material</file>
+        <file>statics/Materials/material1 (21st copy).material</file>
+        <file>statics/Materials/material1 (20th copy).material</file>
+        <file>statics/Materials/material1 (19th copy).material</file>
+        <file>statics/Materials/material1 (18th copy).material</file>
+        <file>statics/Materials/material1 (17th copy).material</file>
+        <file>statics/Materials/material1 (16th copy).material</file>
+        <file>statics/Materials/material1 (15th copy).material</file>
+        <file>statics/Materials/material1 (14th copy).material</file>
+        <file>statics/Materials/material1 (13th copy).material</file>
+        <file>statics/Materials/material1 (12th copy).material</file>
+        <file>statics/Materials/material1 (11th copy).material</file>
+        <file>statics/Materials/material1 (10th copy).material</file>
+        <file>statics/Materials/material1 (9th copy).material</file>
+        <file>statics/Materials/material1 (8th copy).material</file>
+        <file>statics/Materials/material1 (7th copy).material</file>
+        <file>statics/Materials/material1 (6th copy).material</file>
+        <file>statics/Materials/material1 (5th copy).material</file>
     </qresource>
 </RCC>
