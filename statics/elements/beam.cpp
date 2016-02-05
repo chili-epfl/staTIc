@@ -2,7 +2,7 @@
 #include "statics/elements/joint.h"
 #include "statics/abstractstaticsmodule.h"
 #include <QDebug>
-Beam::Beam(JointPtr extreme1, JointPtr extreme2,QString name,QObject* parent):
+Beam::Beam(JointPtr extreme1, JointPtr extreme2,MaterialsManager* mm,QString name,QObject* parent):
     AbstractElement(name,parent),
     m_enable(true),
     m_axial_force_extreme_1(0),
@@ -37,7 +37,8 @@ Beam::Beam(JointPtr extreme1, JointPtr extreme2,QString name,QObject* parent):
     m_extreme1=extreme1;
     m_extreme2=extreme2;
     m_length=extreme1->position().distanceToPoint(extreme2->position());
-//    m_extreme1->addConnectedBeam(this);
+    m_materialsManager=mm;
+    //    m_extreme1->addConnectedBeam(this);
 //    m_extreme2->addConnectedBeam(this);
 
     connect(m_extreme1.data(),SIGNAL(destroyed(QObject*)),this,SIGNAL(killMe()));

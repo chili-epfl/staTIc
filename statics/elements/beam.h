@@ -5,6 +5,7 @@
 #include<QSizeF>
 #include<QVector4D>
 #include "statics/elements/abstractelement.h"
+#include "materialsmanager.h"
 #include <QDebug>
 class Joint;
 typedef QSharedPointer<Joint> JointPtr;
@@ -14,7 +15,7 @@ class Beam : public AbstractElement
 {
     Q_OBJECT
 public:
-    Beam(JointPtr extreme1, JointPtr extreme2,QString name=QString(),QObject* parent=0);
+    Beam(JointPtr extreme1, JointPtr extreme2,MaterialsManager* mm,QString name=QString(),QObject* parent=0);
 
     void extremes(WeakJointPtr& e1,WeakJointPtr& e2);
 
@@ -25,6 +26,7 @@ public:
 
     void ForcesAndMoments(int& axial_type, qreal& Nx, qreal& Vy, qreal& Vz,
                           qreal& Tx,qreal& My,qreal& Mz,int extreme=0);
+
     void stress(qreal& axial,qreal& shearY,qreal& shearZ, qreal& torsion, int extreme);
 
     void setSize(QSizeF size);
@@ -142,6 +144,7 @@ private:
     m_Sz,   /*Section modulus  Z*/
     m_C;    /*Torsion Shear Constant*/
 
+    MaterialsManager* m_materialsManager;
 
 };
 

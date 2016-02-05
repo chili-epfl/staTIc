@@ -1743,7 +1743,7 @@ void Frame3DDKernel::update_statics(
 BeamPtr Frame3DDKernel::createBeam(JointPtr extreme1,JointPtr extreme2,QSizeF size,qreal E,
                                    qreal G, qreal d,QString name){
     if(!extreme1.isNull() && !extreme2.isNull() && extreme1!=extreme2){
-        BeamPtr beam(new Beam(extreme1,extreme2,name,this));
+        BeamPtr beam(new Beam(extreme1,extreme2,m_materialsManager,name,this));
         extreme1->addConnectedBeam(beam);
         extreme2->addConnectedBeam(beam);
         beam->setSize(size);

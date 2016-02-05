@@ -5,7 +5,7 @@
 #include <QVector3D>
 #include <QUrl>
 #include "elements/abstractelement.h"
-
+#include "materialsmanager.h"
 class Joint;
 typedef QSharedPointer<Joint> JointPtr;
 class Beam;
@@ -35,6 +35,8 @@ class AbstractStaticsModule : public QObject
     Q_PROPERTY(qreal maxForce READ maxForce NOTIFY maxForceChanged)
     Q_PROPERTY(qreal minForce READ minForce NOTIFY minForceChanged)
 
+    Q_PROPERTY(MaterialsManager* materialsManager READ materialsManager NOTIFY materialsManagerChanged)
+
 public:
 
     enum Status{NOT_LOADED,LOADED};
@@ -43,7 +45,7 @@ public:
     static qreal modelScale();
 
     AbstractStaticsModule(QObject *parent = 0);
-
+    ~AbstractStaticsModule();
     void setSourceUrl(QUrl sourceUrl){readStructure(sourceUrl.toLocalFile());}
     void setSource(QString source){readStructure(source);}
 
@@ -70,12 +72,15 @@ public:
     virtual bool splitBeam(BeamPtr beam, qreal offset,JointPtr &new_joint)=0;
     virtual bool unifyBeam(BeamPtr beam)=0;
 
+    MaterialsManager* materialsManager(){return m_materialsManager;}
+
 signals:
     void statusChanged();
     void stabilityChanged();
     void minForceChanged();
     void maxForceChanged();
     void updated();
+    void materialsManagerChanged();
 protected:
     virtual bool readStructure(QString path) =0;
     virtual void update() =0;
@@ -84,6 +89,7 @@ protected:
     Status m_status;
     Stability m_stability;
     static qreal m_modelScale;
+    MaterialsManager* m_materialsManager;
 
 };
 
