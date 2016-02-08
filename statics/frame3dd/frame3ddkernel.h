@@ -22,6 +22,8 @@ public:
     //virtual Force* createForce(QVector3D applicationPoint, QVector3D force_vector, AbstractElement* applicationElement=Q_NULLPTR);
     virtual BeamPtr createBeam(JointPtr extreme1,JointPtr extreme2,QSizeF size,qreal E,
                                qreal G, qreal d,QString name=QString());
+    virtual BeamPtr createBeam(JointPtr extreme1,JointPtr extreme2,QSizeF size,QString materialID,QString name=QString());
+
     virtual JointPtr createJoint(QVector3D position,QString name=QString(),
                                bool  support_X=false,bool support_Y=false,bool support_Z=false,
                                bool support_XX=false,bool support_YY=false,bool support_ZZ=false );

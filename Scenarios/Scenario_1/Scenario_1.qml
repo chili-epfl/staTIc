@@ -13,6 +13,7 @@ import Frame3DDKernel 1.0
 import Frame3DDVMManager 1.0
 
 import "qrc:/ui/UI/"
+import MaterialsManager 1.0
 
 Item{
     id: applicationRoot
@@ -113,59 +114,11 @@ Item{
         id:staticsmodule
     }
 
+    property alias materialsManager: staticsmodule.materialsManager
+
     Frame3DDVMManager{
             id:vmFrame3DDManager
     }
-
-
-     /*UI*/
-//     Item{
-//         id:topmenu
-//         anchors.horizontalCenter: parent.horizontalCenter
-//         y:0 ; z:1
-//         state: "DISPLAYED"
-//         ColumnLayout{
-//             Row{
-//                 ViewFilterBar{
-//                     id:viewFilterBar
-//                 }
-//             }
-//             Row{
-//                 Layout.alignment: Qt.AlignCenter
-//                 Image {
-//                     id: ic_topmenu
-//                     source: "qrc:/icons/Icons/ic_keyboard_arrow_up_black_36px.svg"
-//                     MouseArea{
-//                         anchors.fill: parent
-//                         onClicked: {
-//                             if(topmenu.state=="DISPLAYED")
-//                                 topmenu.state="HIDDEN"
-//                             else
-//                                 topmenu.state="DISPLAYED"
-//                         }
-//                     }
-//                 }
-
-//             }
-
-//         }
-//         states: [
-//             State {
-//                 name: "DISPLAYED"
-//                 PropertyChanges { target: topmenu; y: 5}
-//                 PropertyChanges { target: ic_topmenu; rotation:0}
-
-//             },
-//             State {
-//                 name: "HIDDEN"
-//                 PropertyChanges { target: topmenu; y: -viewFilterBar.height+10}
-//                 PropertyChanges { target: ic_topmenu; rotation:180}
-
-//             }
-//         ]
-//         Behavior on y {animation: NumberAnimation{duration: 250}}
-//     }
-
 
      /*3D Rendering*/
      Camera{
@@ -173,7 +126,6 @@ Item{
          deviceId:QtMultimedia.availableCameras[1].deviceId
          imageCapture.resolution: "640x480" //Android sets the viewfinder resolution as the capture one
          viewfinder.resolution:"640x480"
-
          focus {
                      focusMode: Camera.FocusMacro
                      focusPointMode: Camera.FocusPointAuto
@@ -184,8 +136,30 @@ Item{
          exposure.exposureMode: Camera.ExposureAction
          exposure.manualAperture: -1
          exposure.manualShutterSpeed: -1
+
+         imageCapture {
+             onImageCaptured: {
+                 stillImage.source = preview
+             }
+         }
+         property bool isRunning: true
+         onIsRunningChanged: {
+            if(isRunning){
+                camDevice.start();
+            }
+            else{
+                camDevice.imageCapture.capture();
+                camDevice.stop();
+            }
+         }
      }
 
+     Image {
+         id: stillImage
+         visible: camDevice.isRunning && camDevice.cameraStatus==Camera.ActiveStatus ? false:true
+         anchors.fill: parent
+         fillMode: Image.PreserveAspectFit
+     }
 
      VideoOutput{
          z: 0
@@ -193,7 +167,7 @@ Item{
          anchors.centerIn: parent
          anchors.fill: parent
          source: camDevice
-         filters:[backgroundsubtraction,chilitags]
+         filters:[chilitags]
 
          Rectangle{
              anchors.fill: parent
@@ -205,8 +179,8 @@ Item{
              Scene3D {
                  anchors.fill: parent
                  focus: true
-                 //aspects: ["input","physics"]
-                 aspects:["input"]
+                 aspects: ["input","physics"]
+                 //aspects:["input"]
                  multisample:true
                  Scenario1Scene3D {
                      id:scene3D
@@ -234,16 +208,29 @@ Item{
                     anchors.margins: pt2px(20)
                 }
 
+                Image {
+                    anchors.bottom: parent.bottom
+                    anchors.left: parent.left
+                    anchors.margins: 10
+                    width: 100
+                    height: 100
+                    source: camDevice.isRunning ?
+                            "qrc:/icons/Icons/AR_ON.png" :
+                            "qrc:/icons/Icons/AR_OFF.png"
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: camDevice.isRunning = !camDevice.isRunning
+                    }
+                }
              }
          }
-
      }
 
      Chilitags{
          id:chilitags
          tagConfigurationFile:":/scenarios/Scenarios/Scenario_1/Model1.yml"
          chiliobjects: [structure_tag]
-         pause: backgroundsubtraction.entropy > .01 ? false : true
+         //pause: backgroundsubtraction.entropy > .01 ? true : false
      }
 
      ChilitagsObject{

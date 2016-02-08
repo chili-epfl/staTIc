@@ -32,9 +32,9 @@
 #Number of beams
 5
 
-#Beam name,node 1,node 2,width,height,Youngh,E,d
-AB,0,1,120,220,20000,1250,0.50e-9
-BD,1,3,120,220,20000,1250,0.50e-9
-BC,2,1,120,220,20000,1250,0.50e-9
-CD,2,3,120,220,20000,1250,0.50e-9
-AC,0,2,120,220,20000,1250,0.50e-9
+#Beam name,node 1,node 2,width,height,MaterialID
+AB,0,1,120,220,material1
+BD,1,3,120,220,material1
+BC,2,1,120,220,material1
+CD,2,3,120,220,material1
+AC,0,2,120,220,material1

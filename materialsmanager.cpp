@@ -7,7 +7,6 @@ MaterialsManager::MaterialsManager(QObject *parent):
 {
     QString materialsDir=":/materials/statics/Materials/";
     QDirIterator it(materialsDir);
-    int index=1;
     while(it.hasNext()){
         it.next();
         if(it.fileInfo().suffix()=="material"){
@@ -32,6 +31,9 @@ MaterialsManager::MaterialsManager(QObject *parent):
                     }
                     if(property[0]=="Name"){
                         material.name=property[1];
+                    }
+                    else if(property[0]=="UniqueID"){
+                        material.uniqueID=property[1];
                     }
                     else if(property[0]=="Price") {
                         bool ok;
@@ -58,19 +60,17 @@ MaterialsManager::MaterialsManager(QObject *parent):
                     }
                     else{qDebug()<<"Unknown property:"<<part;}
                 }
-
             }while(!line.isNull());
-            if(material.name.isEmpty() || material.density==0 || material.g==0,
-                    material.young==0){
-                qDebug()<<"Invalid material:"<< it.filePath();
+            if(material.uniqueID.isEmpty() || material.name.isEmpty() || material.density==0 ||
+                    material.g==0 || material.young==0 || m_materials.contains(material.uniqueID)){
+                qDebug()<<"Invalid material or duplicated Id:"<< it.filePath();
             }
             else{
-                material.id=index;
-                m_materials.append(material);
-                index++;
+                m_materials[material.uniqueID]=material;
             }
         }
     }
+    m_materialsIndex=m_materials.keys();
 }
 
 int MaterialsManager::rowCount(const QModelIndex &parent) const
@@ -85,10 +85,10 @@ QVariant MaterialsManager::data(const QModelIndex &index, int role) const
     if((index.row()+index.column())>= m_materials.size()) return QVariant();
     switch (role) {
     case Qt::DecorationRole:
-        return m_materials[(index.row()+index.column())].texture_img;
+        return m_materials[m_materialsIndex[(index.row()+index.column())]].texture_img;
         break;
     case Qt::DisplayRole:
-        return m_materials[(index.row()+index.column())].name;
+        return m_materials[m_materialsIndex[(index.row()+index.column())]].name;
         break;
     default:
         return QVariant();
@@ -101,19 +101,39 @@ QVariant MaterialsManager::get(int index, QString info) const
 {
     if(index<0 || index>=m_materials.size()) return QVariant();
     if(info.compare("G",Qt::CaseInsensitive)==0){
-        return m_materials[index].g;
+        return m_materials[m_materialsIndex[index]].g;
     }
     else if(info.compare("Young",Qt::CaseInsensitive)==0){
-        return m_materials[index].young;
+        return m_materials[m_materialsIndex[index]].young;
     }
     else if(info.compare("Price",Qt::CaseInsensitive)==0){
-        return m_materials[index].price;
+        return m_materials[m_materialsIndex[index]].price;
     }
     else if(info.compare("Density",Qt::CaseInsensitive)==0){
-        return m_materials[index].density;
+        return m_materials[m_materialsIndex[index]].density;
+    }
+    else if(info.compare("UniqueID",Qt::CaseInsensitive)==0){
+        return m_materials[m_materialsIndex[index]].uniqueID;
     }
     return QVariant();
+}
 
+QVariant MaterialsManager::get(QString uniqueID, QString info) const
+{
+    if(!m_materials.contains(uniqueID)) return QVariant();
+    if(info.compare("G",Qt::CaseInsensitive)==0){
+        return m_materials[uniqueID].g;
+    }
+    else if(info.compare("Young",Qt::CaseInsensitive)==0){
+        return m_materials[uniqueID].young;
+    }
+    else if(info.compare("Price",Qt::CaseInsensitive)==0){
+        return m_materials[uniqueID].price;
+    }
+    else if(info.compare("Density",Qt::CaseInsensitive)==0){
+        return m_materials[uniqueID].density;
+    }
+    return QVariant();
 
 }
 

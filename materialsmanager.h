@@ -11,10 +11,10 @@ public:
     int rowCount(const QModelIndex &parent)const;
     QVariant data(const QModelIndex &index, int role)const;
     Q_INVOKABLE QVariant get(int index, QString info) const;
-
+    Q_INVOKABLE QVariant get(QString uniqueID, QString info) const;
 private:
     struct Material{
-        int id;
+        QString uniqueID;
         QString name;
         QUrl texture_img;
         qreal price;
@@ -33,8 +33,9 @@ private:
             g=_g;
         }
     };
-    QList<Material> m_materials;
-
+    //QList<Material> m_materials;
+    QMap<QString,Material> m_materials;
+    QList<QString> m_materialsIndex;
 };
 
 #endif // MATERIALSMANAGER_H

@@ -210,7 +210,7 @@ bool Frame3DDKernel::readStructure(QString path){
     for(int i=0;i<number_beams;i++){
         line=readLine(&inputStream);
         QStringList line_parts=line.split(separator);
-        if(line_parts.size()!=8){
+        if(line_parts.size()!=6){
             qWarning("Issue reading element line:");
             qWarning(line.toStdString().c_str());
             return false;
@@ -272,27 +272,13 @@ bool Frame3DDKernel::readStructure(QString path){
             qWarning(line_parts[4].toStdString().c_str());
             return false;
         }
-        qreal E=line_parts[5].toDouble(&ok);
-        if(!ok){
-            qWarning("Fail to convert Young modulus");
+        QString materialID=line_parts[5];
+        if(materialID.isEmpty()){
+            qWarning("Fail to convert material");
             qWarning(line_parts[5].toStdString().c_str());
             return false;
         }
-        qreal G=line_parts[6].toDouble(&ok);
-        if(!ok){
-            qWarning("Fail to convert Shear modulus");
-            qWarning(line_parts[6].toStdString().c_str());
-            return false;
-        }
-        qreal d=line_parts[7].toDouble(&ok);
-        if(!ok){
-            qWarning("Fail to convert density");
-            qWarning(line_parts[7].toStdString().c_str());
-            return false;
-        }
-
-        BeamPtr beam=createBeam(first,second,QSizeF(area_x,area_y),E,G,d,line_parts[0]);
-
+        BeamPtr beam=createBeam(first,second,QSizeF(area_x,area_y),materialID,line_parts[0]);
     }
     solve();
     setStatus(Status::LOADED);
@@ -1750,6 +1736,23 @@ BeamPtr Frame3DDKernel::createBeam(JointPtr extreme1,JointPtr extreme2,QSizeF si
         beam->setYoungModulus(E);
         beam->setShearModulus(G);
         beam->setDensity(d);
+        m_beams.append(beam);
+        connect(beam.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
+        connect(beam.data(),SIGNAL(parametersChanged()),this,SLOT(update()));
+        update();
+        return beam;
+    }
+    return BeamPtr();
+}
+
+BeamPtr Frame3DDKernel::createBeam(JointPtr extreme1, JointPtr extreme2, QSizeF size, QString materialID, QString name)
+{
+    if(!extreme1.isNull() && !extreme2.isNull() && extreme1!=extreme2){
+        BeamPtr beam(new Beam(extreme1,extreme2,m_materialsManager,name,this));
+        extreme1->addConnectedBeam(beam);
+        extreme2->addConnectedBeam(beam);
+        beam->setSize(size);
+        beam->setMaterial(materialID);
         m_beams.append(beam);
         connect(beam.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
         connect(beam.data(),SIGNAL(parametersChanged()),this,SLOT(update()));

@@ -57,6 +57,7 @@ public:
 
     virtual BeamPtr createBeam(JointPtr extreme1,JointPtr extreme2,QSizeF size,qreal E,
                                qreal G, qreal d,QString name=QString())=0;
+    virtual BeamPtr createBeam(JointPtr extreme1,JointPtr extreme2,QSizeF size,QString materialID,QString name=QString())=0;
     virtual JointPtr createJoint(QVector3D position,QString name=QString(),
                                bool  support_X=false,bool support_Y=false,bool support_Z=false,
                                bool support_XX=false,bool support_YY=false,bool support_ZZ=false )=0;
