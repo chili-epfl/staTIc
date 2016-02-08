@@ -7,6 +7,7 @@
 #include "statics/elements/abstractelement.h"
 #include "materialsmanager.h"
 #include <QDebug>
+
 class Joint;
 typedef QSharedPointer<Joint> JointPtr;
 typedef QWeakPointer<Joint> WeakJointPtr;
@@ -52,6 +53,8 @@ public:
     QList<QVector4D> stress_segments(){return m_stress_segments;}
     void setStressSegment(QList<QVector4D> segments){m_stress_segments=segments;emit segmentsChanged();}
 
+    QString materialID(){return m_materialId;}
+    void setMaterial(QString uniqueID);
 
     /*Splitting stuff*/
     QList<QWeakPointer<Beam> > subParts(){return m_sub_parts;}
@@ -71,6 +74,7 @@ signals:
     void hasBeenUnified();
     void segmentsChanged();
 
+    void materialChanged();
 private:
 
     /*THES ARE NOT SETTERS*/
@@ -145,7 +149,7 @@ private:
     m_C;    /*Torsion Shear Constant*/
 
     MaterialsManager* m_materialsManager;
-
+    QString m_materialId;
 };
 
 typedef QSharedPointer<Beam> BeamPtr;

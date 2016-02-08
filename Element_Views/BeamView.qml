@@ -10,6 +10,9 @@ Entity{
 
     readonly property string type: "beam"
 
+    property string materialID
+
+
     property bool visible:  applicationRoot.currentViewFilter=='BEAM'
                             && backgroundsubtraction.entropy < .10
                             && (infobox.current_item == null || infobox.current_item == rootEntity) ? true : false

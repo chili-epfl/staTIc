@@ -32,7 +32,8 @@ Beam::Beam(JointPtr extreme1, JointPtr extreme2,MaterialsManager* mm,QString nam
     m_d(0),
     m_Sy(0),
     m_Sz(0),
-    m_C(0)
+    m_C(0),
+    m_materialId()
 {
     m_extreme1=extreme1;
     m_extreme2=extreme2;
@@ -69,6 +70,30 @@ void Beam::setEnable(bool enable){
     if(m_enable!=enable){
         m_enable=enable;
         emit enableChanged(m_enable);
+    }
+}
+
+void Beam::setMaterial(QString uniqueID)
+{
+    if(m_materialId==uniqueID) return;
+    if(m_materialsManager!=Q_NULLPTR){
+        QVariant g,young,density;
+        g=m_materialsManager->get(uniqueID,"G");
+        young=m_materialsManager->get(uniqueID,"Young");
+        density=m_materialsManager->get(uniqueID,"Density");
+        if(g.isNull() || young.isNull() || density.isNull()){
+            //Set defaults
+        }
+        else {
+           setDensity(density.toDouble());
+           setYoungModulus(young.toDouble());
+           setShearModulus(g.toDouble());
+           emit materialChanged();
+        }
+    }
+    else{
+        qDebug()<<"Set default material";
+        //set default material
     }
 }
 
