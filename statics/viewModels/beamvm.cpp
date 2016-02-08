@@ -23,6 +23,10 @@ BeamVM::BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     connect(m_beam.data(),SIGNAL(hasBeenSplit()),this,SLOT(onBeamSplit()));
     connect(m_beam.data(),SIGNAL(segmentsChanged()),this,SLOT(onSegmentsChanged()));
 
+    /*Material*/
+    connect(m_component3D,SIGNAL(materialIDChanged()),this,SLOT(onMaterialChangedVMSide()));
+    /*Size*/
+    connect(m_component3D,SIGNAL(beamSizeChanged()),this,SLOT(onBeamSizeChangedVMSide()));
 }
 BeamVM::~BeamVM(){
     if(m_component3D)
@@ -43,6 +47,7 @@ void BeamVM::initView(){
     m_component3D->setProperty("extreme1",extreme1.toStrongRef()->scaledPosition());
     m_component3D->setProperty("extreme2",extreme2.toStrongRef()->scaledPosition());
     m_component3D->setProperty("beamSize",beam_str_ref->scaledSize());
+    m_component3D->setProperty("materialID",beam_str_ref->materialID());
 
     onBeamAxialStressChanged();
     onSegmentsChanged();
@@ -104,6 +109,23 @@ void BeamVM::onSegmentsChanged(){
        QVector4List segments= beam_str_ref->stress_segments();
        m_component3D->setProperty("segments",QVariant::fromValue(segments));
     }
+}
+
+void BeamVM::onMaterialChangedVMSide()
+{
+    BeamPtr beam_str_ref=m_beam.toStrongRef();
+    if(!beam_str_ref.isNull() && m_component3D!=Q_NULLPTR){
+        beam_str_ref->setMaterial(m_component3D->property("materialID").toString());
+    }
+}
+
+void BeamVM::onBeamSizeChangedVMSide()
+{
+    BeamPtr beam_str_ref=m_beam.toStrongRef();
+    if(!beam_str_ref.isNull() && m_component3D!=Q_NULLPTR){
+        beam_str_ref->setSize(m_component3D->property("beamSize").toSizeF());
+    }
+
 }
 
 
