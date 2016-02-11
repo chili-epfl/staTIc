@@ -1,0 +1,7 @@
+UniqueID:material1;
+Name:lorenzo;
+Density:0.50e-9;
+Price:1;
+Young:20000;
+G:1250;
+TextureImage:test.png
