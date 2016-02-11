@@ -45,7 +45,7 @@ Entity {
 
     property real equilibrium_distance: currentForce.length()/maxForce.length();
 
-    property int scaleFactor: (Math.log(Math.max(Math.abs(maxForce.x),Math.abs(maxForce.y),Math.abs(maxForce.z)))/Math.LN10) >= 1 ?
+    property int scaleFactor: (Math.log(Math.max(Math.abs(maxForce.x),Math.abs(maxForce.y),Math.abs(maxForce.z)))/Math.LN10) > 1 ?
                                Math.pow(10,Math.floor(Math.log(Math.max(Math.abs(maxForce.x),Math.abs(maxForce.y),Math.abs(maxForce.z)))/Math.LN10))
                               :
                               1

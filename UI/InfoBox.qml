@@ -34,6 +34,7 @@ Rectangle {
     onCurrent_itemChanged: {
         if(applicationRoot.currentViewFilter=='DESIGNER'){
             state="designer"
+            loader.item.current_item=Qt.binding(function(){return current_item})
         }
         else if(current_item != null){
             if(applicationRoot.currentViewFilter=='BEAM' && current_item.type==="beam"){
@@ -75,7 +76,7 @@ Rectangle {
     Loader{
         id:loader
         anchors.fill:parent
-        onLoaded: item.current_item=current_item
+        onLoaded: item.current_item=Qt.binding(function(){return current_item})
         onSourceChanged: console.log(source)
     }
 

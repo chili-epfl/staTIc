@@ -4,7 +4,7 @@ import QtQuick 2.0 as QQ2
 
 Entity{
     id:root
-    property bool visible:  parent.visible
+    property bool visible:  parent!=null ? parent.visible : false
 
     property vector3d extreme1 //Always the joint extreme
     property vector3d extreme2
