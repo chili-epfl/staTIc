@@ -1,6 +1,7 @@
 #include "frame3ddvmmanager.h"
 #include "../viewModels/beamvm.h"
 #include "../viewModels/jointvm.h"
+#include "../viewModels/trapezoidalforcevm.h"
 Frame3DDVMManager::Frame3DDVMManager(QObject* parent):
     AbstractVMManager(parent),
     m_staticsModule(Q_NULLPTR)
@@ -25,7 +26,6 @@ void Frame3DDVMManager::initViewModels(){
     Q_FOREACH(BeamPtr beam,m_staticsModule->beams()){
         createBeamVM(beam);
     }
-    connect(m_staticsModule,SIGNAL(updated()),this,SLOT(updateScaleFactors()));
 }
 
 BeamVM* Frame3DDVMManager::createBeamVM(BeamPtr b){
@@ -42,8 +42,6 @@ BeamVM* Frame3DDVMManager::createBeamVM(BeamPtr b){
     return Q_NULLPTR;
 }
 
-
-
 JointVM* Frame3DDVMManager::createJointVM(JointPtr j){
     if(!j.isNull()){
         JointVM* jointVm=new JointVM(j,m_sceneRoot,this);
@@ -58,6 +56,24 @@ JointVM* Frame3DDVMManager::createJointVM(JointPtr j){
     return Q_NULLPTR;
 }
 
+
+void Frame3DDVMManager::produceTPZForce(Qt3DCore::QEntity *parentEntity)
+{
+    if(parentEntity==Q_NULLPTR) return;
+    if(!m_Entity3D2ViewModel.contains(parentEntity)) return;
+    AbstractElementViewModel* avm= m_Entity3D2ViewModel[parentEntity];
+    BeamVM* beam_vm=qobject_cast<BeamVM*>(avm);
+    if(beam_vm==Q_NULLPTR || beam_vm->beam().isNull()) return;
+    TrapezoidalForcePtr trpForce=m_staticsModule->createTPZLoad(QVector3D(0,-1,0),beam_vm->beam().toStrongRef(),
+                                                                QVector3D(0,0,0),QVector3D(0.5,0,0));
+    TrapezoidalForceVM* tpzForceVM=new TrapezoidalForceVM(trpForce,m_sceneRoot,parentEntity,this);
+    Q_FOREACH(Qt3DCore::QEntity* e,tpzForceVM->getEntities()){
+        m_Entity3D2ViewModel[e]=tpzForceVM;
+        m_entityID2Entity3D[e->id()]=e;
+    }
+    connect(tpzForceVM,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDestroyed(QObject*)));
+    connect(tpzForceVM,SIGNAL(resourcesUpdated()),this,SLOT(onResourcesUpdate()));
+}
 
 Qt3DCore::QEntity* Frame3DDVMManager::getEntity3D(Qt3DCore::QNodeId id){
     if(m_entityID2Entity3D.contains(id))
@@ -75,6 +91,8 @@ AbstractElementViewModel* Frame3DDVMManager::getAssociatedVM(Qt3DCore::QEntity* 
     if(!m_Entity3D2ViewModel.contains(e)) return Q_NULLPTR;
     return m_Entity3D2ViewModel[e];
 }
+
+
 
 void Frame3DDVMManager::onResourceDestroyed(QObject * o){
     Q_FOREACH(Qt3DCore::QEntity* e, m_Entity3D2ViewModel.keys()){

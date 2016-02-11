@@ -6,6 +6,7 @@
 #include <QUrl>
 #include "elements/abstractelement.h"
 #include "materialsmanager.h"
+
 class Joint;
 typedef QSharedPointer<Joint> JointPtr;
 class Beam;
@@ -16,9 +17,12 @@ class UniformlyDistributedLoad;
 typedef QSharedPointer<UniformlyDistributedLoad> UniformlyDistributedLoadPtr;
 class InteriorPointLoad;
 typedef QSharedPointer<InteriorPointLoad> InteriorPointLoadPtr;
+class TrapezoidalForce;
+typedef QSharedPointer<TrapezoidalForce> TrapezoidalForcePtr;
 
 typedef QSharedPointer<AbstractElement> AbstractElementPtr;
 typedef QWeakPointer<AbstractElement> WeakAbstractElementPtr;
+
 
 class AbstractStaticsModule : public QObject
 {
@@ -64,11 +68,14 @@ public:
     virtual NodeLoadPtr createNodeLoad(QVector3D force, JointPtr joint,QString name=QString())=0;
     virtual UniformlyDistributedLoadPtr createUDLoad(QVector3D force, BeamPtr beam,QString name=QString())=0;
     virtual InteriorPointLoadPtr createIPLoad(QVector3D force, BeamPtr beam,qreal distance=-1,QString name=QString())=0;
+    virtual TrapezoidalForcePtr createTPZLoad(QVector3D force, BeamPtr beam,QVector3D begin,QVector3D end,QString name=QString())=0;
+
     virtual void removeBeam(BeamPtr)=0;
     virtual void removeJoint(JointPtr)=0;
     virtual void removeNodeLoad(NodeLoadPtr)=0;
     virtual void removeUDLoad(UniformlyDistributedLoadPtr)=0;
     virtual void removeIPLoad(InteriorPointLoadPtr)=0;
+    virtual void removeTPZLoad(TrapezoidalForcePtr)=0;
 
     virtual bool splitBeam(BeamPtr beam, qreal offset,JointPtr &new_joint)=0;
     virtual bool unifyBeam(BeamPtr beam)=0;

@@ -20,8 +20,10 @@ public:
     virtual qreal minForce(){return m_minForce;}
 
     //virtual Force* createForce(QVector3D applicationPoint, QVector3D force_vector, AbstractElement* applicationElement=Q_NULLPTR);
+    /*TODO: REMOVE*/
     virtual BeamPtr createBeam(JointPtr extreme1,JointPtr extreme2,QSizeF size,qreal E,
                                qreal G, qreal d,QString name=QString());
+
     virtual BeamPtr createBeam(JointPtr extreme1,JointPtr extreme2,QSizeF size,QString materialID,QString name=QString());
 
     virtual JointPtr createJoint(QVector3D position,QString name=QString(),
@@ -30,11 +32,13 @@ public:
     virtual NodeLoadPtr createNodeLoad(QVector3D force, JointPtr joint,QString name=QString());
     virtual UniformlyDistributedLoadPtr createUDLoad(QVector3D force, BeamPtr beam,QString name=QString());
     virtual InteriorPointLoadPtr createIPLoad(QVector3D force, BeamPtr beam,qreal distance=-1,QString name=QString());
+    virtual TrapezoidalForcePtr createTPZLoad(QVector3D force, BeamPtr beam, QVector3D begin, QVector3D end, QString name=QString());
     virtual void removeBeam(BeamPtr);
     virtual void removeJoint(JointPtr);
     virtual void removeNodeLoad(NodeLoadPtr);
     virtual void removeUDLoad(UniformlyDistributedLoadPtr);
     virtual void removeIPLoad(InteriorPointLoadPtr);
+    virtual void removeTPZLoad(TrapezoidalForcePtr);
 
     virtual bool splitBeam(BeamPtr beam, qreal offset,JointPtr &new_joint);
     virtual bool unifyBeam(BeamPtr beam);
@@ -84,6 +88,8 @@ private:
     QVector<NodeLoadPtr> m_node_loads;
     QVector<UniformlyDistributedLoadPtr> m_uniformly_distributed_loads;
     QVector<InteriorPointLoadPtr> m_interior_point_loads;
+    QList<TrapezoidalForcePtr> m_trapezoidal_loads;
+
     QVector3D m_gravity;
 
     int m_shear;
@@ -95,7 +101,7 @@ private:
     float m_minForce;
 
     qreal m_relative_equilibrium_error;
-    QTimer* m_lazyupdateTimer;
+    QTimer m_lazyupdateTimer;
 
 };
 

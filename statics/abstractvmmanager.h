@@ -7,6 +7,7 @@
 
 class BeamVM;
 class JointVM;
+class TrapezoidalForceVM;
 class AbstractElementViewModel;
 
 class AbstractVMManager : public QObject

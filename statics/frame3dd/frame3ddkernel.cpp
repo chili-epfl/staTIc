@@ -6,6 +6,7 @@
 #include "../elements/nodeload.h"
 #include "../elements/interiorpointload.h"
 #include "../elements/uniformlydistributedload.h"
+#include "../elements/trapezoidalforce.h"
 
 #include <QDebug>
 
@@ -29,21 +30,21 @@ QString readLine(QTextStream* inputStream){
     QString line;
     bool isValid=false;
     do{
-       line=inputStream->readLine();
-       if(line.isEmpty())
-           continue;
-       if(line.contains("#"))
-           line=line.split("#").at(0);
-       bool allEmpty=true;
-       Q_FOREACH(QString part, line.split(separator)){
-           if(!part.isEmpty()){
-               allEmpty=false;
-               break;
-           }
-       }
-       if(allEmpty)
-           continue;
-       isValid=true;
+        line=inputStream->readLine();
+        if(line.isEmpty())
+            continue;
+        if(line.contains("#"))
+            line=line.split("#").at(0);
+        bool allEmpty=true;
+        Q_FOREACH(QString part, line.split(separator)){
+            if(!part.isEmpty()){
+                allEmpty=false;
+                break;
+            }
+        }
+        if(allEmpty)
+            continue;
+        isValid=true;
     }while(!isValid);
     return line;
 }
@@ -55,10 +56,9 @@ Frame3DDKernel::Frame3DDKernel(QObject* parent):
     m_shear(0),
     m_geom(0)
 {
-    m_lazyupdateTimer=new QTimer(this);
-    connect(m_lazyupdateTimer, SIGNAL(timeout()), this, SLOT(solve()));
-    m_lazyupdateTimer->setSingleShot(true);
-    m_lazyupdateTimer->setInterval(300);
+    connect(&m_lazyupdateTimer, SIGNAL(timeout()), this, SLOT(solve()));
+    m_lazyupdateTimer.setSingleShot(true);
+    m_lazyupdateTimer.setInterval(300);
     m_maxForce=0;
     m_minForce=0;
 }
@@ -293,9 +293,7 @@ void Frame3DDKernel::setStatus(Status status){
 }
 
 void Frame3DDKernel::update(){
-//    if(!m_lazyupdateTimer->isActive()){
-        m_lazyupdateTimer->start();
-//    }
+    m_lazyupdateTimer.start();
 }
 /**/
 void Frame3DDKernel::solve(){
@@ -303,112 +301,112 @@ void Frame3DDKernel::solve(){
     vec3	*xyz;		// X,Y,Z node coordinates (global)
 
     float	*rj = NULL,	// node size radius, for finite sizes
-        *Ax,*Asy, *Asz,	// cross section areas, incl. shear
-        *Jx,*Iy,*Iz,	// section inertias
-        *E=NULL, *G=NULL,// elastic modulus and shear moduli
-        *p=NULL,	// roll of each member, radians
-        ***U=NULL,	// uniform distributed member loads
-        ***W=NULL,	// trapizoidal distributed member loads
-        ***P=NULL,	// member concentrated loads
-        ***T=NULL,	// member temperature  loads
-        **Dp=NULL,	// prescribed node displacements
-        *d, *EMs=NULL,	// member densities and extra inertia
-        *NMs=NULL, 	// mass of a node
-        *NMx,*NMy,*NMz,	// inertia of a node in global coord
-        gX[_NL_],	// gravitational acceleration in global X
-        gY[_NL_],	// gravitational acceleration in global Y
-        gZ[_NL_];	// gravitational acceleration in global Z
-/*
+            *Ax,*Asy, *Asz,	// cross section areas, incl. shear
+            *Jx,*Iy,*Iz,	// section inertias
+            *E=NULL, *G=NULL,// elastic modulus and shear moduli
+            *p=NULL,	// roll of each member, radians
+            ***U=NULL,	// uniform distributed member loads
+            ***W=NULL,	// trapizoidal distributed member loads
+            ***P=NULL,	// member concentrated loads
+            ***T=NULL,	// member temperature  loads
+            **Dp=NULL,	// prescribed node displacements
+            *d, *EMs=NULL,	// member densities and extra inertia
+            *NMs=NULL, 	// mass of a node
+            *NMx,*NMy,*NMz,	// inertia of a node in global coord
+            gX[_NL_],	// gravitational acceleration in global X
+            gY[_NL_],	// gravitational acceleration in global Y
+            gZ[_NL_];	// gravitational acceleration in global Z
+    /*
         pan=1.0,	// >0: pan during animation; 0: don't
         scale=1.0,	// zoom scale for 3D plotting in Gnuplot
         dx=1.0;		// x-increment for internal force data
 */
     double	**K=NULL,	// equilibrium stiffness matrix
-        // **Ks=NULL,	// Broyden secant stiffness matrix
-        traceK = 0.0,	// trace of the global stiffness matrix
-        **M = NULL,	// global mass matrix
-        traceM = 0.0,	// trace of the global mass matrix
-        ***eqF_mech=NULL,// equivalent end forces from mech loads global
-        ***eqF_temp=NULL,// equivalent end forces from temp loads global
-        **F_mech=NULL,	// mechanical load vectors, all load cases
-        **F_temp=NULL,	// thermal load vectors, all load cases
-        *F  = NULL, 	// total load vectors for a load case
-        *R  = NULL,	// total reaction force vector
-        *dR = NULL,	// incremental reaction force vector
-        *D  = NULL,	// displacement vector
-        *dD = NULL,	// incremental displacement vector
-        //dDdD = 0.0,	// dD' * dD
-        *dF = NULL,	// equilibrium error in nonlinear anlys
-        *L  = NULL,	// node-to-node length of each element
-        *Le = NULL,	// effcve lngth, accounts for node size
-        **Q = NULL,	// local member node end-forces
-        tol = 1.0e-9,	// tolerance for modal convergence
-        shift = 0.0,	// shift-factor for rigid-body-modes
-        struct_mass,	// mass of structural system
-        total_mass,	// total structural mass and extra mass
-        *f  = NULL,	// resonant frequencies
-        **V = NULL,	// resonant mode-shapesIf singleShot is true, the timer will be activated only once.
-        rms_resid=1.0,	// root mean square of residual displ. error
-        error = 1.0,	// rms equilibrium error and reactions
-        Cfreq = 0.0,	// frequency used for Guyan condensation
-        **Kc, **Mc,	// condensed stiffness and mass matrices
-        exagg_static=10,// exaggerate static displ. in mesh data
-        exagg_modal=10;	// exaggerate modal displ. in mesh data
+            // **Ks=NULL,	// Broyden secant stiffness matrix
+            traceK = 0.0,	// trace of the global stiffness matrix
+            **M = NULL,	// global mass matrix
+            traceM = 0.0,	// trace of the global mass matrix
+            ***eqF_mech=NULL,// equivalent end forces from mech loads global
+            ***eqF_temp=NULL,// equivalent end forces from temp loads global
+            **F_mech=NULL,	// mechanical load vectors, all load cases
+            **F_temp=NULL,	// thermal load vectors, all load cases
+            *F  = NULL, 	// total load vectors for a load case
+            *R  = NULL,	// total reaction force vector
+            *dR = NULL,	// incremental reaction force vector
+            *D  = NULL,	// displacement vector
+            *dD = NULL,	// incremental displacement vector
+            //dDdD = 0.0,	// dD' * dD
+            *dF = NULL,	// equilibrium error in nonlinear anlys
+            *L  = NULL,	// node-to-node length of each element
+            *Le = NULL,	// effcve lngth, accounts for node size
+            **Q = NULL,	// local member node end-forces
+            tol = 1.0e-9,	// tolerance for modal convergence
+            shift = 0.0,	// shift-factor for rigid-body-modes
+            struct_mass,	// mass of structural system
+            total_mass,	// total structural mass and extra mass
+            *f  = NULL,	// resonant frequencies
+            **V = NULL,	// resonant mode-shapesIf singleShot is true, the timer will be activated only once.
+            rms_resid=1.0,	// root mean square of residual displ. error
+            error = 1.0,	// rms equilibrium error and reactions
+            Cfreq = 0.0,	// frequency used for Guyan condensation
+            **Kc, **Mc,	// condensed stiffness and mass matrices
+            exagg_static=10,// exaggerate static displ. in mesh data
+            exagg_modal=10;	// exaggerate modal displ. in mesh data
 
-        // peak internal forces, moments, and displacments
-        // in each frame element and each load case
+    // peak internal forces, moments, and displacments
+    // in each frame element and each load case
     double	**pkNx, **pkVy, **pkVz, **pkTx, **pkMy, **pkMz,
-        **pkDx, **pkDy, **pkDz, **pkRx, **pkSy, **pkSz;
+            **pkDx, **pkDy, **pkDz, **pkRx, **pkSy, **pkSz;
 
     int	nN=0,		// number of Nodes
-        nE=0,		// number of frame Elements
-        nL=0, lc=0,	// number of Load cases
-        DoF=0, i, j,	// number of Degrees of Freedom
-        nR=0,		// number of restrained nodes
-        nD[_NL_],	// number of prescribed nodal displ'nts
-        nF[_NL_],	// number of loaded nodes
-        nU[_NL_],	// number of members w/ unifm dist loads
-        nW[_NL_],	// number of members w/ trapz dist loads
-        nP[_NL_],	// number of members w/ conc point loads
-        nT[_NL_],	// number of members w/ temp. changes
-        nI=0,		// number of nodes w/ extra inertia
-        nX=0,		// number of elemts w/ extra mass
-        nC=0,		// number of condensed nodes
-        *N1, *N2,	// begin and end node numbers
-        shear=0,	// indicates shear deformation
-        geom=0,		// indicates  geometric nonlinearity
-        anlyz=1,	// 1: stiffness analysis, 0: data check
-        *q=NULL,*r=NULL,sumR,	// reaction data, total no. of reactions
-        nM=0,		// number of desired modes
-        Mmethod,	// 1: Subspace Jacobi, 2: Stodola
-        nM_calc,	// number of modes to calculate
-        lump=1,		// 1: lumped, 0: consistent mass matrix
-        iter=0,		// number of iterations
-        ok=1,		// number of (-ve) diag. terms of L D L'
-        anim[128],	// the modes to be animated
-        Cdof=0,		// number of condensed degrees o freedom
-        Cmethod=0,	// matrix condensation method
-        *c=NULL,	// vector of DoF's to condense
-        *m=NULL;	// vector of modes to condense
+            nE=0,		// number of frame Elements
+            nL=0, lc=0,	// number of Load cases
+            DoF=0, i, j,	// number of Degrees of Freedom
+            nR=0,		// number of restrained nodes
+            nD[_NL_],	// number of prescribed nodal displ'nts
+            nF[_NL_],	// number of loaded nodes
+            nU[_NL_],	// number of members w/ unifm dist loads
+            nW[_NL_],	// number of members w/ trapz dist loads
+            nP[_NL_],	// number of members w/ conc point loads
+            nT[_NL_],	// number of members w/ temp. changes
+            nI=0,		// number of nodes w/ extra inertia
+            nX=0,		// number of elemts w/ extra mass
+            nC=0,		// number of condensed nodes
+            *N1, *N2,	// begin and end node numbers
+            shear=0,	// indicates shear deformation
+            geom=0,		// indicates  geometric nonlinearity
+            anlyz=1,	// 1: stiffness analysis, 0: data check
+            *q=NULL,*r=NULL,sumR,	// reaction data, total no. of reactions
+            nM=0,		// number of desired modes
+            Mmethod,	// 1: Subspace Jacobi, 2: Stodola
+            nM_calc,	// number of modes to calculate
+            lump=1,		// 1: lumped, 0: consistent mass matrix
+            iter=0,		// number of iterations
+            ok=1,		// number of (-ve) diag. terms of L D L'
+            anim[128],	// the modes to be animated
+            Cdof=0,		// number of condensed degrees o freedom
+            Cmethod=0,	// matrix condensation method
+            *c=NULL,	// vector of DoF's to condense
+            *m=NULL;	// vector of modes to condense
 
     double	exagg_flag=-1.0, // over-ride input file value
-        tol_flag  =-1.0, // over-ride input file value
-        shift_flag=-1.0; // over-ride input file value
+            tol_flag  =-1.0, // over-ride input file value
+            shift_flag=-1.0; // over-ride input file value
 
     float	pan_flag = -1.0; // over-ride input file value
 
     char	extn[16];	// Input Data file name extension
 
 
-/*    parse_options ( argc, argv, IN_file, OUT_file,
+    /*    parse_options ( argc, argv, IN_file, OUT_file,
             &shear_flag, &geom_flag, &anlyz_flag, &exagg_flag,
             &D3_flag,
             &lump_flag, &modal_flag, &tol_flag, &shift_flag,
             &pan_flag, &write_matrix, &axial_sign, &condense_flag,
             &verbose, &debug);
 */
-/*    if ( verbose ) { /*  display program name, version and license type */
-/*        textColor('w','b','b','x');
+    /*    if ( verbose ) { /*  display program name, version and license type */
+    /*        textColor('w','b','b','x');
         fprintf(stdout,"\n FRAME3DD version: %s\n", VERSION);
         fprintf(stdout," Analysis of 2D and 3D structural frames with elastic and geometric stiffness.\n");
         fprintf(stdout," http://frame3dd.sf.net\n");
@@ -420,8 +418,8 @@ void Frame3DDKernel::solve(){
 
     /* open the input data file */
 
-/*    if ((fp = fopen (IN_file, "r")) == NULL) { /* open input data file */
- /*       sprintf (errMsg,"\n ERROR: cannot open input data file '%s'\n", IN_file);
+    /*    if ((fp = fopen (IN_file, "r")) == NULL) { /* open input data file */
+    /*       sprintf (errMsg,"\n ERROR: cannot open input data file '%s'\n", IN_file);
         errorMsg(errMsg);
         display_help();
         if ( argc == 1 ) {
@@ -434,21 +432,21 @@ void Frame3DDKernel::solve(){
 
     filetype = get_file_ext( IN_file, extn ); /* .CSV or .FMM or other? */
 
-//	temp_file_location("frame3dd.3dd",strippedInputFile,FRAME3DD_PATHMAX);
-//    output_path("frame3dd.3dd",strippedInputFile,FRAME3DD_PATHMAX,NULL);
-/*
+    //	temp_file_location("frame3dd.3dd",strippedInputFile,FRAME3DD_PATHMAX);
+    //    output_path("frame3dd.3dd",strippedInputFile,FRAME3DD_PATHMAX,NULL);
+    /*
     parse_input(fp, strippedInputFile);	/* strip comments from input data */
-//    fclose(fp);
+    //    fclose(fp);
 
-//    if ((fp = fopen (strippedInputFile, "r")) == NULL) { /* open stripped input file */
-//        sprintf(errMsg,"\n ERROR: cannot open stripped input data file '%s'\n", strippedInputFile);
-/*        errorMsg(errMsg);
+    //    if ((fp = fopen (strippedInputFile, "r")) == NULL) { /* open stripped input file */
+    //        sprintf(errMsg,"\n ERROR: cannot open stripped input data file '%s'\n", strippedInputFile);
+    /*        errorMsg(errMsg);
         exit(13);
     }
 
     frame3dd_getline(fp, title, MAXL);
     if ( verbose ) {	/*  display analysis title */
-/*        textColor('w','g','b','x');
+    /*        textColor('w','g','b','x');
         fprintf(stdout,"\n");
         fprintf(stdout," ** %s ** \n", title );
         color(0);
@@ -458,14 +456,14 @@ void Frame3DDKernel::solve(){
 
     nN=m_joints.size();
 
-//    sfrv=fscanf(fp, "%d", &nN );		/* number of nodes	*/
-//    if (sfrv != 1)	sferr("nN value for number of nodes");
-//    if ( verbose ) {	/* display nN */
-//        fprintf(stdout," number of nodes ");
-//        dots(stdout,36);	fprintf(stdout," nN =%4d ",nN);
-//    }
+    //    sfrv=fscanf(fp, "%d", &nN );		/* number of nodes	*/
+    //    if (sfrv != 1)	sferr("nN value for number of nodes");
+    //    if ( verbose ) {	/* display nN */
+    //        fprintf(stdout," number of nodes ");
+    //        dots(stdout,36);	fprintf(stdout," nN =%4d ",nN);
+    //    }
 
-                    /* allocate memory for node data ... */
+    /* allocate memory for node data ... */
     rj  =  vector(1,nN);		/* rigid radius around each node */
     xyz = (vec3 *)malloc(sizeof(vec3)*(1+nN));	/* node coordinates */
 
@@ -513,7 +511,7 @@ void Frame3DDKernel::solve(){
 
     nE=active_beams.size();
 
-                   /* allocate memory for frame elements ... */
+    /* allocate memory for frame elements ... */
     L   = dvector(1,nE);	/* length of each element		*/
     Le  = dvector(1,nE);	/* effective length of each element	*/
 
@@ -564,7 +562,7 @@ void Frame3DDKernel::solve(){
 
     nL=1;//NuMBER OF CASES...IN OUR CASE JUST 1
 
-                    /* allocate memory for loads ... */
+    /* allocate memory for loads ... */
     U   =  D3matrix(1,nL,1,nE,1,4);    /* uniform load on each member */
     W   =  D3matrix(1,nL,1,10*nE,1,13);/* trapezoidal load on each member */
     P   =  D3matrix(1,nL,1,10*nE,1,5); /* internal point load each member */
@@ -613,18 +611,18 @@ void Frame3DDKernel::solve(){
     pkSz = dmatrix(1,nL,1,nE);
 
     assemble_loads( nN, nE, nL, DoF, xyz, L, Le, N1, N2,
-            Ax,Asy,Asz, Iy,Iz, E, G, p,
-            d, gX, gY, gZ, r, shear,
-            nF, nU, nW, nP, nT, nD,
-            Q, F_temp, F_mech, F, U, W, P, T,
-            Dp, eqF_mech, eqF_temp,active_beams );
+                    Ax,Asy,Asz, Iy,Iz, E, G, p,
+                    d, gX, gY, gZ, r, shear,
+                    nF, nU, nW, nP, nT, nD,
+                    Q, F_temp, F_mech, F, U, W, P, T,
+                    Dp, eqF_mech, eqF_temp,active_beams );
 
     total_mass = struct_mass = 0.0;
     nM=0;
     Cmethod = nC = Cdof = 0;
 
-     srand(time(NULL));
-     for (lc=1; lc<=nL; lc++) {	/* begin load case analysis loop */
+    srand(time(NULL));
+    for (lc=1; lc<=nL; lc++) {	/* begin load case analysis loop */
 
         /*  initialize displacements and displ. increment to {0}  */
         /*  initialize reactions     and react. increment to {0}  */
@@ -635,8 +633,8 @@ void Frame3DDKernel::solve(){
 
         /*  elastic stiffness matrix  [K({D}^(i))], {D}^(0)={0} (i=0) */
         assemble_K ( K, DoF, nE, xyz, rj, L, Le, N1, N2,
-                    Ax, Asy, Asz, Jx,Iy,Iz, E, G, p,
-                    shear, geom, Q, 0 );
+                     Ax, Asy, Asz, Jx,Iy,Iz, E, G, p,
+                     shear, geom, Q, 0 );
 
         /* first apply temperature loads only, if there are any ... */
         if (nT[lc] > 0) {
@@ -649,15 +647,15 @@ void Frame3DDKernel::solve(){
             for (i=1; i<=DoF; i++)	if (r[i]) R[i] += dR[i];
 
             if (geom) {	/* assemble K = Ke + Kg */
-             /* compute   {Q}={Q_t} ... temp.-induced forces     */
-             element_end_forces ( Q, nE, xyz, L, Le, N1,N2,
-                Ax, Asy,Asz, Jx,Iy,Iz, E,G, p,
-                eqF_temp[lc], eqF_mech[lc], D, shear, geom );
+                /* compute   {Q}={Q_t} ... temp.-induced forces     */
+                element_end_forces ( Q, nE, xyz, L, Le, N1,N2,
+                                     Ax, Asy,Asz, Jx,Iy,Iz, E,G, p,
+                                     eqF_temp[lc], eqF_mech[lc], D, shear, geom );
 
-             /* assemble temp.-stressed stiffness [K({D_t})]     */
-             assemble_K ( K, DoF, nE, xyz, rj, L, Le, N1, N2,
-                        Ax,Asy,Asz, Jx,Iy,Iz, E, G, p,
-                        shear,geom, Q, 0 );
+                /* assemble temp.-stressed stiffness [K({D_t})]     */
+                assemble_K ( K, DoF, nE, xyz, rj, L, Le, N1, N2,
+                             Ax,Asy,Asz, Jx,Iy,Iz, E, G, p,
+                             shear,geom, Q, 0 );
             }
         }
 
@@ -686,8 +684,8 @@ void Frame3DDKernel::solve(){
 
         /*  element forces {Q} for displacements {D}	*/
         element_end_forces ( Q, nE, xyz, L, Le, N1,N2,
-                Ax, Asy,Asz, Jx,Iy,Iz, E,G, p,
-                eqF_temp[lc], eqF_mech[lc], D, shear, geom );
+                             Ax, Asy,Asz, Jx,Iy,Iz, E,G, p,
+                             eqF_temp[lc], eqF_mech[lc], D, shear, geom );
 
         /*  check the equilibrium error	*/
         error = equilibrium_error ( dF, F, K, D, DoF, q,r );
@@ -700,8 +698,8 @@ void Frame3DDKernel::solve(){
 
             /*  assemble stiffness matrix [K({D}^(i))]	      */
             assemble_K ( K, DoF, nE, xyz, rj, L, Le, N1, N2,
-                Ax,Asy,Asz, Jx,Iy,Iz, E, G, p,
-                shear,geom, Q, 0 );
+                         Ax,Asy,Asz, Jx,Iy,Iz, E, G, p,
+                         shear,geom, Q, 0 );
 
             /*  compute equilibrium error, {dF}, at iteration i   */
             /*  {dF}^(i) = {F} - [K({D}^(i))]*{D}^(i)	      */
@@ -725,8 +723,8 @@ void Frame3DDKernel::solve(){
 
             /*  element forces {Q} for displacements {D}^(i)      */
             element_end_forces ( Q, nE, xyz, L, Le, N1,N2,
-                Ax, Asy,Asz, Jx,Iy,Iz, E,G, p,
-                eqF_temp[lc], eqF_mech[lc], D, shear, geom );
+                                 Ax, Asy,Asz, Jx,Iy,Iz, E,G, p,
+                                 eqF_temp[lc], eqF_mech[lc], D, shear, geom );
 
         }			/* end quasi Newton-Raphson iteration */
 
@@ -739,19 +737,19 @@ void Frame3DDKernel::solve(){
         // if ( geom )	free_dmatrix(Ks, 1, DoF, 1, DoF );
 
         write_internal_forces ( lc, nL, 10, xyz,
-                    Q, nN, nE, L, N1, N2,
-                    Ax, Asy, Asz, Jx, Iy, Iz, E, G, p,
-                    d, gX[lc], gY[lc], gZ[lc],
-                    nU[lc],U[lc],nW[lc],W[lc],nP[lc],P[lc],
-                    D, shear, error );
+                                Q, nN, nE, L, N1, N2,
+                                Ax, Asy, Asz, Jx, Iy, Iz, E, G, p,
+                                d, gX[lc], gY[lc], gZ[lc],
+                                nU[lc],U[lc],nW[lc],W[lc],nP[lc],P[lc],
+                                D, shear, error );
 
-//        static_mesh ( IN_file, infcpath, meshpath, plotpath, title,
-//                    nN, nE, nL, lc, DoF,
-//                    xyz, L, N1,N2, p, D,
-//                    exagg_static, D3_flag, anlyz,
-//                    dx, scale );
+        //        static_mesh ( IN_file, infcpath, meshpath, plotpath, title,
+        //                    nN, nE, nL, lc, DoF,
+        //                    xyz, L, N1,N2, p, D,
+        //                    exagg_static, D3_flag, anlyz,
+        //                    dx, scale );
 
-     } /* end load case loop */
+    } /* end load case loop */
 
 
     if ( nM > 0 ) { /* carry out modal analysis */
@@ -764,15 +762,15 @@ void Frame3DDKernel::solve(){
 
     /* deallocate memory used for each frame analysis variable */
     deallocate ( nN, nE, nL, nF, nU, nW, nP, nT, DoF, nM,
-            xyz, rj, L, Le, N1, N2, q,r,
-            Ax, Asy, Asz, Jx, Iy, Iz, E, G, p,
-            U,W,P,T, Dp, F_mech, F_temp,
-            eqF_mech, eqF_temp, F, dF,
-            K, Q, D, dD, R, dR,
-            d,EMs,NMs,NMx,NMy,NMz, M,f,V, c, m,
-            pkNx, pkVy, pkVz, pkTx, pkMy, pkMz,
-            pkDx, pkDy, pkDz, pkRx, pkSy, pkSz
-    );
+                 xyz, rj, L, Le, N1, N2, q,r,
+                 Ax, Asy, Asz, Jx, Iy, Iz, E, G, p,
+                 U,W,P,T, Dp, F_mech, F_temp,
+                 eqF_mech, eqF_temp, F, dF,
+                 K, Q, D, dD, R, dR,
+                 d,EMs,NMs,NMx,NMy,NMz, M,f,V, c, m,
+                 pkNx, pkVy, pkVz, pkTx, pkMy, pkMz,
+                 pkDx, pkDy, pkDz, pkRx, pkSy, pkSz
+                 );
 
 }
 
@@ -785,44 +783,44 @@ void Frame3DDKernel::write_internal_forces (
         float *d, float gX, float gY, float gZ,
         int nU, float **U, int nW, float **W, int nP, float **P,
         double *D, int shear, double error
-){
+        ){
     double	t1, t2, t3, t4, t5, t6, t7, t8, t9, /* coord transformation */
-        u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12; /* displ. */
+            u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12; /* displ. */
 
     double	xx1,xx2, wx1,wx2,	/* trapz load data, local x dir */
-        xy1,xy2, wy1,wy2,	/* trapz load data, local y dir */
-        xz1,xz2, wz1,wz2;	/* trapz load data, local z dir */
+            xy1,xy2, wy1,wy2,	/* trapz load data, local y dir */
+            xz1,xz2, wz1,wz2;	/* trapz load data, local z dir */
 
     double	wx=0, wy=0, wz=0, // distributed loads in local coords at x[i]
-        wx_=0,wy_=0,wz_=0,// distributed loads in local coords at x[i-1]
-        wxg=0,wyg=0,wzg=0,// gravity loads in local x, y, z coord's
-        tx=0.0, tx_=0.0;  // distributed torque about local x coord
+            wx_=0,wy_=0,wz_=0,// distributed loads in local coords at x[i-1]
+            wxg=0,wyg=0,wzg=0,// gravity loads in local x, y, z coord's
+            tx=0.0, tx_=0.0;  // distributed torque about local x coord
 
     double	xp;		/* location of internal point loads	*/
 
     double	*x, dx_, dxnx,	/* distance along frame element		*/
-        *Nx,		/* axial force within frame el.		*/
-        *Vy, *Vz,	/* shear forces within frame el.	*/
-        *Tx,		/* torsional moment within frame el.	*/
-        *My, *Mz, 	/* bending moments within frame el.	*/
-        *Sy, *Sz,	/* transverse slopes of frame el.	*/
-        *Dx, *Dy, *Dz,	/* frame el. displ. in local x,y,z, dir's */
-        *Rx;		/* twist rotation about the local x-axis */
+            *Nx,		/* axial force within frame el.		*/
+            *Vy, *Vz,	/* shear forces within frame el.	*/
+            *Tx,		/* torsional moment within frame el.	*/
+            *My, *Mz, 	/* bending moments within frame el.	*/
+            *Sy, *Sz,	/* transverse slopes of frame el.	*/
+            *Dx, *Dy, *Dz,	/* frame el. displ. in local x,y,z, dir's */
+            *Rx;		/* twist rotation about the local x-axis */
 
     double	maxNx, maxVy, maxVz, 	/*  maximum internal forces	*/
-        maxTx, maxMy, maxMz,	/*  maximum internal moments	*/
-        maxDx, maxDy, maxDz,	/*  maximum element displacements */
-        maxRx, maxSy, maxSz;	/*  maximum element rotations	*/
+            maxTx, maxMy, maxMz,	/*  maximum internal moments	*/
+            maxDx, maxDy, maxDz,	/*  maximum element displacements */
+            maxRx, maxSy, maxSz;	/*  maximum element rotations	*/
 
     double	minNx, minVy, minVz, 	/*  minimum internal forces	*/
-        minTx, minMy, minMz,	/*  minimum internal moments	*/
-        minDx, minDy, minDz,	/*  minimum element displacements */
-        minRx, minSy, minSz;	/*  minimum element rotations	*/
+            minTx, minMy, minMz,	/*  minimum internal moments	*/
+            minDx, minDy, minDz,	/*  minimum element displacements */
+            minRx, minSy, minSz;	/*  minimum element rotations	*/
 
     int	n, m,		/* frame element number			*/
-        cU=0, cW=0, cP=0, /* counters for U, W, and P loads	*/
-        i, nx,		/* number of sections alont x axis	*/
-        n1,n2,i1,i2;	/* starting and stopping node no's	*/
+            cU=0, cW=0, cP=0, /* counters for U, W, and P loads	*/
+            i, nx,		/* number of sections alont x axis	*/
+            n1,n2,i1,i2;	/* starting and stopping node no's	*/
 
     if (dx == -1.0)	return;	// skip calculation of internal forces and displ
 
@@ -833,7 +831,7 @@ void Frame3DDKernel::write_internal_forces (
         nx = floor(L[m]/dx);	// number of x-axis increments
         if (nx < 1) nx = 1;	// at least one x-axis increment
 
-    // allocate memory for interior force data for frame element "m"
+        // allocate memory for interior force data for frame element "m"
         x  = dvector(0,nx);
         Nx = dvector(0,nx);
         Vy = dvector(0,nx);
@@ -849,16 +847,16 @@ void Frame3DDKernel::write_internal_forces (
         Dz = dvector(0,nx);
 
 
-    // the local x-axis for frame element "m" starts at 0 and ends at L[m]
+        // the local x-axis for frame element "m" starts at 0 and ends at L[m]
         for (i=0; i<nx; i++)	x[i] = i*dx;
         x[nx] = L[m];
         dxnx = x[nx]-x[nx-1];	// length of the last x-axis increment
 
 
-    // find interior axial force, shear forces, torsion and bending moments
+        // find interior axial force, shear forces, torsion and bending moments
 
         coord_trans ( xyz, L[m], n1, n2,
-            &t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[m] );
+                      &t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[m] );
 
         // distributed gravity load in local x, y, z coordinates
         wxg = d[m]*Ax[m]*(t1*gX + t2*gY + t3*gZ);
@@ -901,20 +899,20 @@ void Frame3DDKernel::write_internal_forces (
             // add trapezoidally-distributed loads
             for (n=1; n<=10*nE && cW<nW; n++) {
                 if ( (int) W[n][1] == m ) { // load n on element m
-                if (i==nx) ++cW;
-                xx1 = W[n][2];  xx2 = W[n][3];
-                wx1 = W[n][4];  wx2 = W[n][5];
-                xy1 = W[n][6];  xy2 = W[n][7];
-                wy1 = W[n][8];  wy2 = W[n][9];
-                xz1 = W[n][10]; xz2 = W[n][11];
-                wz1 = W[n][12]; wz2 = W[n][13];
+                    if (i==nx) ++cW;
+                    xx1 = W[n][2];  xx2 = W[n][3];
+                    wx1 = W[n][4];  wx2 = W[n][5];
+                    xy1 = W[n][6];  xy2 = W[n][7];
+                    wy1 = W[n][8];  wy2 = W[n][9];
+                    xz1 = W[n][10]; xz2 = W[n][11];
+                    wz1 = W[n][12]; wz2 = W[n][13];
 
-                if ( x[i]>xx1 && x[i]<=xx2 )
-                    wx += wx1+(wx2-wx1)*(x[i]-xx1)/(xx2-xx1);
-                if ( x[i]>xy1 && x[i]<=xy2 )
-                    wy += wy1+(wy2-wy1)*(x[i]-xy1)/(xy2-xy1);
-                if ( x[i]>xz1 && x[i]<=xz2 )
-                    wz += wz1+(wz2-wz1)*(x[i]-xz1)/(xz2-xz1);
+                    if ( x[i]>xx1 && x[i]<=xx2 )
+                        wx += wx1+(wx2-wx1)*(x[i]-xx1)/(xx2-xx1);
+                    if ( x[i]>xy1 && x[i]<=xy2 )
+                        wy += wy1+(wy2-wy1)*(x[i]-xy1)/(xy2-xy1);
+                    if ( x[i]>xz1 && x[i]<=xz2 )
+                        wz += wz1+(wz2-wz1)*(x[i]-xz1)/(xz2-xz1);
                 }
             }
 
@@ -935,19 +933,19 @@ void Frame3DDKernel::write_internal_forces (
             // add interior point loads
             for (n=1; n<=10*nE && cP<nP; n++) {
                 if ( (int) P[n][1] == m ) { // load n on element m
-                if (i==nx) ++cP;
-                xp = P[n][5];
-                if ( x[i] <= xp && xp < x[i]+dx ) {
-                    Nx[i] -= P[n][2] * 0.5 * (1.0 - (xp-x[i])/dx);
-                    Vy[i] -= P[n][3] * 0.5 * (1.0 - (xp-x[i])/dx);
-                    Vz[i] -= P[n][4] * 0.5 * (1.0 - (xp-x[i])/dx);
+                    if (i==nx) ++cP;
+                    xp = P[n][5];
+                    if ( x[i] <= xp && xp < x[i]+dx ) {
+                        Nx[i] -= P[n][2] * 0.5 * (1.0 - (xp-x[i])/dx);
+                        Vy[i] -= P[n][3] * 0.5 * (1.0 - (xp-x[i])/dx);
+                        Vz[i] -= P[n][4] * 0.5 * (1.0 - (xp-x[i])/dx);
 
-                }
-                if ( x[i]-dx <= xp && xp < x[i] ) {
-                    Nx[i] -= P[n][2] * 0.5 * (1.0 - (x[i]-dx-xp)/dx);
-                    Vy[i] -= P[n][3] * 0.5 * (1.0 - (x[i]-dx-xp)/dx);
-                    Vz[i] -= P[n][4] * 0.5 * (1.0 - (x[i]-dx-xp)/dx);
-                }
+                    }
+                    if ( x[i]-dx <= xp && xp < x[i] ) {
+                        Nx[i] -= P[n][2] * 0.5 * (1.0 - (x[i]-dx-xp)/dx);
+                        Vy[i] -= P[n][3] * 0.5 * (1.0 - (x[i]-dx-xp)/dx);
+                        Vz[i] -= P[n][4] * 0.5 * (1.0 - (x[i]-dx-xp)/dx);
+                    }
                 }
             }
         }
@@ -972,7 +970,7 @@ void Frame3DDKernel::write_internal_forces (
             Mz[i] -= (Mz[nx]-Q[m][12]) * i/nx;
         }
 
-    // find interior transverse displacements
+        // find interior transverse displacements
 
         i1 = 6*(n1-1);	i2 = 6*(n2-1);
 
@@ -1056,13 +1054,13 @@ void Frame3DDKernel::write_internal_forces (
             Dz[i] -= (Dz[nx]-u9) * i/nx;
         }
 
-    // initialize the maximum and minimum element forces and displacements
+        // initialize the maximum and minimum element forces and displacements
         maxNx = minNx = Nx[0]; maxVy = minVy = Vy[0]; maxVz = minVz = Vz[0];  	//  maximum internal forces
         maxTx = minTx = Tx[0]; maxMy = minMy = My[0]; maxMz = minMz = Mz[0]; 	//  maximum internal moments
         maxDx = minDx = Dx[0]; maxDy = minDy = Dy[0]; maxDz = minDz = Dz[0]; 	//  maximum element displacements
         maxRx =	minRx = Rx[0]; maxSy = minSy = Sy[0]; maxSz = minSz = Sz[0];	//  maximum element rotations
 
-    // find maximum and minimum internal element forces
+        // find maximum and minimum internal element forces
         for (i=1; i<=nx; i++) {
             maxNx = (Nx[i] > maxNx) ? Nx[i] : maxNx;
             minNx = (Nx[i] < minNx) ? Nx[i] : minNx;
@@ -1079,7 +1077,7 @@ void Frame3DDKernel::write_internal_forces (
             minMz = (Mz[i] < minMz) ? Mz[i] : minMz;
         }
 
-    // find maximum and minimum internal element displacements
+        // find maximum and minimum internal element displacements
         for (i=1; i<=nx; i++) {
             maxDx = (Dx[i] > maxDx) ? Dx[i] : maxDx;
             minDx = (Dx[i] < minDx) ? Dx[i] : minDx;
@@ -1095,22 +1093,22 @@ void Frame3DDKernel::write_internal_forces (
             minSz = (Sz[i] < minSz) ? Sz[i] : minSz;
         }
 
-    // write results to the internal frame element force output data file
+        // write results to the internal frame element force output data file
         QList<QVector4D> segments;
-//        fprintf(fpif,"#.x                \tNx        \tVy        \tVz        \tTx       \tMy        \tMz        \tDx        \tDy        \tDz        \tRx\t~\n");
+        //        fprintf(fpif,"#.x                \tNx        \tVy        \tVz        \tTx       \tMy        \tMz        \tDx        \tDy        \tDz        \tRx\t~\n");
         for (i=0; i<=nx; i++) {
             segments.push_back(QVector4D(Dx[i], Dy[i], Dz[i], Rx[i]));
-//            fprintf(fpif,"%14.6e\t", x[i] );
-//            fprintf(fpif,"%14.6e\t%14.6e\t%14.6e\t",
-//                        Nx[i], Vy[i], Vz[i] );
-//            fprintf(fpif,"%14.6e\t%14.6e\t%14.6e\t",
-//                        Tx[i], My[i], Mz[i] );
-//            fprintf(fpif,"%14.6e\t%14.6e\t%14.6e\t%14.6e\n",
-//                        Dx[i], Dy[i], Dz[i], Rx[i] );
+            //            fprintf(fpif,"%14.6e\t", x[i] );
+            //            fprintf(fpif,"%14.6e\t%14.6e\t%14.6e\t",
+            //                        Nx[i], Vy[i], Vz[i] );
+            //            fprintf(fpif,"%14.6e\t%14.6e\t%14.6e\t",
+            //                        Tx[i], My[i], Mz[i] );
+            //            fprintf(fpif,"%14.6e\t%14.6e\t%14.6e\t%14.6e\n",
+            //                        Dx[i], Dy[i], Dz[i], Rx[i] );
         }
         m_beams[m-1]->setStressSegment(segments);
 
-    // free memory
+        // free memory
         free_dvector(x,0,nx);
         free_dvector(Nx,0,nx);
         free_dvector(Vy,0,nx);
@@ -1147,7 +1145,7 @@ void Frame3DDKernel::assemble_loads (
         double ***eqF_mech, // equivalent mech loads, global coord
         double ***eqF_temp, // equivalent temp loads, global coord
         QVector<BeamPtr> active_beams
-){
+        ){
     float	hy, hz;			/* section dimensions in local coords */
 
     float	x1,x2, w1,w2;
@@ -1155,334 +1153,310 @@ void Frame3DDKernel::assemble_loads (
 
     /* equivalent element end forces from distributed and thermal loads */
     double	Nx1, Vy1, Vz1, Mx1=0.0, My1=0.0, Mz1=0.0,
-        Nx2, Vy2, Vz2, Mx2=0.0, My2=0.0, Mz2=0.0;
+            Nx2, Vy2, Vz2, Mx2=0.0, My2=0.0, Mz2=0.0;
     double	Ksy, Ksz, 		/* shear deformatn coefficients	*/
-        a, b,			/* point load locations */
-        t1, t2, t3, t4, t5, t6, t7, t8, t9;	/* 3D coord Xfrm coeffs */
+            a, b,			/* point load locations */
+            t1, t2, t3, t4, t5, t6, t7, t8, t9;	/* 3D coord Xfrm coeffs */
     int	i,j,l, n, n1, n2;
 
     /* initialize load data vectors and matrices to zero */
     for (j=1; j<=DoF; j++)	Fo[j] = 0.0;
     for (j=1; j<=DoF; j++)
-            F_temp[1][j] = F_mech[1][j] = 0.0;
+        F_temp[1][j] = F_mech[1][j] = 0.0;
     for (i=1; i<=12; i++)
         for (n=1; n<=nE; n++)
-                eqF_mech[1][n][i] = eqF_temp[1][n][i] = 0.0;
+            eqF_mech[1][n][i] = eqF_temp[1][n][i] = 0.0;
 
     for (i=1; i<=DoF; i++) Dp[1][i] = 0.0;
 
     for (i=1;i<=nE;i++)	for(j=1;j<=12;j++)	Q[i][j] = 0.0;
 
 
-      /* gravity loads applied uniformly to all frame elements ------- */
-      gX[1]=m_gravity.x(); gY[1]=m_gravity.y(), gZ[1]=m_gravity.z();
+    /* gravity loads applied uniformly to all frame elements ------- */
+    gX[1]=m_gravity.x(); gY[1]=m_gravity.y(), gZ[1]=m_gravity.z();
 
-      for (n=1; n<=nE; n++) {
+    for (n=1; n<=nE; n++) {
 
         n1 = J1[n];	n2 = J2[n];
 
         coord_trans ( xyz, L[n], n1, n2,
-            &t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[n] );
+                      &t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[n] );
 
         eqF_mech[1][n][1]  = d[n]*Ax[n]*L[n]*gX[1] / 2.0;
         eqF_mech[1][n][2]  = d[n]*Ax[n]*L[n]*gY[1] / 2.0;
         eqF_mech[1][n][3]  = d[n]*Ax[n]*L[n]*gZ[1] / 2.0;
 
         eqF_mech[1][n][4]  = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
-            ( (-t4*t8+t5*t7)*gY[1] + (-t4*t9+t6*t7)*gZ[1] );
+                ( (-t4*t8+t5*t7)*gY[1] + (-t4*t9+t6*t7)*gZ[1] );
         eqF_mech[1][n][5]  = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
-            ( (-t5*t7+t4*t8)*gX[1] + (-t5*t9+t6*t8)*gZ[1] );
+                ( (-t5*t7+t4*t8)*gX[1] + (-t5*t9+t6*t8)*gZ[1] );
         eqF_mech[1][n][6]  = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
-            ( (-t6*t7+t4*t9)*gX[1] + (-t6*t8+t5*t9)*gY[1] );
+                ( (-t6*t7+t4*t9)*gX[1] + (-t6*t8+t5*t9)*gY[1] );
 
         eqF_mech[1][n][7]  = d[n]*Ax[n]*L[n]*gX[1] / 2.0;
         eqF_mech[1][n][8]  = d[n]*Ax[n]*L[n]*gY[1] / 2.0;
         eqF_mech[1][n][9]  = d[n]*Ax[n]*L[n]*gZ[1] / 2.0;
 
         eqF_mech[1][n][10] = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
-            ( ( t4*t8-t5*t7)*gY[1] + ( t4*t9-t6*t7)*gZ[1] );
+                ( ( t4*t8-t5*t7)*gY[1] + ( t4*t9-t6*t7)*gZ[1] );
         eqF_mech[1][n][11] = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
-            ( ( t5*t7-t4*t8)*gX[1] + ( t5*t9-t6*t8)*gZ[1] );
+                ( ( t5*t7-t4*t8)*gX[1] + ( t5*t9-t6*t8)*gZ[1] );
         eqF_mech[1][n][12] = d[n]*Ax[n]*L[n]*L[n] / 12.0 *
-            ( ( t6*t7-t4*t9)*gX[1] + ( t6*t8-t5*t9)*gY[1] );
+                ( ( t6*t7-t4*t9)*gX[1] + ( t6*t8-t5*t9)*gY[1] );
 
-      }					/* end gravity loads */
+    }					/* end gravity loads */
 
-      /* node point loads -------------------------------------------- */
-      nF[1]=m_node_loads.size();
+    /* node point loads -------------------------------------------- */
+    nF[1]=m_node_loads.size();
 
-      Q_FOREACH(NodeLoadPtr nodeload, m_node_loads){
-          int application_joint_index=m_joints.indexOf(nodeload->joint().toStrongRef());
-          F_mech[1][6*application_joint_index+1]+=nodeload->force().x();//I added a plus...
-          F_mech[1][6*application_joint_index+2]+=nodeload->force().y();
-          F_mech[1][6*application_joint_index+3]+=nodeload->force().z();
-          F_mech[1][6*application_joint_index+4]+=nodeload->force().x();
-          F_mech[1][6*application_joint_index+5]+=nodeload->force().y();
-          F_mech[1][6*application_joint_index+6]+=nodeload->force().z();
-      }
+    Q_FOREACH(NodeLoadPtr nodeload, m_node_loads){
+        int application_joint_index=m_joints.indexOf(nodeload->joint().toStrongRef());
+        F_mech[1][6*application_joint_index+1]+=nodeload->force().x();//I added a plus...
+        F_mech[1][6*application_joint_index+2]+=nodeload->force().y();
+        F_mech[1][6*application_joint_index+3]+=nodeload->force().z();
+        F_mech[1][6*application_joint_index+4]+=nodeload->force().x();
+        F_mech[1][6*application_joint_index+5]+=nodeload->force().y();
+        F_mech[1][6*application_joint_index+6]+=nodeload->force().z();
+    }
 
-      /* uniformly distributed loads --------------------------------- */
+    /* uniformly distributed loads --------------------------------- */
 
-      nU[1]=m_uniformly_distributed_loads.size();
+    nU[1]=m_uniformly_distributed_loads.size();
 
-      Q_FOREACH(UniformlyDistributedLoadPtr UDLoad,m_uniformly_distributed_loads){
-          int i=1;
-          int application_beam_index=active_beams.indexOf(UDLoad->beam().toStrongRef())+1;
-          if(application_beam_index<=0){
-              qDebug("UDLoad on disabled beam");
-              return ;
-          }
-          U[1][i][1] = (double) application_beam_index;
-          U[1][i][2] = UDLoad->forceLocal().x();
-          U[1][i][3] = UDLoad->forceLocal().y();
-          U[1][i][4] = UDLoad->forceLocal().z();
+    Q_FOREACH(UniformlyDistributedLoadPtr UDLoad,m_uniformly_distributed_loads){
+        int i=1;
+        int application_beam_index=active_beams.indexOf(UDLoad->beam().toStrongRef())+1;
+        if(application_beam_index<=0){
+            qDebug("UDLoad on disabled beam");
+            return ;
+        }
+        U[1][i][1] = (double) application_beam_index;
+        U[1][i][2] = UDLoad->forceLocal().x();
+        U[1][i][3] = UDLoad->forceLocal().y();
+        U[1][i][4] = UDLoad->forceLocal().z();
 
-          Nx1 = Nx2 = U[1][i][2]*Le[application_beam_index] / 2.0;
-          Vy1 = Vy2 = U[1][i][3]*Le[application_beam_index] / 2.0;
-          Vz1 = Vz2 = U[1][i][4]*Le[application_beam_index] / 2.0;
-          Mx1 = Mx2 = 0.0;
-          My1 = -U[1][i][4]*Le[application_beam_index]*Le[application_beam_index] / 12.0;	My2 = -My1;
-          Mz1 =  U[1][i][3]*Le[application_beam_index]*Le[application_beam_index] / 12.0;	Mz2 = -Mz1;
+        Nx1 = Nx2 = U[1][i][2]*Le[application_beam_index] / 2.0;
+        Vy1 = Vy2 = U[1][i][3]*Le[application_beam_index] / 2.0;
+        Vz1 = Vz2 = U[1][i][4]*Le[application_beam_index] / 2.0;
+        Mx1 = Mx2 = 0.0;
+        My1 = -U[1][i][4]*Le[application_beam_index]*Le[application_beam_index] / 12.0;	My2 = -My1;
+        Mz1 =  U[1][i][3]*Le[application_beam_index]*Le[application_beam_index] / 12.0;	Mz2 = -Mz1;
 
-          n1 = J1[application_beam_index];	n2 = J2[application_beam_index];
+        n1 = J1[application_beam_index];	n2 = J2[application_beam_index];
 
-          coord_trans ( xyz, L[application_beam_index], n1, n2,
-              &t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[application_beam_index] );
+        coord_trans ( xyz, L[application_beam_index], n1, n2,
+                      &t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[application_beam_index] );
 
-          /* {F} = [T]'{Q} */
-          eqF_mech[1][application_beam_index][1]  += ( Nx1*t1 + Vy1*t4 + Vz1*t7 );
-          eqF_mech[1][application_beam_index][2]  += ( Nx1*t2 + Vy1*t5 + Vz1*t8 );
-          eqF_mech[1][application_beam_index][3]  += ( Nx1*t3 + Vy1*t6 + Vz1*t9 );
-          eqF_mech[1][application_beam_index][4]  += ( Mx1*t1 + My1*t4 + Mz1*t7 );
-          eqF_mech[1][application_beam_index][5]  += ( Mx1*t2 + My1*t5 + Mz1*t8 );
-          eqF_mech[1][application_beam_index][6]  += ( Mx1*t3 + My1*t6 + Mz1*t9 );
+        /* {F} = [T]'{Q} */
+        eqF_mech[1][application_beam_index][1]  += ( Nx1*t1 + Vy1*t4 + Vz1*t7 );
+        eqF_mech[1][application_beam_index][2]  += ( Nx1*t2 + Vy1*t5 + Vz1*t8 );
+        eqF_mech[1][application_beam_index][3]  += ( Nx1*t3 + Vy1*t6 + Vz1*t9 );
+        eqF_mech[1][application_beam_index][4]  += ( Mx1*t1 + My1*t4 + Mz1*t7 );
+        eqF_mech[1][application_beam_index][5]  += ( Mx1*t2 + My1*t5 + Mz1*t8 );
+        eqF_mech[1][application_beam_index][6]  += ( Mx1*t3 + My1*t6 + Mz1*t9 );
 
-          eqF_mech[1][application_beam_index][7]  += ( Nx2*t1 + Vy2*t4 + Vz2*t7 );
-          eqF_mech[1][application_beam_index][8]  += ( Nx2*t2 + Vy2*t5 + Vz2*t8 );
-          eqF_mech[1][application_beam_index][9]  += ( Nx2*t3 + Vy2*t6 + Vz2*t9 );
-          eqF_mech[1][application_beam_index][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
-          eqF_mech[1][application_beam_index][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
-          eqF_mech[1][application_beam_index][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
+        eqF_mech[1][application_beam_index][7]  += ( Nx2*t1 + Vy2*t4 + Vz2*t7 );
+        eqF_mech[1][application_beam_index][8]  += ( Nx2*t2 + Vy2*t5 + Vz2*t8 );
+        eqF_mech[1][application_beam_index][9]  += ( Nx2*t3 + Vy2*t6 + Vz2*t9 );
+        eqF_mech[1][application_beam_index][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
+        eqF_mech[1][application_beam_index][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
+        eqF_mech[1][application_beam_index][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
 
-          i++;
-      }
-        /* end uniformly distributed loads */
+        i++;
+    }
+    /* end uniformly distributed loads */
 
 
-      /* trapezoidally distributed loads ----------------------------- */
-      nW[1]=0;
-      //JUST REMEBER THAT lc=1 AND THE INDEXES ARE FROM 1
-//      sfrv=fscanf(fp,"%d", &nW[lc] );
-//      if (sfrv != 1) sferr("nW value in load data");
-//      if ( verbose ) {
-//        fprintf(stdout,"  number of trapezoidally distributed loads ");
-//        dots(stdout,9);	fprintf(stdout," nW = %3d\n", nW[lc]);
-//      }
-//      if ( nW[lc] < 0 || nW[lc] > 10*nE ) {
-//        sprintf(errMsg,"\n  error: valid ranges for nW is 0 ... %d \n", 10*nE );
-//        errorMsg(errMsg);
-//        exit(140);
-//      }
-//      for (i=1; i <= nW[lc]; i++) {	/* ! local element coordinates ! */
-//        sfrv=fscanf(fp,"%d", &n );
-//        if (sfrv != 1) sferr("frame element number in trapezoidal load data");
-//        if ( n < 1 || n > nE ) {
-//            sprintf(errMsg,"\n  error in trapezoidally-distributed loads: element number %d is out of range\n",n);
-//            errorMsg(errMsg);
-//            exit(141);
-//        }
-//        W[lc][i][1] = (double) n;
-//        for (l=2; l<=13; l++) {
-//            sfrv=fscanf(fp,"%f", &W[lc][i][l] );
-//            if (sfrv != 1) sferr("value in trapezoidal load data");
-//        }
+    /* trapezoidally distributed loads ----------------------------- */
+    nW[1]=m_trapezoidal_loads.size();
+    //JUST REMEBER THAT lc=1 AND THE INDEXES ARE FROM 1
+    if ( nW[1] > 10*nE ) {
+        qWarning("Too many trapezoidal loads");
+        nW[1]=10*nE;
+    }
+    for (i=1; i <= nW[1]; i++){	/* ! local element coordinates ! */
+        TrapezoidalForcePtr trz_load=m_trapezoidal_loads[i-1];
+        //n is the idnex of the beam the force is applied on
+        n=active_beams.indexOf(trz_load->beam().toStrongRef())+1;
+        QVector3D begin,end;
+        trz_load->positionOnBeam(begin,end);
+        W[1][i][1] = (double) n;
+        W[1][i][2]=begin.x();//xx1
+        W[1][i][3]=end.x();//xx2
+        W[1][i][4]=trz_load->forceLocal().x();//wx1
+        W[1][i][5]=trz_load->forceLocal().x();//wx1
+        W[1][i][6]=begin.y();
+        W[1][i][7]=end.y();
+        W[1][i][8]=trz_load->forceLocal().y();
+        W[1][i][9]=trz_load->forceLocal().y();
+        W[1][i][10]=begin.z();
+        W[1][i][11]=end.z();
+        W[1][i][12]=trz_load->forceLocal().z();
+        W[1][i][13]=trz_load->forceLocal().z();
 
-//        Ln = L[n];
+        Ln = L[n];
 
-//        /* error checking */
+        /* error checking */
 
-//        if ( W[lc][i][ 4]==0 && W[lc][i][ 5]==0 &&
-//             W[lc][i][ 8]==0 && W[lc][i][ 9]==0 &&
-//             W[lc][i][12]==0 && W[lc][i][13]==0 ) {
-//          fprintf(stderr,"\n   Warning: All trapezoidal loads applied to frame element %d  are zero\n", n );
-//          fprintf(stderr,"     load case: %d , element %d , load %d\n ", lc, n, i );
-//        }
+        if ( W[1][i][ 4]==0 && W[1][i][ 5]==0 &&
+             W[1][i][ 8]==0 && W[1][i][ 9]==0 &&
+             W[1][i][12]==0 && W[1][i][13]==0 ) {
+            qWarning("Warning: All trapezoidal loads applied to frame element  are zero\n");
+        }
 
-//        if ( W[lc][i][ 2] < 0 ) {
-//          sprintf(errMsg,"\n   error in x-axis trapezoidal loads, load case: %d , element %d , load %d\n  starting location = %f < 0\n",
-//          lc, n, i , W[lc][i][2]);
-//          errorMsg(errMsg);
-//          exit(142);
-//        }
-//        if ( W[lc][i][ 2] > W[lc][i][3] ) {
-//          sprintf(errMsg,"\n   error in x-axis trapezoidal loads, load case: %d , element %d , load %d\n  starting location = %f > ending location = %f \n",
-//          lc, n, i , W[lc][i][2], W[lc][i][3] );
-//          errorMsg(errMsg);
-//          exit(143);
-//        }
-//        if ( W[lc][i][ 3] > Ln ) {
-//          sprintf(errMsg,"\n   error in x-axis trapezoidal loads, load case: %d , element %d , load %d\n ending location = %f > L (%f) \n",
-//          lc, n, i, W[lc][i][3], Ln );
-//          errorMsg(errMsg);
-//          exit(144);
-//        }
-//        if ( W[lc][i][ 6] < 0 ) {
-//          sprintf(errMsg,"\n   error in y-axis trapezoidal loads, load case: %d , element %d , load %d\n starting location = %f < 0\n",
-//          lc, n, i, W[lc][i][6]);
-//          errorMsg(errMsg);
-//          exit(142);
-//        }
-//        if ( W[lc][i][ 6] > W[lc][i][7] ) {
-//          sprintf(errMsg,"\n   error in y-axis trapezoidal loads, load case: %d , element %d , load %d\n starting location = %f > ending location = %f \n",
-//          lc, n, i, W[lc][i][6], W[lc][i][7] );
-//          errorMsg(errMsg);https://www.google.ch/search?client=ubuntu&channel=fs&q=Tessellation+not+supported+with+OpenGL+3+without+GL_ARB_tessellation_shader&ie=utf-8&oe=utf-8&gfe_rd=cr&ei=H0p5Vs6dLqmF8QebgIe4Cg#safe=off&channel=fs&q=%22GL_ARB_tessellation_shader%22+ubuntu+install
-//          exit(143);
-//        }
-//        if ( W[lc][i][ 7] > Ln ) {
-//          sprintf(errMsg,"\n   error in y-axis trapezoidal loads, load case: %d , element %d , load %d\n ending location = %f > L (%f) \n",
-//          lc, n, i, W[lc][i][7],Ln );
-//          errorMsg(errMsg);
-//          exit(144);
-//        }
-//        if ( W[lc][i][10] < 0 ) {
-//          sprintf(errMsg,"\n   error in z-axis trapezoidal loads, load case: %d , element %d , load %d\n starting location = %f < 0\n",
-//          lc, n, i, W[lc][i][10]);
-//          errorMsg(errMsg);
-//          exit(142);
-//        }
-//        if ( W[lc][i][10] > W[lc][i][11] ) {
-//          sprintf(errMsg,"\n   error in z-axis trapezoidal loads, load case: %d , element %d , load %d\n starting location = %f > ending location = %f \n",
-//          lc, n, i, W[lc][i][10], W[lc][i][11] );
-//          errorMsg(errMsg);
-//          exit(143);
-//        }
-//        if ( W[lc][i][11] > Ln ) {
-//          sprintf(errMsg,"\n   error in z-axis trapezoidal loads, load case: %d , element %d , load %d\n ending location = %f > L (%f) \n",lc, n, i, W[lc][i][11], Ln );
-//          errorMsg(errMsg);
-//          exit(144);
-//        }
+        if ( W[1][i][ 2] < 0 ) {
+            qWarning("  error in trapezoidal loads");
 
-//        if ( shear ) {
-//            Ksy = (12.0*E[n]*Iz[n]) / (G[n]*Asy[n]*Le[n]*Le[n]);
-//            Ksz = (12.0*E[n]*Iy[n]) / (G[n]*Asz[n]*Le[n]*Le[n]);
-//        } else	Ksy = Ksz = 0.0;
+        }
+        if ( W[1][i][ 2] > W[1][i][3] ) {
+            qWarning("error in trapezoidal loads");
+        }
+        if ( W[1][i][ 3] > Ln ) {
+            qWarning("  error in trapezoidal loads");
 
-//        /* x-axis trapezoidal loads (along the frame element length) */
-//        x1 =  W[lc][i][2]; x2 =  W[lc][i][3];
-//        w1 =  W[lc][i][4]; w2 =  W[lc][i][5];
+        }
+        if ( W[1][i][ 6] < 0 ) {
+            qWarning("  error in trapezoidal loads");
 
-//        Nx1 = ( 3.0*(w1+w2)*Ln*(x2-x1) - (2.0*w2+w1)*x2*x2 + (w2-w1)*x2*x1 + (2.0*w1+w2)*x1*x1 ) / (6.0*Ln);
-//        Nx2 = ( -(2.0*w1+w2)*x1*x1 + (2.0*w2+w1)*x2*x2  - (w2-w1)*x1*x2 ) / ( 6.0*Ln );
+        }
+        if ( W[1][i][ 6] > W[1][i][7] ) {
+            qWarning("  error in trapezoidal loads");
+        }
+        if ( W[1][i][ 7] > Ln ) {
+            qWarning("  error in trapezoidal loads");
+        }
+        if ( W[1][i][10] < 0 ) {
+            qWarning("  error in trapezoidal loads");
+        }
+        if ( W[1][i][10] > W[1][i][11] ) {
+            qWarning("  error in trapezoidal loads");
+        }
+        if ( W[1][i][11] > Ln ) {
+            qWarning("  error in trapezoidal loads");
 
-//        /* y-axis trapezoidal loads (across the frame element length) */
-//        x1 =  W[lc][i][6];  x2 = W[lc][i][7];
-//        w1 =  W[lc][i][8]; w2 =  W[lc][i][9];
+        }
 
-//        R1o = ( (2.0*w1+w2)*x1*x1 - (w1+2.0*w2)*x2*x2 +
-//             3.0*(w1+w2)*Ln*(x2-x1) - (w1-w2)*x1*x2 ) / (6.0*Ln);
-//        R2o = ( (w1+2.0*w2)*x2*x2 + (w1-w2)*x1*x2 -
-//            (2.0*w1+w2)*x1*x1 ) / (6.0*Ln);
+        if ( shear ) {
+            Ksy = (12.0*E[n]*Iz[n]) / (G[n]*Asy[n]*Le[n]*Le[n]);
+            Ksz = (12.0*E[n]*Iy[n]) / (G[n]*Asz[n]*Le[n]*Le[n]);
+        } else	Ksy = Ksz = 0.0;
 
-//        f01 = (  3.0*(w2+4.0*w1)*x1*x1*x1*x1 -  3.0*(w1+4.0*w2)*x2*x2*x2*x2
-//              - 15.0*(w2+3.0*w1)*Ln*x1*x1*x1 + 15.0*(w1+3.0*w2)*Ln*x2*x2*x2
-//              -  3.0*(w1-w2)*x1*x2*(x1*x1 + x2*x2)
-//              + 20.0*(w2+2.0*w1)*Ln*Ln*x1*x1 - 20.0*(w1+2.0*w2)*Ln*Ln*x2*x2
-//              + 15.0*(w1-w2)*Ln*x1*x2*(x1+x2)
-//              -  3.0*(w1-w2)*x1*x1*x2*x2 - 20.0*(w1-w2)*Ln*Ln*x1*x2 ) / 360.0;
+        /* x-axis trapezoidal loads (along the frame element length) */
+        x1 =  W[1][i][2]; x2 =  W[1][i][3];
+        w1 =  W[1][i][4]; w2 =  W[1][i][5];
 
-//        f02 = (  3.0*(w2+4.0*w1)*x1*x1*x1*x1 - 3.0*(w1+4.0*w2)*x2*x2*x2*x2
-//              -  3.0*(w1-w2)*x1*x2*(x1*x1+x2*x2)
-//              - 10.0*(w2+2.0*w1)*Ln*Ln*x1*x1 + 10.0*(w1+2.0*w2)*Ln*Ln*x2*x2
-//              -  3.0*(w1-w2)*x1*x1*x2*x2 + 10.0*(w1-w2)*Ln*Ln*x1*x2 ) / 360.0;
+        Nx1 = ( 3.0*(w1+w2)*Ln*(x2-x1) - (2.0*w2+w1)*x2*x2 + (w2-w1)*x2*x1 + (2.0*w1+w2)*x1*x1 ) / (6.0*Ln);
+        Nx2 = ( -(2.0*w1+w2)*x1*x1 + (2.0*w2+w1)*x2*x2  - (w2-w1)*x1*x2 ) / ( 6.0*Ln );
 
-//        Mz1 = -( 4.0*f01 + 2.0*f02 + Ksy*(f01 - f02) ) / ( Ln*Ln*(1.0+Ksy) );
-//        Mz2 = -( 2.0*f01 + 4.0*f02 - Ksy*(f01 - f02) ) / ( Ln*Ln*(1.0+Ksy) );
+        /* y-axis trapezoidal loads (across the frame element length) */
+        x1 =  W[1][i][6];  x2 = W[1][i][7];
+        w1 =  W[1][i][8]; w2 =  W[1][i][9];
 
-//        Vy1 =  R1o + Mz1/Ln + Mz2/Ln;
-//        Vy2 =  R2o - Mz1/Ln - Mz2/Ln;
+        R1o = ( (2.0*w1+w2)*x1*x1 - (w1+2.0*w2)*x2*x2 +
+                3.0*(w1+w2)*Ln*(x2-x1) - (w1-w2)*x1*x2 ) / (6.0*Ln);
+        R2o = ( (w1+2.0*w2)*x2*x2 + (w1-w2)*x1*x2 -
+                (2.0*w1+w2)*x1*x1 ) / (6.0*Ln);
 
-//        /* z-axis trapezoidal loads (across the frame element length) */
-//        x1 =  W[lc][i][10]; x2 =  W[lc][i][11];
-//        w1 =  W[lc][i][12]; w2 =  W[lc][i][13];
+        f01 = (  3.0*(w2+4.0*w1)*x1*x1*x1*x1 -  3.0*(w1+4.0*w2)*x2*x2*x2*x2
+                 - 15.0*(w2+3.0*w1)*Ln*x1*x1*x1 + 15.0*(w1+3.0*w2)*Ln*x2*x2*x2
+                 -  3.0*(w1-w2)*x1*x2*(x1*x1 + x2*x2)
+                 + 20.0*(w2+2.0*w1)*Ln*Ln*x1*x1 - 20.0*(w1+2.0*w2)*Ln*Ln*x2*x2
+                 + 15.0*(w1-w2)*Ln*x1*x2*(x1+x2)
+                 -  3.0*(w1-w2)*x1*x1*x2*x2 - 20.0*(w1-w2)*Ln*Ln*x1*x2 ) / 360.0;
 
-//        R1o = ( (2.0*w1+w2)*x1*x1 - (w1+2.0*w2)*x2*x2 +
-//             3.0*(w1+w2)*Ln*(x2-x1) - (w1-w2)*x1*x2 ) / (6.0*Ln);
-//        R2o = ( (w1+2.0*w2)*x2*x2 + (w1-w2)*x1*x2 -
-//            (2.0*w1+w2)*x1*x1 ) / (6.0*Ln);
+        f02 = (  3.0*(w2+4.0*w1)*x1*x1*x1*x1 - 3.0*(w1+4.0*w2)*x2*x2*x2*x2
+                 -  3.0*(w1-w2)*x1*x2*(x1*x1+x2*x2)
+                 - 10.0*(w2+2.0*w1)*Ln*Ln*x1*x1 + 10.0*(w1+2.0*w2)*Ln*Ln*x2*x2
+                 -  3.0*(w1-w2)*x1*x1*x2*x2 + 10.0*(w1-w2)*Ln*Ln*x1*x2 ) / 360.0;
 
-//        f01 = (  3.0*(w2+4.0*w1)*x1*x1*x1*x1 -  3.0*(w1+4.0*w2)*x2*x2*x2*x2
-//              - 15.0*(w2+3.0*w1)*Ln*x1*x1*x1 + 15.0*(w1+3.0*w2)*Ln*x2*x2*x2
-//              -  3.0*(w1-w2)*x1*x2*(x1*x1 + x2*x2)
-//              + 20.0*(w2+2.0*w1)*Ln*Ln*x1*x1 - 20.0*(w1+2.0*w2)*Ln*Ln*x2*x2
-//              + 15.0*(w1-w2)*Ln*x1*x2*(x1+x2)
-//              -  3.0*(w1-w2)*x1*x1*x2*x2 - 20.0*(w1-w2)*Ln*Ln*x1*x2 ) / 360.0;
+        Mz1 = -( 4.0*f01 + 2.0*f02 + Ksy*(f01 - f02) ) / ( Ln*Ln*(1.0+Ksy) );
+        Mz2 = -( 2.0*f01 + 4.0*f02 - Ksy*(f01 - f02) ) / ( Ln*Ln*(1.0+Ksy) );
 
-//        f02 = (  3.0*(w2+4.0*w1)*x1*x1*x1*x1 - 3.0*(w1+4.0*w2)*x2*x2*x2*x2
-//              -  3.0*(w1-w2)*x1*x2*(x1*x1+x2*x2)
-//              - 10.0*(w2+2.0*w1)*Ln*Ln*x1*x1 + 10.0*(w1+2.0*w2)*Ln*Ln*x2*x2
-//              -  3.0*(w1-w2)*x1*x1*x2*x2 + 10.0*(w1-w2)*Ln*Ln*x1*x2 ) / 360.0;
+        Vy1 =  R1o + Mz1/Ln + Mz2/Ln;
+        Vy2 =  R2o - Mz1/Ln - Mz2/Ln;
 
-//        My1 = ( 4.0*f01 + 2.0*f02 + Ksz*(f01 - f02) ) / ( Ln*Ln*(1.0+Ksz) );
-//        My2 = ( 2.0*f01 + 4.0*f02 - Ksz*(f01 - f02) ) / ( Ln*Ln*(1.0+Ksz) );
+        /* z-axis trapezoidal loads (across the frame element length) */
+        x1 =  W[1][i][10]; x2 =  W[1][i][11];
+        w1 =  W[1][i][12]; w2 =  W[1][i][13];
 
-//        Vz1 =  R1o - My1/Ln - My2/Ln;
-//        Vz2 =  R2o + My1/Ln + My2/Ln;
+        R1o = ( (2.0*w1+w2)*x1*x1 - (w1+2.0*w2)*x2*x2 +
+                3.0*(w1+w2)*Ln*(x2-x1) - (w1-w2)*x1*x2 ) / (6.0*Ln);
+        R2o = ( (w1+2.0*w2)*x2*x2 + (w1-w2)*x1*x2 -
+                (2.0*w1+w2)*x1*x1 ) / (6.0*Ln);
 
-//        /* debugging ... check internal force values
-//        printf("n=%d\n Nx1=%9.3f\n Nx2=%9.3f\n Vy1=%9.3f\n Vy2=%9.3f\n Vz1=%9.3f\n Vz2=%9.3f\n My1=%9.3f\n My2=%9.3f\n Mz1=%9.3f\n Mz2=%9.3f\n",
-//                n, Nx1,Nx2,Vy1,Vy2,Vz1,Vz2, My1,My2,Mz1,Mz2 );
-//        */
+        f01 = (  3.0*(w2+4.0*w1)*x1*x1*x1*x1 -  3.0*(w1+4.0*w2)*x2*x2*x2*x2
+                 - 15.0*(w2+3.0*w1)*Ln*x1*x1*x1 + 15.0*(w1+3.0*w2)*Ln*x2*x2*x2
+                 -  3.0*(w1-w2)*x1*x2*(x1*x1 + x2*x2)
+                 + 20.0*(w2+2.0*w1)*Ln*Ln*x1*x1 - 20.0*(w1+2.0*w2)*Ln*Ln*x2*x2
+                 + 15.0*(w1-w2)*Ln*x1*x2*(x1+x2)
+                 -  3.0*(w1-w2)*x1*x1*x2*x2 - 20.0*(w1-w2)*Ln*Ln*x1*x2 ) / 360.0;
 
-//        n1 = J1[n];	n2 = J2[n];
+        f02 = (  3.0*(w2+4.0*w1)*x1*x1*x1*x1 - 3.0*(w1+4.0*w2)*x2*x2*x2*x2
+                 -  3.0*(w1-w2)*x1*x2*(x1*x1+x2*x2)
+                 - 10.0*(w2+2.0*w1)*Ln*Ln*x1*x1 + 10.0*(w1+2.0*w2)*Ln*Ln*x2*x2
+                 -  3.0*(w1-w2)*x1*x1*x2*x2 + 10.0*(w1-w2)*Ln*Ln*x1*x2 ) / 360.0;
 
-//        coord_trans ( xyz, Ln, n1, n2,
-//            &t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[n] );
+        My1 = ( 4.0*f01 + 2.0*f02 + Ksz*(f01 - f02) ) / ( Ln*Ln*(1.0+Ksz) );
+        My2 = ( 2.0*f01 + 4.0*f02 - Ksz*(f01 - f02) ) / ( Ln*Ln*(1.0+Ksz) );
 
-//        /* debugging ... check coordinate transformation coefficients
-//        printf("t1=%5.2f t2=%5.2f t3=%5.2f \n", t1, t2, t3 );
-//        printf("t4=%5.2f t5=%5.2f t6=%5.2f \n", t4, t5, t6 );
-//        printf("t7=%5.2f t8=%5.2f t9=%5.2f \n", t7, t8, t9 );
-//        */
+        Vz1 =  R1o - My1/Ln - My2/Ln;
+        Vz2 =  R2o + My1/Ln + My2/Ln;
 
-//        /* {F} = [T]'{Q} */
-//        eqF_mech[lc][n][1]  += ( Nx1*t1 + Vy1*t4 + Vz1*t7 );
-//        eqF_mech[lc][n][2]  += ( Nx1*t2 + Vy1*t5 + Vz1*t8 );
-//        eqF_mech[lc][n][3]  += ( Nx1*t3 + Vy1*t6 + Vz1*t9 );
-//        eqF_mech[lc][n][4]  += ( Mx1*t1 + My1*t4 + Mz1*t7 );
-//        eqF_mech[lc][n][5]  += ( Mx1*t2 + My1*t5 + Mz1*t8 );
-//        eqF_mech[lc][n][6]  += ( Mx1*t3 + My1*t6 + Mz1*t9 );
+        /* debugging ... check internal force values
+        printf("n=%d\n Nx1=%9.3f\n Nx2=%9.3f\n Vy1=%9.3f\n Vy2=%9.3f\n Vz1=%9.3f\n Vz2=%9.3f\n My1=%9.3f\n My2=%9.3f\n Mz1=%9.3f\n Mz2=%9.3f\n",
+                n, Nx1,Nx2,Vy1,Vy2,Vz1,Vz2, My1,My2,Mz1,Mz2 );
+        */
 
-//        eqF_mech[lc][n][7]  += ( Nx2*t1 + Vy2*t4 + Vz2*t7 );
-//        eqF_mech[lc][n][8]  += ( Nx2*t2 + Vy2*t5 + Vz2*t8 );
-//        eqF_mech[lc][n][9]  += ( Nx2*t3 + Vy2*t6 + Vz2*t9 );
-//        eqF_mech[lc][n][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
-//        eqF_mech[lc][n][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
-//        eqF_mech[lc][n][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
+        n1 = J1[n];	n2 = J2[n];
 
-//        /* debugging ... check eqF data
-//        for (l=1;l<=13;l++) printf(" %9.2e ", W[lc][i][l] );
-//        printf("\n");
-//        printf("n=%d ", n);
-//        for (l=1;l<=12;l++) {
-//            if (eqF_mech[lc][n][l] != 0)
-//               printf(" eqF %d = %9.3f ", l, eqF_mech[lc][n][l] );
-//        }
-//        printf("\n");
-//        */
-//      }			/* end trapezoidally distributed loads */
+        coord_trans ( xyz, Ln, n1, n2,
+                      &t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[n] );
 
-      /* internal element point loads -------------------------------- */
-      nP[1]=m_interior_point_loads.size();
-      if ( nP[1] > 10*nE ) {
+        /* debugging ... check coordinate transformation coefficients
+        printf("t1=%5.2f t2=%5.2f t3=%5.2f \n", t1, t2, t3 );
+        printf("t4=%5.2f t5=%5.2f t6=%5.2f \n", t4, t5, t6 );
+        printf("t7=%5.2f t8=%5.2f t9=%5.2f \n", t7, t8, t9 );
+        */
+
+        /* {F} = [T]'{Q} */
+        eqF_mech[1][n][1]  += ( Nx1*t1 + Vy1*t4 + Vz1*t7 );
+        eqF_mech[1][n][2]  += ( Nx1*t2 + Vy1*t5 + Vz1*t8 );
+        eqF_mech[1][n][3]  += ( Nx1*t3 + Vy1*t6 + Vz1*t9 );
+        eqF_mech[1][n][4]  += ( Mx1*t1 + My1*t4 + Mz1*t7 );
+        eqF_mech[1][n][5]  += ( Mx1*t2 + My1*t5 + Mz1*t8 );
+        eqF_mech[1][n][6]  += ( Mx1*t3 + My1*t6 + Mz1*t9 );
+
+        eqF_mech[1][n][7]  += ( Nx2*t1 + Vy2*t4 + Vz2*t7 );
+        eqF_mech[1][n][8]  += ( Nx2*t2 + Vy2*t5 + Vz2*t8 );
+        eqF_mech[1][n][9]  += ( Nx2*t3 + Vy2*t6 + Vz2*t9 );
+        eqF_mech[1][n][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
+        eqF_mech[1][n][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
+        eqF_mech[1][n][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
+
+        /* debugging ... check eqF data
+        for (l=1;l<=13;l++) printf(" %9.2e ", W[1][i][l] );
+        printf("\n");
+        printf("n=%d ", n);
+        for (l=1;l<=12;l++) {
+            if (eqF_mech[1][n][l] != 0)
+               printf(" eqF %d = %9.3f ", l, eqF_mech[1][n][l] );
+        }
+        printf("\n");
+        */
+    }			/* end trapezoidally distributed loads */
+
+    /* internal element point loads -------------------------------- */
+    nP[1]=m_interior_point_loads.size();
+    if ( nP[1] > 10*nE ) {
         qDebug("Invalid number of concentrated frame element point loads");
         return;
-      }
-      for (i=1; i <= nP[1]; i++) {	/* ! local element coordinates ! */
+    }
+    for (i=1; i <= nP[1]; i++) {	/* ! local element coordinates ! */
         InteriorPointLoadPtr ipl=m_interior_point_loads.at(i-1);
         n=active_beams.indexOf(ipl->beam().toStrongRef())+1;
         if ( n <= 0 ) {
-           qDebug("Error in internal point loads: wrong beam reference");
-           return;
+            qDebug("Error in internal point loads: wrong beam reference");
+            return;
         }
         P[1][i][1] = (double) n;
         P[1][i][2] = ipl->forceLocal().x();
@@ -1508,31 +1482,31 @@ void Frame3DDKernel::assemble_loads (
         Nx2 = P[1][i][2]*b/Ln;
 
         Vy1 = (1./(1.+Ksz))    * P[1][i][3]*b*b*(3.*a + b) / ( Ln*Ln*Ln ) +
-            (Ksz/(1.+Ksz)) * P[1][i][3]*b/Ln;
+                (Ksz/(1.+Ksz)) * P[1][i][3]*b/Ln;
         Vy2 = (1./(1.+Ksz))    * P[1][i][3]*a*a*(3.*b + a) / ( Ln*Ln*Ln ) +
-            (Ksz/(1.+Ksz)) * P[1][i][3]*a/Ln;
+                (Ksz/(1.+Ksz)) * P[1][i][3]*a/Ln;
 
         Vz1 = (1./(1.+Ksy))    * P[1][i][4]*b*b*(3.*a + b) / ( Ln*Ln*Ln ) +
-            (Ksy/(1.+Ksy)) * P[1][i][4]*b/Ln;
+                (Ksy/(1.+Ksy)) * P[1][i][4]*b/Ln;
         Vz2 = (1./(1.+Ksy))    * P[1][i][4]*a*a*(3.*b + a) / ( Ln*Ln*Ln ) +
-            (Ksy/(1.+Ksy)) * P[1][i][4]*a/Ln;
+                (Ksy/(1.+Ksy)) * P[1][i][4]*a/Ln;
 
         Mx1 = Mx2 = 0.0;
 
         My1 = -(1./(1.+Ksy))  * P[1][i][4]*a*b*b / ( Ln*Ln ) -
-            (Ksy/(1.+Ksy))* P[1][i][4]*a*b   / (2.*Ln);
+                (Ksy/(1.+Ksy))* P[1][i][4]*a*b   / (2.*Ln);
         My2 =  (1./(1.+Ksy))  * P[1][i][4]*a*a*b / ( Ln*Ln ) +
-            (Ksy/(1.+Ksy))* P[1][i][4]*a*b   / (2.*Ln);
+                (Ksy/(1.+Ksy))* P[1][i][4]*a*b   / (2.*Ln);
 
         Mz1 =  (1./(1.+Ksz))  * P[1][i][3]*a*b*b / ( Ln*Ln ) +
-            (Ksz/(1.+Ksz))* P[1][i][3]*a*b   / (2.*Ln);
+                (Ksz/(1.+Ksz))* P[1][i][3]*a*b   / (2.*Ln);
         Mz2 = -(1./(1.+Ksz))  * P[1][i][3]*a*a*b / ( Ln*Ln ) -
-            (Ksz/(1.+Ksz))* P[1][i][3]*a*b   / (2.*Ln);
+                (Ksz/(1.+Ksz))* P[1][i][3]*a*b   / (2.*Ln);
 
         n1 = J1[n];	n2 = J2[n];
 
         coord_trans ( xyz, Ln, n1, n2,
-            &t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[n] );
+                      &t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[n] );
 
         /* {F} = [T]'{Q} */
         eqF_mech[1][n][1]  += ( Nx1*t1 + Vy1*t4 + Vz1*t7 );
@@ -1548,96 +1522,96 @@ void Frame3DDKernel::assemble_loads (
         eqF_mech[1][n][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
         eqF_mech[1][n][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
         eqF_mech[1][n][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
-      }					/* end element point loads */
+    }					/* end element point loads */
 
-      /* thermal loads ----------------------------------------------- */
-      nT[1]=0;
+    /* thermal loads ----------------------------------------------- */
+    nT[1]=0;
 
-//      for (i=1; i <= nT[lc]; i++) {	/* ! local element coordinates ! */
-//        sfrv=fscanf(fp,"%d", &n );
-//        if (sfrv != 1) sferr("frame element number in temperature load data");
-//        if ( n < 1 || n > nE ) {
-//            sprintf(errMsg,"\n  error in temperature loads: frame element number %d is out of range\n",n);
-//            errorMsg(errMsg);
-//            exit(161);
-//        }
-//        T[lc][i][1] = (double) n;
-//        for (l=2; l<=8; l++) {
-//            sfrv=fscanf(fp,"%f", &T[lc][i][l] );
-//            if (sfrv != 1) sferr("value in temperature load data");
-//        }
-//        a  = T[lc][i][2];
-//        hy = T[lc][i][3];
-//        hz = T[lc][i][4];
+    //      for (i=1; i <= nT[1]; i++) {	/* ! local element coordinates ! */
+    //        sfrv=fscanf(fp,"%d", &n );
+    //        if (sfrv != 1) sferr("frame element number in temperature load data");
+    //        if ( n < 1 || n > nE ) {
+    //            sprintf(errMsg,"\n  error in temperature loads: frame element number %d is out of range\n",n);
+    //            errorMsg(errMsg);
+    //            exit(161);
+    //        }
+    //        T[lc][i][1] = (double) n;
+    //        for (l=2; l<=8; l++) {
+    //            sfrv=fscanf(fp,"%f", &T[lc][i][l] );
+    //            if (sfrv != 1) sferr("value in temperature load data");
+    //        }
+    //        a  = T[lc][i][2];
+    //        hy = T[lc][i][3];
+    //        hz = T[lc][i][4];
 
-//        if ( hy < 0 || hz < 0 ) {
-//            sprintf(errMsg,"\n  error in thermal load data: section dimension < 0\n   Frame element number: %d  hy: %f  hz: %f\n", n,hy,hz);
-//            errorMsg(errMsg);
-//            exit(162);
-//        }
+    //        if ( hy < 0 || hz < 0 ) {
+    //            sprintf(errMsg,"\n  error in thermal load data: section dimension < 0\n   Frame element number: %d  hy: %f  hz: %f\n", n,hy,hz);
+    //            errorMsg(errMsg);
+    //            exit(162);
+    //        }
 
-//        Nx2 = a*(1.0/4.0)*( T[lc][i][5]+T[lc][i][6]+T[lc][i][7]+T[lc][i][8])*E[n]*Ax[n];
-//        Nx1 = -Nx2;
-//        Vy1 = Vy2 = Vz1 = Vz2 = 0.0;
-//        Mx1 = Mx2 = 0.0;
-//        My1 =  (a/hz)*(T[lc][i][8]-T[lc][i][7])*E[n]*Iy[n];
-//        My2 = -My1;
-//        Mz1 =  (a/hy)*(T[lc][i][5]-T[lc][i][6])*E[n]*Iz[n];
-//        Mz2 = -Mz1;
+    //        Nx2 = a*(1.0/4.0)*( T[lc][i][5]+T[lc][i][6]+T[lc][i][7]+T[lc][i][8])*E[n]*Ax[n];
+    //        Nx1 = -Nx2;
+    //        Vy1 = Vy2 = Vz1 = Vz2 = 0.0;
+    //        Mx1 = Mx2 = 0.0;
+    //        My1 =  (a/hz)*(T[lc][i][8]-T[lc][i][7])*E[n]*Iy[n];
+    //        My2 = -My1;
+    //        Mz1 =  (a/hy)*(T[lc][i][5]-T[lc][i][6])*E[n]*Iz[n];
+    //        Mz2 = -Mz1;
 
-//        n1 = J1[n];	n2 = J2[n];
+    //        n1 = J1[n];	n2 = J2[n];
 
-//        coord_trans ( xyz, L[n], n1, n2,
-//            &t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[n] );
+    //        coord_trans ( xyz, L[n], n1, n2,
+    //            &t1, &t2, &t3, &t4, &t5, &t6, &t7, &t8, &t9, p[n] );
 
-//        /* {F} = [T]'{Q} */
-//        eqF_temp[lc][n][1]  += ( Nx1*t1 + Vy1*t4 + Vz1*t7 );
-//        eqF_temp[lc][n][2]  += ( Nx1*t2 + Vy1*t5 + Vz1*t8 );
-//        eqF_temp[lc][n][3]  += ( Nx1*t3 + Vy1*t6 + Vz1*t9 );
-//        eqF_temp[lc][n][4]  += ( Mx1*t1 + My1*t4 + Mz1*t7 );
-//        eqF_temp[lc][n][5]  += ( Mx1*t2 + My1*t5 + Mz1*t8 );
-//        eqF_temp[lc][n][6]  += ( Mx1*t3 + My1*t6 + Mz1*t9 );
+    //        /* {F} = [T]'{Q} */
+    //        eqF_temp[lc][n][1]  += ( Nx1*t1 + Vy1*t4 + Vz1*t7 );
+    //        eqF_temp[lc][n][2]  += ( Nx1*t2 + Vy1*t5 + Vz1*t8 );
+    //        eqF_temp[lc][n][3]  += ( Nx1*t3 + Vy1*t6 + Vz1*t9 );
+    //        eqF_temp[lc][n][4]  += ( Mx1*t1 + My1*t4 + Mz1*t7 );
+    //        eqF_temp[lc][n][5]  += ( Mx1*t2 + My1*t5 + Mz1*t8 );
+    //        eqF_temp[lc][n][6]  += ( Mx1*t3 + My1*t6 + Mz1*t9 );
 
-//        eqF_temp[lc][n][7]  += ( Nx2*t1 + Vy2*t4 + Vz2*t7 );
-//        eqF_temp[lc][n][8]  += ( Nx2*t2 qreal distance=-1+ Vy2*t5 + Vz2*t8 );
-//        eqF_temp[lc][n][9]  += ( Nx2*t3 + Vy2*t6 + Vz2*t9 );
-//        eqF_temp[lc][n][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
-//        eqF_temp[lc][n][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
-//        eqF_temp[lc][n][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
-//      }				/* end thermal loads	*/
+    //        eqF_temp[lc][n][7]  += ( Nx2*t1 + Vy2*t4 + Vz2*t7 );
+    //        eqF_temp[lc][n][8]  += ( Nx2*t2 qreal distance=-1+ Vy2*t5 + Vz2*t8 );
+    //        eqF_temp[lc][n][9]  += ( Nx2*t3 + Vy2*t6 + Vz2*t9 );
+    //        eqF_temp[lc][n][10] += ( Mx2*t1 + My2*t4 + Mz2*t7 );
+    //        eqF_temp[lc][n][11] += ( Mx2*t2 + My2*t5 + Mz2*t8 );
+    //        eqF_temp[lc][n][12] += ( Mx2*t3 + My2*t6 + Mz2*t9 );
+    //      }				/* end thermal loads	*/
 
-      // assemble all element equivalent loads into
-      // separate load vectors for mechanical and thermal loading
-      for (n=1; n<=nE; n++) {
-         n1 = J1[n];	n2 = J2[n];
-         for (i=1; i<= 6; i++) F_mech[1][6*n1- 6+i] += eqF_mech[1][n][i];
-         for (i=7; i<=12; i++) F_mech[1][6*n2-12+i] += eqF_mech[1][n][i];
-         for (i=1; i<= 6; i++) F_temp[1][6*n1- 6+i] += eqF_temp[1][n][i];
-         for (i=7; i<=12; i++) F_temp[1][6*n2-12+i] += eqF_temp[1][n][i];
-      }
+    // assemble all element equivalent loads into
+    // separate load vectors for mechanical and thermal loading
+    for (n=1; n<=nE; n++) {
+        n1 = J1[n];	n2 = J2[n];
+        for (i=1; i<= 6; i++) F_mech[1][6*n1- 6+i] += eqF_mech[1][n][i];
+        for (i=7; i<=12; i++) F_mech[1][6*n2-12+i] += eqF_mech[1][n][i];
+        for (i=1; i<= 6; i++) F_temp[1][6*n1- 6+i] += eqF_temp[1][n][i];
+        for (i=7; i<=12; i++) F_temp[1][6*n2-12+i] += eqF_temp[1][n][i];
+    }
 
-      /* prescribed displacements ------------------------------------ */
-      nD[1]=0;
-//      sfrv=fscanf(fp,"%d", &nD[lc] );
-//      if (sfrv != 1) sferr("nD value in load data");
-//      if ( verbose ) {
-//        fprintf(stdout,"  number of prescribed displacements ");
-//        dots(stdout,16);	fprintf(stdout," nD = %3d\n", nD[lc] );
-//      }
-//      for (i=1; i <= nD[lc]; i++) {
-//        sfrv=fscanf(fp,"%d", &j);
-//        if (sfrv != 1) sferr("node number value in prescribed displacement data");
-//        for (l=5; l >=0; l--) {
-//            sfrv=fscanf(fp,"%f", &Dp[lc][6*j-l] );
-//            if (sfrv != 1) sferr("prescribed displacement value");
-//            if ( r[6*j-l] == 0 && Dp[lc][6*j-l] != 0.0 ) {
-//                sprintf(errMsg," Initial displacements can be prescribed only at restrained coordinates\n  node: %d  dof: %d  r: %d\n",
-//                j, 6-l, r[6*j-l] );
-//                errorMsg(errMsg);
-//                exit(171);
-//            }
-//        }
-//      }
+    /* prescribed displacements ------------------------------------ */
+    nD[1]=0;
+    //      sfrv=fscanf(fp,"%d", &nD[lc] );
+    //      if (sfrv != 1) sferr("nD value in load data");
+    //      if ( verbose ) {
+    //        fprintf(stdout,"  number of prescribed displacements ");
+    //        dots(stdout,16);	fprintf(stdout," nD = %3d\n", nD[lc] );
+    //      }
+    //      for (i=1; i <= nD[lc]; i++) {
+    //        sfrv=fscanf(fp,"%d", &j);
+    //        if (sfrv != 1) sferr("node number value in prescribed displacement data");
+    //        for (l=5; l >=0; l--) {
+    //            sfrv=fscanf(fp,"%f", &Dp[lc][6*j-l] );
+    //            if (sfrv != 1) sferr("prescribed displacement value");
+    //            if ( r[6*j-l] == 0 && Dp[lc][6*j-l] != 0.0 ) {
+    //                sprintf(errMsg," Initial displacements can be prescribed only at restrained coordinates\n  node: %d  dof: %d  r: %d\n",
+    //                j, 6-l, r[6*j-l] );
+    //                errorMsg(errMsg);
+    //                exit(171);
+    //            }
+    //        }
+    //      }
 }
 
 
@@ -1646,15 +1620,15 @@ void Frame3DDKernel::update_statics(
         int *J1, int *J2,
         double *F, double *D, double *R, int *r, double **Q,
         double err, int ok,QVector<BeamPtr> active_beams
-){
+        ){
     double	disp;
     int	i,j,n;
 
     if ( ok < 0 ) {
-     qDebug("  * The Stiffness Matrix is not positive-definite *\n");
-     qDebug("    Check that all six rigid-body translations are restrained\n");
-     qDebug("    If geometric stiffness is included, reduce the loads.\n");
-/*	 return; */
+        qDebug("  * The Stiffness Matrix is not positive-definite *\n");
+        qDebug("    Check that all six rigid-body translations are restrained\n");
+        qDebug("    If geometric stiffness is included, reduce the loads.\n");
+        /*	 return; */
     }
 
     /*Node Displacement.
@@ -1762,8 +1736,8 @@ BeamPtr Frame3DDKernel::createBeam(JointPtr extreme1, JointPtr extreme2, QSizeF 
     return BeamPtr();
 }
 JointPtr Frame3DDKernel::createJoint(QVector3D position, QString name,
-                                    bool  support_X,bool support_Y,bool support_Z,
-                                    bool support_XX,bool support_YY,bool support_ZZ){
+                                     bool  support_X,bool support_Y,bool support_Z,
+                                     bool support_XX,bool support_YY,bool support_ZZ){
 
     JointPtr joint(new Joint(position,name,this));
     joint->setSupport(support_X,support_Y,support_Z, support_XX,support_YY,support_ZZ);
@@ -1820,6 +1794,27 @@ InteriorPointLoadPtr Frame3DDKernel::createIPLoad(QVector3D force, BeamPtr beam,
     return InteriorPointLoadPtr();
 }
 
+TrapezoidalForcePtr Frame3DDKernel::createTPZLoad(QVector3D force, BeamPtr beam, QVector3D begin, QVector3D end, QString name)
+{
+    if(!force.isNull() && !beam.isNull()
+            && begin!=end
+            && begin.x()>=0
+            && begin.x()<=1
+            && end.x()>=0
+            && end.x()<=1){
+        TrapezoidalForcePtr tpzLoad(new TrapezoidalForce(beam,name,this));
+        tpzLoad->setForce(force);
+        tpzLoad->setRelativePosition(begin,end);
+        m_trapezoidal_loads.append(tpzLoad);
+        connect(tpzLoad.data(),SIGNAL(forceChanged()),this,SLOT(update()));
+        connect(tpzLoad.data(),SIGNAL(relativePositionChanged()),this,SLOT(update()));
+        connect(tpzLoad.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
+        update();
+        return tpzLoad;
+    }
+    return TrapezoidalForcePtr();
+}
+
 bool Frame3DDKernel::splitBeam(BeamPtr beam, qreal offset,JointPtr &new_joint){
     if(!beam.isNull() && offset>0 && offset<=beam->length()){
         qDebug()<<"Splitting";
@@ -1833,7 +1828,7 @@ bool Frame3DDKernel::splitBeam(BeamPtr beam, qreal offset,JointPtr &new_joint){
         QVector3D new_joint_position=extreme1->position()+(direction*offset);
         new_joint=createJoint(new_joint_position);
 
-        BeamPtr segment_1,segment_2;       
+        BeamPtr segment_1,segment_2;
 
         qreal dummy,E,G,d;
 
@@ -1866,10 +1861,10 @@ bool Frame3DDKernel::unifyBeam(BeamPtr beam){
                 e_mid=e1_sub;
             }
             unifyBeam_recursive_step(b.toStrongRef());
-         }
-         m_joints.removeAll(e_mid);
-         beam->unify();
-         return true;
+        }
+        m_joints.removeAll(e_mid);
+        beam->unify();
+        return true;
     }
     return false;
 }
@@ -1905,9 +1900,10 @@ void Frame3DDKernel::onKillRequest(){
                 break;
             }
         }
-        if(!_ptr.isNull())
+        if(!_ptr.isNull()){
             m_joints.removeAll(_ptr);
-        return;
+            update();
+        }
     }
     Beam* b=qobject_cast<Beam*>(sender);
     if(b!=Q_NULLPTR){
@@ -1918,9 +1914,10 @@ void Frame3DDKernel::onKillRequest(){
                 break;
             }
         }
-        if(!_ptr.isNull())
+        if(!_ptr.isNull()){
             m_beams.removeAll(_ptr);
-        return;
+            update();
+        }
     }
     NodeLoad* nl=qobject_cast<NodeLoad*>(sender);
     if(nl!=Q_NULLPTR ){
@@ -1931,9 +1928,10 @@ void Frame3DDKernel::onKillRequest(){
                 break;
             }
         }
-        if(!_ptr.isNull())
+        if(!_ptr.isNull()){
             m_node_loads.removeAll(_ptr);
-        return;
+            update();
+        }
     }
     UniformlyDistributedLoad* udl=qobject_cast<UniformlyDistributedLoad*>(sender);
     if(udl!=Q_NULLPTR){
@@ -1944,24 +1942,39 @@ void Frame3DDKernel::onKillRequest(){
                 break;
             }
         }
-        if(!_ptr.isNull())
+        if(!_ptr.isNull()){
             m_uniformly_distributed_loads.removeAll(_ptr);
-        return;
+            update();
+        }
     }
     InteriorPointLoad* ipl=qobject_cast<InteriorPointLoad*>(sender);
     if(ipl!=Q_NULLPTR) {
-            InteriorPointLoadPtr _ptr;
-            Q_FOREACH(InteriorPointLoadPtr item, m_interior_point_loads){
-                if(item.data()==ipl){
-                    _ptr=item;
-                    break;
-                }
+        InteriorPointLoadPtr _ptr;
+        Q_FOREACH(InteriorPointLoadPtr item, m_interior_point_loads){
+            if(item.data()==ipl){
+                _ptr=item;
+                break;
             }
-            if(!_ptr.isNull())
-                m_interior_point_loads.removeAll(_ptr);
-            return;
         }
-    update();
+        if(!_ptr.isNull()){
+            m_interior_point_loads.removeAll(_ptr);
+            update();
+        }
+    }
+    TrapezoidalForce* tpz=qobject_cast<TrapezoidalForce*>(sender);
+    if(tpz!=Q_NULLPTR) {
+        TrapezoidalForcePtr _ptr;
+        Q_FOREACH(TrapezoidalForcePtr item, m_trapezoidal_loads){
+            if(item.data()==tpz){
+                _ptr=item;
+                break;
+            }
+        }
+        if(!_ptr.isNull()){
+            m_trapezoidal_loads.removeAll(_ptr);
+            update();
+        }
+    }
 }
 
 void Frame3DDKernel::removeBeam(BeamPtr item){
@@ -1978,6 +1991,12 @@ void Frame3DDKernel::removeJoint(JointPtr item){
 
 void Frame3DDKernel::removeIPLoad(InteriorPointLoadPtr item){
     m_interior_point_loads.removeAll(item);
+    update();
+}
+
+void Frame3DDKernel::removeTPZLoad(TrapezoidalForcePtr item)
+{
+    m_trapezoidal_loads.removeAll(item);
     update();
 }
 

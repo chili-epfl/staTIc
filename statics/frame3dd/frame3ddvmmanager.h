@@ -20,6 +20,10 @@ public:
     AbstractElementViewModel* getAssociatedVM(Qt3DCore::QNodeId id);
     AbstractElementViewModel* getAssociatedVM(Qt3DCore::QEntity*);
 
+    /*Factory methods invoked by the QML side mainly*/
+    Q_INVOKABLE void produceTPZForce(Qt3DCore::QEntity* parentEntity);
+
+
 protected slots:
     void initViewModels();
 signals:
