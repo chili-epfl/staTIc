@@ -42,7 +42,11 @@ SOURCES += main.cpp \
     AR/arucodetector.cpp \
     AR/arucodetectorthread.cpp \
     AR/arucoobject.cpp \
-    materialsmanager.cpp
+    materialsmanager.cpp \
+    statics/elements/trapezoidalforce.cpp \
+    statics/viewModels/trapezoidalforcevm.cpp \
+    warehouse3d.cpp \
+    instantiator43dentity.cpp
 
 
 HEADERS += \
@@ -86,7 +90,11 @@ HEADERS += \
     AR/arucodetector.h \
     AR/arucodetectorthread.h \
     AR/arucoobject.h \
-    materialsmanager.h
+    materialsmanager.h \
+    statics/elements/trapezoidalforce.h \
+    statics/viewModels/trapezoidalforcevm.h \
+    warehouse3d.h \
+    instantiator43dentity.h
 
 
 RESOURCES += qml.qrc

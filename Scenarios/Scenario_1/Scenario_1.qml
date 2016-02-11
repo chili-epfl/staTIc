@@ -5,16 +5,15 @@ import QtQuick.Layouts 1.1
 import QtQuick.Scene3D 2.0
 import Chilitags 1.0
 
-import BackgroundSubtraction 1.0
-
 import Qt3D.Render 2.0
+
+import BackgroundSubtraction 1.0
 
 import Frame3DDKernel 1.0
 import Frame3DDVMManager 1.0
 
 import "qrc:/ui/UI/"
-import MaterialsManager 1.0
-
+import Warehouse3D 1.0
 Item{
     id: applicationRoot
     anchors.fill: parent
@@ -44,6 +43,7 @@ Item{
             StateChangeScript{
               script: {
                   initState++;
+                  console.log(1);
                   staticsmodule.source=":/scenarios/Scenarios/Scenario_1/Model1.lol"
               }
             }
@@ -58,6 +58,7 @@ Item{
             StateChangeScript{
               script: {
                   initState++;
+                  console.log(2);
                   scene3D.structureLoader.source="qrc:/scenarios/Scenarios/Scenario_1/Model1.dae"
               }
             }
@@ -71,6 +72,7 @@ Item{
             }
             StateChangeScript {
                 script: {
+                    console.log(3);
                     initState++
                     vmFrame3DDManager.staticsModule=staticsmodule
                     vmFrame3DDManager.sceneRoot=scene3D.structureEntity
@@ -118,6 +120,9 @@ Item{
 
     Frame3DDVMManager{
             id:vmFrame3DDManager
+    }
+    Warehouse3D{
+        id:warehouse3d
     }
 
      /*3D Rendering*/

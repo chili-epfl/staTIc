@@ -7,6 +7,7 @@
 
 #include "scenariolistmodel.h"
 #include "materialsmanager.h"
+#include "warehouse3d.h"
 
 #include "statics/frame3dd/frame3ddkernel.h"
 #include "statics/frame3dd/frame3ddvmmanager.h"
@@ -18,12 +19,18 @@
 #include "AR/deformingbeammesh.h"
 
 #include <opencv2/core.hpp>
+#include "instantiator43dentity.h"
 
 int main(int argc, char *argv[])
 {
 //    QApplication app(argc, argv);
 //    QQmlApplicationEngine engine;
     QApplication app(argc, argv);
+
+    if(!QDir("Warehouse3D").exists()){
+        qDebug()<<"Creating Warehouse dir";
+        QDir().mkdir("Warehouse3D");
+    }
 
     QQuickView view;
 
@@ -33,6 +40,10 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<ScenarioListModel>("ScenarioListModel", 1, 0, "ScenarioListModel");
     qmlRegisterType<MaterialsManager>("MaterialsManager", 1, 0, "MaterialsManager");
+    qmlRegisterType<Warehouse3D>("Warehouse3D", 1, 0, "Warehouse3D");
+
+    qmlRegisterType<Instantiator43DEntity>("Instantiator43DEntity", 1, 0, "Instantiator43DEntity");
+
 
     //qmlRegisterType<TwoDimensionalStaticsModule>("StaticsModule2D", 1, 0, "StaticsModule2D");
     //qmlRegisterType<TwoDimentionalEventHandler>("EventHandler2D", 1, 0, "EventHandler2D");
