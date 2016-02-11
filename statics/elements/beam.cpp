@@ -35,15 +35,24 @@ Beam::Beam(JointPtr extreme1, JointPtr extreme2,MaterialsManager* mm,QString nam
     m_C(0),
     m_materialId()
 {
+    m_dirty=DirtyFlag::Clean;
     m_extreme1=extreme1;
     m_extreme2=extreme2;
     m_length=extreme1->position().distanceToPoint(extreme2->position());
     m_materialsManager=mm;
-    //    m_extreme1->addConnectedBeam(this);
-//    m_extreme2->addConnectedBeam(this);
 
     connect(m_extreme1.data(),SIGNAL(destroyed(QObject*)),this,SIGNAL(killMe()));
     connect(m_extreme2.data(),SIGNAL(destroyed(QObject*)),this,SIGNAL(killMe()));
+    m_lazy_signal_emitter.setInterval(500);
+    connect(&m_lazy_signal_emitter,SIGNAL(timeout()),this,SLOT(lazy_update()));
+}
+
+void Beam::lazy_update(){
+    if(m_dirty.testFlag(DirtyFlag::ParametersChanged))
+        emit parametersChanged();
+    if(m_dirty.testFlag(DirtyFlag::StressChanged))
+        emit stressChanged();
+    m_dirty=DirtyFlag::Clean;
 }
 
 void Beam::extremes(WeakJointPtr& e1,WeakJointPtr& e2){
@@ -76,15 +85,24 @@ void Beam::setEnable(bool enable){
 void Beam::setMaterial(QString uniqueID)
 {
     if(m_materialId==uniqueID) return;
-    if(m_materialsManager!=Q_NULLPTR){
+    if(m_materialsManager!=Q_NULLPTR){        
         QVariant g,young,density;
         g=m_materialsManager->get(uniqueID,"G");
         young=m_materialsManager->get(uniqueID,"Young");
         density=m_materialsManager->get(uniqueID,"Density");
         if(g.isNull() || young.isNull() || density.isNull()){
-            //Set defaults
+            qDebug()<<"Setting default material";
+            m_materialId="default";
+            g=m_materialsManager->get(m_materialId,"G");
+            young=m_materialsManager->get(m_materialId,"Young");
+            density=m_materialsManager->get(m_materialId,"Density");
+            setDensity(density.toDouble());
+            setYoungModulus(young.toDouble());
+            setShearModulus(g.toDouble());
+            emit materialChanged();
         }
-        else {
+        else {            
+           m_materialId=uniqueID;
            setDensity(density.toDouble());
            setYoungModulus(young.toDouble());
            setShearModulus(g.toDouble());
@@ -92,8 +110,7 @@ void Beam::setMaterial(QString uniqueID)
         }
     }
     else{
-        qDebug()<<"Set default material";
-        //set default material
+        qCritical("Missing Material Manager");
     }
 }
 
@@ -166,9 +183,10 @@ void Beam::setForcesAndMoments(int axial_type,qreal Nx, qreal Vy, qreal Vz,
         m_shear_stress_y_extreme2=fabs(m_shear_y_extreme_2)/m_Asy+fabs(m_axial_moment_extreme_2)/m_C;
         m_shear_stress_z_extreme2=fabs(m_shear_z_extreme_2)/m_Asz+fabs(m_axial_moment_extreme_2)/m_C;
     }
-    if(updated)
-        emit stressChanged();
-
+    if(updated){
+        m_dirty.operator |=( DirtyFlag::StressChanged);
+        m_lazy_signal_emitter.start();
+    }
 //    qDebug()<<this->objectName();
 //    qDebug()<<"Axial stress extreme 1:"<<m_axial_stress_extreme1;
 //    qDebug()<<"Shear stress extreme 1:"<<m_shear_stress_y_extreme1;
@@ -260,7 +278,8 @@ void Beam::setSize(QSizeF size){
         m_Sy=computeShearAreaY();
         m_Sz=computeShearAreaZ();
         m_C=computeTorsionShearConstant();
-        emit parametersChanged();
+        m_dirty.operator |=( DirtyFlag::ParametersChanged);
+        m_lazy_signal_emitter.start();
     }
 }
 
@@ -274,7 +293,8 @@ void Beam::setYoungModulus(qreal E)
 {
     if(m_E!=E){
         m_E=E;
-        emit parametersChanged();
+        m_dirty.operator |=( DirtyFlag::ParametersChanged);
+        m_lazy_signal_emitter.start();
     }
 }
 
@@ -282,16 +302,16 @@ void Beam::setShearModulus(qreal G)
 {
     if(m_G!=G){
         m_G=G;
-        emit parametersChanged();
-    }
+        m_dirty.operator |=( DirtyFlag::ParametersChanged);
+        m_lazy_signal_emitter.start();    }
 }
 
 void Beam::setDensity(qreal d)
 {
     if(m_d!=d){
         m_d=d;
-        emit parametersChanged();
-    }
+        m_dirty.operator |=( DirtyFlag::ParametersChanged);
+        m_lazy_signal_emitter.start();    }
 }
 
 qreal Beam::scaledLength()
@@ -314,8 +334,11 @@ void Beam::cloneProperties(BeamPtr beam){
     m_Sy=beam->m_Sy;
     m_Sz=beam->m_Sz;
     m_C=beam->m_C;
-    emit parametersChanged();
-}
+    m_dirty.operator |=( DirtyFlag::ParametersChanged);
+    m_lazy_signal_emitter.start();}
+
+
+
 
 void Beam::split(){
     setEnable(false);

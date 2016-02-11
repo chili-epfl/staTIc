@@ -22,11 +22,11 @@ BeamVM::BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     connect(m_beam.data(),SIGNAL(enableChanged(bool)),this,SLOT(onEnableChanged()));
     connect(m_beam.data(),SIGNAL(hasBeenSplit()),this,SLOT(onBeamSplit()));
     connect(m_beam.data(),SIGNAL(segmentsChanged()),this,SLOT(onSegmentsChanged()));
-
+    connect(m_beam.data(),SIGNAL(parametersChanged()),this,SLOT(onParametersChanged()));
     /*Material*/
     connect(m_component3D,SIGNAL(materialIDChanged()),this,SLOT(onMaterialChangedVMSide()));
     /*Size*/
-    connect(m_component3D,SIGNAL(beamSizeChanged()),this,SLOT(onBeamSizeChangedVMSide()));
+    connect(m_component3D,SIGNAL(realBeamSizeChanged()),this,SLOT(onBeamSizeChangedVMSide()));
 }
 BeamVM::~BeamVM(){
     if(m_component3D)
@@ -46,15 +46,22 @@ void BeamVM::initView(){
 
     m_component3D->setProperty("extreme1",extreme1.toStrongRef()->scaledPosition());
     m_component3D->setProperty("extreme2",extreme2.toStrongRef()->scaledPosition());
-    m_component3D->setProperty("beamSize",beam_str_ref->scaledSize());
-    m_component3D->setProperty("materialID",beam_str_ref->materialID());
 
+    onParametersChanged();
     onBeamAxialStressChanged();
     onSegmentsChanged();
     append_3D_resources(m_component3D);
     m_component3D->setParent(m_sceneRoot);
 }
 
+void BeamVM::onParametersChanged(){
+    BeamPtr beam_str_ref=m_beam.toStrongRef();
+    if(m_component3D){
+        m_component3D->setProperty("beamSize",beam_str_ref->scaledSize());
+        m_component3D->setProperty("realBeamSize",beam_str_ref->size());
+        m_component3D->setProperty("materialID",beam_str_ref->materialID());
+    }
+}
 
 void BeamVM::onBeamAxialStressChanged(){
     BeamPtr beam_str_ref=m_beam.toStrongRef();
@@ -123,7 +130,7 @@ void BeamVM::onBeamSizeChangedVMSide()
 {
     BeamPtr beam_str_ref=m_beam.toStrongRef();
     if(!beam_str_ref.isNull() && m_component3D!=Q_NULLPTR){
-        beam_str_ref->setSize(m_component3D->property("beamSize").toSizeF());
+        beam_str_ref->setSize(m_component3D->property("realBeamSize").toSizeF());
     }
 
 }

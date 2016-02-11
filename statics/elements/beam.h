@@ -16,6 +16,13 @@ class Beam : public AbstractElement
 {
     Q_OBJECT
 public:
+    enum DirtyFlag {
+            Clean = 0,
+            ParametersChanged = 1 ,
+            StressChanged = 2
+    };
+    Q_DECLARE_FLAGS(DirtyFlags, DirtyFlag)
+
     Beam(JointPtr extreme1, JointPtr extreme2,MaterialsManager* mm,QString name=QString(),QObject* parent=0);
 
     void extremes(WeakJointPtr& e1,WeakJointPtr& e2);
@@ -60,22 +67,28 @@ public:
     QList<QWeakPointer<Beam> > subParts(){return m_sub_parts;}
     void addPart(QSharedPointer<Beam> beam);
     void removePart(QSharedPointer<Beam> beam);
-
     void setParentBeam(QSharedPointer<Beam> parent);
     QWeakPointer<Beam> parentBeam(){return m_parent_beam;}
+
+public slots:
+    void lazy_update();
 
 signals:
     void parametersChanged();
     void stressChanged();
 
+    void segmentsChanged();
+    void materialChanged();
     void enableChanged(bool);
-
     void hasBeenSplit();
     void hasBeenUnified();
-    void segmentsChanged();
-
-    void materialChanged();
 private:
+
+
+
+    DirtyFlags m_dirty;
+
+
 
     /*THES ARE NOT SETTERS*/
     qreal computeTorsionShearConstant(QSizeF size=QSizeF()); // C
@@ -87,7 +100,6 @@ private:
     qreal computeBendingMomentInertiaZ(QSizeF size=QSizeF());//Iz
     qreal computeSectionModulusY(QSizeF size=QSizeF());//Sy
     qreal computeSectionModulusZ(QSizeF size=QSizeF());//Sz
-
 
     bool m_enable;
 
@@ -150,7 +162,12 @@ private:
 
     MaterialsManager* m_materialsManager;
     QString m_materialId;
+
+
+
+
 };
+Q_DECLARE_OPERATORS_FOR_FLAGS(Beam::DirtyFlags)
 
 typedef QSharedPointer<Beam> BeamPtr;
 typedef QWeakPointer<Beam> WeakBeamPtr;

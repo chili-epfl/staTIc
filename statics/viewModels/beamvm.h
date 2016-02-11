@@ -22,6 +22,7 @@ public slots:
     void onBeamSplit();
     void onScaleFactorUpdated();
     void onSegmentsChanged();
+    void onParametersChanged();
 
     /*These come from the VM*/
     void onMaterialChangedVMSide();
