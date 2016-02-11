@@ -12,6 +12,7 @@ Entity{
 
     property string materialID
 
+    onMaterialIDChanged: apply_animation.start()
 
     property bool visible:  applicationRoot.currentViewFilter=='BEAM'
                             && backgroundsubtraction.entropy < .10
@@ -20,44 +21,27 @@ Entity{
     property vector3d extreme1
     property vector3d extreme2
 
-    property var segments
-
-    property real length: extreme1.minus(extreme2).length()
-    property size beamSize
-
-    property int axialForceType: 0 //-1 compression,0 nul, 1 tension
-    property real axialForce : 0
-
-    //property real scaleFactor:2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 1
-    property real scaleFactor:3
-
-    property real relativeAxialStress: 0
-
-//    onAxialForceTypeChanged: {
-//        animation.stop();
-//        var prevAnimationValue=animationValue
-//        if(axialForceType>0){
-//            animation.from=prevAnimationValue
-//            animation.to=length/2+prevAnimationValue
-//        }
-//        else{
-//            animation.to=prevAnimationValue
-//            animation.from=length/2+prevAnimationValue
-//        }
-//        animation.restart()
-//    }
-
-
-    property int nModels: 20
-    property matrix4x4 poseMatrix
-
-    property int animationValue: 0
-    property int step: 10
-    property int module: Math.round(length/2 - step)
-
     onExtreme1Changed: computeTransform()
     onExtreme2Changed: computeTransform()
 
+    property real length: extreme1.minus(extreme2).length()
+    onLengthChanged: console.log(length)
+
+    /*The segments for the deforming beam*/
+    property var segments
+
+    property size beamSize    
+    onBeamSizeChanged: apply_animation.start();
+
+    property size realBeamSize
+
+    property int axialForceType: 0 //-1 compression,0 nul, 1 tension
+
+    /*The stress relative to th esize and material.
+     *If it's 1 or more, it is above the limits*/
+    property real relativeAxialStress: 0
+    onRelativeAxialStressChanged: console.log(relativeAxialStress)
+    property matrix4x4 poseMatrix
 
     function computeTransform(){
         var a=Qt.vector3d(0,1,0);
@@ -80,7 +64,6 @@ Entity{
         result.m34=center.z;
         poseMatrix=result;
     }
-
     function ssc(v){
         var matrix=Qt.matrix4x4(0, -v.z, v.y, 0,
                                 v.z, 0, -v.x, 0,
@@ -89,12 +72,31 @@ Entity{
         return matrix;
     }
 
-
+    /*Main mesh*/
     CylinderMesh{
-        id:mesh
-        radius: 0.5
+        id:mainMesh
+        radius: 5
         length: parent.length
-        enabled:  false
+        enabled:  applicationRoot.currentViewFilter=='DESIGNER'
+                  && backgroundsubtraction.entropy < .10
+                  ? true : false
+    }
+
+    QQ2.NumberAnimation{
+        id: apply_animation
+        target:  main_mesh_material
+        property: "alpha"
+        from: 1
+        to:0.75
+        running: false
+    }
+
+    PhongAlphaMaterial{
+        id:main_mesh_material
+        ambient: infobox.current_item == rootEntity ? "green" : "grey"
+        diffuse:"grey"
+        specular:"black"
+        alpha:0.75
     }
 
     Transform{
@@ -102,10 +104,16 @@ Entity{
         matrix: poseMatrix
     }
 
-    components: [mesh,transform]
+    components: [mainMesh,transform,main_mesh_material]
 
+    /*Overview related part*/
     Entity{
-        enabled: visible
+        id:overview_entity
+        enabled: applicationRoot.currentViewFilter=='BEAM'
+                 && backgroundsubtraction.entropy < .10
+                 && (infobox.current_item == null ||
+                     infobox.current_item == rootEntity) ? true : false
+
         SphereMesh{
             id:overview_mesh
             radius: 10
@@ -127,7 +135,7 @@ Entity{
         }
         Transform{
             id:overview_scale
-            property real delta: 1*Math.min(relativeAxialStress,1)
+            property real delta: 0.8*Math.min(relativeAxialStress,1)
             scale3D:Qt.vector3d(1-axialForceType*(delta),1+axialForceType*(delta),1-axialForceType*(delta));
             QQ2.Behavior on scale3D{
                 QQ2.Vector3dAnimation{
@@ -136,24 +144,65 @@ Entity{
             }
         }
         components: [overview_material,overview_mesh,overview_scale]
-//        Entity{
-//            Transform{
-//                id:overview_shift_pos
-//                translation:Qt.vector3d(0,10,0);
-
-//            }
-//            components: [overview_shift_pos,overview_mesh,overview_material]
-//        }
-//        Entity{
-//            Transform{
-//                id:overview_shift_neg
-//                translation:Qt.vector3d(0,-10,0);
-
-//            }
-//            components: [overview_shift_neg,overview_mesh,overview_material]
-//        }
     }
 
+    /*-----Reference bodies----*/
+    Entity{
+        components: [
+            SphereMesh{
+                id:extreme1Ref
+                radius: 5
+                enabled: overview_entity.enabled &&
+                         infobox.current_item == rootEntity ?
+                         true: false
+            },
+            PhongMaterial{
+                ambient:"#980000"
+                diffuse:"black"
+                specular:"black"
+                shininess:0
+            },
+            Transform{
+                translation:Qt.vector3d(0,length/2,0)
+            } ]
+    }
+    Entity{
+        components: [
+            SphereMesh{
+                id:extreme2Ref
+                radius: 5
+                enabled: overview_entity.enabled &&
+                         infobox.current_item == rootEntity ?
+                         true: false
+            },
+            PhongMaterial{
+                ambient:"#479800"
+                diffuse:"black"
+                specular:"black"
+                shininess:0
+            },
+            Transform{
+                translation:Qt.vector3d(0,-length/2,0)
+            } ]
+    }
+    Entity{
+        components: [
+            SphereMesh{
+                id:extreme3Ref
+                radius: 5
+                enabled: overview_entity.enabled &&
+                         infobox.current_item == rootEntity ?
+                         true: false
+            },
+            PhongMaterial{
+                ambient:"#001a98"
+                diffuse:"black"
+                specular:"black"
+            },
+            Transform{
+                translation:Qt.vector3d(20,0,0)
+            } ]
+    }
 
 
     /*-----Physical body----*/
@@ -172,198 +221,76 @@ Entity{
        }
        PhongAlphaMaterial{
            id:transparentMaterial
-           alpha:0.2
+           alpha:0.0
        }
-
        components: [pBodyMesh,pBody,transparentMaterial]
     }
-    /*-----Object Picker----*/
-    Entity{
-       SphereMesh{
-           enabled: false
-           id:objectPickerMesh
-           radius: 10
-       }
 
-       property ObjectPicker objectPicker: ObjectPicker {
-                   hoverEnabled: false
-                   onClicked: {
-                       if(rootEntity.visible)
+    /*Pickers and Dragging anchors*/
+    property bool drag_anchor_enabled:false;
+    property vector3d current_anchor_position: Qt.vector3d(0,0,0);
+    SphereMesh{
+        id:drag_mesh
+        radius:10
+    }
+    PhongAlphaMaterial{
+        id:drag_material
+        ambient: "black"
+        diffuse: "black"
+        specular: "black"
+        shininess: 0
+        alpha:0.0
+    }
+    Entity{
+        enabled: applicationRoot.currentViewFilter=='BEAM' ||
+                 applicationRoot.currentViewFilter=='DESIGNER' ? true : false
+        property ObjectPicker objectPicker:ObjectPicker{
+            hoverEnabled: drag_anchor_enabled
+            onEntered: current_anchor_position=drag_transform.translation;
+            onClicked: {
+                infobox.current_item=rootEntity
+            }
+        }
+        components: [drag_mesh,drag_material,objectPicker]
+    }
+    NodeInstantiator {
+        model: length/(4*drag_mesh.radius)-1;
+        delegate:Entity{
+            enabled: applicationRoot.currentViewFilter=='BEAM' ||
+                     applicationRoot.currentViewFilter=='DESIGNER' ? true : false
+            property Transform transform: Transform{
+                translation:Qt.vector3d(10,(index+1)*(2*drag_mesh.radius),0)
+            }
+            property ObjectPicker objectPicker:ObjectPicker{
+                hoverEnabled: drag_anchor_enabled
+                onEntered: current_anchor_position=transform.translation;
+                onClicked: {
                         infobox.current_item=rootEntity
-                   }
-       }
-       components: [objectPickerMesh,objectPicker]
+                }
+            }
+            components: [drag_mesh,drag_material,transform,objectPicker]
+        }
     }
-    /*-----Reference bodies----*/
-    Entity{
-        components: [
-            SphereMesh{
-                id:extreme1Ref
-                radius: 5
-                enabled: infobox.current_item == rootEntity ? true: false
-            },
-            PhongMaterial{
-                ambient:"#980000"
-                diffuse:"black"
-                specular:"black"
-                shininess:0
-            },
-            Transform{
-                translation:Qt.vector3d(0,length/2,0)
-            } ]
+    NodeInstantiator {
+        model: length/(4*drag_mesh.radius)-1;
+        delegate:Entity{
+            enabled: applicationRoot.currentViewFilter=='BEAM' ||
+                     applicationRoot.currentViewFilter=='DESIGNER' ? true : false
+             property Transform transform: Transform{
+                id:drag_transform
+                translation:Qt.vector3d(10,-(index+1)*(2*drag_mesh.radius),0)
+            }
+            property ObjectPicker objectPicker: ObjectPicker{
+                hoverEnabled: drag_anchor_enabled
+                onEntered: current_anchor_position=transform.translation
+                onClicked: {
+                        infobox.current_item=rootEntity
+                }
+            }
+
+            components: [drag_mesh,drag_material,transform,objectPicker]
+
+        }
     }
-    Entity{
-        components: [
-            SphereMesh{
-                id:extreme2Ref
-                radius: 5
-                enabled: infobox.current_item == rootEntity ? true: false
-            },
-            PhongMaterial{
-                ambient:"#479800"
-                diffuse:"black"
-                specular:"black"
-                shininess:0
-            },
-            Transform{
-                translation:Qt.vector3d(0,-length/2,0)
-            } ]
-    }
-    Entity{
-        components: [
-            SphereMesh{
-                id:extreme3Ref
-                radius: 5
-                enabled: infobox.current_item == rootEntity ? true: false
-            },
-            PhongMaterial{
-                ambient:"#001a98"
-                diffuse:"black"
-                specular:"black"
-            },
-            Transform{
-                translation:Qt.vector3d(20,0,0)
-            } ]
-    }
-
-//    QQ2.NumberAnimation on animationValue{
-//        id:animation
-//        duration: 10000
-//        from: 0
-//        to:  length/2
-//        loops: QQ2.Animation.Infinite
-//        running: visible && axialForceType!==0
-//    }
-
-    //First sequence
-
-//    Mesh{
-//        id:tiny_arrow
-//        enabled: visible
-//        source:"qrc:/element_views/Element_Views/tiny_arrow.obj"
-//    }
-
-
-//    AnimationUnitDy{
-//        unitId: 0
-//        unitMesh: tiny_arrow
-//        step: parent.step
-//        animationValue: parent.animationValue
-//        module: parent.module
-//        direction: 1
-//        scaleFactor: parent.scaleFactor
-//        rotate: parent.axialForceType < 0
-//    }
-//    AnimationUnitDy{
-//        unitId: 1
-//        unitMesh: tiny_arrow
-//        step: parent.step
-//        animationValue: parent.animationValue
-//        module: parent.module
-//        direction: 1
-//        scaleFactor: parent.scaleFactor
-//        rotate: parent.axialForceType < 0
-//    }
-//    AnimationUnitDy{
-//        unitId: 2
-//        unitMesh: tiny_arrow
-//        step: parent.step
-//        animationValue: parent.animationValue
-//        module: parent.module
-//        direction: 1
-//        scaleFactor: parent.scaleFactor
-//        rotate: parent.axialForceType < 0
-//    }
-//    AnimationUnitDy{
-//        unitId: 3
-//        unitMesh: tiny_arrow
-//        step: parent.step
-//        animationValue: parent.animationValue
-//        module: parent.module
-//        direction: 1
-//        scaleFactor: parent.scaleFactor
-//        rotate: parent.axialForceType < 0
-//    }
-//    AnimationUnitDy{
-//        unitId: 4
-//        unitMesh: tiny_arrow
-//        step: parent.step
-//        animationValue: parent.animationValue
-//        module: parent.module
-//        direction: 1
-//        scaleFactor: parent.scaleFactor
-//        rotate: parent.axialForceType < 0
-//    }
-
-//    AnimationUnitDy{
-//        unitId: 0
-//        unitMesh: tiny_arrow
-//        step: parent.step
-//        animationValue: parent.animationValue
-//        module: parent.module
-//        direction: -1
-//        scaleFactor: parent.scaleFactor
-//        rotate: parent.axialForceType > 0
-//    }
-//    AnimationUnitDy{
-//        unitId: 1
-//        unitMesh: tiny_arrow
-//        step: parent.step
-//        animationValue: parent.animationValue
-//        module: parent.module
-//        direction: -1
-//        scaleFactor: parent.scaleFactor
-//        rotate: parent.axialForceType > 0
-//    }
-//    AnimationUnitDy{
-//        unitId: 2
-//        unitMesh: tiny_arrow
-//        step: parent.step
-//        animationValue: parent.animationValue
-//        module: parent.module
-//        direction: -1
-//        scaleFactor: parent.scaleFactor
-//        rotate: parent.axialForceType > 0
-//    }
-//    AnimationUnitDy{
-//        unitId: 3
-//        unitMesh: tiny_arrow
-//        step: parent.step
-//        animationValue: parent.animationValue
-//        module: parent.module
-//        direction: -1
-//        scaleFactor: parent.scaleFactor
-//        rotate: parent.axialForceType > 0
-//    }
-//    AnimationUnitDy{
-//        unitId: 4
-//        unitMesh: tiny_arrow
-//        step: parent.step
-//        animationValue: parent.animationValue
-//        module: parent.module
-//        direction: -1
-//        scaleFactor: parent.scaleFactor
-//        rotate: parent.axialForceType > 0
-//    }
 
 }

@@ -5,7 +5,15 @@
 MaterialsManager::MaterialsManager(QObject *parent):
     QAbstractListModel(parent)
 {
-    QString materialsDir=":/materials/statics/Materials/";
+    /*Creating default material*/
+    Material default_material;
+    default_material.set("default",QUrl("qrc:/images/Images/woodbackground.png"),
+                 20,0.50e-9,20000,1250);
+    default_material.uniqueID="default";
+
+    m_materials[default_material.uniqueID]=default_material;
+
+    QString materialsDir=":/maparentterials/statics/Materials/";
     QDirIterator it(materialsDir);
     while(it.hasNext()){
         it.next();
@@ -132,6 +140,9 @@ QVariant MaterialsManager::get(QString uniqueID, QString info) const
     }
     else if(info.compare("Density",Qt::CaseInsensitive)==0){
         return m_materials[uniqueID].density;
+    }
+    else if(info.compare("Index",Qt::CaseInsensitive)==0){
+        return m_materialsIndex.indexOf(uniqueID);
     }
     return QVariant();
 

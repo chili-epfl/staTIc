@@ -20,6 +20,8 @@
         <file>Icons/AR_OFF.png</file>
         <file>Icons/apply_pressed.png</file>
         <file>Icons/apply.png</file>
+        <file>Icons/delete.png</file>
+        <file>Icons/delete_pressed.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>Images/mainbanner.png</file>
@@ -39,6 +41,7 @@
         <file>Element_Views/tiny_arrow.mtl</file>
         <file>Element_Views/tiny_arrow.obj</file>
         <file>Element_Views/AnimationUnitDx.qml</file>
+        <file>Element_Views/TrapezoidalForce.qml</file>
     </qresource>
     <qresource prefix="/opengl">
         <file>Opengl/phongalpha.frag</file>
@@ -82,26 +85,16 @@
     <qresource prefix="/materials">
         <file>statics/Materials/test.png</file>
         <file>statics/Materials/material1.material</file>
-        <file>statics/Materials/material1 (copy).material</file>
-        <file>statics/Materials/material1 (another copy).material</file>
-        <file>statics/Materials/material1 (4th copy).material</file>
-        <file>statics/Materials/material1 (3rd copy).material</file>
-        <file>statics/Materials/material1 (21st copy).material</file>
-        <file>statics/Materials/material1 (20th copy).material</file>
-        <file>statics/Materials/material1 (19th copy).material</file>
-        <file>statics/Materials/material1 (18th copy).material</file>
-        <file>statics/Materials/material1 (17th copy).material</file>
-        <file>statics/Materials/material1 (16th copy).material</file>
-        <file>statics/Materials/material1 (15th copy).material</file>
-        <file>statics/Materials/material1 (14th copy).material</file>
-        <file>statics/Materials/material1 (13th copy).material</file>
-        <file>statics/Materials/material1 (12th copy).material</file>
-        <file>statics/Materials/material1 (11th copy).material</file>
-        <file>statics/Materials/material1 (10th copy).material</file>
-        <file>statics/Materials/material1 (9th copy).material</file>
-        <file>statics/Materials/material1 (8th copy).material</file>
-        <file>statics/Materials/material1 (7th copy).material</file>
-        <file>statics/Materials/material1 (6th copy).material</file>
-        <file>statics/Materials/material1 (5th copy).material</file>
+<!--        <file>statics/Materials/material1 (copy).material</file>-->
+    </qresource>
+    <qresource prefix="/3dobjects">
+        <file>3DObjects/paneling.jpg</file>
+        <file>3DObjects/jacuzzi.3ds</file>
+        <file>3DObjects/jacuzzi-.jpg</file>
+        <file>3DObjects/jacuzzi.obj</file>
+        <file>3DObjects/jacuzzi.mtl</file>
+        <file>3DObjects/jacuzzi-screen.jpg</file>
+        <file>3DObjects/paneling-for-interior.jpg</file>
+        <file>3DObjects/jacuzzi_normal_map.jpg</file>
     </qresource>
 </RCC>
