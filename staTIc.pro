@@ -46,7 +46,8 @@ SOURCES += main.cpp \
     statics/elements/trapezoidalforce.cpp \
     statics/viewModels/trapezoidalforcevm.cpp \
     warehouse3d.cpp \
-    instantiator43dentity.cpp
+    instantiator43dentity.cpp \
+    resourcesfetcher.cpp
 
 
 HEADERS += \
@@ -94,7 +95,8 @@ HEADERS += \
     statics/elements/trapezoidalforce.h \
     statics/viewModels/trapezoidalforcevm.h \
     warehouse3d.h \
-    instantiator43dentity.h
+    instantiator43dentity.h \
+    resourcesfetcher.h
 
 
 RESOURCES += qml.qrc

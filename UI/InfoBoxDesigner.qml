@@ -8,7 +8,6 @@ Rectangle {
     id:root
     property var current_item
     onCurrent_itemChanged: {
-        console.log(current_item.materialID);
         if(current_item!=null &&
             current_item.type=="beam")
             tab_view.getTab(tab_view.currentIndex).item.currentIndex=materialsManager.get(current_item.materialID ,"Index");

@@ -22,6 +22,7 @@
         <file>Icons/apply.png</file>
         <file>Icons/delete.png</file>
         <file>Icons/delete_pressed.png</file>
+        <file>Icons/LOADING.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>Images/mainbanner.png</file>
@@ -85,7 +86,6 @@
     <qresource prefix="/materials">
         <file>statics/Materials/test.png</file>
         <file>statics/Materials/material1.material</file>
-<!--        <file>statics/Materials/material1 (copy).material</file>-->
     </qresource>
     <qresource prefix="/3dobjects">
         <file>3DObjects/paneling.jpg</file>

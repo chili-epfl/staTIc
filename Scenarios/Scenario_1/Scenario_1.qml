@@ -23,97 +23,113 @@ Item{
     property alias minForce : staticsmodule.minForce
 
     state: "LoadingCamera"
-    property  int initState : 0
-
     states: [
         State {
             name: "LoadingCamera"
+            when: camDevice.cameraStatus!=Camera.ActiveStatus
             PropertyChanges {
-                target: loadingLogo
-                source:"qrc:/images/Images/camera_icon.png"
+                target: loadingAnimation_text
+                text:"Loading Camera"
+            }
+            PropertyChanges {
+                target: loadingAnimation_progressbar
+                value:0.25
             }
         },
         State {
             name: "LoadingStaticsModel"
-            when: camDevice.cameraStatus==Camera.ActiveState && initState<1
+            when: camDevice.cameraStatus==Camera.ActiveStatus &&
+                  staticsmodule.status!=Frame3DDKernel.LOADED
             PropertyChanges {
-                target: loadingLogo
-                source:"qrc:/images/Images/camera_icon.png"
+                target: loadingAnimation_text
+                text:"Loading 3D structure"
             }
-            StateChangeScript{
-              script: {
-                  initState++;
-                  console.log(1);
-                  staticsmodule.source=":/scenarios/Scenarios/Scenario_1/Model1.lol"
-              }
+            PropertyChanges {
+                target: loadingAnimation_progressbar
+                value:0.5
             }
         },
         State {
             name: "Loading3DModel"
-            when: staticsmodule.status==Frame3DDKernel.LOADED && initState<2
+            when: staticsmodule.status==Frame3DDKernel.LOADED &&
+                  scene3D.structureLoader.status!=SceneLoader.Loaded
             PropertyChanges {
-                target: loadingLogo
-                source:"qrc:/images/Images/camera_icon.png"
+                target: loadingAnimation_text
+                text:"Loading Scenario"
             }
-            StateChangeScript{
-              script: {
-                  initState++;
-                  console.log(2);
-                  scene3D.structureLoader.source="qrc:/scenarios/Scenarios/Scenario_1/Model1.dae"
-              }
+            PropertyChanges {
+                target: loadingAnimation_progressbar
+                value:0.75
             }
+
         },
         State {
             name: "LoadingVMManager"
-            when: scene3D.structureLoader.status==SceneLoader.Loaded && initState<3
+            when: scene3D.structureLoader.status==SceneLoader.Loaded
             PropertyChanges {
-                target: loadingLogo
-                source:"qrc:/images/Images/camera_icon.png"
+                target: loadingAnimation_text
+                text:"Enjoy :)"
+            }
+            PropertyChanges {
+                target: vmFrame3DDManager
+                staticsModule:staticsmodule
+            }
+            PropertyChanges {
+                target: vmFrame3DDManager
+                sceneRoot:scene3D.structureEntity
+            }
+            PropertyChanges {
+                target: loadingAnimation_progressbar
+                value:1
             }
             StateChangeScript {
                 script: {
-                    console.log(3);
-                    initState++
-                    vmFrame3DDManager.staticsModule=staticsmodule
-                    vmFrame3DDManager.sceneRoot=scene3D.structureEntity
-                    loadingAnimation.destroy()
+                    loadingAnimation.destroy(2000)
                 }
             }
         }
     ]
 
+    Component.onCompleted: camDevice.deviceId=QtMultimedia.availableCameras[1].deviceId
+
     /*Loading animation*/
     Rectangle{
         id:loadingAnimation
         anchors.fill: parent
-        color: "grey"
+        color: "#2f3439"
         z:2
         Image {
             anchors.centerIn: parent
             id: loadingLogo
-            source:"qrc:/images/Images/camera_icon.png"
-            Rectangle{
-                property real contentSize: Math.max(loadingLogo.paintedHeight,loadingLogo.paintedWidth)
-                anchors.centerIn: parent
-                width: Math.sqrt(2*contentSize*contentSize)
-                height: width
-                radius: width*0.5
-                color: "transparent"
-                border.color: "red"
-                border.width: pt2px(10)
-            }
+            width: parent.width/3
+            height: width
+            source:"qrc:/icons/Icons/LOADING.png"
         }
         Text{
-           anchors.horizontalCenter: parent.horizontalCenter
+           id:loadingAnimation_text
+           anchors.horizontalCenter: loadingAnimation.horizontalCenter
            anchors.top: loadingLogo.bottom
-           text: "Loading"
+           text: "Loading Camera"
+           color: "white"
            font.pixelSize: pt2px(15)
+        }
+        ProgressBar{
+            id:loadingAnimation_progressbar
+            anchors.margins: 10
+            anchors.horizontalCenter: loadingAnimation.horizontalCenter
+            anchors.top: loadingAnimation_text.bottom
         }
     }
     /************/
 
     Frame3DDKernel{
         id:staticsmodule
+        onStatusChanged: {
+            if(status==Frame3DDKernel.LOADED){
+                loadingAnimation_text.text="Loading Scenario";
+                scene3D.structureLoader.source="qrc:/scenarios/Scenarios/Scenario_1/Model1.dae"
+            }
+        }
     }
 
     property alias materialsManager: staticsmodule.materialsManager
@@ -128,7 +144,12 @@ Item{
      /*3D Rendering*/
      Camera{
          id:camDevice
-         deviceId:QtMultimedia.availableCameras[1].deviceId
+         onCameraStatusChanged: {
+             if(camDevice.cameraStatus==Camera.ActiveStatus){
+                 loadingAnimation_text.text="Loading 3D structure";
+                 staticsmodule.source=":/scenarios/Scenarios/Scenario_1/Model1.lol"
+             }
+         }
          imageCapture.resolution: "640x480" //Android sets the viewfinder resolution as the capture one
          viewfinder.resolution:"640x480"
          focus {
@@ -136,7 +157,7 @@ Item{
                      focusPointMode: Camera.FocusPointAuto
                  }
          imageProcessing {
-                 whiteBalanceMode: Camera.WhiteBalanceAuto
+                 whiteBalanceMode: CameraImageProcessing.WhiteBalanceAuto
          }
          exposure.exposureMode: Camera.ExposureAction
          exposure.manualAperture: -1

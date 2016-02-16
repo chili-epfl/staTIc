@@ -14,6 +14,7 @@ Entity{
     onBeginChanged:  relativePositionChanged;
     onEndChanged: relativePositionChanged()
 
+    property bool dragging: false;
     /*Visual aspect*/
     CuboidMesh{
         id:mesh
@@ -25,23 +26,38 @@ Entity{
         hoverEnabled: false
         onClicked: {
                 infobox.current_item=rootEntity
+                rootEntity.parent.drag_anchor_enabled=false;
         }
         onPressed: {
+            infobox.current_item=rootEntity
             rootEntity.parent.drag_anchor_enabled=true;
             rootEntity.parent.current_anchor_position=transform.translation
+            dragging=true;
         }
         onReleased: {
             rootEntity.parent.drag_anchor_enabled=false;
+            dragging=false;
         }
     }
     Transform{
         id:transform
         QQ2.Binding on translation{
-        when:rootEntity.parent.drag_anchor_enabled==true
+        when: dragging
         value:rootEntity.parent.current_anchor_position
+        }
+        onTranslationChanged:{
+                    resetTimer.restart()
         }
     }
 
     components: [mesh,objectPicker,transform]
-
+    QQ2.Timer{
+        id:resetTimer
+        interval: 3000
+        onTriggered: {
+            rootEntity.parent.drag_anchor_enabled=false;
+            dragging=false;
+        }
+        running: false;
+    }
 }

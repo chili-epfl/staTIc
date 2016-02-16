@@ -8,9 +8,12 @@ Entity{
 
     property var connected_beams: []
 
-    property bool visible:  applicationRoot.currentViewFilter=='JOINT'
-                            && backgroundsubtraction.entropy < .10
-                            && (infobox.current_item == null || infobox.current_item == root) ? true : false
+    property bool visible:  backgroundsubtraction.entropy < .10
+                            && (
+                               (applicationRoot.currentViewFilter=='JOINT'
+                                   && (infobox.current_item == null || infobox.current_item == root))
+                                || applicationRoot.currentViewFilter=='DESIGNER')
+                            ? true : false
 
     property vector3d position
     property vector3d reaction

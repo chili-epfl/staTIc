@@ -14,10 +14,6 @@ Entity{
 
     onMaterialIDChanged: apply_animation.start()
 
-    property bool visible:  applicationRoot.currentViewFilter=='BEAM'
-                            && backgroundsubtraction.entropy < .10
-                            && (infobox.current_item == null || infobox.current_item == rootEntity) ? true : false
-
     property vector3d extreme1
     property vector3d extreme2
 
@@ -25,7 +21,6 @@ Entity{
     onExtreme2Changed: computeTransform()
 
     property real length: extreme1.minus(extreme2).length()
-    onLengthChanged: console.log(length)
 
     /*The segments for the deforming beam*/
     property var segments
@@ -40,7 +35,6 @@ Entity{
     /*The stress relative to th esize and material.
      *If it's 1 or more, it is above the limits*/
     property real relativeAxialStress: 0
-    onRelativeAxialStressChanged: console.log(relativeAxialStress)
     property matrix4x4 poseMatrix
 
     function computeTransform(){
@@ -73,11 +67,13 @@ Entity{
     }
 
     /*Main mesh*/
+
     CylinderMesh{
         id:mainMesh
-        radius: 5
-        length: parent.length
+        radius: 1
+        length: 25
         enabled:  applicationRoot.currentViewFilter=='DESIGNER'
+                  && infobox.current_item == rootEntity
                   && backgroundsubtraction.entropy < .10
                   ? true : false
     }
@@ -104,16 +100,36 @@ Entity{
         matrix: poseMatrix
     }
 
-    components: [mainMesh,transform,main_mesh_material]
+    components: [transform]
+
+
+    Entity{
+
+        property Transform transform: Transform{
+                translation:Qt.vector3d(0,0.5*mainMesh.length+1.5*overview_mesh.radius,0)
+        }
+        components: [mainMesh,this.transform,main_mesh_material]
+    }
+    Entity{
+
+        property Transform transform: Transform{
+                translation:Qt.vector3d(0,-0.5*mainMesh.length-1.5*overview_mesh.radius,0)
+        }
+        components: [mainMesh,this.transform,main_mesh_material]
+    }
+
+
 
     /*Overview related part*/
     Entity{
         id:overview_entity
-        enabled: applicationRoot.currentViewFilter=='BEAM'
-                 && backgroundsubtraction.entropy < .10
-                 && (infobox.current_item == null ||
-                     infobox.current_item == rootEntity) ? true : false
-
+        enabled: backgroundsubtraction.entropy < .10
+                 && (
+                    (applicationRoot.currentViewFilter=='BEAM'
+                        && (infobox.current_item == null || infobox.current_item == rootEntity))
+                     || applicationRoot.currentViewFilter=='DESIGNER')
+                 ? true : false
+        onEnabledChanged: console.log(enabled)
         SphereMesh{
             id:overview_mesh
             radius: 10
@@ -139,7 +155,7 @@ Entity{
             scale3D:Qt.vector3d(1-axialForceType*(delta),1+axialForceType*(delta),1-axialForceType*(delta));
             QQ2.Behavior on scale3D{
                 QQ2.Vector3dAnimation{
-                    duration: 1000
+                    duration: 500
                 }
             }
         }
@@ -153,6 +169,7 @@ Entity{
                 id:extreme1Ref
                 radius: 5
                 enabled: overview_entity.enabled &&
+                         applicationRoot.currentViewFilter=='BEAM' &&
                          infobox.current_item == rootEntity ?
                          true: false
             },
@@ -172,6 +189,7 @@ Entity{
                 id:extreme2Ref
                 radius: 5
                 enabled: overview_entity.enabled &&
+                         applicationRoot.currentViewFilter=='BEAM' &&
                          infobox.current_item == rootEntity ?
                          true: false
             },
@@ -191,6 +209,7 @@ Entity{
                 id:extreme3Ref
                 radius: 5
                 enabled: overview_entity.enabled &&
+                         applicationRoot.currentViewFilter=='BEAM' &&
                          infobox.current_item == rootEntity ?
                          true: false
             },
@@ -239,27 +258,32 @@ Entity{
         diffuse: "black"
         specular: "black"
         shininess: 0
-        alpha:0.0
+        alpha:0.00
     }
     Entity{
         enabled: applicationRoot.currentViewFilter=='BEAM' ||
                  applicationRoot.currentViewFilter=='DESIGNER' ? true : false
+        property Transform transform: Transform{
+            rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+        }
         property ObjectPicker objectPicker:ObjectPicker{
             hoverEnabled: drag_anchor_enabled
-            onEntered: current_anchor_position=drag_transform.translation;
+            onEntered: {current_anchor_position=Qt.vector3d(0,0,0);
+                        }
             onClicked: {
                 infobox.current_item=rootEntity
             }
         }
-        components: [drag_mesh,drag_material,objectPicker]
+        components: [drag_mesh,drag_material,this.transform,objectPicker]
     }
     NodeInstantiator {
-        model: length/(4*drag_mesh.radius)-1;
+        model: (length-40)/(4*drag_mesh.radius)-1;
         delegate:Entity{
             enabled: applicationRoot.currentViewFilter=='BEAM' ||
                      applicationRoot.currentViewFilter=='DESIGNER' ? true : false
             property Transform transform: Transform{
-                translation:Qt.vector3d(10,(index+1)*(2*drag_mesh.radius),0)
+                rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+                translation:Qt.vector3d(0,(index+1)*(2*drag_mesh.radius),0)
             }
             property ObjectPicker objectPicker:ObjectPicker{
                 hoverEnabled: drag_anchor_enabled
@@ -272,13 +296,14 @@ Entity{
         }
     }
     NodeInstantiator {
-        model: length/(4*drag_mesh.radius)-1;
+        model: (length-40)/(4*drag_mesh.radius)-1;
         delegate:Entity{
             enabled: applicationRoot.currentViewFilter=='BEAM' ||
                      applicationRoot.currentViewFilter=='DESIGNER' ? true : false
              property Transform transform: Transform{
                 id:drag_transform
-                translation:Qt.vector3d(10,-(index+1)*(2*drag_mesh.radius),0)
+                rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+                translation:Qt.vector3d(0,-(index+1)*(2*drag_mesh.radius),0)
             }
             property ObjectPicker objectPicker: ObjectPicker{
                 hoverEnabled: drag_anchor_enabled
@@ -287,7 +312,6 @@ Entity{
                         infobox.current_item=rootEntity
                 }
             }
-
             components: [drag_mesh,drag_material,transform,objectPicker]
 
         }

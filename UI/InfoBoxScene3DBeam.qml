@@ -13,6 +13,10 @@ Entity {
 
     property var segments: []
     property bool play: true
+    onPlayChanged: {
+        if(!play)
+            deformingMeshMaterial.state=0
+    }
     property real beamLength
     property size beamSize
     property alias exagerate: deformingMesh.exagerate
@@ -93,31 +97,31 @@ Entity {
             effect: WireframeEffect {}
             ambient: Qt.rgba( 0.2, 0.0, 0.0, 1.0 )
             diffuse: Qt.rgba( 0.8, 0.0, 0.0, 1.0 )
+//            QQ2.SequentialAnimation {
+//                loops: 1
+//                running: true
+
+//                QQ2.NumberAnimation {
+//                    target: deformingMeshMaterial;
+//                    property: "lineWidth";
+//                    duration: 1000;
+//                    from: 0.8
+//                    to: 1.8
+//                }
+
+//                QQ2.NumberAnimation {
+//                    target: deformingMeshMaterial;
+//                    property: "lineWidth";
+//                    duration: 1000;
+//                    from: 1.8
+//                    to: 0.8
+//                }
+
+//                QQ2.PauseAnimation { duration: 1500 }
+//            }
+
             QQ2.SequentialAnimation {
-                loops: QQ2.Animation.Infinite
-                running: true
-
-                QQ2.NumberAnimation {
-                    target: deformingMeshMaterial;
-                    property: "lineWidth";
-                    duration: 1000;
-                    from: 0.8
-                    to: 1.8
-                }
-
-                QQ2.NumberAnimation {
-                    target: deformingMeshMaterial;
-                    property: "lineWidth";
-                    duration: 1000;
-                    from: 1.8
-                    to: 0.8
-                }
-
-                QQ2.PauseAnimation { duration: 1500 }
-            }
-
-            QQ2.SequentialAnimation {
-                loops: QQ2.Animation.Infinite
+                loops: 1//QQ2.Animation.Infinite
                 running: play
 
                 QQ2.NumberAnimation {
@@ -128,13 +132,13 @@ Entity {
                     to: deformingMesh.keyframes-1
                 }
 
-                QQ2.NumberAnimation {
-                    target: deformingMeshMaterial;
-                    property: "state";
-                    duration: 1000;
-                    from: deformingMesh.keyframes-1
-                    to: 0
-                }
+//                QQ2.NumberAnimation {
+//                    target: deformingMeshMaterial;
+//                    property: "state";
+//                    duration: 1000;
+//                    from: deformingMesh.keyframes-1
+//                    to: 0
+//                }
             }
         }
 

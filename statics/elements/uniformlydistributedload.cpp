@@ -39,7 +39,6 @@ QVector3D UniformlyDistributedLoad::forceLocal(){
         mat.setRow(2,QVector4D(-c.z()/den,0,c.x()/den,0));
         mat.setRow(3,QVector4D(0,0,0,1));
     }
-
     return mat.mapVector(m_force);
 
 }
