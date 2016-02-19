@@ -20,6 +20,8 @@
 
 #include <opencv2/core.hpp>
 #include "instantiator43dentity.h"
+#include "resourcesfetcher.h"
+#include "static_global.h"
 
 int main(int argc, char *argv[])
 {
@@ -27,9 +29,30 @@ int main(int argc, char *argv[])
 //    QQmlApplicationEngine engine;
     QApplication app(argc, argv);
 
-    if(!QDir("Warehouse3D").exists()){
-        qDebug()<<"Creating Warehouse dir";
-        QDir().mkdir("Warehouse3D");
+    if(!QDir(materialsPath).exists()){
+        qDebug()<<"Creating material Path";
+        QDir().mkpath(materialsPath);
+    }
+    if(!QDir(assets3DPath).exists()){
+        qDebug()<<"Creating assets3d Path";
+        QDir().mkpath(assets3DPath);
+    }
+    if(!QDir(scenariosPath).exists()){
+        qDebug()<<"Creating scenarios Path";
+        QDir().mkpath(scenariosPath);
+    }
+
+    if(!QDir(materialsPrivatePath).exists()){
+        qDebug()<<"Creating material Private Path";
+        QDir().mkpath(materialsPrivatePath);
+    }
+    if(!QDir(assets3DPrivatePath).exists()){
+        qDebug()<<"Creating assets3d Private Path";
+        QDir().mkpath(assets3DPrivatePath);
+    }
+    if(!QDir(scenariosPrivatePath).exists()){
+        qDebug()<<"Creating scenarios Private Path";
+        QDir().mkpath(scenariosPrivatePath);
     }
 
     QQuickView view;
@@ -43,6 +66,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<Warehouse3D>("Warehouse3D", 1, 0, "Warehouse3D");
 
     qmlRegisterType<Instantiator43DEntity>("Instantiator43DEntity", 1, 0, "Instantiator43DEntity");
+    qmlRegisterType<ResourcesFetcher>("ResourcesFetcher", 1, 0, "ResourcesFetcher");
 
 
     //qmlRegisterType<TwoDimensionalStaticsModule>("StaticsModule2D", 1, 0, "StaticsModule2D");

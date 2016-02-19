@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += qml quick widgets 3dcore 3drender 3dinput multimedia
+QT += qml quick widgets 3dcore 3drender 3dinput multimedia network
 
 CONFIG += c++11
 SOURCES += main.cpp \
@@ -96,7 +96,8 @@ HEADERS += \
     statics/viewModels/trapezoidalforcevm.h \
     warehouse3d.h \
     instantiator43dentity.h \
-    resourcesfetcher.h
+    resourcesfetcher.h \
+    static_global.h
 
 
 RESOURCES += qml.qrc
@@ -156,4 +157,7 @@ android {
     LIBS += -L/home/chili/chilitags/build-linux/install/lib
     LIBS += -L/home/chili/Downloads/bullet3-2.83.5/build-linux/install/lib
 }
+
+DISTFILES += \
+    settings.xml
 

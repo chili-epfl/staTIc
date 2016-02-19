@@ -3,6 +3,7 @@
         <file>main.qml</file>
         <file>exploreView.qml</file>
         <file>Scene.qml</file>
+        <file>settings.xml</file>
     </qresource>
     <qresource prefix="/icons">
         <file>Icons/ic_keyboard_arrow_up_black_36px.svg</file>
@@ -23,6 +24,10 @@
         <file>Icons/delete.png</file>
         <file>Icons/delete_pressed.png</file>
         <file>Icons/LOADING.png</file>
+        <file>Icons/synch_ON.png</file>
+        <file>Icons/synch_pressed.png</file>
+        <file>Icons/realto_logo.png</file>
+        <file>Icons/material_design.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>Images/mainbanner.png</file>
@@ -76,6 +81,8 @@
         <file>UI/arrowR0_70L1.mtl</file>
         <file>UI/half_sphere.obj</file>
         <file>UI/InfoBoxDesigner.qml</file>
+        <file>SynchDialogBox.qml</file>
+        <file>MaterialDesigner.qml</file>
     </qresource>
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>
@@ -86,15 +93,19 @@
     <qresource prefix="/materials">
         <file>statics/Materials/test.png</file>
         <file>statics/Materials/material1.material</file>
+        <file>statics/Materials/material1 (another copy).material</file>
+        <file>statics/Materials/material1 (copy).material</file>
+        <file>statics/Materials/oak.jpeg</file>
+        <file>statics/Materials/oak_dark.jpeg</file>
+        <file>statics/Materials/plywood.jpg</file>
     </qresource>
     <qresource prefix="/3dobjects">
-        <file>3DObjects/paneling.jpg</file>
-        <file>3DObjects/jacuzzi.3ds</file>
-        <file>3DObjects/jacuzzi-.jpg</file>
-        <file>3DObjects/jacuzzi.obj</file>
-        <file>3DObjects/jacuzzi.mtl</file>
-        <file>3DObjects/jacuzzi-screen.jpg</file>
-        <file>3DObjects/paneling-for-interior.jpg</file>
-        <file>3DObjects/jacuzzi_normal_map.jpg</file>
+        <file>3DObjects/jacuzzi_3ds/jacuzzi.3ds</file>
+        <file>3DObjects/jacuzzi_3ds/jacuzzi-.jpg</file>
+        <file>3DObjects/jacuzzi_3ds/paneling.jpg</file>
+        <file>3DObjects/jacuzzi_3ds/jacuzzi.dae</file>
+        <file>3DObjects/jacuzzi_3ds/jacuzzi.mtl</file>
+        <file>3DObjects/jacuzzi_3ds/jacuzzi.obj</file>
+        <file>3DObjects/jacuzzi_3ds/jacuzzi.glb</file>
     </qresource>
 </RCC>

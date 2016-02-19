@@ -3,6 +3,9 @@ import QtQuick.Controls 1.3
 import QtQuick.Window 2.0
 import QtQuick.Layouts 1.1
 import ScenarioListModel 1.0
+import ResourcesFetcher 1.0
+import QtQuick.Dialogs 1.2
+import "qrc:/ui"
 
 Item {
     function pt2px(pt){return pt*0.3759*Screen.pixelDensity}
@@ -16,6 +19,12 @@ Item {
         fillMode: Image.Tile
         id:background
         source: "qrc:/images/Images/woodbackground.png"
+    }
+
+    ResourcesFetcher{
+        id:resourcesFetcher
+        hostUrl: "http://localhost:3003/api/carpenterData"
+        username: "lollo"
     }
 
     Loader{
@@ -127,8 +136,41 @@ Item {
                 anchors.right: parent.right
                 anchors.rightMargin: 10
             }
+
+            Image{
+                width: 100
+                height: 100
+                source: synch_mouse_area.pressed ? "qrc:/icons/Icons/synch_pressed.png" : "qrc:/icons/Icons/synch_ON.png"
+                anchors.bottom:  parent.bottom
+                anchors.rightMargin: 10
+                MouseArea{
+                    id:synch_mouse_area
+                    anchors.fill: parent
+                    onClicked: synch_dialog_box.visible=true
+                }
+            }
+
+            Image{
+                width: 100
+                height: 100
+                source: "qrc:/icons/Icons/material_design.png"
+                anchors.bottom:  parent.bottom
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.rightMargin: 10
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: materialDesigner.visible=true
+                }
+            }
         }
 
+    }
+    SynchDialogBox{
+        id:synch_dialog_box
+        resourcesFetcher: resourcesFetcher
+    }
+    MaterialDesigner{
+        id:materialDesigner
     }
 
 

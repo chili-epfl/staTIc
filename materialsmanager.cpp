@@ -7,13 +7,13 @@ MaterialsManager::MaterialsManager(QObject *parent):
 {
     /*Creating default material*/
     Material default_material;
-    default_material.set("default",QUrl("qrc:/images/Images/woodbackground.png"),
+    default_material.set("Cherry",QUrl("qrc:/images/Images/woodbackground.png"),
                  20,0.50e-9,20000,1250);
     default_material.uniqueID="default";
 
     m_materials[default_material.uniqueID]=default_material;
 
-    QString materialsDir=":/maparentterials/statics/Materials/";
+    QString materialsDir=":/materials/statics/Materials/";
     QDirIterator it(materialsDir);
     while(it.hasNext()){
         it.next();
