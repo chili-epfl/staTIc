@@ -33,17 +33,12 @@ signals:
     void passwordChanged();
     void hostUrlChanged();
     void loadingChanged();
-    void pushCompleted();
 public slots:
     void slotError();
     void slotPullPhase2();
     void slotPullPhase1();
-    void slotPushPhase1();
     void pullResources();
-    void pushMaterials();
-    void slotPushPhase2();
-    void slotCloseFile();
-    void slotThumbnailUploaded();
+
 private:
     QString m_username,m_password;
     QUrl m_hostUrl;
@@ -53,14 +48,6 @@ private:
     bool m_loading;
     void finished();
 
-    struct PushData{
-        QString filename;
-        QString thumbnail;
-        short resource_type;
-        short replies_S3;
-    };
-    QMap<QNetworkReply*, PushData > m_pushData_map;
-    QMap<QNetworkReply*, QFile* > m_openFile_map;
 
 };
 

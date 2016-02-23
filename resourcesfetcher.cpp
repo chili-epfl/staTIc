@@ -11,7 +11,6 @@ const short scenario_code=3;
 
 ResourcesFetcher::ResourcesFetcher(QObject *parent) : QObject(parent)
 {
-    connect(this,SIGNAL(pushCompleted()),this, SLOT(pullResources()));
 
 }
 
@@ -44,7 +43,7 @@ void ResourcesFetcher::synchronize()
     if(m_hostUrl.isEmpty() || m_username.isEmpty() ) return;
     m_loading=true;
     emit loadingChanged();
-    pushMaterials();
+    pullResources();
 }
 
 void ResourcesFetcher::pullResources(){
@@ -87,149 +86,6 @@ void ResourcesFetcher::pullResources(){
 }
 
 
-void ResourcesFetcher::pushMaterials(){
-    QDir materialsPrivateDir(materialsPrivatePath);
-    QStringList files=materialsPrivateDir.entryList();
-    Q_FOREACH(QString file, files){
-        if(!file.endsWith(".static_material")) continue;
-        QString basename=file.split(".static_material")[0];
-        if(!files.contains(basename+".png")) continue;
-        QNetworkRequest push;
-        QUrl url=m_hostUrl;
-        QString query="type=request-put&resourceType=material&email="+m_username
-                +"&filename="+file+"&thumbnail="+basename+".png";
-        url.setQuery(query);
-        push.setUrl(url);
-        PushData pushData;
-        pushData.filename=file;
-        pushData.thumbnail=basename+".png";
-        pushData.resource_type=material_code;
-        pushData.replies_S3=0;
-        QNetworkReply* reply=manager.get(push);
-        connect(reply, SIGNAL(finished()), this, SLOT(slotPushPhase1()));
-        connect(reply, SIGNAL(error(QNetworkReply::NetworkError)),
-                this, SLOT(slotError()));
-        m_pushData_map[reply]=pushData;
-    }
-    if(m_pushData_map.count()==0)
-        emit pushCompleted();
-}
-
-
-void ResourcesFetcher::slotPushPhase1(){
-    QNetworkReply *reply=static_cast<QNetworkReply *>(QObject::sender());
-    if(reply->error()==QNetworkReply::NoError){
-        QString urlFile, urlThumbnail;
-        urlFile=reply->readLine();
-        urlFile=urlFile.split("\r\n")[0];
-
-        urlThumbnail=reply->readLine();
-        urlThumbnail=urlThumbnail.split("\r\n")[0];
-        qDebug()<<urlFile;
-        qDebug()<<urlThumbnail;
-
-        QNetworkRequest putFile;
-        QUrl URLFile=urlFile;
-        putFile.setUrl(URLFile);
-        QString filePath;
-        switch (m_pushData_map[reply].resource_type) {
-        case material_code:
-            filePath=materialsPrivatePath;
-            break;
-        case asset3d_code:
-            filePath=assets3DPrivatePath;
-            break;
-        case scenario_code:
-            filePath=scenariosPrivatePath;
-            break;
-        }
-        QFile* file=new QFile(filePath+m_pushData_map[reply].filename);
-        file->open(QIODevice::ReadOnly);
-        QNetworkReply *replyFile = manager.put(putFile,file);
-        connect(replyFile, SIGNAL(finished()), this, SLOT(slotCloseFile()));
-        connect(replyFile, SIGNAL(error(QNetworkReply::NetworkError)),
-                  this, SLOT(slotError()));
-        m_openFile_map[replyFile]=file;
-
-        QNetworkRequest putThumbnail;
-        QUrl URLThumbnail=urlThumbnail;
-        putThumbnail.setUrl(URLThumbnail);
-        QString thumbnailPath;
-        switch (m_pushData_map[reply].resource_type) {
-        case material_code:
-            thumbnailPath=materialsPrivatePath;
-            break;
-        case asset3d_code:
-            thumbnailPath=assets3DPrivatePath;
-            break;
-        case scenario_code:
-            thumbnailPath=scenariosPrivatePath;
-            break;
-        }
-        QFile* thumbnailFile=new QFile(thumbnailPath+m_pushData_map[reply].thumbnail);
-        thumbnailFile->open(QIODevice::ReadOnly);
-        QNetworkReply *replyThumbnail = manager.put(putThumbnail,thumbnailFile);
-        connect(replyThumbnail, SIGNAL(finished()), this, SLOT(slotCloseFile()));
-        connect(replyThumbnail, SIGNAL(finished()), this, SLOT(slotThumbnailUploaded()));
-        connect(replyThumbnail, SIGNAL(error(QNetworkReply::NetworkError)),
-                this, SLOT(slotError()));
-        m_openFile_map[replyThumbnail]=thumbnailFile;
-        m_pushData_map[replyThumbnail]=m_pushData_map[reply];
-    }
-    m_pushData_map.remove(reply);
-    reply->deleteLater();
-    if(m_pushData_map.count()==0){
-        emit pushCompleted();
-    }
-}
-void ResourcesFetcher::slotPushPhase2(){
-    QNetworkReply *reply=static_cast<QNetworkReply *>(QObject::sender());
-    m_pushData_map.remove(reply);
-    reply->deleteLater();
-    if(m_pushData_map.count()==0){
-        emit pushCompleted();
-    }
-}
-void ResourcesFetcher::slotThumbnailUploaded(){
-    QNetworkReply *reply=static_cast<QNetworkReply *>(QObject::sender());
-    if(reply->error()==QNetworkReply::NoError){
-        /*Create the Post*/
-        QNetworkRequest createPost;
-        QUrl createPostURL=m_hostUrl;
-
-        QString resourceType="";
-        switch (m_pushData_map[reply].resource_type) {
-        case material_code:
-            resourceType="resourceType=material";
-            break;
-        case asset3d_code:
-            resourceType="resourceType=asset3D";
-            break;
-        case scenario_code:
-            resourceType="resourceType=scenario";
-            break;
-        }
-        QString email="email="+m_username;
-
-        QString filename="filename="+m_pushData_map[reply].filename;
-        QString thumbnail="thumbnail="+m_pushData_map[reply].thumbnail;
-
-        QString query=QString("type=create-post&")+email+"&"+resourceType+"&"+filename
-                +"&"+thumbnail;
-        createPostURL.setQuery(query);
-        createPost.setUrl(createPostURL);
-        QNetworkReply *postReply = manager.get(createPost);
-        connect(postReply, SIGNAL(finished()), this, SLOT(slotPushPhase2()));
-        connect(postReply, SIGNAL(error(QNetworkReply::NetworkError)),
-                this, SLOT(slotError()));
-        m_pushData_map[postReply]=m_pushData_map[reply];
-    }
-    m_pushData_map.remove(reply);
-    reply->deleteLater();
-    if(m_pushData_map.count()==0){
-        emit pushCompleted();
-    }
-}
 
 void ResourcesFetcher::slotPullPhase1(){
     QNetworkReply *reply=static_cast<QNetworkReply *>(QObject::sender());
@@ -290,15 +146,6 @@ void ResourcesFetcher::slotPullPhase2(){
     }
 }
 
-void ResourcesFetcher::slotCloseFile(){
-    QNetworkReply *reply=static_cast<QNetworkReply *>(QObject::sender());
-    if(m_openFile_map.contains(reply)){
-        QFile* f=m_openFile_map[reply];
-        m_openFile_map.remove(reply);
-        f->close();
-        f->deleteLater();
-    }
-}
 
 void ResourcesFetcher::finished(){
     m_loading=false;
