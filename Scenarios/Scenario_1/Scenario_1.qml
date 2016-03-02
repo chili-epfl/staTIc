@@ -22,11 +22,13 @@ Item{
     property alias maxForce : staticsmodule.maxForce
     property alias minForce : staticsmodule.minForce
 
+    property bool firstInit : true
+
     state: "LoadingCamera"
     states: [
         State {
             name: "LoadingCamera"
-            when: camDevice.cameraStatus!=Camera.ActiveStatus
+            when: firstInit && camDevice.cameraStatus!=Camera.ActiveStatus
             PropertyChanges {
                 target: loadingAnimation_text
                 text:"Loading Camera"
@@ -38,7 +40,7 @@ Item{
         },
         State {
             name: "LoadingStaticsModel"
-            when: camDevice.cameraStatus==Camera.ActiveStatus &&
+            when: firstInit && camDevice.cameraStatus==Camera.ActiveStatus &&
                   staticsmodule.status!=Frame3DDKernel.LOADED
             PropertyChanges {
                 target: loadingAnimation_text
@@ -51,7 +53,7 @@ Item{
         },
         State {
             name: "Loading3DModel"
-            when: staticsmodule.status==Frame3DDKernel.LOADED &&
+            when: firstInit && staticsmodule.status==Frame3DDKernel.LOADED &&
                   scene3D.structureLoader.status!=SceneLoader.Loaded
             PropertyChanges {
                 target: loadingAnimation_text
@@ -65,7 +67,7 @@ Item{
         },
         State {
             name: "LoadingVMManager"
-            when: scene3D.structureLoader.status==SceneLoader.Loaded
+            when: firstInit && scene3D.structureLoader.status==SceneLoader.Loaded
             PropertyChanges {
                 target: loadingAnimation_text
                 text:"Enjoy :)"
@@ -85,6 +87,7 @@ Item{
             StateChangeScript {
                 script: {
                     loadingAnimation.destroy(2000)
+                    firstInit=false;
                 }
             }
         }
@@ -125,7 +128,7 @@ Item{
     Frame3DDKernel{
         id:staticsmodule
         onStatusChanged: {
-            if(status==Frame3DDKernel.LOADED){
+            if(firstInit && status==Frame3DDKernel.LOADED){
                 loadingAnimation_text.text="Loading Scenario";
                 scene3D.structureLoader.source="qrc:/scenarios/Scenarios/Scenario_1/Model1.dae"
             }
@@ -145,7 +148,7 @@ Item{
      Camera{
          id:camDevice
          onCameraStatusChanged: {
-             if(camDevice.cameraStatus==Camera.ActiveStatus){
+             if(firstInit && camDevice.cameraStatus==Camera.ActiveStatus ){
                  loadingAnimation_text.text="Loading 3D structure";
                  staticsmodule.source=":/scenarios/Scenarios/Scenario_1/Model1.lol"
              }
@@ -205,7 +208,7 @@ Item{
              Scene3D {
                  anchors.fill: parent
                  focus: true
-                 aspects: ["input","physics"]
+                 aspects: ["input","physics","logic"]
                  //aspects:["input"]
                  multisample:true
                  Scenario1Scene3D {
