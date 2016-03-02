@@ -35,6 +35,7 @@ Entity{
     /*The stress relative to th esize and material.
      *If it's 1 or more, it is above the limits*/
     property real relativeAxialStress: 0
+    onRelativeAxialStressChanged: console.log(relativeAxialStress)
     property matrix4x4 poseMatrix
 
     function computeTransform(){

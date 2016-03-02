@@ -35,7 +35,11 @@ public:
     void ForcesAndMoments(int& axial_type, qreal& Nx, qreal& Vy, qreal& Vz,
                           qreal& Tx,qreal& My,qreal& Mz,int extreme=0);
 
-    void stress(qreal& axial,qreal& shearY,qreal& shearZ, qreal& torsion, int extreme);
+    void stress(qreal& axial, qreal &bending, qreal& shearY, qreal& shearZ, qreal& torsion, int extreme);
+
+    /*The proportion between the stress and the material limit values*/
+    void stressRatio(qreal& axialComponent, qreal& shearComponent,int extreme);
+
 
     void setSize(QSizeF size);
     QSizeF size(){return m_size;}
@@ -125,11 +129,13 @@ private:
     qreal m_z_moment_extreme_2;
 
     qreal m_axial_stress_extreme1;
+    qreal m_bending_stress_extreme1;
     qreal m_shear_stress_y_extreme1;
     qreal m_shear_stress_z_extreme1;
     qreal m_torsional_stess_extreme1;
 
     qreal m_axial_stress_extreme2;
+    qreal m_bending_stress_extreme2;
     qreal m_shear_stress_y_extreme2;
     qreal m_shear_stress_z_extreme2;
     qreal m_torsional_stess_extreme2;

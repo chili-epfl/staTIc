@@ -21,16 +21,26 @@ private:
         qreal density;
         qreal young;
         qreal g;
+        qreal ft0,fc0,fmk,ft90,fc90,fvk;
         void set(QString _name,
         QUrl _texture_img,
         qreal _price,
-        qreal _density, qreal _young, qreal _g){
+        qreal _density, qreal _young, qreal _g,
+        qreal _ft0,qreal _fc0,qreal _fmk,//parallel tension, parallel compression, bending,
+        qreal _ft90,qreal _fc90,qreal _fvk)//perpendicular tension, perpendicular compression, shear
+        {
             name=_name;
             texture_img=_texture_img;
             price=_price;
             density=_density;
             young=_young;
             g=_g;
+            ft0=_ft0;
+            fc0=_fc0;
+            fmk=_fmk;
+            ft90=_ft90;
+            fc90=_fc90;
+            fvk=_fvk;
         }
     };
     //QList<Material> m_materials;

@@ -7,8 +7,8 @@ MaterialsManager::MaterialsManager(QObject *parent):
 {
     /*Creating default material*/
     Material default_material;
-    default_material.set("Cherry",QUrl("qrc:/images/Images/woodbackground.png"),
-                 20,0.50e-9,20000,1250);
+    default_material.set("Conifers(C14)",QUrl("qrc:/images/Images/woodbackground.png"),
+                 20,0.385e-9,7000,440,8,16,14,0.4,2,3);
     default_material.uniqueID="default";
 
     m_materials[default_material.uniqueID]=default_material;
@@ -27,7 +27,7 @@ MaterialsManager::MaterialsManager(QObject *parent):
             QString line;
             QStringList sub_parts,property;
             Material material;
-            material.set(QString(),QUrl(),0,0,0,0);
+            material.set(QString(),QUrl(),0,0,0,0,0,0,0,0,0,0);
             do{
                 line=inputStream.readLine();
                 sub_parts=line.split(";",QString::SplitBehavior::SkipEmptyParts);
@@ -66,11 +66,43 @@ MaterialsManager::MaterialsManager(QObject *parent):
                     else if(property[0]=="TextureImage") {
                         material.texture_img="qrc"+materialsDir+property[1];
                     }
+                    else if(property[0]=="ft0") {
+                        bool ok;
+                        material.ft0=property[1].toFloat(&ok);
+                        if(!ok) qDebug()<<"Convertion error:"<<part;
+                    }
+                    else if(property[0]=="fc0") {
+                        bool ok;
+                        material.fc0=property[1].toFloat(&ok);
+                        if(!ok) qDebug()<<"Convertion error:"<<part;
+                    }
+                    else if(property[0]=="fmk") {
+                        bool ok;
+                        material.fmk=property[1].toFloat(&ok);
+                        if(!ok) qDebug()<<"Convertion error:"<<part;
+                    }
+                    else if(property[0]=="ft90") {
+                        bool ok;
+                        material.ft90=property[1].toFloat(&ok);
+                        if(!ok) qDebug()<<"Convertion error:"<<part;
+                    }
+                    else if(property[0]=="fc90") {
+                        bool ok;
+                        material.fc90=property[1].toFloat(&ok);
+                        if(!ok) qDebug()<<"Convertion error:"<<part;
+                    }
+                    else if(property[0]=="fvk") {
+                        bool ok;
+                        material.fvk=property[1].toFloat(&ok);
+                        if(!ok) qDebug()<<"Convertion error:"<<part;
+                    }
                     else{qDebug()<<"Unknown property:"<<part;}
                 }
             }while(!line.isNull());
-            if(material.uniqueID.isEmpty() || material.name.isEmpty() || material.density==0 ||
-                    material.g==0 || material.young==0 || m_materials.contains(material.uniqueID)){
+            if(material.uniqueID.isEmpty() || material.name.isEmpty() || material.density<=0 ||
+                    material.g<=0 || material.young<=0 || m_materials.contains(material.uniqueID)
+                    || material.fc0<=0 || material.fc90<=0 || material.fmk<=0 || material.ft0<=0
+                    ||material.ft90<=0||material.fvk<=0){
                 qDebug()<<"Invalid material or duplicated Id:"<< it.filePath();
             }
             else{
@@ -123,6 +155,27 @@ QVariant MaterialsManager::get(int index, QString info) const
     else if(info.compare("UniqueID",Qt::CaseInsensitive)==0){
         return m_materials[m_materialsIndex[index]].uniqueID;
     }
+    else if(info.compare("ft0",Qt::CaseInsensitive)==0){
+        return m_materials[m_materialsIndex[index]].ft0;
+    }
+    else if(info.compare("fc0",Qt::CaseInsensitive)==0){
+        return m_materials[m_materialsIndex[index]].fc0;
+    }
+    else if(info.compare("fmk",Qt::CaseInsensitive)==0){
+        return m_materials[m_materialsIndex[index]].fmk;
+    }
+    else if(info.compare("ft90",Qt::CaseInsensitive)==0){
+        return m_materials[m_materialsIndex[index]].ft90;
+    }
+    else if(info.compare("fc90",Qt::CaseInsensitive)==0){
+        return m_materials[m_materialsIndex[index]].fc90;
+    }
+    else if(info.compare("fvk",Qt::CaseInsensitive)==0){
+        return m_materials[m_materialsIndex[index]].fvk;
+    }
+
+
+
     return QVariant();
 }
 
@@ -144,6 +197,26 @@ QVariant MaterialsManager::get(QString uniqueID, QString info) const
     else if(info.compare("Index",Qt::CaseInsensitive)==0){
         return m_materialsIndex.indexOf(uniqueID);
     }
+    else if(info.compare("ft0",Qt::CaseInsensitive)==0){
+        return m_materials[uniqueID].ft0;
+    }
+    else if(info.compare("fc0",Qt::CaseInsensitive)==0){
+        return m_materials[uniqueID].fc0;
+    }
+    else if(info.compare("fmk",Qt::CaseInsensitive)==0){
+        return m_materials[uniqueID].fmk;
+    }
+    else if(info.compare("ft90",Qt::CaseInsensitive)==0){
+        return m_materials[uniqueID].ft90;
+    }
+    else if(info.compare("fc90",Qt::CaseInsensitive)==0){
+        return m_materials[uniqueID].fc90;
+    }
+    else if(info.compare("fvk",Qt::CaseInsensitive)==0){
+        return m_materials[uniqueID].fvk;
+    }
+
+
     return QVariant();
 
 }
