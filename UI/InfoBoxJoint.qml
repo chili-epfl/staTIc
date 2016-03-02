@@ -12,13 +12,18 @@ Rectangle {
 
     onCurrent_itemChanged: {
         forceListModel.clear()
+        hasReaction=false;
+        infoboxScene3D.resetBeams();
+        infoboxScene3D.beam_poses=[];
         if(current_item != null && current_item.connected_beams){
             title.text="Joint "+ current_item.objectName;
             for(var i=0;i<current_item.connected_beams.length;i++){
                 forceListModel.append({isAdded:true,
                                        beam:current_item.connected_beams[i],
                                       })
+                infoboxScene3D.beam_poses.push(current_item.connected_beams[i].poseMatrix)
             }
+            infoboxScene3D.updateBeams();
             //Important that this stays at the end!
             if(Math.abs(current_item.reaction.length())>0.0001){
                    hasReaction=true;
@@ -43,6 +48,7 @@ Rectangle {
         infoboxScene3D.currentForce=sum
         infoboxScene3D.maxForce=max;
     }
+
     function computeMaxForce(index){
         if (index==current_item.connected_beams.length) return Qt.vector3d(0,0,0);
         var next=computeMaxForce(index+1);

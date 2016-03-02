@@ -45,12 +45,11 @@ Entity {
 
     property real equilibrium_distance: currentForce.length()/maxForce.length();
 
-    property int scaleFactor: (Math.log(Math.max(Math.abs(maxForce.x),Math.abs(maxForce.y),Math.abs(maxForce.z)))/Math.LN10) > 1 ?
-                               Math.pow(10,Math.floor(Math.log(Math.max(Math.abs(maxForce.x),Math.abs(maxForce.y),Math.abs(maxForce.z)))/Math.LN10))
-                              :
-                              1
-    onScaleFactorChanged: console.log(scaleFactor)
-    onCurrentForceChanged: console.log(currentForce)
+    property int scaleFactor: Math.max(Math.abs(maxForce.x),Math.abs(maxForce.y),Math.abs(maxForce.z))/10
+
+    onScaleFactorChanged: console.log(beam_poses.length)
+
+    property var beam_poses:[];
 
     CylinderMesh{
         id:axis_mesh
@@ -124,8 +123,8 @@ Entity {
 
     /*Current Force Entity*/
     Entity{
-
         Entity{
+            enabled: false
             objectName: "x_axis"
             components: [axis_mesh,x_axis_transform,red]
             Entity{
@@ -133,10 +132,12 @@ Entity {
             }
         }
         Entity{
+            enabled: false
             objectName: "x_axis_neg"
             components: [axis_mesh,x_axis_transform_neg,grey]
         }
         Entity{
+            enabled: false
             objectName: "y_axis"
             components: [axis_mesh,y_axis_transform,green]
             Entity{
@@ -145,11 +146,13 @@ Entity {
 
         }
         Entity{
+            enabled: false
             objectName: "y_axis_neg"
             components: [axis_mesh,y_axis_transform_neg,grey]
 
         }
         Entity{
+            enabled: false
             objectName:"z_axis"
             components: [axis_mesh,z_axis_transform,blue]
             Entity{
@@ -158,6 +161,7 @@ Entity {
 
         }
         Entity{
+            enabled: false
             objectName:"z_axis_neg"
             components: [axis_mesh,z_axis_transform_neg,grey]
 
@@ -342,6 +346,48 @@ Entity {
 
 
     }
+
+
+    /*Mina's solution*/
+    function updateBeams(){
+      beams_creator.model=beam_poses.length
+    }
+    function resetBeams(){
+      beams_creator.model=0
+    }
+    DiffuseMapMaterial {
+                id: test_material
+                diffuse: "qrc:/materials/statics/Materials/oak.jpeg"
+                specular: Qt.rgba( 0.2, 0.2, 0.2, 1.0 )
+                shininess: 2.0
+    }
+    NodeInstantiator{
+        id:beams_creator
+        model:0
+        delegate:Entity{
+                    Transform{
+                        id:transform
+                        matrix:{
+                            var m=Qt.matrix4x4(beam_poses[index].m11,beam_poses[index].m12,
+                                               beam_poses[index].m13,beam_poses[index].m14,
+                                               beam_poses[index].m21,beam_poses[index].m22,
+                                               beam_poses[index].m23,beam_poses[index].m24,
+                                               beam_poses[index].m31,beam_poses[index].m32,
+                                               beam_poses[index].m33,beam_poses[index].m34,
+                                               beam_poses[index].m41,beam_poses[index].m42,
+                                               beam_poses[index].m43,beam_poses[index].m44);
+                            m.rotate(-90, Qt.vector3d(0, 0, 1))
+                            m.translate(Qt.vector3d(0,0.5*axis_mesh.length,0));
+                            return m
+                        }
+                    }
+                    components: [axis_mesh,transform,test_material]
+
+                }
+
+
+    }
+
 
 
 }
