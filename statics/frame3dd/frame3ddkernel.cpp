@@ -66,6 +66,8 @@ Frame3DDKernel::Frame3DDKernel(QObject* parent):
 bool Frame3DDKernel::readStructure(QString path){
 
     bool is2d=true;
+    QList<QVector3D> tmp_nodes;
+    QStringList tmp_nodes_names;
 
     QFile inputFile(path);
     if (!inputFile.open(QIODevice::ReadOnly | QIODevice::Text)){
@@ -122,8 +124,20 @@ bool Frame3DDKernel::readStructure(QString path){
         if(z!=0){
             is2d=false;
         }
-        createJoint(QVector3D(x,y,z),line_parts[0]);
+        tmp_nodes.append(QVector3D(x,y,z));
+        tmp_nodes_names.append(line_parts[0]);
     }
+
+    for(int i=0;i<tmp_nodes.size();i++){
+        if(is2d){
+            createJoint(tmp_nodes[i],tmp_nodes_names[i]);
+        }
+        else{
+            createJoint(QVector3D(tmp_nodes[i].x(),tmp_nodes[i].z(),-tmp_nodes[i].y()),tmp_nodes_names[i]);
+        }
+    }
+
+
 
     int DoF=6*number_nodes;
     /*Read number of reactions */
@@ -479,8 +493,14 @@ void Frame3DDKernel::solve(){
     for(i=0; i<nN;i++){
         JointPtr joint=m_joints.at(i);
         xyz[i+1].x=joint->position().x();
-        xyz[i+1].y=joint->position().y();
-        xyz[i+1].z=joint->position().z();
+        if(m_is2D){
+            xyz[i+1].y=joint->position().y();
+            xyz[i+1].z=joint->position().z();
+        }
+        else{
+            xyz[i+1].z=joint->position().y();
+            xyz[i+1].y=-joint->position().z();
+        }
         rj[i+1]=0;
     }
 
@@ -495,7 +515,7 @@ void Frame3DDKernel::solve(){
     for(i=0;i<m_joints.size();i++){
         JointPtr joint=m_joints.at(i);
         bool X,Y,Z,XX,YY,ZZ;
-        joint->support(X,Y,Z,XX,YY,ZZ);
+        joint->support(X,Y,Z,XX,YY,ZZ);//TODO:2D to 3D
         if(X || Y || Z || XX || YY || ZZ){
             nR++;
             r[i*6+1]=X;
@@ -550,11 +570,18 @@ void Frame3DDKernel::solve(){
         qreal beam_Ax,beam_Asy,beam_Asz,beam_Jx,beam_Iy,beam_Iz,beam_E,beam_G,beam_p,beam_d;
         beam->parameters(beam_Ax,beam_Asy,beam_Asz,beam_Jx,beam_Iy,beam_Iz,beam_E,beam_G,beam_p,beam_d);
         Ax[i+1]=beam_Ax;
-        Asy[i+1]=beam_Asy;
-        Asz[i+1]=beam_Asz;
         Jx[i+1]=beam_Jx;
-        Iy[i+1]=beam_Iy;
-        Iz[i+1]=beam_Iz;
+        if(m_is2D){
+            Asy[i+1]=beam_Asy;
+            Asz[i+1]=beam_Asz;
+            Iy[i+1]=beam_Iy;
+            Iz[i+1]=beam_Iz;
+        }else{
+            Asy[i+1]=beam_Asz;
+            Asz[i+1]=beam_Asy;
+            Iy[i+1]=beam_Iz;
+            Iz[i+1]=beam_Iy;
+        }
         E[i+1]=beam_E;
         G[i+1]=beam_G;
         p[i+1]=beam_p;
@@ -1105,7 +1132,11 @@ void Frame3DDKernel::write_internal_forces (
         QList<QVector4D> segments;
         //        fprintf(fpif,"#.x                \tNx        \tVy        \tVz        \tTx       \tMy        \tMz        \tDx        \tDy        \tDz        \tRx\t~\n");
         for (i=0; i<=nx; i++) {
-            segments.push_back(QVector4D(Dx[i], Dy[i], Dz[i], Rx[i]));
+            if(m_is2D)
+                segments.push_back(QVector4D(Dx[i], Dy[i], Dz[i], Rx[i]));
+            else
+                segments.push_back(QVector4D(Dx[i], Dz[i],-Dy[i], Rx[i]));
+
             //            fprintf(fpif,"%14.6e\t", x[i] );
             //            fprintf(fpif,"%14.6e\t%14.6e\t%14.6e\t",
             //                        Nx[i], Vy[i], Vz[i] );
@@ -1181,8 +1212,14 @@ void Frame3DDKernel::assemble_loads (
 
 
     /* gravity loads applied uniformly to all frame elements ------- */
-    gX[1]=m_gravity.x(); gY[1]=m_gravity.y(), gZ[1]=m_gravity.z();
-
+    gX[1]=m_gravity.x();
+    if(m_is2D){
+        gY[1]=m_gravity.y();
+        gZ[1]=m_gravity.z();
+    }else{
+        gY[1]=m_gravity.z();
+        gZ[1]=-m_gravity.y();
+    }
     for (n=1; n<=nE; n++) {
 
         n1 = J1[n];	n2 = J2[n];
@@ -1220,12 +1257,22 @@ void Frame3DDKernel::assemble_loads (
     Q_FOREACH(NodeLoadPtr nodeload, m_node_loads){
         int application_joint_index=m_joints.indexOf(nodeload->joint().toStrongRef());
         F_mech[1][6*application_joint_index+1]+=nodeload->force().x();//I added a plus...
-        F_mech[1][6*application_joint_index+2]+=nodeload->force().y();
-        F_mech[1][6*application_joint_index+3]+=nodeload->force().z();
-        F_mech[1][6*application_joint_index+4]+=nodeload->force().x();
-        F_mech[1][6*application_joint_index+5]+=nodeload->force().y();
-        F_mech[1][6*application_joint_index+6]+=nodeload->force().z();
+        F_mech[1][6*application_joint_index+4]+=nodeload->momentum().x();
+        if(m_is2D){
+            F_mech[1][6*application_joint_index+2]+=nodeload->force().y();
+            F_mech[1][6*application_joint_index+3]+=nodeload->force().z();
+            F_mech[1][6*application_joint_index+5]+=nodeload->momentum().y();
+            F_mech[1][6*application_joint_index+6]+=nodeload->momentum().z();
+        }
+        else{
+            F_mech[1][6*application_joint_index+2]+=nodeload->force().z();
+            F_mech[1][6*application_joint_index+3]-=nodeload->force().y();
+            F_mech[1][6*application_joint_index+5]+=nodeload->momentum().z();
+            F_mech[1][6*application_joint_index+6]-=nodeload->momentum().y();
+
+        }
     }
+
 
     /* uniformly distributed loads --------------------------------- */
 
@@ -1240,8 +1287,13 @@ void Frame3DDKernel::assemble_loads (
         }
         U[1][i][1] = (double) application_beam_index;
         U[1][i][2] = UDLoad->forceLocal().x();
-        U[1][i][3] = UDLoad->forceLocal().y();
-        U[1][i][4] = UDLoad->forceLocal().z();
+        if(m_is2D){
+            U[1][i][3] = UDLoad->forceLocal().y();
+            U[1][i][4] = UDLoad->forceLocal().z();
+        }else{
+            U[1][i][3] = UDLoad->forceLocal().z();
+            U[1][i][4] = -UDLoad->forceLocal().y();
+        }
 
         Nx1 = Nx2 = U[1][i][2]*Le[application_beam_index] / 2.0;
         Vy1 = Vy2 = U[1][i][3]*Le[application_beam_index] / 2.0;
@@ -1293,14 +1345,28 @@ void Frame3DDKernel::assemble_loads (
         W[1][i][3]=end.x();//xx2
         W[1][i][4]=trz_load->forceLocal().x();//wx1
         W[1][i][5]=trz_load->forceLocal().x();//wx1
-        W[1][i][6]=begin.y();
-        W[1][i][7]=end.y();
-        W[1][i][8]=trz_load->forceLocal().y();
-        W[1][i][9]=trz_load->forceLocal().y();
-        W[1][i][10]=begin.z();
-        W[1][i][11]=end.z();
-        W[1][i][12]=trz_load->forceLocal().z();
-        W[1][i][13]=trz_load->forceLocal().z();
+        if(m_is2D){
+            W[1][i][6]=begin.y();
+            W[1][i][7]=end.y();
+            W[1][i][8]=trz_load->forceLocal().y();
+            W[1][i][9]=trz_load->forceLocal().y();
+            W[1][i][10]=begin.z();
+            W[1][i][11]=end.z();
+            W[1][i][12]=trz_load->forceLocal().z();
+            W[1][i][13]=trz_load->forceLocal().z();
+        }else{
+
+            W[1][i][6]=begin.z();
+            W[1][i][7]=end.z();
+            W[1][i][8]=trz_load->forceLocal().z();
+            W[1][i][9]=trz_load->forceLocal().z();
+            W[1][i][10]=begin.y();
+            W[1][i][11]=end.y();
+            W[1][i][12]=trz_load->forceLocal().y();
+            W[1][i][13]=trz_load->forceLocal().y();
+
+        }
+
 
         Ln = L[n];
 
@@ -1468,8 +1534,14 @@ void Frame3DDKernel::assemble_loads (
         }
         P[1][i][1] = (double) n;
         P[1][i][2] = ipl->forceLocal().x();
-        P[1][i][3] = ipl->forceLocal().y();
-        P[1][i][4] = ipl->forceLocal().z();
+        if(m_is2D){
+            P[1][i][3] = ipl->forceLocal().y();
+            P[1][i][4] = ipl->forceLocal().z();
+        }
+        else{
+            P[1][i][3] = ipl->forceLocal().z();
+            P[1][i][4] = -ipl->forceLocal().y();
+        }
         P[1][i][5] = ipl->distance();
 
         a = P[1][i][5];	b = L[n] - a;
@@ -1647,8 +1719,13 @@ void Frame3DDKernel::update_statics(
         for ( i=5; i>=0; i-- ) disp += fabs( D[6*j-i] );
         JointPtr joint=m_joints.at(j-1);
         if ( disp > 0.0 ) {
-            joint->setDisplacement(QVector3D(D[6*j-5],D[6*j-4],D[6*j-3]));
-            joint->setDisplacementRot(QVector3D(D[6*j-2],D[6*j-1],D[6*j]));
+            if(m_is2D){
+                joint->setDisplacement(QVector3D(D[6*j-5],D[6*j-4],D[6*j-3]));
+                joint->setDisplacementRot(QVector3D(D[6*j-2],D[6*j-1],D[6*j]));
+            }else{
+                joint->setDisplacement(QVector3D(D[6*j-5],D[6*j-3],-D[6*j-4]));
+                joint->setDisplacementRot(QVector3D(D[6*j-2],D[6*j],D[6*j-1]));
+            }
         }else{
             joint->setDisplacement(QVector3D(0,0,0));
             joint->setDisplacementRot(QVector3D(0,0,0));
@@ -1665,14 +1742,20 @@ void Frame3DDKernel::update_statics(
         if ( Q[n][1] >=  0.0001 ) axial_type=-1;//compression
         if ( Q[n][1] <= -0.0001 ) axial_type=1;//tension
 
-        beam->setForcesAndMoments(axial_type,Q[n][1],Q[n][2],Q[n][3],Q[n][4],Q[n][5],Q[n][6],1);
+        if(m_is2D)
+            beam->setForcesAndMoments(axial_type,Q[n][1],Q[n][2],Q[n][3],Q[n][4],Q[n][5],Q[n][6],1);
+        else
+            beam->setForcesAndMoments(axial_type,Q[n][1],Q[n][3],-Q[n][2],Q[n][4],Q[n][6],Q[n][5],1);
 
         if (fabs(Q[n][7]) < 0.0001)
             axial_type=0;
         if ( Q[n][7] >=  0.0001 ) axial_type=1;//tension
         if ( Q[n][7] <= -0.0001 ) axial_type=-1;//compression
-        beam->setForcesAndMoments(axial_type,Q[n][7],Q[n][8],Q[n][9],Q[n][10],Q[n][11],Q[n][12],2);
-        //qDebug()<<beam->objectName()<<" "<<  Q[n][1];
+        if(m_is2D)
+            beam->setForcesAndMoments(axial_type,Q[n][7],Q[n][8],Q[n][9],Q[n][10],Q[n][11],Q[n][12],2);
+        else
+            beam->setForcesAndMoments(axial_type,Q[n][7],Q[n][9],-Q[n][8],Q[n][10],Q[n][12],-Q[n][11],2);
+
 
         if( maxF < (fabs(Q[n][7])+fabs(Q[n][1]))*0.5 ){
             maxF=(fabs(Q[n][7])+fabs(Q[n][1]))*0.5;
@@ -1688,8 +1771,13 @@ void Frame3DDKernel::update_statics(
         i = 6*(j-1);
         if ( r[i+1] || r[i+2] || r[i+3] ||
              r[i+4] || r[i+5] || r[i+6] ) {
-            joint->setReaction(QVector3D(R[6*j-5],R[6*j-4],R[6*j-3]));
-            joint->setReactionMomentum(QVector3D(R[6*j-2],R[6*j-1],R[6*j]));
+            if(m_is2D){
+                joint->setReaction(QVector3D(R[6*j-5],R[6*j-4],R[6*j-3]));
+                joint->setReactionMomentum(QVector3D(R[6*j-2],R[6*j-1],R[6*j]));
+            }else{
+                joint->setReaction(QVector3D(R[6*j-5],R[6*j-3],-R[6*j-4]));
+                joint->setReactionMomentum(QVector3D(R[6*j-2],R[6*j],R[6*j-1]));
+            }
         }
         if( maxF < joint->reaction().length() ){
             maxF= joint->reaction().length();
