@@ -65,6 +65,8 @@ Frame3DDKernel::Frame3DDKernel(QObject* parent):
 
 bool Frame3DDKernel::readStructure(QString path){
 
+    bool is2d=true;
+
     QFile inputFile(path);
     if (!inputFile.open(QIODevice::ReadOnly | QIODevice::Text)){
         qDebug()<<"Failed to open structure file";
@@ -116,6 +118,9 @@ bool Frame3DDKernel::readStructure(QString path){
             qWarning("Fail to convert coordinate:");
             qWarning(line_parts[3].toStdString().c_str());
             return false;
+        }
+        if(z!=0){
+            is2d=false;
         }
         createJoint(QVector3D(x,y,z),line_parts[0]);
     }
@@ -282,6 +287,9 @@ bool Frame3DDKernel::readStructure(QString path){
     }
     solve();
     setStatus(Status::LOADED);
+    m_is2D=is2d;
+    emit is2DChanged();
+
     return true;
 }
 

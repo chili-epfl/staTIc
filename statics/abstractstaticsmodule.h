@@ -36,6 +36,8 @@ class AbstractStaticsModule : public QObject
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(Stability stability READ stability NOTIFY stabilityChanged)
 
+    Q_PROPERTY(bool is2D READ is2D NOTIFY is2DChanged)
+
     Q_PROPERTY(qreal maxForce READ maxForce NOTIFY maxForceChanged)
     Q_PROPERTY(qreal minForce READ minForce NOTIFY minForceChanged)
 
@@ -55,7 +57,7 @@ public:
 
     Status status(){return m_status;}
     Stability stability(){return m_stability;}
-
+    bool is2D(){return m_is2D;}
     virtual qreal maxForce()=0;
     virtual qreal minForce()=0;
 
@@ -89,6 +91,8 @@ signals:
     void maxForceChanged();
     void updated();
     void materialsManagerChanged();
+    void is2DChanged();
+
 protected:
     virtual bool readStructure(QString path) =0;
     virtual void update() =0;
@@ -98,6 +102,7 @@ protected:
     Stability m_stability;
     static qreal m_modelScale;
     MaterialsManager* m_materialsManager;
+    bool m_is2D;
 
 };
 
