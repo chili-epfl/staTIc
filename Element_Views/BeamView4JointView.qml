@@ -36,20 +36,43 @@ Entity{
     }
 
     function updateGlobalForceExtreme1(){
-            var ab=extreme2.minus(extreme1).normalized();
-            var shearY;
-            var shearZ;
+        var ab=extreme2.minus(extreme1).normalized();
+        var a=Qt.vector3d(1,0,0);
+        var b
+        if(flip_extremes)
+                b=extreme1.minus(extreme2).normalized();
+        else
+                b=extreme2.minus(extreme1).normalized();
+
+        var axb=a.crossProduct(b);
+        var result=Qt.matrix4x4();
+        if(axb.x!==0 || axb.y!==0 || axb.z!==0){
+            var tmp_ssc=ssc(axb);
+            result=result.plus(tmp_ssc).plus(tmp_ssc.times(tmp_ssc).times((1-a.dotProduct(b))/Math.pow(axb.length(),2)));
+            result.m44=1;
+        }else{
+            if(b.x===-1){
+                result.m11=-1;
+                result.m22=-1;
+            }else{
+                //Hack
+                result.translate(0,0,0.00001);
+            }
+        }
+        var shearY=result.times(Qt.vector3d(0,shearYForce_extreme1,0).times(-1))
+        var shearZ=result.times(Qt.vector3d(0,0,shearZForce_extreme1).times(-1))
             if(flip_extremes){
-                shearY=poseMatrix.times(Qt.vector3d(0,shearYForce_extreme1,0))
-                shearZ=poseMatrix.times(Qt.vector3d(0,0,shearZForce_extreme1))
                 ab=ab.times(axialForce_extreme1);
             }
             else{
-                shearY=poseMatrix.times(Qt.vector3d(0,shearYForce_extreme1,0).times(-1))
-                shearZ=poseMatrix.times(Qt.vector3d(0,0,shearZForce_extreme1).times(-1))
                 ab=ab.times(axialForce_extreme1).times(-1);
             }
+
             globalForceExtreme1=ab.plus(shearY).plus(shearZ);
+
+
+
+
     }
 
 
