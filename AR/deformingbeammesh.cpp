@@ -227,7 +227,7 @@ void DeformingBeamMesh::generateGeometry(){
 
 
         //From opengl to Frame3DD
-        QVector2D _v(-v.z(),v.y());
+        QVector2D _v(v.y(),-v.z());
         float cos_theta=cos(disp.w());
         float sin_theta=sin(disp.w());
         //Clock wise rotation because of frame3dd
@@ -239,7 +239,8 @@ void DeformingBeamMesh::generateGeometry(){
 //        _final_vertices.push_back(QVector3D(v_final.x(),v_final.z(),-v_final.y()));
 
         /*2D case:y is vertical displacement*/
-        QVector3D v_final(v_rot.x(),v_rot.z(),-v_rot.y());
+        QVector3D v_final(v_rot.x(),v_rot.y(),-v_rot.z());
+
         v_final+=m_exagerate*disp.toVector3D();
         //Back to Opengl
         _final_vertices.push_back(v_final);
