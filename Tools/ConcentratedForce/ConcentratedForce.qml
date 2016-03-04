@@ -6,6 +6,7 @@ import QuickConcentratedForce 1.0
 import QtQuick 2.3 as QQ2
 
 Entity {
+    objectName: "conceForce"
     QQ2.Component.onCompleted: {
         var array=chilitags.chiliobjects
         array.push(forceTag)
@@ -18,9 +19,9 @@ Entity {
     /*Graphical rapresentation*/
     SphereMesh{
         id:collisionSphere
-        enabled: false
+        enabled: true
         radius:15
-    }
+    }    
     Transform{
         id:collisionTransform
         matrix: {
@@ -36,6 +37,7 @@ Entity {
         id:sphereBody
         kinematic:true
         inputTransform: collisionTransform;
+        //onCollided: console.log("collition")
     }
 
     QuickConcentratedForce{
@@ -44,8 +46,20 @@ Entity {
         emittingBodyInfo:sphereBody
     }
 
-    //components:[collisionSphere,sphereBody,collisionTransform]
+    components:[sphereBody,collisionTransform]
+    QQ2.Timer{
+        interval: 5000
+        running: true
+        //onTriggered: scene.source="qrc:/3dobjects/3DObjects/jacuzzi.obj"
+    }
+    Entity{
+        SceneLoader{
+            id:scene
+            //source:"qrc:/3dobjects/3DObjects/jacuzzi_3ds/jacuzzi.obj"
 
+        }
+        components: [scene]
+    }
 }
 
 

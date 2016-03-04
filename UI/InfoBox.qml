@@ -77,7 +77,6 @@ Rectangle {
         id:loader
         anchors.fill:parent
         onLoaded: item.current_item=Qt.binding(function(){return current_item})
-        onSourceChanged: console.log(source)
     }
 
 }

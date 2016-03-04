@@ -110,7 +110,7 @@ QML_IMPORT_PATH =
 # Default rules for deployment.
 include(deployment.pri)
 
-LIBS += -lopencv_core -lopencv_video -lopencv_imgproc
+LIBS += -lopencv_core -lopencv_video -lopencv_imgproc -lquazip -lz
 #-lopencv_highgui -lopencv_imgproc
 #-lopencv_video -lopencv_calib3d
 LIBS += -lLinearMath -lBulletDynamics -lBulletCollision -lBulletSoftBody
@@ -158,6 +158,4 @@ android {
     LIBS += -L/home/chili/Downloads/bullet3-2.83.5/build-linux/install/lib
 }
 
-DISTFILES += \
-    settings.xml
 

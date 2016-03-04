@@ -2,7 +2,7 @@
 #include <QQmlContext>
 #include <QQmlComponent>
 #include <QQmlEngine>
-
+#include <Qt3DRender>
 
 TrapezoidalForceVM::TrapezoidalForceVM(TrapezoidalForcePtr force, Qt3DCore::QEntity *sceneRoot, Qt3DCore::QEntity* parentEntity,QObject *parent)
     :AbstractElementViewModel(sceneRoot,parent)
@@ -38,11 +38,16 @@ void TrapezoidalForceVM::initView(Qt3DCore::QEntity* parentEntity)
     QQmlComponent component(QQmlEngine::contextForObject(parentEntity)->engine(),QUrl("qrc:/element_views/Element_Views/TrapezoidalForce.qml"));
     Qt3DCore::QEntity* forceView= qobject_cast<Qt3DCore::QEntity*>(component.create(new QQmlContext(QQmlEngine::contextForObject(parentEntity))));
     m_component3D=forceView;
-    QQmlEngine::setObjectOwnership(m_component3D,QQmlEngine::JavaScriptOwnership);
+    QQmlEngine::setObjectOwnership(m_component3D,QQmlEngine::CppOwnership);
     onForceChanged();
     onRelativePositionChanged();
     connect(m_component3D,SIGNAL(forceChanged()),this,SLOT(onForceChanged()));
     connect(m_component3D,SIGNAL(relativePositionChanged()),SLOT(onRelativePositionChanged()));
 
     m_component3D->setParent(parentEntity);
+
+    Qt3DCore::QEntity* test=new Qt3DCore::QEntity(m_component3D);
+    Qt3DRender::QSceneLoader *sceneLoader = new Qt3DRender::QSceneLoader(test);
+    test->addComponent(sceneLoader);
+    sceneLoader->setSource(QUrl("qrc:/3dobjects/3DObjects/jacuzzi_3ds/jacuzzi.dae"));
 }

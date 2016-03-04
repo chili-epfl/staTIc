@@ -40,14 +40,13 @@ Entity {
 
 
     property vector3d currentForce: Qt.vector3d(0,0,0)
+    onCurrentForceChanged: console.log(currentForce)
 
     property vector3d maxForce: Qt.vector3d(0.0001,0,0)
 
     property real equilibrium_distance: currentForce.length()/maxForce.length();
 
     property int scaleFactor: Math.max(Math.abs(maxForce.x),Math.abs(maxForce.y),Math.abs(maxForce.z))/10
-
-    onScaleFactorChanged: console.log(beam_poses.length)
 
     property var beam_poses:[];
 

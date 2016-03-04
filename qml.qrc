@@ -1,9 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>exploreView.qml</file>
-        <file>Scene.qml</file>
-        <file>settings.xml</file>
     </qresource>
     <qresource prefix="/icons">
         <file>Icons/ic_keyboard_arrow_up_black_36px.svg</file>
@@ -66,6 +63,12 @@
         <file>Scenarios/Scenario_1/Model1.yml</file>
         <file>Scenarios/Scenario_1/Scenario_1.qml</file>
         <file>Scenarios/Scenario_1/Scenario1Scene3D.qml</file>
+        <file>Scenarios/Scenario_2/Model1.dae</file>
+        <file>Scenarios/Scenario_2/Model1.lol</file>
+        <file>Scenarios/Scenario_2/Model1.png</file>
+        <file>Scenarios/Scenario_2/Model1.yml</file>
+        <file>Scenarios/Scenario_2/Scenario2Scene3D.qml</file>
+        <file>Scenarios/Scenario_2/Scenario_2.qml</file>
     </qresource>
     <qresource prefix="/ui">
         <file>UI/ViewFilterBar.qml</file>
@@ -83,6 +86,7 @@
         <file>UI/InfoBoxDesigner.qml</file>
         <file>SynchDialogBox.qml</file>
         <file>MaterialDesigner.qml</file>
+        <file>UI/diffuse.webp</file>
     </qresource>
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>

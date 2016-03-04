@@ -194,7 +194,7 @@ Rectangle {
                                             }
                                             Text {
                                                 color: "white"
-                                                text: "Density:"+materialsManager.get(index,"Price")                                }
+                                                text: "Density:"+materialsManager.get(index,"Density")                                }
                                         }
                                         Image{
                                             visible: materials_list.currentIndex==index

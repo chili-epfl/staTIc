@@ -15,6 +15,7 @@ Entity {
     property int zoom: 0
     property bool resize : false
     property int totalTranslationZ:0
+
     QtObject {
         id: d
         readonly property vector3d firstPersonUp: Qt.vector3d(0, 1, 0)

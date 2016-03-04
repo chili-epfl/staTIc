@@ -2,8 +2,8 @@
 #define CONCENTRATEDFORCE_H
 
 #include <QObject>
-#include <QtPhysicsUnofficial/frontend/physicscollisionevent.h>
-#include <QtPhysicsUnofficial/frontend/physicsbodyinfo.h>
+#include <frontend/physicscollisionevent.h>
+#include <frontend/physicsbodyinfo.h>
 #include "statics/abstractvmmanager.h"
 
 class InteriorPointLoad;

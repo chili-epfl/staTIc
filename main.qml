@@ -6,8 +6,8 @@ import ScenarioListModel 1.0
 import ResourcesFetcher 1.0
 import QtQuick.Dialogs 1.2
 import "qrc:/ui"
-
 Item {
+
     function pt2px(pt){return pt*0.3759*Screen.pixelDensity}
     id: applicationWindow
     visible: true

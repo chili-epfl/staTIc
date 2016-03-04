@@ -68,7 +68,6 @@ int main(int argc, char *argv[])
     qmlRegisterType<Instantiator43DEntity>("Instantiator43DEntity", 1, 0, "Instantiator43DEntity");
     qmlRegisterType<ResourcesFetcher>("ResourcesFetcher", 1, 0, "ResourcesFetcher");
 
-
     //qmlRegisterType<TwoDimensionalStaticsModule>("StaticsModule2D", 1, 0, "StaticsModule2D");
     //qmlRegisterType<TwoDimentionalEventHandler>("EventHandler2D", 1, 0, "EventHandler2D");
     qmlRegisterType<Frame3DDKernel>("Frame3DDKernel",1,0,"Frame3DDKernel");
