@@ -1,7 +1,6 @@
 import Qt3D.Core 2.0
 import Qt3D.Render 2.0
 import QtQuick 2.0 as QQ2
-
 Entity{
     id:root
     property bool visible:  parent!=null ? parent.visible : false
@@ -75,25 +74,22 @@ Entity{
 
     }
 
-
-
-
     property real scaleFactor: 2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 1
 
 
     property int nModels: 5
     property matrix4x4 poseMatrix: Qt.matrix4x4()
-    property int animationValue: 0
+    property int animationValue: axialForceType<0 ? (50-globalNumericAnimation) : globalNumericAnimation
     property int step: 10
 
 
-    QQ2.NumberAnimation on animationValue{
-            duration: 10000
-            from: axialForceType<0 ? 50 : 0
-            to: axialForceType<0 ? 0 : 50
-            loops: QQ2.Animation.Infinite
-            running: visible && axialForceType!==0
-    }
+//    QQ2.NumberAnimation on animationValue{
+//            duration: 10000
+//            from: axialForceType<0 ? 50 : 0
+//            to: axialForceType<0 ? 0 : 50
+//            loops: QQ2.Animation.Infinite
+//            running: visible && axialForceType!==0
+//    }
 
     onExtreme1Changed: computeTransform()
     onExtreme2Changed: computeTransform()

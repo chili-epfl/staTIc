@@ -9,13 +9,20 @@ import "qrc:/"
 
 import "qrc:/tools/Tools/ConcentratedForce"
 import "qrc:/tools/Tools/Scaffold"
-
+import "qrc:/ui/UI/"
 Entity {
     id: sceneRoot
 
     property alias structureLoader : structureLoader
     property alias structureEntity: structureEntity
-
+    property int globalNumericAnimation;
+    QQ2.NumberAnimation on globalNumericAnimation{
+        duration: 10000
+        from:0
+        to:50
+        running: true
+        loops: QQ2.Animation.Infinite
+    }
     Camera {
         id: camera
         objectName: "camera"
@@ -40,9 +47,11 @@ Entity {
 //    MouseController {
 //        id: mouseController
 //    }
+//    CameraController{
+//        camera: camera
+//    }
 
     components: [
-
         FrameGraph {
             activeFrameGraph:
                 ForwardRenderer {
@@ -87,6 +96,10 @@ Entity {
         /*Scaffold{
 
         }*/
+
+
+
+
 
     }
 
