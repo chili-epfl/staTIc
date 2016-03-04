@@ -22,6 +22,7 @@
 #include "instantiator43dentity.h"
 #include "resourcesfetcher.h"
 #include "static_global.h"
+#include "AR/arucodetector.h"
 
 int main(int argc, char *argv[])
 {
@@ -72,6 +73,8 @@ int main(int argc, char *argv[])
     //qmlRegisterType<TwoDimentionalEventHandler>("EventHandler2D", 1, 0, "EventHandler2D");
     qmlRegisterType<Frame3DDKernel>("Frame3DDKernel",1,0,"Frame3DDKernel");
     qmlRegisterType<Frame3DDVMManager>("Frame3DDVMManager",1,0,"Frame3DDVMManager");
+
+    qmlRegisterType<ArucoDetector>("ArucoDetector",1,0,"ArucoDetector");
 
 
     //qmlRegisterType<MaterialSetter>("MaterialSetter", 1, 0, "MaterialSetter");
