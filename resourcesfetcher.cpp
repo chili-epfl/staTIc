@@ -3,6 +3,7 @@
 #include <QNetworkReply>
 #include <QFile>
 #include <QDirIterator>
+#include <quazip/JlCompress.h>
 #include "static_global.h"
 
 const short material_code=1;
@@ -133,8 +134,13 @@ void ResourcesFetcher::slotPullPhase2(){
         if(file.isOpen()){
             file.write(reply->readAll());
             file.close();
+            QStringList fileList=JlCompress::extractDir(filename,filename.split(".static_").at(0));
+            if(fileList.isEmpty())
+                qDebug()<<"Can't extract file";
+            file.remove();
         }
-        qDebug()<<"Can't save file";
+        else
+            qDebug()<<"Can't save file";
     }else{
         qDebug()<<reply->error();
         qDebug()<<reply->readAll();
@@ -156,12 +162,6 @@ void ResourcesFetcher::finished(){
 void ResourcesFetcher::slotError(){
     QNetworkReply *reply=static_cast<QNetworkReply *>(QObject::sender());
     qDebug()<<reply->error();
-    if(m_openFile_map.contains(reply)){
-        QFile* f=m_openFile_map[reply];
-        m_openFile_map.remove(reply);
-        f->close();
-        f->deleteLater();
-    }
     m_reply_resource_map.remove(reply);
     reply->deleteLater();
     if(m_reply_resource_map.count()==0){
