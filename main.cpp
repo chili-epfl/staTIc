@@ -23,6 +23,7 @@
 #include "resourcesfetcher.h"
 #include "static_global.h"
 #include "AR/arucodetector.h"
+#include "AR/arucoobject.h"
 
 int main(int argc, char *argv[])
 {
@@ -75,6 +76,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<Frame3DDVMManager>("Frame3DDVMManager",1,0,"Frame3DDVMManager");
 
     qmlRegisterType<ArucoDetector>("ArucoDetector",1,0,"ArucoDetector");
+    qmlRegisterType<ArucoObject>("ArucoObject",1,0,"ArucoObject");
 
 
     //qmlRegisterType<MaterialSetter>("MaterialSetter", 1, 0, "MaterialSetter");

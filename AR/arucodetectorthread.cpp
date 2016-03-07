@@ -1,6 +1,7 @@
 #include "arucodetectorthread.h"
 #include "arucodetector.h"
 #include <opencv2/core.hpp>
+#include <opencv2/imgproc.hpp>
 #include <opencv2/calib3d.hpp>
 #include <opencv2/highgui.hpp>
 #include <QMatrix4x4>
@@ -166,7 +167,7 @@ DetectionTask::DetectionTask(QMatrix4x4 projectionMatrix)
 {
     m_distCoeff=cv::Mat();
     setProjectionMatrix(projectionMatrix);
-    m_dictionary= cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_250);
+    m_dictionary= cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_1000);
 
 }
 
@@ -256,7 +257,6 @@ void DetectionTask::doWork()
             frameLock.unlock();
             poseMap.clear();
             cv::aruco::detectMarkers(nextFrame,m_dictionary,m_markerCorners,m_markerIds);
-
             for(int i=0;i<m_boards.size();i++){
                 if(cv::aruco::estimatePoseBoard(m_markerCorners,m_markerIds,m_boards[i],m_cv_projectionMatrix,
                                              m_distCoeff,rvec,tvec)){
@@ -264,11 +264,16 @@ void DetectionTask::doWork()
                     poseMap[m_board_names[i]]=
                             QMatrix4x4(
                                 (qreal)rmat(0,0),    (qreal)rmat(0,1),    (qreal)rmat(0,2),    (qreal)tvec.at<double>(0),
-                                (qreal)rmat(1,0),    (qreal)rmat(1,1),    (qreal)rmat(1,2),    (qreal)tvec.at<double>(1),
-                                (qreal)rmat(2,0),    (qreal)rmat(2,1),    (qreal)rmat(2,2),    (qreal)tvec.at<double>(2),
+                                -(qreal)rmat(1,0),    -(qreal)rmat(1,1),   -(qreal)rmat(1,2),    -(qreal)tvec.at<double>(1),
+                                -(qreal)rmat(2,0),    -(qreal)rmat(2,1),    -(qreal)rmat(2,2),    -(qreal)tvec.at<double>(2),
                                 0,                          0,                          0,                          1
                                 );
+//                    cv::Mat debug=nextFrame.clone();
+//                    cv::cvtColor(debug,debug,CV_GRAY2RGB);
+//                    cv::aruco::drawAxis(debug,m_cv_projectionMatrix,m_distCoeff,rvec,tvec,10);
+//                    cv::imwrite("test.png",debug);
                 }
+
             }
 
             frameLock.lock();
@@ -285,7 +290,7 @@ void DetectionTask::doWork()
         millisElapsed += millis;
         fps = FPS_RATE*fps + (1.0f - FPS_RATE)*(1000.0f/millis);
         if(millisElapsed >= FPS_PRINT_PERIOD){
-            qDebug("Chilitags is running at %f FPS",fps);
+            //qDebug("Chilitags is running at %f FPS",fps);
             millisElapsed = 0;
         }
 #endif

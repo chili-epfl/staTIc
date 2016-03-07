@@ -13,6 +13,7 @@ ArucoDetector::ArucoDetector(QQuickItem *parent)
         0,              0,              1,  0,
         0,              0,              0,  1
                 );
+    addConfigurationFile(QUrl());
 }
 
 QVideoFilterRunnable *ArucoDetector::createFilterRunnable()
@@ -33,17 +34,37 @@ QMatrix4x4 ArucoDetector::getProjectionMatrix() const
 
 void ArucoDetector::addConfigurationFile(QUrl url)
 {
-    QFile configFile(url.toLocalFile());
+    //QFile configFile(url.toLocalFile());
+    QFile configFile(":/AR/board.yml");
     configFile.open(QFile::ReadOnly);
     if(configFile.isOpen()){
-        QXmlStreamReader xmlReader;//(configFile);
-        while (!xmlReader.atEnd()) {
-              xmlReader.readNext();
+        cv::FileStorage fs(configFile.readAll().toStdString(), cv::FileStorage::READ | cv::FileStorage::MEMORY);
+        cv::aruco::Board board;
+        board.dictionary=cv::aruco::getPredefinedDictionary(
+                    cv::aruco::PREDEFINED_DICTIONARY_NAME((int)fs["dictionary"]));
+        fs["ids"]>>board.ids;
+        std::vector<cv::Point3f> points;
+        fs["points"]>>points;
+        for(int i=0;i<points.size();i++){
+            if(i%4==0) board.objPoints.push_back(std::vector<cv::Point3f>());
+            board.objPoints[i/4].push_back(points[i]);
         }
-        if (xmlReader.hasError()) {
-            qDebug()<<"Reading error:"<<xmlReader.errorString()<<
-                      "/n At line:"<<xmlReader.lineNumber();
-        }
+        fs.release();
+        m_boards["Default"]=board;
+//        for(int i=0;i<test.ids.size();i++)
+//            std::cout<<test.ids.at(i)<<"\n";
+//        for(int i=0;i<test.objPoints.size();i++)
+//            for(int j=0;j<test.objPoints.at(i).size();j++)
+//                std::cout<<test.objPoints.at(i).at(j)<<"\n";
+
+//        QXmlStreamReader xmlReader;//(configFile);
+//        while (!xmlReader.atEnd()) {
+//              xmlReader.readNext();
+//        }
+//        if (xmlReader.hasError()) {
+//            qDebug()<<"Reading error:"<<xmlReader.errorString()<<
+//                      "/n At line:"<<xmlReader.lineNumber();
+//        }
     }else{
         qDebug()<<"Can't open file:"<<url.toLocalFile();
     }

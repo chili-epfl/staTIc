@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.1
 import QtQuick.Scene3D 2.0
 import Chilitags 1.0
 import ArucoDetector 1.0
+import ArucoObject 1.0
 
 import Qt3D.Render 2.0
 
@@ -261,19 +262,19 @@ Item{
      }
      ArucoDetector{
         id:aruco
+
+     }
+     ArucoObject{
+        id:structure_tag
+        objectId: "Default"
+        onPoseMatrixChanged: console.log(poseMatrix)
+        Component.onCompleted: aruco.registerObserver(structure_tag)
      }
 
      Chilitags{
          id:chilitags
-         tagConfigurationFile:structureTagConfig
-         chiliobjects: [structure_tag]
-         //pause: backgroundsubtraction.entropy > .01 ? true : false
      }
 
-     ChilitagsObject{
-         id: structure_tag
-         name:"Model1"
-     }
 
      BackgroundSubtraction{
         id:backgroundsubtraction
