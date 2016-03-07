@@ -36,6 +36,7 @@ Item {
             intromenu.enabled=false;
             item.structureUrl=gridview.model.get(gridview.currentIndex,"ScenarioStructure");
             item.structure3DAsset=gridview.model.get(gridview.currentIndex,"Scenario3DAsset");
+            item.structureTagConfig=gridview.model.get(gridview.currentIndex,"ScenarioTagConfiguration");
         }
     }
 

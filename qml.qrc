@@ -59,7 +59,6 @@
     <qresource prefix="/scripts">
         <file>Scripts/DefaultScript.qml</file>
         <file>Scripts/DefaultScriptScene3D.qml</file>
-        <file>Scripts/PlaygroundConfiguration.yml</file>
     </qresource>
     <qresource prefix="/ui">
         <file>UI/ViewFilterBar.qml</file>

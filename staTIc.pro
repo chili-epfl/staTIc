@@ -158,6 +158,8 @@ DISTFILES += \
     Resources/Scenarios/Model1/Model1.png \
     Resources/Scenarios/Model2/Model2.png \
     Resources/Scenarios/Model1/Model1.structure \
-    Resources/Scenarios/Model2/Model2.structure
+    Resources/Scenarios/Model2/Model2.structure \
+    Resources/Scenarios/Model1/Model1.yml \
+    Resources/Scenarios/Model2/Model2.yml
 
 

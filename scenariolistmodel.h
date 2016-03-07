@@ -25,6 +25,7 @@ private:
     QMap<QString, QUrl> m_scenariosStructures;
     QMap<QString, QUrl> m_scenariosThumbs;
     QMap<QString, QUrl> m_scenarios3DAsset;
+    QMap<QString, QUrl> m_scenariosTagConfiguration;
 
 };
 

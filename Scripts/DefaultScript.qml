@@ -26,6 +26,7 @@ Item{
 
     property url structureUrl;
     property url structure3DAsset;
+    property url structureTagConfig;
 
     state: "LoadingCamera"
     states: [
@@ -260,7 +261,7 @@ Item{
 
      Chilitags{
          id:chilitags
-         tagConfigurationFile:":/scripts/Scripts/PlaygroundConfiguration.yml"
+         tagConfigurationFile:structureTagConfig
          chiliobjects: [structure_tag]
          //pause: backgroundsubtraction.entropy > .01 ? true : false
      }
