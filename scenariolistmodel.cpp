@@ -1,11 +1,11 @@
 #include "scenariolistmodel.h"
-
+#include "static_global.h"
 
 
 ScenarioListModel::ScenarioListModel(QObject * parent ):
     QAbstractListModel(parent)
 {
-
+    setSource();
 }
 
 int ScenarioListModel::rowCount(const QModelIndex &parent) const{
@@ -29,31 +29,48 @@ QVariant ScenarioListModel::data(const QModelIndex &index, int role)const{
 
 QVariant ScenarioListModel::get(int index, QString info)const{
     if (index<0 || index>=m_scenariosNames.size()) return QVariant();
-    if(info.compare("ScenarioQML",Qt::CaseInsensitive)==0){
-        return m_scenariosQml[m_scenariosNames[index]];
+    if(info.compare("ScenarioStructure",Qt::CaseInsensitive)==0){
+        return m_scenariosStructures[m_scenariosNames[index]];
+    }
+    if(info.compare("Scenario3DAsset",Qt::CaseInsensitive)==0){
+        return m_scenarios3DAsset[m_scenariosNames[index]];
     }
     return QVariant();
 
 }
 
 
-void ScenarioListModel::setSource(QString source){
-    m_source= source;
+void ScenarioListModel::setSource(){
+    m_source=scenariosPath;
     QDirIterator it(m_source);
+    QString name;
+    QUrl structure,thumb,asset;
     while(it.hasNext()){
         it.next();
-        if(it.fileInfo().isDir() ){
-            QString name=it.fileInfo().baseName();
-            m_scenariosNames.append(name);
+        name.clear();
+        structure.clear();
+        thumb.clear();
+        asset.clear();
+        if(it.fileInfo().isDir()&& it.fileName()!="." && it.fileName()!=".."){
+            name=it.fileInfo().baseName();
             QDirIterator it2(it.fileInfo().canonicalFilePath());
             while(it2.hasNext()){
                 it2.next();
-                if(it2.fileInfo().baseName()==name && it2.fileInfo().suffix()=="qml"){
-                    m_scenariosQml[name]=QUrl("qrc"+m_source+"/"+name+"/"+it2.fileInfo().fileName());
+                if(it2.fileInfo().baseName()==name && it2.fileInfo().suffix()=="structure"){
+                    structure=QUrl::fromLocalFile(m_source+"/"+name+"/"+it2.fileInfo().fileName());
                 }
                 else if(it2.fileInfo().suffix()=="png")
-                    m_scenariosThumbs[name]=QUrl("qrc"+m_source+"/"+name+"/"+it2.fileInfo().fileName());
+                    thumb=QUrl::fromLocalFile(m_source+"/"+name+"/"+it2.fileInfo().fileName());
+                else if(it2.fileInfo().suffix()=="dae")
+                    asset=QUrl::fromLocalFile(m_source+"/"+name+"/"+it2.fileInfo().fileName());
             }
         }
+        if(!name.isEmpty() && !structure.isEmpty() && !thumb.isEmpty() && !asset.isEmpty()){
+            m_scenariosNames.append(name);
+            m_scenariosStructures[name]=structure;
+            m_scenariosThumbs[name]=thumb;
+            m_scenarios3DAsset[name]=asset;
+        }
+
     }
 }

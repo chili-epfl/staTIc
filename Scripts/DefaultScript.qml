@@ -24,6 +24,9 @@ Item{
 
     property bool firstInit : true
 
+    property url structureUrl;
+    property url structure3DAsset;
+
     state: "LoadingCamera"
     states: [
         State {
@@ -130,7 +133,7 @@ Item{
         onStatusChanged: {
             if(firstInit && status==Frame3DDKernel.LOADED){
                 loadingAnimation_text.text="Loading Scenario";
-                scene3D.structureLoader.source="qrc:/scenarios/Scenarios/Scenario_1/Model1.dae"
+                scene3D.structureLoader.source=structure3DAsset;
             }
         }
     }
@@ -150,7 +153,7 @@ Item{
          onCameraStatusChanged: {
              if(firstInit && camDevice.cameraStatus==Camera.ActiveStatus ){
                  loadingAnimation_text.text="Loading 3D structure";
-                 staticsmodule.source=":/scenarios/Scenarios/Scenario_1/Model1.lol"
+                 staticsmodule.sourceUrl=structureUrl;
              }
          }
          imageCapture.resolution: "640x480" //Android sets the viewfinder resolution as the capture one
@@ -211,7 +214,7 @@ Item{
                  aspects: ["input","physics","logic"]
                  //aspects:["input"]
                  multisample:true
-                 Scenario1Scene3D {
+                 DefaultScriptScene3D {
                      id:scene3D
                  }
              }
@@ -257,7 +260,7 @@ Item{
 
      Chilitags{
          id:chilitags
-         tagConfigurationFile:":/scenarios/Scenarios/Scenario_1/Model1.yml"
+         tagConfigurationFile:":/scripts/Scripts/PlaygroundConfiguration.yml"
          chiliobjects: [structure_tag]
          //pause: backgroundsubtraction.entropy > .01 ? true : false
      }
