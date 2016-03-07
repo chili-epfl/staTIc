@@ -249,7 +249,6 @@ void DetectionTask::doWork()
 
         //Process frame if possible
         if(nextFrameAvailable){
-
             //Signal that we're consuming the next frame now
             nextFrameAvailable = false;
             state = BUSY;
@@ -257,11 +256,8 @@ void DetectionTask::doWork()
             //Unlock the lock so that we can present a new frame while it's estimating
             frameLock.unlock();
             poseMap.clear();
-            //cv::imwrite("alpha.png",nextFrame);
-
             cv::aruco::detectMarkers(nextFrame,m_dictionary,m_markerCorners,m_markerIds);
-            if(m_markerIds.size()>0)
-                qDebug()<<"w";
+
             for(int i=0;i<m_boards.size();i++){
                 if(cv::aruco::estimatePoseBoard(m_markerCorners,m_markerIds,m_boards[i],m_cv_projectionMatrix,
                                              m_distCoeff,rvec,tvec)){
@@ -290,7 +286,7 @@ void DetectionTask::doWork()
         millisElapsed += millis;
         fps = FPS_RATE*fps + (1.0f - FPS_RATE)*(1000.0f/millis);
         if(millisElapsed >= FPS_PRINT_PERIOD){
-            //qDebug("Chilitags is running at %f FPS",fps);
+            qDebug("Chilitags is running at %f FPS",fps);
             millisElapsed = 0;
         }
 #endif

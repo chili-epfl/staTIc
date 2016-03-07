@@ -4,6 +4,7 @@ import QtMultimedia 5.5
 import QtQuick.Layouts 1.1
 import QtQuick.Scene3D 2.0
 import Chilitags 1.0
+import ArucoDetector 1.0
 
 import Qt3D.Render 2.0
 
@@ -196,7 +197,7 @@ Item{
          anchors.centerIn: parent
          anchors.fill: parent
          source: camDevice
-         filters:[chilitags]
+         filters:[aruco]
 
          Rectangle{
              anchors.fill: parent
@@ -253,6 +254,9 @@ Item{
                 }
              }
          }
+     }
+     ArucoDetector{
+        id:aruco
      }
 
      Chilitags{
