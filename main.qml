@@ -28,19 +28,22 @@ Item {
     }
 
     Loader{
-        id:scenarioLoader
+        id:scriptLoader
         property bool valid: item !== null
         anchors.fill: parent
         onLoaded: {
             intromenu.visible=false;
             intromenu.enabled=false;
+            item.structureUrl=gridview.model.get(gridview.currentIndex,"ScenarioStructure");
+            item.structure3DAsset=gridview.model.get(gridview.currentIndex,"Scenario3DAsset");
+            item.structureTagConfig=gridview.model.get(gridview.currentIndex,"ScenarioTagConfiguration");
         }
     }
 
     Connections {
         ignoreUnknownSignals: true
-        target: scenarioLoader.valid ? scenarioLoader.item : null
-        onPageExit: { intromenu.visible=true;intromenu.enabled=true;scenarioLoader.source=""}
+        target: scriptLoader.valid ? scriptLoader.item : null
+        onPageExit: { intromenu.visible=true;intromenu.enabled=true;scriptLoader.source=""}
     }
 
     /*Item conteining all the item for the intro menu.*/
@@ -111,7 +114,7 @@ Item {
                 clip:true
                 spacing: 10
                 anchors.fill: parent
-                model: ScenarioListModel{ source:":/scenarios/Scenarios" }
+                model: ScenarioListModel{ }
                 highlight: Rectangle { color: "lightsteelblue"; radius: 2 }
                 delegate:modelDelegate
 
@@ -130,7 +133,7 @@ Item {
                 text: "Button"
                 onClicked: {
                     if(gridview.currentIndex !=-1){
-                        scenarioLoader.source=gridview.model.get(gridview.currentIndex,"ScenarioQML");
+                        scriptLoader.source="qrc:/scripts/Scripts/DefaultScript.qml"
                     }
                 }
                 anchors.right: parent.right

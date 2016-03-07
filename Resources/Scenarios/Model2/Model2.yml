@@ -1,0 +1,25 @@
+%YAML:1.0
+Model1:
+    - tag: 1
+      size: 21
+      translation: [0, 0., 0.]
+    - tag: 2
+      size: 21
+      translation: [270.,-300., 0.]
+      rotation: [0., 0., 45.]
+    - tag: 3
+      size: 21
+      translation: [270., 0., 0.]
+      rotation: [0., 0., 0.]
+
+tag_5:
+    -tag: 5
+     size: 12
+
+tag_6:
+    -tag: 6
+     size: 12
+
+tag_7:
+    -tag: 7
+     size: 16

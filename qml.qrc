@@ -56,19 +56,9 @@
         <file>Opengl/WireframeEffect.qml</file>
         <file>Opengl/WireframeMaterial.qml</file>
     </qresource>
-    <qresource prefix="/scenarios">
-        <file>Scenarios/Scenario_1/Model1.dae</file>
-        <file>Scenarios/Scenario_1/Model1.lol</file>
-        <file>Scenarios/Scenario_1/Model1.png</file>
-        <file>Scenarios/Scenario_1/Model1.yml</file>
-        <file>Scenarios/Scenario_1/Scenario_1.qml</file>
-        <file>Scenarios/Scenario_1/Scenario1Scene3D.qml</file>
-        <file>Scenarios/Scenario_2/Model1.dae</file>
-        <file>Scenarios/Scenario_2/Model1.lol</file>
-        <file>Scenarios/Scenario_2/Model1.png</file>
-        <file>Scenarios/Scenario_2/Model1.yml</file>
-        <file>Scenarios/Scenario_2/Scenario2Scene3D.qml</file>
-        <file>Scenarios/Scenario_2/Scenario_2.qml</file>
+    <qresource prefix="/scripts">
+        <file>Scripts/DefaultScript.qml</file>
+        <file>Scripts/DefaultScriptScene3D.qml</file>
     </qresource>
     <qresource prefix="/ui">
         <file>UI/ViewFilterBar.qml</file>
@@ -93,15 +83,6 @@
         <file>Tools/Scaffold/Scaffold.qml</file>
         <file>Tools/Scaffold/Anchor.qml</file>
         <file>Tools/BeamRemover/BeamRemover.qml</file>
-    </qresource>
-    <qresource prefix="/materials">
-        <file>statics/Materials/test.png</file>
-        <file>statics/Materials/material1.material</file>
-        <file>statics/Materials/material1 (another copy).material</file>
-        <file>statics/Materials/material1 (copy).material</file>
-        <file>statics/Materials/oak.jpeg</file>
-        <file>statics/Materials/oak_dark.jpeg</file>
-        <file>statics/Materials/plywood.jpg</file>
     </qresource>
     <qresource prefix="/3dobjects">
         <file>3DObjects/jacuzzi_3ds/jacuzzi.3ds</file>

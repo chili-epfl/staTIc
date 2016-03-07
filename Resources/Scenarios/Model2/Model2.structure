@@ -1,0 +1,69 @@
+#j,-259,-251.48,0,A,FIXED
+#j,0,0,0,B
+#j,0,-251.48,0,C
+#j,259,-251.48,0,D,ROLLING
+#m,0,1,AB
+#m,1,3,BD
+#m,1,2,BC
+#m,2,3,CD
+#m,0,2,AC
+
+#Scale factor between tangible model and real model(real models are in the order of meters)(affect only the position of the joints)
+0.1
+
+#Number of nodes
+12
+
+#Node id,x,y,z,dim(always 0)
+0,0,0,0,0
+1,1500,1400,0,0
+2,2700,3000,0,0
+3,2700,0,0,0
+4,4000,1400,0,0
+5,5300,0,0,0
+6,0,0,3500,0
+7,1500,1400,3500,0
+8,2700,3000,3500,0
+9,2700,0,3500,0
+10,4000,1400,3500,0
+11,5300,0,3500,0
+
+#Number of reaction
+4
+
+#Node Id,x,y,z,Mx,My,Mz
+0,1,1,1,1,1,1
+6,1,1,1,1,1,1
+5,1,1,1,1,1,1
+11,1,1,1,1,1,1
+
+#Number of beams
+23
+
+#Beam name,node 1,node 2,width,height,MaterialID
+AB,0,1,120,220,material1
+BC,1,2,120,220,material1
+CE,2,4,120,220,material1
+EF,4,5,120,220,material1
+AD,0,3,120,220,material1
+DF,3,5,120,220,material1
+BD,1,3,120,220,material1
+DE,3,4,120,220,material1
+CD,3,2,120,220,material1
+
+NM,6,7,120,220,material1
+MI,7,8,120,220,material1
+IH,8,10,120,220,material1
+HG,10,11,120,220,material1
+NL,6,9,120,220,material1
+LG,9,11,120,220,material1
+ML,7,9,120,220,material1
+LH,9,10,120,220,material1
+IL,9,8,120,220,material1
+
+AN,0,6,120,220,material1
+FG,5,11,120,220,material1
+CI,2,8,120,220,material1
+IF,8,5,120,220,material1
+NC,6,2,120,220,material1
+

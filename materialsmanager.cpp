@@ -1,4 +1,5 @@
 #include "materialsmanager.h"
+#include "static_global.h"
 #include <QDirIterator>
 #include <QTextStream>
 #include <QDebug>
@@ -8,105 +9,111 @@ MaterialsManager::MaterialsManager(QObject *parent):
     /*Creating default material*/
     Material default_material;
     default_material.set("Conifers(C14)",QUrl("qrc:/images/Images/woodbackground.png"),
-                 20,0.385e-9,7000,440,8,16,14,0.4,2,3);
+                         20,0.385e-9,7000,440,8,16,14,0.4,2,3);
     default_material.uniqueID="default";
 
     m_materials[default_material.uniqueID]=default_material;
 
-    QString materialsDir=":/materials/statics/Materials/";
-    QDirIterator it(materialsDir);
-    while(it.hasNext()){
-        it.next();
-        if(it.fileInfo().suffix()=="material"){
-            QFile inputFile(it.filePath());
-            if (!inputFile.open(QIODevice::ReadOnly | QIODevice::Text)){
-                qDebug()<<"Failed to open material file"<<it.filePath();
-                continue;
-            }
-            QTextStream inputStream(&inputFile);
-            QString line;
-            QStringList sub_parts,property;
-            Material material;
-            material.set(QString(),QUrl(),0,0,0,0,0,0,0,0,0,0);
-            do{
-                line=inputStream.readLine();
-                sub_parts=line.split(";",QString::SplitBehavior::SkipEmptyParts);
-                Q_FOREACH(QString part,sub_parts){
-                    property=part.split(":",QString::SplitBehavior::SkipEmptyParts);
-                    if(property.size()!=2){
-                        qDebug()<<"Wrong property format: "<<part;
+    QString materialsDir=materialsPath;
+    QDirIterator dirIt(materialsDir);
+    while(dirIt.hasNext()){
+        dirIt.next();
+        if(dirIt.fileInfo().isDir()&& dirIt.fileName()!="." && dirIt.fileName()!=".."){
+            QDirIterator it(dirIt.fileInfo().canonicalFilePath());
+            while(it.hasNext()){
+                it.next();
+                if(it.fileInfo().suffix()=="material"){
+                    QFile inputFile(it.filePath());
+                    if (!inputFile.open(QIODevice::ReadOnly | QIODevice::Text)){
+                        qDebug()<<"Failed to open material file"<<it.filePath();
                         continue;
                     }
-                    if(property[0]=="Name"){
-                        material.name=property[1];
+                    QTextStream inputStream(&inputFile);
+                    QString line;
+                    QStringList sub_parts,property;
+                    Material material;
+                    material.set(QString(),QUrl(),0,0,0,0,0,0,0,0,0,0);
+                    do{
+                        line=inputStream.readLine();
+                        sub_parts=line.split(";",QString::SplitBehavior::SkipEmptyParts);
+                        Q_FOREACH(QString part,sub_parts){
+                            property=part.split(":",QString::SplitBehavior::SkipEmptyParts);
+                            if(property.size()!=2){
+                                qDebug()<<"Wrong property format: "<<part;
+                                continue;
+                            }
+                            if(property[0]=="Name"){
+                                material.name=property[1];
+                            }
+                            else if(property[0]=="UniqueID"){
+                                material.uniqueID=property[1];
+                            }
+                            else if(property[0]=="Price") {
+                                bool ok;
+                                material.price=property[1].toFloat(&ok);
+                                if(!ok) qDebug()<<"Convertion error:"<<part;
+                            }
+                            else if(property[0]=="Density") {
+                                bool ok;
+                                material.density=property[1].toFloat(&ok);
+                                if(!ok) qDebug()<<"Convertion error:"<<part;
+                            }
+                            else if(property[0]=="Young") {
+                                bool ok;
+                                material.young=property[1].toFloat(&ok);
+                                if(!ok) qDebug()<<"Convertion error:"<<part;
+                            }
+                            else if(property[0]=="G") {
+                                bool ok;
+                                material.g=property[1].toFloat(&ok);
+                                if(!ok) qDebug()<<"Convertion error:"<<part;
+                            }
+                            else if(property[0]=="TextureImage") {
+                                material.texture_img="qrc"+materialsDir+property[1];
+                            }
+                            else if(property[0]=="ft0") {
+                                bool ok;
+                                material.ft0=property[1].toFloat(&ok);
+                                if(!ok) qDebug()<<"Convertion error:"<<part;
+                            }
+                            else if(property[0]=="fc0") {
+                                bool ok;
+                                material.fc0=property[1].toFloat(&ok);
+                                if(!ok) qDebug()<<"Convertion error:"<<part;
+                            }
+                            else if(property[0]=="fmk") {
+                                bool ok;
+                                material.fmk=property[1].toFloat(&ok);
+                                if(!ok) qDebug()<<"Convertion error:"<<part;
+                            }
+                            else if(property[0]=="ft90") {
+                                bool ok;
+                                material.ft90=property[1].toFloat(&ok);
+                                if(!ok) qDebug()<<"Convertion error:"<<part;
+                            }
+                            else if(property[0]=="fc90") {
+                                bool ok;
+                                material.fc90=property[1].toFloat(&ok);
+                                if(!ok) qDebug()<<"Convertion error:"<<part;
+                            }
+                            else if(property[0]=="fvk") {
+                                bool ok;
+                                material.fvk=property[1].toFloat(&ok);
+                                if(!ok) qDebug()<<"Convertion error:"<<part;
+                            }
+                            else{qDebug()<<"Unknown property:"<<part;}
+                        }
+                    }while(!line.isNull());
+                    if(material.uniqueID.isEmpty() || material.name.isEmpty() || material.density<=0 ||
+                            material.g<=0 || material.young<=0 || m_materials.contains(material.uniqueID)
+                            || material.fc0<=0 || material.fc90<=0 || material.fmk<=0 || material.ft0<=0
+                            ||material.ft90<=0||material.fvk<=0){
+                        qDebug()<<"Invalid material or duplicated Id:"<< it.filePath();
                     }
-                    else if(property[0]=="UniqueID"){
-                        material.uniqueID=property[1];
+                    else{
+                        m_materials[material.uniqueID]=material;
                     }
-                    else if(property[0]=="Price") {
-                        bool ok;
-                        material.price=property[1].toFloat(&ok);
-                        if(!ok) qDebug()<<"Convertion error:"<<part;
-                    }
-                    else if(property[0]=="Density") {
-                        bool ok;
-                        material.density=property[1].toFloat(&ok);
-                        if(!ok) qDebug()<<"Convertion error:"<<part;
-                    }
-                    else if(property[0]=="Young") {
-                        bool ok;
-                        material.young=property[1].toFloat(&ok);
-                        if(!ok) qDebug()<<"Convertion error:"<<part;
-                    }
-                    else if(property[0]=="G") {
-                        bool ok;
-                        material.g=property[1].toFloat(&ok);
-                        if(!ok) qDebug()<<"Convertion error:"<<part;
-                    }
-                    else if(property[0]=="TextureImage") {
-                        material.texture_img="qrc"+materialsDir+property[1];
-                    }
-                    else if(property[0]=="ft0") {
-                        bool ok;
-                        material.ft0=property[1].toFloat(&ok);
-                        if(!ok) qDebug()<<"Convertion error:"<<part;
-                    }
-                    else if(property[0]=="fc0") {
-                        bool ok;
-                        material.fc0=property[1].toFloat(&ok);
-                        if(!ok) qDebug()<<"Convertion error:"<<part;
-                    }
-                    else if(property[0]=="fmk") {
-                        bool ok;
-                        material.fmk=property[1].toFloat(&ok);
-                        if(!ok) qDebug()<<"Convertion error:"<<part;
-                    }
-                    else if(property[0]=="ft90") {
-                        bool ok;
-                        material.ft90=property[1].toFloat(&ok);
-                        if(!ok) qDebug()<<"Convertion error:"<<part;
-                    }
-                    else if(property[0]=="fc90") {
-                        bool ok;
-                        material.fc90=property[1].toFloat(&ok);
-                        if(!ok) qDebug()<<"Convertion error:"<<part;
-                    }
-                    else if(property[0]=="fvk") {
-                        bool ok;
-                        material.fvk=property[1].toFloat(&ok);
-                        if(!ok) qDebug()<<"Convertion error:"<<part;
-                    }
-                    else{qDebug()<<"Unknown property:"<<part;}
                 }
-            }while(!line.isNull());
-            if(material.uniqueID.isEmpty() || material.name.isEmpty() || material.density<=0 ||
-                    material.g<=0 || material.young<=0 || m_materials.contains(material.uniqueID)
-                    || material.fc0<=0 || material.fc90<=0 || material.fmk<=0 || material.ft0<=0
-                    ||material.ft90<=0||material.fvk<=0){
-                qDebug()<<"Invalid material or duplicated Id:"<< it.filePath();
-            }
-            else{
-                m_materials[material.uniqueID]=material;
             }
         }
     }

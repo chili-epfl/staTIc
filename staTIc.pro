@@ -39,9 +39,6 @@ SOURCES += main.cpp \
     AR/backgroundsubtraction.cpp \
     AR/backgroundsubtractionfilter.cpp \
     AR/deformingbeammesh.cpp \
-    AR/arucodetector.cpp \
-    AR/arucodetectorthread.cpp \
-    AR/arucoobject.cpp \
     materialsmanager.cpp \
     statics/elements/trapezoidalforce.cpp \
     statics/viewModels/trapezoidalforcevm.cpp \
@@ -88,9 +85,6 @@ HEADERS += \
     AR/backgroundsubtraction.h \
     AR/backgroundsubtractionfilter.h \
     AR/deformingbeammesh.h \
-    AR/arucodetector.h \
-    AR/arucodetectorthread.h \
-    AR/arucoobject.h \
     materialsmanager.h \
     statics/elements/trapezoidalforce.h \
     statics/viewModels/trapezoidalforcevm.h \
@@ -157,5 +151,15 @@ android {
     LIBS += -L/home/chili/chilitags/build-linux/install/lib
     LIBS += -L/home/chili/Downloads/bullet3-2.83.5/build-linux/install/lib
 }
+
+DISTFILES += \
+    Resources/Scenarios/Model1/Model1.dae \
+    Resources/Scenarios/Model2/Model2.dae \
+    Resources/Scenarios/Model1/Model1.png \
+    Resources/Scenarios/Model2/Model2.png \
+    Resources/Scenarios/Model1/Model1.structure \
+    Resources/Scenarios/Model2/Model2.structure \
+    Resources/Scenarios/Model1/Model1.yml \
+    Resources/Scenarios/Model2/Model2.yml
 
 
