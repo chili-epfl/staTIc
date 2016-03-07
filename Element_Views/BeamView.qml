@@ -270,7 +270,8 @@ Entity{
             onEntered: {current_anchor_position=Qt.vector3d(0,0,0);
                         }
             onClicked: {
-                infobox.current_item=rootEntity
+                if(parent.enabled)
+                    infobox.current_item=rootEntity
             }
         }
         components: [drag_mesh,drag_material,this.transform,objectPicker]
@@ -288,6 +289,7 @@ Entity{
                 hoverEnabled: drag_anchor_enabled
                 onEntered: current_anchor_position=transform.translation;
                 onClicked: {
+                    if(parent.enabled)
                         infobox.current_item=rootEntity
                 }
             }
