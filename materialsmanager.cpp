@@ -69,7 +69,7 @@ MaterialsManager::MaterialsManager(QObject *parent):
                                 if(!ok) qDebug()<<"Convertion error:"<<part;
                             }
                             else if(property[0]=="TextureImage") {
-                                material.texture_img="qrc"+materialsDir+property[1];
+                                material.texture_img=QUrl::fromLocalFile(dirIt.fileInfo().canonicalFilePath()+"/"+property[1]);
                             }
                             else if(property[0]=="ft0") {
                                 bool ok;
