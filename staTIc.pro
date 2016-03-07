@@ -44,7 +44,10 @@ SOURCES += main.cpp \
     statics/viewModels/trapezoidalforcevm.cpp \
     warehouse3d.cpp \
     instantiator43dentity.cpp \
-    resourcesfetcher.cpp
+    resourcesfetcher.cpp \
+    AR/arucodetector.cpp \
+    AR/arucodetectorthread.cpp \
+    AR/arucoobject.cpp
 
 
 HEADERS += \
@@ -91,7 +94,10 @@ HEADERS += \
     warehouse3d.h \
     instantiator43dentity.h \
     resourcesfetcher.h \
-    static_global.h
+    static_global.h \
+    AR/arucodetector.h \
+    AR/arucodetectorthread.h \
+    AR/arucoobject.h
 
 
 RESOURCES += qml.qrc
