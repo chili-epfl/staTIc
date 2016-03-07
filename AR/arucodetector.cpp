@@ -3,6 +3,7 @@
 #include "arucodetectorthread.h"
 ArucoDetector::ArucoDetector(QQuickItem *parent)
 {
+    qRegisterMetaType<PoseMap>("PoseMap");
     m_pause=false;
     m_focalLength=700.0;
     m_cameraResolution=QSizeF(640,480);
@@ -97,6 +98,18 @@ void ArucoDetector::updateObserver(QString prevObjId)
 
 void ArucoDetector::notifyObservers(const PoseMap &poses)
 {
+    Q_FOREACH(QString key, m_observers.keys()){
+        if(poses.contains(key)){
+            Q_FOREACH(ArucoObject* observer, m_observers.values(key)){
+                observer->setPoseMatrix(poses[key]);
+                observer->setVisible(true);
+            }
+        }
+        else{
+            Q_FOREACH(ArucoObject* observer, m_observers.values(key))
+                observer->setVisible(false);
+        }
+    }
 
 }
 

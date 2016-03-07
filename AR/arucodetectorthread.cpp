@@ -16,7 +16,6 @@ ArucoDetectorThread::ArucoDetectorThread(ArucoDetector* detector,QObject *parent
     connect(&workerThread, SIGNAL(started()), task, SLOT(doWork()));
     connect(task, SIGNAL(objectsReady(PoseMap)),
             this, SIGNAL(objectsReady(PoseMap)));
-
     //TODO: update projection matrix and boards;
 }
 
