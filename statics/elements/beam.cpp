@@ -152,6 +152,11 @@ void Beam::setForcesAndMoments(int axial_type,qreal Nx, qreal Vy, qreal Vz,
         m_shear_stress_y_extreme1=fabs(m_shear_y_extreme_1)/m_Asy;
         m_shear_stress_z_extreme1=fabs(m_shear_z_extreme_1)/m_Asz;
         m_torsional_stess_extreme1=fabs(m_axial_moment_extreme_1)/m_C;
+//        qDebug()<<this->objectName();
+//        qDebug()<<"Etxreme1";
+//        qDebug()<<m_y_moment_extreme_1<<"  "<< m_Sy;
+//        qDebug()<<m_z_moment_extreme_1<<"  "<< m_Sz;
+//        qDebug()<<m_bending_stress_extreme1;
     }
     if(extreme==2){
         if(m_axial_force_extreme_2!=Nx){
@@ -184,12 +189,19 @@ void Beam::setForcesAndMoments(int axial_type,qreal Nx, qreal Vy, qreal Vz,
         m_shear_stress_y_extreme2=fabs(m_shear_y_extreme_2)/m_Asy;
         m_shear_stress_z_extreme2=fabs(m_shear_z_extreme_2)/m_Asz;
         m_torsional_stess_extreme2=fabs(m_axial_moment_extreme_2)/m_C;
+//        qDebug()<<this->objectName();
+//        qDebug()<<"Etxreme2";
+//        qDebug()<<m_y_moment_extreme_2<<"  "<< m_Sy;
+//        qDebug()<<m_z_moment_extreme_2<<"  "<< m_Sz;
+//        qDebug()<<m_bending_stress_extreme2;
+
+
     }
     if(updated){
         m_dirty.operator |=( DirtyFlag::StressChanged);
         m_lazy_signal_emitter.start();
     }
-//    qDebug()<<this->objectName();
+
 //    qDebug()<<"Axial stress extreme 1:"<<m_axial_stress_extreme1;
 //    qDebug()<<"Shear stress extreme 1:"<<m_shear_stress_y_extreme1;
 //    qDebug()<<"Shear stress extreme 1:"<<m_shear_stress_z_extreme1;
@@ -296,7 +308,7 @@ void Beam::stressRatio(qreal& axialComponent, qreal& shearComponent, int extreme
         shearComponent+=fabs(m_torsional_stess_extreme1)/m_materialsManager->get(m_materialId,"fvk").toDouble();
     }
     else if(extreme==2){
-        if(m_axial_type_extreme_2>0){//tension
+        if(m_axial_type_extreme_2>0){//Tension
             axialComponent+= m_axial_stress_extreme2/m_materialsManager->get(m_materialId,"ft0").toDouble();
         }
         else{
@@ -330,8 +342,8 @@ void Beam::setSize(QSizeF size){
         m_Jx=computeTorsionalMomentInertia();
         m_Iy=computeBendingMomentInertiaY();
         m_Iz=computeBendingMomentInertiaZ();
-        m_Sy=computeShearAreaY();
-        m_Sz=computeShearAreaZ();
+        m_Sy=computeSectionModulusY();
+        m_Sz=computeSectionModulusZ();
         m_C=computeTorsionShearConstant();
         m_dirty.operator |=( DirtyFlag::ParametersChanged);
         m_lazy_signal_emitter.start();
