@@ -21,7 +21,7 @@ void TrapezoidalForceVM::onForceChanged()
 {
     if(m_component3D!=Q_NULLPTR && !m_trapezoidalForce.isNull()){
         TrapezoidalForcePtr trp_f_ptr=m_trapezoidalForce.toStrongRef();
-        trp_f_ptr->setForce(m_component3D->property("force").value<QVector3D>());
+        trp_f_ptr->setForce(m_component3D->property("globalForce").value<QVector3D>());
     }
 }
 
@@ -29,7 +29,7 @@ void TrapezoidalForceVM::onRelativePositionChanged()
 {
     if(m_component3D!=Q_NULLPTR && !m_trapezoidalForce.isNull()){
         TrapezoidalForcePtr trp_f_ptr=m_trapezoidalForce.toStrongRef();
-        trp_f_ptr->setRelativePosition(m_component3D->property("begin").value<QVector3D>(),m_component3D->property("end").value<QVector3D>());
+        trp_f_ptr->setRelativePosition(m_component3D->property("relativeLocalPosition").value<QVector3D>(),m_component3D->property("extent").value<QVector2D>());
     }
 }
 
@@ -41,8 +41,9 @@ void TrapezoidalForceVM::initView(Qt3DCore::QEntity* parentEntity)
     QQmlEngine::setObjectOwnership(m_component3D,QQmlEngine::CppOwnership);
     onForceChanged();
     onRelativePositionChanged();
-    connect(m_component3D,SIGNAL(forceChanged()),this,SLOT(onForceChanged()));
-    connect(m_component3D,SIGNAL(relativePositionChanged()),SLOT(onRelativePositionChanged()));
+    connect(m_component3D,SIGNAL(globalForceChanged()),this,SLOT(onForceChanged()));
+    connect(m_component3D,SIGNAL(relativeLocalPositionChanged()),SLOT(onRelativePositionChanged()));
+    connect(m_component3D,SIGNAL(extentChanged()),SLOT(onRelativePositionChanged()));
 
     m_component3D->setParent(parentEntity);
 

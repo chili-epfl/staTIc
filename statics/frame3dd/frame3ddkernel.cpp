@@ -644,7 +644,7 @@ void Frame3DDKernel::solve(){
             Asy[i+1]=beam_Asy;
             Asz[i+1]=beam_Asz;
             Iy[i+1]=beam_Iy;
-            Iz[i+1]=beam_Iz;
+            Iz[i+1]=beam_Iz;            
         }
         E[i+1]=beam_E;
         G[i+1]=beam_G;
@@ -1832,7 +1832,6 @@ void Frame3DDKernel::update_statics(
         else
 //            beam->setForcesAndMoments(axial_type,Q[n][1],Q[n][3],-Q[n][2],Q[n][4],Q[n][6],-Q[n][5],1);
             beam->setForcesAndMoments(axial_type,Q[n][1],Q[n][2],-Q[n][3],Q[n][4],Q[n][5],-Q[n][6],1);
-
         if (fabs(Q[n][7]) < 0.0001)
             axial_type=0;
         if ( Q[n][7] >=  0.0001 ) axial_type=1;//tension
@@ -1979,17 +1978,12 @@ InteriorPointLoadPtr Frame3DDKernel::createIPLoad(QVector3D force, BeamPtr beam,
     return InteriorPointLoadPtr();
 }
 
-TrapezoidalForcePtr Frame3DDKernel::createTPZLoad(QVector3D force, BeamPtr beam, QVector3D begin, QVector3D end, QString name)
+TrapezoidalForcePtr Frame3DDKernel::createTPZLoad(QVector3D force, BeamPtr beam, QVector3D localPosition, QVector2D extent, QString name)
 {
-    if(!force.isNull() && !beam.isNull()
-            && begin!=end
-            && begin.x()>=0
-            && begin.x()<=1
-            && end.x()>=0
-            && end.x()<=1){
+    if(!force.isNull() && !beam.isNull()){
         TrapezoidalForcePtr tpzLoad(new TrapezoidalForce(beam,name,this));
         tpzLoad->setForce(force);
-        tpzLoad->setRelativePosition(begin,end);
+        tpzLoad->setRelativePosition(localPosition,extent);
         m_trapezoidal_loads.append(tpzLoad);
         connect(tpzLoad.data(),SIGNAL(forceChanged()),this,SLOT(update()));
         connect(tpzLoad.data(),SIGNAL(relativePositionChanged()),this,SLOT(update()));

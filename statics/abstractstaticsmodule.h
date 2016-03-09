@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QVector3D>
+#include <QVector2D>
 #include <QUrl>
 #include "elements/abstractelement.h"
 #include "materialsmanager.h"
@@ -46,6 +47,7 @@ class AbstractStaticsModule : public QObject
 public:
 
     enum Status{NOT_LOADED,LOADED};
+
     enum Stability{UNSTABLE,DETERMINATE,INDETERMINATE};
 
     static qreal modelScale();
@@ -70,7 +72,7 @@ public:
     virtual NodeLoadPtr createNodeLoad(QVector3D force, JointPtr joint,QString name=QString())=0;
     virtual UniformlyDistributedLoadPtr createUDLoad(QVector3D force, BeamPtr beam,QString name=QString())=0;
     virtual InteriorPointLoadPtr createIPLoad(QVector3D force, BeamPtr beam,qreal distance=-1,QString name=QString())=0;
-    virtual TrapezoidalForcePtr createTPZLoad(QVector3D force, BeamPtr beam,QVector3D begin,QVector3D end,QString name=QString())=0;
+    virtual TrapezoidalForcePtr createTPZLoad(QVector3D force, BeamPtr beam, QVector3D localPosition, QVector2D extent, QString name=QString())=0;
 
     virtual void removeBeam(BeamPtr)=0;
     virtual void removeJoint(JointPtr)=0;

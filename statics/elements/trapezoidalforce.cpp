@@ -3,12 +3,14 @@
 #include "statics/elements/joint.h"
 
 #include <QVector3D>
+#include <QVector2D>
+
 #include <QMatrix4x4>
 TrapezoidalForce::TrapezoidalForce(BeamPtr beam, QString name, QObject *parent)
     :AbstractElement(name,parent),
     m_force(1,0,0),
-    m_local_begin(0,0,0),
-    m_local_end(0.1,0,0)
+    m_relative_position(0,0,0),
+    m_extent(0,1)
 {
     m_beam=beam.toWeakRef();
     connect(m_beam.data(),SIGNAL(destroyed(QObject*)),this, SIGNAL(killMe()));
@@ -41,33 +43,41 @@ QVector3D TrapezoidalForce::forceLocal()
 
 void TrapezoidalForce::setForce(QVector3D force)
 {
-    if(force!=m_force && !force.isNull()){
-        m_force=force;
-        emit forceChanged();
+    BeamPtr ptr=m_beam.toStrongRef();
+    if(!ptr.isNull()){
+        if(force!=m_force && !force.isNull()){
+            m_force=force/ptr->size().width();
+            emit forceChanged();
+        }
     }
 }
 
-void TrapezoidalForce::setRelativePosition(QVector3D begin, QVector3D end)
+void TrapezoidalForce::setRelativePosition(QVector3D relativePosition, QVector2D extent)
 {
-    if(begin!=end && (begin!=m_local_begin || end!=m_local_end)){
-        m_local_begin=begin;
-        m_local_end=end;
+    if(relativePosition!=m_relative_position || (extent!=m_extent)){
+        m_relative_position=relativePosition;
+        m_extent=extent;
         emit relativePositionChanged();
     }
 }
 
-void TrapezoidalForce::relativePosition(QVector3D &begin, QVector3D &end)
+void TrapezoidalForce::relativePosition(QVector3D &relativePosition,QVector2D& extent)
 {
-    begin=m_local_begin;
-    end=m_local_end;
+    relativePosition=m_relative_position;
+    extent=m_extent;
 }
 
 void TrapezoidalForce::positionOnBeam(QVector3D &begin, QVector3D &end)
 {
     BeamPtr ptr=m_beam.toStrongRef();
     if(!ptr.isNull()){
-        begin=m_local_begin*QVector3D(ptr->length(),ptr->size().width(),ptr->size().height());
-        end=m_local_end*QVector3D(ptr->length(),ptr->size().width(),ptr->size().height());
+        QVector2D relativeExtent=m_extent/ptr->length();
+        begin=QVector3D(qMax(0.0f,m_relative_position.x()+relativeExtent.x()),
+                        qMax(0.0f,m_relative_position.y()+relativeExtent.x()),
+                        qMax(0.0f,m_relative_position.z()+relativeExtent.x()))*ptr->length();
+        end=QVector3D(qMin(1.0f,m_relative_position.x()+relativeExtent.y()),
+                      qMin(1.0f,m_relative_position.y()+relativeExtent.y()),
+                      qMin(1.0f,m_relative_position.z()+relativeExtent.y()))*ptr->length();
 
     }
 }

@@ -65,7 +65,7 @@ void Frame3DDVMManager::produceTPZForce(Qt3DCore::QEntity *parentEntity)
     BeamVM* beam_vm=qobject_cast<BeamVM*>(avm);
     if(beam_vm==Q_NULLPTR || beam_vm->beam().isNull()) return;
     TrapezoidalForcePtr trpForce=m_staticsModule->createTPZLoad(QVector3D(0,-1,0),beam_vm->beam().toStrongRef(),
-                                                                QVector3D(0,0,0),QVector3D(0.5,0,0));
+                                                                QVector3D(0,0,0),QVector2D(0,1));
     TrapezoidalForceVM* tpzForceVM=new TrapezoidalForceVM(trpForce,m_sceneRoot,parentEntity,this);
     Q_FOREACH(Qt3DCore::QEntity* e,tpzForceVM->getEntities()){
         m_Entity3D2ViewModel[e]=tpzForceVM;

@@ -3,6 +3,7 @@
 
 #include "abstractelement.h"
 #include <QVector3D>
+#include <QVector2D>
 class Beam;
 typedef QSharedPointer<Beam> BeamPtr;
 typedef QWeakPointer<Beam> WeakBeamPtr;
@@ -17,8 +18,8 @@ public:
     QVector3D force(){return m_force;}
     QVector3D forceLocal();
     void setForce(QVector3D force);
-    void setRelativePosition(QVector3D begin, QVector3D end);
-    void relativePosition(QVector3D& begin, QVector3D& end);
+    void setRelativePosition(QVector3D relativePosition, QVector2D extent);
+    void relativePosition(QVector3D& relativePosition, QVector2D &extent);
     void positionOnBeam(QVector3D& begin, QVector3D& end);
 signals:
     void forceChanged();
@@ -27,11 +28,10 @@ private:
     WeakBeamPtr m_beam;
     QVector3D m_force;
     //Forces are applied on elements,
-    //these are the begin and end positions of the force
     //the component spam between 0 and 1 in relation to the size
-    //of the element the ofrce is applied on
-    QVector3D m_local_begin;
-    QVector3D m_local_end;
+    QVector3D m_relative_position;
+    //Extent---real size
+    QVector2D m_extent;
 };
 
 typedef QSharedPointer<TrapezoidalForce> TrapezoidalForcePtr;

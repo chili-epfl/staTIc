@@ -32,7 +32,7 @@ public:
     virtual NodeLoadPtr createNodeLoad(QVector3D force, JointPtr joint,QString name=QString());
     virtual UniformlyDistributedLoadPtr createUDLoad(QVector3D force, BeamPtr beam,QString name=QString());
     virtual InteriorPointLoadPtr createIPLoad(QVector3D force, BeamPtr beam,qreal distance=-1,QString name=QString());
-    virtual TrapezoidalForcePtr createTPZLoad(QVector3D force, BeamPtr beam, QVector3D begin, QVector3D end, QString name=QString());
+    virtual TrapezoidalForcePtr createTPZLoad(QVector3D force, BeamPtr beam, QVector3D localPosition, QVector2D extent, QString name=QString());
     virtual void removeBeam(BeamPtr);
     virtual void removeJoint(JointPtr);
     virtual void removeNodeLoad(NodeLoadPtr);
