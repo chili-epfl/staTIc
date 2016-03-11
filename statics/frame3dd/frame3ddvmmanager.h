@@ -21,7 +21,7 @@ public:
     AbstractElementViewModel* getAssociatedVM(Qt3DCore::QEntity*);
 
     /*Factory methods invoked by the QML side mainly*/
-    Q_INVOKABLE void produceTPZForce(Qt3DCore::QEntity* parentEntity);
+    Q_INVOKABLE void produceTPZForce(Qt3DCore::QEntity* parentEntity, QVariantHash properties=QVariantHash());
 
 
 protected slots:
@@ -33,6 +33,8 @@ private slots:
     void onResourceDestroyed(QObject*);
     void onResourcesUpdate();
     void updateScaleFactors();
+    void generateSoundEffects();
+    void resetPlayer(QMediaPlayer::State state);
 private:
 
     Frame3DDKernel* m_staticsModule;
@@ -40,6 +42,9 @@ private:
     QHash<Qt3DCore::QNodeId, Qt3DCore::QEntity* > m_entityID2Entity3D;
 
     QList<qreal> m_previousStresses;
+
+    QMediaPlayer m_player;
+    QMediaPlaylist m_effectList;
 };
 
 #endif // FRAME3DDVMMANAGER_H
