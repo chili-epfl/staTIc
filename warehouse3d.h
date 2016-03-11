@@ -3,6 +3,7 @@
 #include <QAbstractItemModel>
 #include <QSet>
 #include <QUrl>
+#include <QVariantHash>
 
 class Warehouse3D:public QAbstractListModel
 {
@@ -16,8 +17,8 @@ private:
 
     struct Object{
         QString name;
-        QString main_asset_file_path;
         QUrl decoration_img;
+        QVariantHash properties;
     };
 
     QList<Object> m_objectsIndexes;

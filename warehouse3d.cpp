@@ -1,32 +1,70 @@
 #include "warehouse3d.h"
 #include <QDirIterator>
 #include <QDebug>
-
+#include <static_global.h>
+#include <QImage>
+#include <QVector2D>
 QSet<QString> Warehouse3D::m_3Dasset_extensions=QSet<QString>()<< "obj"<<"dae"<<"3ds";
-
 QSet<QString> Warehouse3D::m_image_extensions=QSet<QString>()<< "jpg"<<"jpeg"<<"png";
 
 Warehouse3D::Warehouse3D(QObject *parent): QAbstractListModel(parent)
 {
-    /*3D resources are stored in as foleders*/
-    QString warehouseDir="Warehouse3D/";
-    QDirIterator it(warehouseDir);
+    QDirIterator it(assets3DPath);
     while(it.hasNext()){
         it.next();
         Object obj;
-        if(it.fileInfo().isDir()){
+        if(it.fileInfo().isDir() && it.fileName()!="." && it.fileName()!=".." ){
             obj.name=it.fileName();
             QDirIterator it2(it.fileInfo().canonicalFilePath());
             while(it2.hasNext()){
                 it2.next();
-                if(m_image_extensions.contains(it2.fileInfo().suffix())){
-                    obj.decoration_img=QUrl::fromLocalFile(it2.fileInfo().canonicalFilePath());
-                }
-                else if(m_3Dasset_extensions.contains(it2.fileInfo().suffix())){
-                    obj.main_asset_file_path=it2.fileInfo().canonicalFilePath();
+                if(it2.fileInfo().suffix()=="asset"){
+                    QFile configFile(it2.filePath());
+                    configFile.open(QFile::ReadOnly);
+                    if(configFile.isOpen()){
+                        QTextStream inputStream(&configFile);
+                        QString line;
+                        do{
+                            line=inputStream.readLine();
+                            if(!line.isEmpty()){
+                                QStringList parts=line.split(":");
+                                if(parts.size()>1){
+                                    obj.properties[parts[0]]=parts[1];
+                                }
+                            }
+                        }while(!line.isEmpty());
+                        configFile.close();
+                    }
+
+                    if(obj.properties.contains("thumbnail")){
+                        QString thumbFile=it.fileInfo().canonicalFilePath()+"/"+obj.properties["thumbnail"].toString();
+                        QImage img(thumbFile);
+                        if(!img.isNull()){
+                            obj.decoration_img=QUrl::fromLocalFile(thumbFile);
+                            obj.properties["thumbnail"]=QUrl::fromLocalFile(thumbFile);
+                        }
+                    }
+                    if(obj.properties.contains("main_asset_url")){
+                        obj.properties["main_asset_url"]=QUrl::fromLocalFile(it.fileInfo().canonicalFilePath()+
+                                                                             "/"+obj.properties["main_asset_url"].toString());
+                    }
+
+                    if(obj.properties.contains("main_asset_diffuse_map_url")){
+                        obj.properties["main_asset_diffuse_map_url"]=QUrl::fromLocalFile(it.fileInfo().canonicalFilePath()+
+                                                                             "/"+obj.properties["main_asset_diffuse_map_url"].toString());
+                    }
+                    if(obj.properties.contains("weight")){
+                        obj.properties["weight"]=obj.properties["weight"].toString().toFloat();
+                    }
+                    if(obj.properties.contains("extent")){
+                        QString stringExtent=obj.properties["extent"].toString();
+                        QStringList minmax=stringExtent.split(",");
+                        obj.properties["extent"]=QVector2D(minmax[0].toFloat(),minmax[1].toFloat());
+                    }
+                    break;
                 }
             }
-            if(!obj.name.isEmpty() && !obj.decoration_img.isEmpty() && !obj.main_asset_file_path.isEmpty())
+            if(!obj.name.isEmpty() && !obj.decoration_img.isEmpty())
                 m_objectsIndexes.append(obj);
         }
     }
@@ -57,8 +95,20 @@ QVariant Warehouse3D::data(const QModelIndex &index, int role) const
 QVariant Warehouse3D::get(int index, QString info) const
 {
     if(index<0 || index>=m_objectsIndexes.size()) return QVariant();
-    if(info.compare("Main-Asset",Qt::CaseInsensitive)==0){
-        return m_objectsIndexes[index].main_asset_file_path;
+    if(info.compare("Properties",Qt::CaseInsensitive)==0){
+        return m_objectsIndexes[index].properties;
+    }
+    if(info.compare("main_asset_url",Qt::CaseInsensitive)==0){
+        if(m_objectsIndexes[index].properties.contains("main_asset_url"))
+            return m_objectsIndexes[index].properties["main_asset_url"];
+        else
+            return QVariant();
+    }
+    if(info.compare("weight",Qt::CaseInsensitive)==0){
+        if(m_objectsIndexes[index].properties.contains("weight"))
+            return m_objectsIndexes[index].properties["weight"];
+        else
+            return QVariant();
     }
     return QVariant();
 }
