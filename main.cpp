@@ -19,7 +19,6 @@
 #include "AR/deformingbeammesh.h"
 
 #include <opencv2/core.hpp>
-#include "instantiator43dentity.h"
 #include "resourcesfetcher.h"
 #include "static_global.h"
 #include "AR/arucodetector.h"
@@ -67,7 +66,6 @@ int main(int argc, char *argv[])
     qmlRegisterType<MaterialsManager>("MaterialsManager", 1, 0, "MaterialsManager");
     qmlRegisterType<Warehouse3D>("Warehouse3D", 1, 0, "Warehouse3D");
 
-    qmlRegisterType<Instantiator43DEntity>("Instantiator43DEntity", 1, 0, "Instantiator43DEntity");
     qmlRegisterType<ResourcesFetcher>("ResourcesFetcher", 1, 0, "ResourcesFetcher");
 
     //qmlRegisterType<TwoDimensionalStaticsModule>("StaticsModule2D", 1, 0, "StaticsModule2D");

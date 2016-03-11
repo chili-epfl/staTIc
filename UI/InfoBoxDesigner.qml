@@ -3,7 +3,6 @@ import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
 import QtQuick.Controls.Styles 1.4
 
-import Instantiator43DEntity 1.0
 Rectangle {
     id:root
     property var current_item
@@ -122,7 +121,6 @@ Rectangle {
                                 MouseArea{
                                     id:object_apply_button
                                     anchors.fill: parent
-                                    property Instantiator43DEntity instantiator:Instantiator43DEntity{}
                                     onClicked:{
                                         if(current_item.type=="beam"){
                                             vmFrame3DDManager.produceTPZForce(current_item,warehouse3d.get(catalog_grid.currentIndex,"properties"))
