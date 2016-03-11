@@ -35,6 +35,7 @@ Entity{
     /*The stress relative to th esize and material.
      *If it's 1 or more, it is above the limits*/
     property real relativeAxialStress: 0
+    //onRelativeAxialStressChanged: console.log(rootEntity.objectName+":"+relativeAxialStress)
     property matrix4x4 poseMatrix
 
     function computeTransform(){
@@ -270,7 +271,8 @@ Entity{
             onEntered: {current_anchor_position=Qt.vector3d(0,0,0);
                         }
             onClicked: {
-                infobox.current_item=rootEntity
+                if(parent.enabled)
+                    infobox.current_item=rootEntity
             }
         }
         components: [drag_mesh,drag_material,this.transform,objectPicker]
@@ -287,9 +289,10 @@ Entity{
             property ObjectPicker objectPicker:ObjectPicker{
                 hoverEnabled: drag_anchor_enabled
                 onEntered: current_anchor_position=transform.translation;
-                onClicked: {
-                        infobox.current_item=rootEntity
-                }
+//                onClicked: {
+//                        if(parent.enabled)
+//                            infobox.current_item=rootEntity
+//                }
             }
             components: [drag_mesh,drag_material,transform,objectPicker]
         }
@@ -307,13 +310,15 @@ Entity{
             property ObjectPicker objectPicker: ObjectPicker{
                 hoverEnabled: drag_anchor_enabled
                 onEntered: current_anchor_position=transform.translation
-                onClicked: {
-                        infobox.current_item=rootEntity
-                }
+//                onClicked: {
+//                    if(parent.enabled)
+//                        infobox.current_item=rootEntity
+//                }
             }
             components: [drag_mesh,drag_material,transform,objectPicker]
 
         }
     }
+
 
 }
