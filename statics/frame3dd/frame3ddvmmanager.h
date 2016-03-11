@@ -3,6 +3,8 @@
 
 #include "../abstractvmmanager.h"
 #include "frame3ddkernel.h"
+#include <QMediaPlayer>
+#include <QMediaPlaylist>
 class Frame3DDVMManager: public AbstractVMManager
 {
     Q_OBJECT
