@@ -10,6 +10,7 @@ import "qrc:/"
 import "qrc:/tools/Tools/ConcentratedForce"
 import "qrc:/tools/Tools/Scaffold"
 import "qrc:/ui/UI/"
+
 Entity {
     id: sceneRoot
 
@@ -76,16 +77,20 @@ Entity {
 
         Transform {
             id: structureLoaderTransform
+            readonly property matrix4x4 boardAlign:Qt.matrix4x4(0,0,1,0,
+                                                                1,0,0,0,
+                                                                0,1,0,0,
+                                                                0,0,0,1);
             matrix:{
-                var m=Qt.matrix4x4()
-                //m.rotate(-180, Qt.vector3d(1, 0, 0))
-                m=m.times(structure_tag.poseMatrix)
-                //m.rotate(180, Qt.vector3d(1, 0, 0))
+                var m=structure_tag.poseMatrix
+                m=m.times(boardAlign)
                 return m;
             }
         }
 
         components: [ structureLoaderTransform ]
+
+
 
 
         /*Tools*/
