@@ -36,10 +36,12 @@ Item{
             name: "LoadingCamera"
             when: firstInit && camDevice.cameraStatus!=Camera.ActiveStatus
             PropertyChanges {
+                restoreEntryValues:false
                 target: loadingAnimation_text
                 text:"Loading Camera"
             }
             PropertyChanges {
+                restoreEntryValues:false
                 target: loadingAnimation_progressbar
                 value:0.25
             }
@@ -49,10 +51,12 @@ Item{
             when: firstInit && camDevice.cameraStatus==Camera.ActiveStatus &&
                   staticsmodule.status!=Frame3DDKernel.LOADED
             PropertyChanges {
+                restoreEntryValues:false
                 target: loadingAnimation_text
                 text:"Loading 3D structure"
             }
             PropertyChanges {
+                restoreEntryValues:false
                 target: loadingAnimation_progressbar
                 value:0.5
             }
@@ -62,10 +66,12 @@ Item{
             when: firstInit && staticsmodule.status==Frame3DDKernel.LOADED &&
                   scene3D.structureLoader.status!=SceneLoader.Loaded
             PropertyChanges {
+                restoreEntryValues:false
                 target: loadingAnimation_text
                 text:"Loading Scenario"
             }
             PropertyChanges {
+                restoreEntryValues:false
                 target: loadingAnimation_progressbar
                 value:0.75
             }
@@ -75,30 +81,43 @@ Item{
             name: "LoadingVMManager"
             when: firstInit && scene3D.structureLoader.status==SceneLoader.Loaded
             PropertyChanges {
+                restoreEntryValues:false
                 target: loadingAnimation_text
                 text:"Enjoy :)"
             }
             PropertyChanges {
+                restoreEntryValues:false
                 target: vmFrame3DDManager
                 staticsModule:staticsmodule
             }
             PropertyChanges {
+                restoreEntryValues:false
                 target: vmFrame3DDManager
                 sceneRoot:scene3D.structureEntity
             }
             PropertyChanges {
+                restoreEntryValues:false
                 target: loadingAnimation_progressbar
                 value:1
             }
             StateChangeScript {
                 script: {
-                    loadingAnimation.destroy(2000)
-                    firstInit=false;
+                   closeLoadingAnimation.start()
                 }
             }
         }
     ]
 
+    Timer{
+        id:closeLoadingAnimation
+        onTriggered: {
+            loadingAnimation.visible=false;
+            loadingAnimation.enabled=false;
+            firstInit=false;
+        }
+        running: false;
+        interval: 2000
+    }
     Component.onCompleted: camDevice.deviceId=QtMultimedia.availableCameras[1].deviceId
 
     /*Loading animation*/
@@ -214,7 +233,7 @@ Item{
              Scene3D {
                  anchors.fill: parent
                  focus: true
-                 aspects: ["input","physics","logic"]
+                 aspects: ["input","physics"]
                  //aspects:["input"]
                  multisample:true
                  DefaultScriptScene3D {
@@ -267,7 +286,6 @@ Item{
      ArucoObject{
         id:structure_tag
         objectId: "Default"
-        onPoseMatrixChanged: console.log(poseMatrix)
         Component.onCompleted: aruco.registerObserver(structure_tag)
      }
 
