@@ -3,7 +3,7 @@
 
 #include "statics/viewModels/abstractelementviewmodel.h"
 #include "statics/elements/beam.h"
-
+#include <QQmlComponent>
 class BeamVM : public AbstractElementViewModel
 {
     Q_OBJECT
@@ -33,6 +33,8 @@ private:
     void initView();
     WeakBeamPtr m_beam;
     Qt3DCore::QEntity* m_component3D;
+    QQmlComponent* m_qqmlcomponent;
+    QQmlContext* m_qqmlcontext;
 };
 
 typedef QList<QVector4D> QVector4List;

@@ -12,8 +12,9 @@ BeamVM::BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     AbstractElementViewModel(sceneRoot,parent),
     m_component3D(Q_NULLPTR)
 {
+    m_qqmlcomponent=Q_NULLPTR;
+    m_qqmlcontext=Q_NULLPTR;
     m_beam=beam.toWeakRef();
-
     connect(m_beam.data(),SIGNAL(destroyed(QObject*)),this,SLOT(deleteLater()));
 
     //Element Specific bindings
@@ -31,13 +32,20 @@ BeamVM::BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent):
 BeamVM::~BeamVM(){
     if(m_component3D)
         m_component3D->deleteLater();
+    if(m_qqmlcomponent)
+        m_qqmlcomponent->deleteLater();
+    if(m_qqmlcontext)
+        m_qqmlcontext->deleteLater();
 }
 
 void BeamVM::initView(){
     BeamPtr beam_str_ref=m_beam.toStrongRef();
     if(!beam_str_ref->enable()) return;
-    QQmlComponent beamView_component(QQmlEngine::contextForObject(m_sceneRoot)->engine(),QUrl("qrc:/element_views/Element_Views/BeamView.qml"));
-    Qt3DCore::QEntity* beamView= qobject_cast<Qt3DCore::QEntity*>(beamView_component.create(new QQmlContext(QQmlEngine::contextForObject(m_sceneRoot))));
+    m_qqmlcomponent=new QQmlComponent(qmlEngine(m_sceneRoot),m_sceneRoot);
+    m_qqmlcomponent->loadUrl(QUrl("qrc:/element_views/Element_Views/BeamView.qml"));
+    m_qqmlcontext=new QQmlContext(qmlContext(m_sceneRoot));
+    Qt3DCore::QEntity* beamView= qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent->create(m_qqmlcontext));
+    m_qqmlcontext->setContextObject(beamView);
     m_component3D=beamView;
 
     m_component3D->setObjectName(beam_str_ref->objectName());

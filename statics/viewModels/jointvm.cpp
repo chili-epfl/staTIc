@@ -10,6 +10,8 @@ JointVM::JointVM(JointPtr joint,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     AbstractElementViewModel(sceneRoot,parent),
     m_component3D(Q_NULLPTR)
 {
+    m_qqmlcomponent=Q_NULLPTR;
+    m_qqmlcontext=Q_NULLPTR;
     m_joint=joint.toWeakRef();
     initView();
     connect(m_joint.data(),SIGNAL(reactionChanged()),this,SLOT(onReactionChanged()));
@@ -19,6 +21,10 @@ JointVM::JointVM(JointPtr joint,Qt3DCore::QEntity* sceneRoot,QObject* parent):
 JointVM::~JointVM(){
     if(m_component3D)
         m_component3D->deleteLater();
+    if(m_qqmlcomponent)
+        m_qqmlcomponent->deleteLater();
+    if(m_qqmlcontext)
+        m_qqmlcontext->deleteLater();
 }
 
 
@@ -57,9 +63,12 @@ void JointVM::onConnectedBeamChanged(){
 
 void JointVM::initView(){
     JointPtr joint_str_ref=m_joint.toStrongRef();
-    QQmlComponent jointView_component(QQmlEngine::contextForObject(m_sceneRoot)->engine(),QUrl("qrc:/element_views/Element_Views/JointView.qml"));
-    Qt3DCore::QEntity *jointView;
-    jointView = qobject_cast<Qt3DCore::QEntity*>(jointView_component.create(new QQmlContext(QQmlEngine::contextForObject(m_sceneRoot))));
+    m_qqmlcomponent=new QQmlComponent(qmlEngine(m_sceneRoot),m_sceneRoot);
+    m_qqmlcomponent->loadUrl(QUrl("qrc:/element_views/Element_Views/JointView.qml"));
+    m_qqmlcontext=new QQmlContext(qmlContext(m_sceneRoot));
+    Qt3DCore::QEntity* jointView= qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent->create(m_qqmlcontext));
+    m_qqmlcontext->setContextObject(jointView);
+
     m_component3D=jointView;
 
     m_component3D->setObjectName(joint_str_ref->objectName());

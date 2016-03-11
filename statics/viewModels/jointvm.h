@@ -3,7 +3,7 @@
 #include "statics/viewModels/abstractelementviewmodel.h"
 #include "statics/elements/joint.h"
 #include "jointvmitemmodel.h"
-
+#include <QQmlComponent>
 class JointVM:public AbstractElementViewModel
 {
     Q_OBJECT
@@ -28,6 +28,8 @@ private:
     /*A map between the beams and the relative entity*/
     QHash<Qt3DCore::QEntity*,WeakBeamPtr> m_beamsMap;
     WeakJointPtr m_joint;
+    QQmlComponent* m_qqmlcomponent;
+    QQmlContext* m_qqmlcontext;
 };
 
 #endif // JOINTVM_H
