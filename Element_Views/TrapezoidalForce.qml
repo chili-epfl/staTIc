@@ -4,7 +4,13 @@ import QtQuick 2.3 as QQ2
 Entity{
     id:rootEntity
     readonly property string type: "trapezoidalForce"
-    property vector3d globalForce: Qt.vector3d(0,-980000,0);
+    property vector3d globalForce: Qt.vector3d(0,-weight*9800,0);
+
+    property url asset3DMeshURL;
+    property url asset3DTextureURL;
+    property real weight
+
+    signal killMe();
 
 //    property vector3d localForce: globalToLocalMat.times(globalForce);
 //    onLocalForceChanged: console.log(localForce);
@@ -29,27 +35,33 @@ Entity{
 
     /*Force is acting in the y direction*/
     property vector3d relativeLocalPosition:Qt.vector3d(0,-transform.translation.y/rootEntity.parent.length + 0.5,0)
-    property vector2d extent: Qt.vector2d(5,5)
+    property vector2d extent: Qt.vector2d(-5,5)
 
     property bool dragging: false;
     /*Visual aspect*/
-    CuboidMesh{
-        id:mesh
-        xExtent: 10
-        yExtent: 10
-        zExtent: 10
+    Transform{
+        id:transform
+        rotation:fromAxisAndAngle(Qt.vector3d(0, 0, 1), -90)
+        QQ2.Binding on translation{           
+            when: dragging && rootEntity.parent!=null
+            value:Qt.vector3d(5,0,0).plus(rootEntity.parent.current_anchor_position)
+        }
+        onTranslationChanged:{
+                    resetTimer.restart()
+        }
     }
-
     property ObjectPicker objectPicker: ObjectPicker {
         hoverEnabled: false
         onClicked: {
-                infobox.current_item=rootEntity
+                if(applicationRoot.currentViewFilter=='DESIGNER')
+                    infobox.current_item=rootEntity
                 rootEntity.parent.drag_anchor_enabled=false;
         }
         onPressed: {
-            infobox.current_item=rootEntity
+            if(applicationRoot.currentViewFilter=='DESIGNER')
+                infobox.current_item=rootEntity
             rootEntity.parent.drag_anchor_enabled=true;
-            rootEntity.parent.current_anchor_position=transform.translation
+            rootEntity.parent.current_anchor_position=transform.translation.plus(Qt.vector3d(-5,0,0))
             dragging=true;
         }
         onReleased: {
@@ -57,22 +69,24 @@ Entity{
             dragging=false;
         }
     }
-    Transform{
-        id:transform
-        scale3D:Qt.vector3d(2,2,2)
-        QQ2.Binding on translation{
-            when: dragging && rootEntity.parent!=null
-            value:rootEntity.parent.current_anchor_position
-        }
-        onTranslationChanged:{
-                    resetTimer.restart()
-        }
+
+    Mesh{
+        id:customMesh
+        source: asset3DMeshURL
+    }
+    DiffuseMapMaterial {
+        id:material
+        ambient: Qt.rgba( 0.2, 0.2, 0.2, 1.0 )
+        diffuse:  asset3DTextureURL
+        shininess: 2.0
     }
 
-    components: [mesh,objectPicker,transform]
+    components: [transform,customMesh,material,objectPicker]
+
+
     QQ2.Timer{
         id:resetTimer
-        interval: 3000
+        interval: 2000
         onTriggered: {
             rootEntity.parent.drag_anchor_enabled=false;
             dragging=false;

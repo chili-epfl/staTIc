@@ -4,15 +4,58 @@
 #include <QQmlEngine>
 #include <Qt3DRender>
 
-TrapezoidalForceVM::TrapezoidalForceVM(TrapezoidalForcePtr force, Qt3DCore::QEntity *sceneRoot, Qt3DCore::QEntity* parentEntity,QObject *parent)
+TrapezoidalForceVM::TrapezoidalForceVM(TrapezoidalForcePtr force, Qt3DCore::QEntity *sceneRoot, Qt3DCore::QEntity* parentEntity, QVariantHash properties, QObject *parent)
     :AbstractElementViewModel(sceneRoot,parent)
 {
+    m_qqmlcomponent=Q_NULLPTR;
+    m_qqmlcontext=Q_NULLPTR;
+    m_component3D=Q_NULLPTR;
+    m_asset_tmp_copy=QString();
     m_trapezoidalForce=force.toWeakRef();
-    initView(parentEntity);
+    initView(parentEntity,properties);
     connect(m_trapezoidalForce.data(),SIGNAL(destroyed(QObject*)),this,SLOT(deleteLater()));
     connect(m_trapezoidalForce.data(),SIGNAL(destroyed(QObject*)),m_component3D,SLOT(deleteLater()));
-    connect(m_component3D,SIGNAL(destroyed(QObject*)),this,SLOT(deleteLater()));
-    connect(m_component3D,SIGNAL(destroyed(QObject*)),m_trapezoidalForce.data(),SIGNAL(killMe()));
+    connect(m_component3D,SIGNAL(killMe()),this,SLOT(deleteLater()));
+    connect(m_component3D,SIGNAL(killMe()),m_trapezoidalForce.data(),SIGNAL(killMe()));
+}
+
+TrapezoidalForceVM::~TrapezoidalForceVM()
+{
+   if(!m_asset_tmp_copy.isEmpty())
+        QFile::remove(m_asset_tmp_copy.toLocalFile());
+   if(m_component3D){
+       m_component3D->setParent(Q_NODE_NULLPTR);
+       delete m_component3D;
+   }
+   if(m_qqmlcomponent)
+       delete m_qqmlcomponent;
+   if(m_qqmlcontext)
+       delete m_qqmlcontext;
+   m_qqmlcomponent=Q_NULLPTR;
+   m_qqmlcontext=Q_NULLPTR;
+   m_component3D=Q_NULLPTR;
+
+
+}
+
+void TrapezoidalForceVM::setProperties(QVariantHash properties)
+{
+    if(m_component3D){
+        Q_FOREACH(QString property, properties.keys()){
+            if(property.compare("weight",Qt::CaseInsensitive)==0){
+                m_component3D->setProperty("weight",properties[property]);
+            }
+            else if(property.compare("extent",Qt::CaseInsensitive)==0){
+                m_component3D->setProperty("extent",properties[property]);
+            }
+            else if(property.compare("main_asset_url",Qt::CaseInsensitive)==0){
+                m_component3D->setProperty("asset3DMeshURL",properties[property]);
+            }
+            else if(property.compare("main_asset_diffuse_map_url",Qt::CaseInsensitive)==0){
+                m_component3D->setProperty("asset3DTextureURL",properties[property]);
+            }
+        }
+    }
 }
 
 
@@ -33,22 +76,22 @@ void TrapezoidalForceVM::onRelativePositionChanged()
     }
 }
 
-void TrapezoidalForceVM::initView(Qt3DCore::QEntity* parentEntity)
+void TrapezoidalForceVM::initView(Qt3DCore::QEntity* parentEntity,QVariantHash properties)
 {
-    QQmlComponent component(QQmlEngine::contextForObject(parentEntity)->engine(),QUrl("qrc:/element_views/Element_Views/TrapezoidalForce.qml"));
-    Qt3DCore::QEntity* forceView= qobject_cast<Qt3DCore::QEntity*>(component.create(new QQmlContext(QQmlEngine::contextForObject(parentEntity))));
+    m_qqmlcomponent=new QQmlComponent(qmlEngine(parentEntity),parentEntity);
+    m_qqmlcomponent->loadUrl(QUrl("qrc:/element_views/Element_Views/TrapezoidalForce.qml"));
+    m_qqmlcontext=new QQmlContext(qmlContext(parentEntity));
+    Qt3DCore::QEntity* forceView= qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent->beginCreate(m_qqmlcontext));
+    m_qqmlcontext->setContextObject(forceView);
     m_component3D=forceView;
-    QQmlEngine::setObjectOwnership(m_component3D,QQmlEngine::CppOwnership);
+    //QQmlEngine::setObjectOwnership(m_component3D,QQmlEngine::JavaScriptOwnership);
     onForceChanged();
     onRelativePositionChanged();
+    setProperties(properties);
     connect(m_component3D,SIGNAL(globalForceChanged()),this,SLOT(onForceChanged()));
     connect(m_component3D,SIGNAL(relativeLocalPositionChanged()),SLOT(onRelativePositionChanged()));
     connect(m_component3D,SIGNAL(extentChanged()),SLOT(onRelativePositionChanged()));
-
+    m_qqmlcomponent->completeCreate();
     m_component3D->setParent(parentEntity);
 
-    Qt3DCore::QEntity* test=new Qt3DCore::QEntity(m_component3D);
-    Qt3DRender::QSceneLoader *sceneLoader = new Qt3DRender::QSceneLoader(test);
-    test->addComponent(sceneLoader);
-    sceneLoader->setSource(QUrl("qrc:/3dobjects/3DObjects/jacuzzi_3ds/jacuzzi.dae"));
 }
