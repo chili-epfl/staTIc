@@ -77,26 +77,12 @@
         <file>UI/InfoBoxDesigner.qml</file>
         <file>SynchDialogBox.qml</file>
         <file>MaterialDesigner.qml</file>
-        <file>UI/diffuse.webp</file>
     </qresource>
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>
         <file>Tools/Scaffold/Scaffold.qml</file>
         <file>Tools/Scaffold/Anchor.qml</file>
         <file>Tools/BeamRemover/BeamRemover.qml</file>
-    </qresource>
-    <qresource prefix="/3dobjects">
-        <file>3DObjects/jacuzzi_3ds/jacuzzi.3ds</file>
-        <file>3DObjects/jacuzzi_3ds/jacuzzi-.jpg</file>
-        <file>3DObjects/jacuzzi_3ds/paneling.jpg</file>
-        <file>3DObjects/jacuzzi_3ds/jacuzzi.dae</file>
-        <file>3DObjects/jacuzzi_3ds/jacuzzi.mtl</file>
-        <file>3DObjects/jacuzzi_3ds/jacuzzi.obj</file>
-        <file>3DObjects/jacuzzi_3ds/jacuzzi.glb</file>
-        <file>3DObjects/jacuzzi_3ds/layout.png</file>
-        <file>3DObjects/jacuzzi_3ds/layout.webp</file>
-        <file>3DObjects/jacuzzi_3ds/Chest.obj</file>
-        <file>3DObjects/jacuzzi_3ds/diffuse.webp</file>
     </qresource>
     <qresource prefix="/soundeffects">
         <file>AR/SoundEffects/crash_wood_1.mp3</file>

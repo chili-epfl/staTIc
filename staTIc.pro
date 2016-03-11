@@ -43,7 +43,6 @@ SOURCES += main.cpp \
     statics/elements/trapezoidalforce.cpp \
     statics/viewModels/trapezoidalforcevm.cpp \
     warehouse3d.cpp \
-    instantiator43dentity.cpp \
     resourcesfetcher.cpp \
     AR/arucodetector.cpp \
     AR/arucodetectorthread.cpp \
@@ -92,7 +91,6 @@ HEADERS += \
     statics/elements/trapezoidalforce.h \
     statics/viewModels/trapezoidalforcevm.h \
     warehouse3d.h \
-    instantiator43dentity.h \
     resourcesfetcher.h \
     static_global.h \
     AR/arucodetector.h \
