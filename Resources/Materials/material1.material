@@ -1,0 +1,7 @@
+UniqueID:material1;
+Name:Oak;
+Density:0.65e-9;
+Price:40;
+Young:20000;
+G:1250;
+TextureImage:oak.jpeg;

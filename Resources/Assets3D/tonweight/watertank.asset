@@ -1,0 +1,5 @@
+thumbnail:texture.png
+main_asset_url:tonweight.obj
+main_asset_diffuse_map_url:texture.png
+weight:50
+extent:-12,12
