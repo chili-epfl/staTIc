@@ -93,5 +93,23 @@
         <file>3DObjects/jacuzzi_3ds/jacuzzi.mtl</file>
         <file>3DObjects/jacuzzi_3ds/jacuzzi.obj</file>
         <file>3DObjects/jacuzzi_3ds/jacuzzi.glb</file>
+        <file>3DObjects/jacuzzi_3ds/layout.png</file>
+        <file>3DObjects/jacuzzi_3ds/layout.webp</file>
+        <file>3DObjects/jacuzzi_3ds/Chest.obj</file>
+        <file>3DObjects/jacuzzi_3ds/diffuse.webp</file>
+    </qresource>
+    <qresource prefix="/soundeffects">
+        <file>AR/SoundEffects/crash_wood_1.mp3</file>
+        <file>AR/SoundEffects/crash_wood_2.mp3</file>
+        <file>AR/SoundEffects/creak_low_1.mp3</file>
+        <file>AR/SoundEffects/creak_low_2.mp3</file>
+        <file>AR/SoundEffects/creak_low_3.mp3</file>
+        <file>AR/SoundEffects/creak_low_4.mp3</file>
+        <file>AR/SoundEffects/crash_wood_1.ogg</file>
+        <file>AR/SoundEffects/crash_wood_2.ogg</file>
+        <file>AR/SoundEffects/creak_low_1.ogg</file>
+        <file>AR/SoundEffects/creak_low_2.ogg</file>
+        <file>AR/SoundEffects/creak_low_3.ogg</file>
+        <file>AR/SoundEffects/creak_low_4.ogg</file>
     </qresource>
 </RCC>

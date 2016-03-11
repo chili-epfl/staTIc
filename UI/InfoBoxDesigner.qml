@@ -9,8 +9,9 @@ Rectangle {
     property var current_item
     onCurrent_itemChanged: {
         if(current_item!=null &&
-            current_item.type=="beam")
-            tab_view.getTab(tab_view.currentIndex).item.currentIndex=materialsManager.get(current_item.materialID ,"Index");
+            current_item.type==="beam" &&
+                tab_view.currentIndex===1)
+                tab_view.getTab(1).item.currentIndex=materialsManager.get(current_item.materialID ,"Index");
     }
     color: "transparent"
     TabView{
@@ -46,22 +47,39 @@ Rectangle {
                             anchors.margins: 10
                             model: warehouse3d
                             clip: true
-                            cellWidth : parent.width/2
+                            cellWidth : parent.width/2-10
                             cellHeight: cellWidth
                             delegate: Rectangle{
                                 height: catalog_grid.cellHeight-10
                                 width:  catalog_grid.cellWidth-10
-                                anchors.margins: 5
-                                color:"#2f3439";
+                                color:"transparent";
                                 Image {
+                                    id:image
+                                    width: parent.width
+                                    height: 0.9*parent.height
                                     anchors.fill: parent
+                                    anchors.margins: 20
                                     source: decoration
+                                }
+                                Rectangle{
+                                    color: "#2f3439"
+                                    width: parent.width
+                                    anchors.leftMargin : 20
+                                    anchors.rightMargin: 20
+                                    height: 0.1*parent.height
+                                    anchors.top: image.bottom
+                                    Text{
+                                        anchors.centerIn: parent
+                                        color: "#F0F0F0"
+                                        text:"Weight:"+warehouse3d.get(catalog_grid.currentIndex,"weight")+"Kg"
+                                    }
                                 }
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked: catalog_grid.currentIndex=index;
                                 }
                             }
+                            highlight: Rectangle { color: "red"; radius: 5 }
                         }
                     }
                     /*Apply/Delete modifier*/
@@ -87,8 +105,8 @@ Rectangle {
                                     id:object_delete_button
                                     anchors.fill: parent
                                     onClicked:{
-                                        if(current_item.type=="trapezoidalForce"){
-                                            current_item.destroy();
+                                        if(current_item.type==="trapezoidalForce"){
+                                            current_item.killMe();
                                             current_item=null;
                                         }
                                     }
@@ -107,7 +125,7 @@ Rectangle {
                                     property Instantiator43DEntity instantiator:Instantiator43DEntity{}
                                     onClicked:{
                                         if(current_item.type=="beam"){
-                                            vmFrame3DDManager.produceTPZForce(current_item)
+                                            vmFrame3DDManager.produceTPZForce(current_item,warehouse3d.get(catalog_grid.currentIndex,"properties"))
                                             //current_item=instantiator.createEntity(current_item,"qrc:/element_views/Element_Views/TrapezoidalForce.qml")
                                         }
 
@@ -149,10 +167,6 @@ Rectangle {
                             anchors.margins: 10
                             model: materialsManager
                             clip: true
-                            currentIndex: (current_item!=null &&
-                                          current_item.type=="beam") ?
-                                              materialsManager.get(current_item.materialID ,"Index")
-                                            : 0
                             spacing: 10
                             delegate: Rectangle{
                                 width: materialItem.width-20

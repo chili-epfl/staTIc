@@ -166,6 +166,35 @@ DISTFILES += \
     Resources/Scenarios/Model1/Model1.structure \
     Resources/Scenarios/Model2/Model2.structure \
     Resources/Scenarios/Model1/Model1.yml \
-    Resources/Scenarios/Model2/Model2.yml
+    Resources/Scenarios/Model2/Model2.yml \
+    Resources/Assets3D/solar_pannel/Solar.blend \
+    Resources/Assets3D/girl/girl.obj \
+    Resources/Assets3D/jacuzzi/jacuzzi.obj \
+    Resources/Assets3D/snow/snow.obj \
+    Resources/Assets3D/solar_pannel/Solar.obj \
+    Resources/Assets3D/tonweight/tonweight.obj \
+    Resources/Assets3D/waterTank/watertank.obj \
+    Resources/Assets3D/girl/girl.asset~ \
+    Resources/Assets3D/jacuzzi/jacuzzi.asset~ \
+    Resources/Assets3D/snow/snow.asset~ \
+    Resources/Assets3D/solar_pannel/solar_pannel.asset~ \
+    Resources/Assets3D/tonweight/watertank.asset~ \
+    Resources/Assets3D/waterTank/watertank.asset~ \
+    Resources/Assets3D/girl/texture.jpg \
+    Resources/Assets3D/jacuzzi/jacuzzi.jpg \
+    Resources/Assets3D/solar_pannel/preview.jpg \
+    Resources/Materials/oak.jpeg \
+    Resources/Assets3D/jacuzzi/layout.png \
+    Resources/Assets3D/snow/texture.png \
+    Resources/Assets3D/solar_pannel/Solar.png \
+    Resources/Assets3D/tonweight/texture.png \
+    Resources/Assets3D/waterTank/watertank.png \
+    Resources/Assets3D/girl/girl.asset \
+    Resources/Assets3D/jacuzzi/jacuzzi.asset \
+    Resources/Assets3D/snow/snow.asset \
+    Resources/Assets3D/solar_pannel/solar_pannel.asset \
+    Resources/Assets3D/tonweight/watertank.asset \
+    Resources/Assets3D/waterTank/watertank.asset \
+    Resources/Materials/material1.material
 
 

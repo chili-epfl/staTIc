@@ -8,7 +8,6 @@ Rectangle {
     id:root
     property var current_item
     color: "transparent"
-
     onCurrent_itemChanged: {
         if(current_item != null && current_item.segments){
                 title.text="Beam "+ current_item.objectName;
@@ -258,8 +257,6 @@ Rectangle {
                 anchors.left: controlSwitch.right
             }
         }
-
-
         Rectangle{
             color:"#2f3439"
             radius: 1

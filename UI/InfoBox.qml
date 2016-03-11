@@ -76,6 +76,7 @@ Rectangle {
     Loader{
         id:loader
         anchors.fill:parent
+        asynchronous: true
         onLoaded: item.current_item=Qt.binding(function(){return current_item})
     }
 
