@@ -510,7 +510,7 @@ qreal Beam::computeBendingMomentInertiaY(QSizeF size)
         if(!m_size.isValid()) return -1;
         size=this->m_size;
     }
-    return size.width()*pow(size.height(),3)/12;
+    return size.height()*pow(size.width(),3)/12;
 }
 
 qreal Beam::computeBendingMomentInertiaZ(QSizeF size)
@@ -519,7 +519,7 @@ qreal Beam::computeBendingMomentInertiaZ(QSizeF size)
         if(!m_size.isValid()) return -1;
         size=this->m_size;
     }
-    return size.height()*pow(size.width(),3)/12;
+    return size.width()*pow(size.height(),3)/12;
 }
 
 qreal Beam::computeSectionModulusY(QSizeF size)
@@ -529,7 +529,7 @@ qreal Beam::computeSectionModulusY(QSizeF size)
         size=this->m_size;
     }
     qreal Iy= computeBendingMomentInertiaY(size);
-    return 2*Iy/size.height();
+    return 2*Iy/size.width();
 }
 
 qreal Beam::computeSectionModulusZ(QSizeF size)
@@ -539,5 +539,5 @@ qreal Beam::computeSectionModulusZ(QSizeF size)
         size=this->m_size;
     }
     qreal Iz= computeBendingMomentInertiaZ(size);
-    return 2*Iz/size.width();
+    return 2*Iz/size.height();
 }
