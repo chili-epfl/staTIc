@@ -4,7 +4,6 @@
 #include "../abstractvmmanager.h"
 #include "frame3ddkernel.h"
 #include <QMediaPlayer>
-#include <QMediaPlaylist>
 class Frame3DDVMManager: public AbstractVMManager
 {
     Q_OBJECT
@@ -36,7 +35,8 @@ private slots:
     void onResourcesUpdate();
     void updateScaleFactors();
     void generateSoundEffects();
-    void resetPlayer(QMediaPlayer::State state);
+    void playEffect(QMediaPlayer::State state);
+
 private:
 
     Frame3DDKernel* m_staticsModule;
@@ -46,7 +46,7 @@ private:
     QList<qreal> m_previousStresses;
 
     QMediaPlayer m_player;
-    QMediaPlaylist m_effectList;
+    QList<QUrl> m_effectList;
 };
 
 #endif // FRAME3DDVMMANAGER_H

@@ -5,18 +5,15 @@
 Frame3DDVMManager::Frame3DDVMManager(QObject* parent):
     AbstractVMManager(parent),
     m_staticsModule(Q_NULLPTR),
-    m_player(this),
-    m_effectList(this)
+    m_player(this)
 {
-    m_effectList.addMedia(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_1.ogg"));
-    m_effectList.addMedia(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_2.ogg"));
-    m_effectList.addMedia(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_3.ogg"));
-    m_effectList.addMedia(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_4.ogg"));
-    m_effectList.addMedia(QUrl("qrc:/soundeffects/AR/SoundEffects/crash_wood_1.ogg"));
-    m_effectList.addMedia(QUrl("qrc:/soundeffects/AR/SoundEffects/crash_wood_2.ogg"));
-    //m_player.setPlaylist(&m_effectList);
-    m_player.setMedia(QUrl("qrc:/soundeffects/AR/SoundEffects/crash_wood_1.ogg"));
-    connect(&m_player,SIGNAL(stateChanged(QMediaPlayer::State)),this,SLOT(resetPlayer(QMediaPlayer::State)));
+    m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_1.ogg"));
+    m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_2.ogg"));
+    m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_3.ogg"));
+    m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_4.ogg"));
+    m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/crash_wood_1.ogg"));
+    m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/crash_wood_2.ogg"));
+    connect(&m_player,SIGNAL(stateChanged(QMediaPlayer::State)),this,SLOT(playEffect(QMediaPlayer::State)));
     connect(this,SIGNAL(staticsModuleChanged()),this,SLOT(initViewModels()));
     connect(this,SIGNAL(sceneRootChanged()),this,SLOT(initViewModels()));
 }
@@ -173,22 +170,24 @@ void Frame3DDVMManager::generateSoundEffects()
 
         if(max>1){
             qreal r=qrand()/RAND_MAX;
-            int index=qRound(r+5);
+            int index=qRound(r+4);
+            m_player.setMedia(m_effectList.at(index));
             m_player.play();
 
         }
         else if(max>0.5){
-            qDebug()<<"in2";
             qreal r=qrand()/RAND_MAX;
+            int index=qRound(r*3);
+            m_player.setMedia(m_effectList.at(index));
             m_player.play();
         }
 
     }
 }
 
-void Frame3DDVMManager::resetPlayer(QMediaPlayer::State state)
+void Frame3DDVMManager::playEffect(QMediaPlayer::State state)
 {
-    if(state==QMediaPlayer::StoppedState){
-        m_player.setPosition(0);
+    if(state==QMediaPlayer::LoadedMedia){
+        m_player.play();
     }
 }
