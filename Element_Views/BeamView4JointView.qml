@@ -74,8 +74,7 @@ Entity{
 
     }
 
-    property real scaleFactor: 2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 1
-
+    property real scaleFactor: Math.min(2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 1,3)
 
     property int nModels: 5
     property matrix4x4 poseMatrix: Qt.matrix4x4()

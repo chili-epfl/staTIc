@@ -70,7 +70,7 @@ Rectangle {
                                     Text{
                                         anchors.centerIn: parent
                                         color: "#F0F0F0"
-                                        text:"Weight:"+warehouse3d.get(catalog_grid.currentIndex,"weight")+"Kg"
+                                        text:"Weight:"+warehouse3d.get(index,"weight")+"Kg"
                                     }
                                 }
                                 MouseArea{

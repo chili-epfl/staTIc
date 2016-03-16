@@ -248,9 +248,14 @@ Entity{
     /*Pickers and Dragging anchors*/
     property bool drag_anchor_enabled:false;
     property vector3d current_anchor_position: Qt.vector3d(0,0,0);
-    SphereMesh{
+//    SphereMesh{
+//        id:drag_mesh
+//        radius:10
+//    }
+    CylinderMesh{
         id:drag_mesh
-        radius:10
+        radius: 5
+        length: 40
     }
     PhongAlphaMaterial{
         id:drag_material
@@ -278,13 +283,13 @@ Entity{
         components: [drag_mesh,drag_material,this.transform,objectPicker]
     }
     NodeInstantiator {
-        model: (length-40)/(4*drag_mesh.radius)-1;
+        model: (length-40)/(4*(drag_mesh.radius+2))-1;
         delegate:Entity{
             enabled: applicationRoot.currentViewFilter=='BEAM' ||
                      applicationRoot.currentViewFilter=='DESIGNER' ? true : false
             property Transform transform: Transform{
                 rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
-                translation:Qt.vector3d(0,(index+1)*(2*drag_mesh.radius),0)
+                translation:Qt.vector3d(0,(index+1)*(2*(drag_mesh.radius+2)),0)
             }
             property ObjectPicker objectPicker:ObjectPicker{
                 hoverEnabled: drag_anchor_enabled
@@ -294,18 +299,18 @@ Entity{
 //                            infobox.current_item=rootEntity
 //                }
             }
-            components: [drag_mesh,drag_material,transform,objectPicker]
+            components: drag_anchor_enabled ? [drag_mesh,drag_material,transform,objectPicker] : []
         }
     }
     NodeInstantiator {
-        model: (length-40)/(4*drag_mesh.radius)-1;
+        model: (length-40)/(4*(drag_mesh.radius+2))-1;
         delegate:Entity{
             enabled: applicationRoot.currentViewFilter=='BEAM' ||
                      applicationRoot.currentViewFilter=='DESIGNER' ? true : false
              property Transform transform: Transform{
                 id:drag_transform
                 rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
-                translation:Qt.vector3d(0,-(index+1)*(2*drag_mesh.radius),0)
+                translation:Qt.vector3d(0,-(index+1)*(2*(drag_mesh.radius+2)),0)
             }
             property ObjectPicker objectPicker: ObjectPicker{
                 hoverEnabled: drag_anchor_enabled
@@ -315,7 +320,7 @@ Entity{
 //                        infobox.current_item=rootEntity
 //                }
             }
-            components: [drag_mesh,drag_material,transform,objectPicker]
+            components: drag_anchor_enabled ? [drag_mesh,drag_material,transform,objectPicker] : []
 
         }
     }

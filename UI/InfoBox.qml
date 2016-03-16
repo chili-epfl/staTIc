@@ -1,8 +1,7 @@
 import QtQuick 2.0
 import QtQuick.Controls.Styles 1.4
-import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
-
+import QtQuick.Controls 1.4
 Rectangle {
     id:root
     property var current_item
@@ -53,6 +52,7 @@ Rectangle {
 
     Rectangle{
         //close button
+        visible: applicationRoot.currentViewFilter!='DESIGNER'
         z:1
         anchors.right: parent.right
         anchors.top: parent.top
@@ -72,7 +72,19 @@ Rectangle {
             onClicked: { root.current_item=null;}
         }
     }
-
+    Rectangle{
+        anchors.centerIn: parent
+        width: busyIndicator.width*1.2
+        height: width
+        radius: width/2
+        color: "#F8F8F8"
+        visible: loader.status!=Loader.Ready
+        BusyIndicator {
+            id:busyIndicator
+            anchors.centerIn: parent
+            running: parent.visible
+        }
+    }
     Loader{
         id:loader
         anchors.fill:parent

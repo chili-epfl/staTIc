@@ -44,7 +44,7 @@ Entity{
         rotation:fromAxisAndAngle(Qt.vector3d(0, 0, 1), -90)
         QQ2.Binding on translation{           
             when: dragging && rootEntity.parent!=null
-            value:Qt.vector3d(5,0,0).plus(rootEntity.parent.current_anchor_position)
+            value:Qt.vector3d(7.5,0,0).plus(rootEntity.parent.current_anchor_position)
         }
         onTranslationChanged:{
                     resetTimer.restart()
@@ -75,12 +75,24 @@ Entity{
         source: asset3DMeshURL
     }
     DiffuseMapMaterial {
-        id:material
+        id:material_diffuse
         ambient: Qt.rgba( 0.2, 0.2, 0.2, 1.0 )
         diffuse:  asset3DTextureURL
         shininess: 2.0
     }
-
+    PhongAlphaMaterial{
+        id:material_selection
+        ambient:  "yellow"
+        diffuse:"grey"
+        specular:"black"
+        alpha:0.80
+    }
+    property Material material: isSelected ? material_selection:material_diffuse
+    property bool isSelected: infobox.current_item==rootEntity
+    onIsSelectedChanged: {
+        if(!isSelected)
+            rootEntity.parent.drag_anchor_enabled=false
+    }
     components: [transform,customMesh,material,objectPicker]
 
 
