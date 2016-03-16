@@ -257,10 +257,6 @@ Item{
                 InfoBox{
                     id:infobox
                     width:Math.max(parent.width/3,pt2px(142))//5cm
-                    anchors.bottom: parent.bottom
-                    anchors.right: parent.right
-                    anchors.top: parent.top
-                    anchors.margins: pt2px(20)
                 }
 
                 Image {

@@ -9,7 +9,7 @@ Rectangle {
     states: [
         State {
             name: "beam"
-            PropertyChanges {
+            PropertyChanges {                
                 target: loader
                 source:"qrc:/ui/UI/InfoBoxBeam.qml"
             }
@@ -72,6 +72,69 @@ Rectangle {
             onClicked: { root.current_item=null;}
         }
     }
+
+    Rectangle{
+        id:hideButton
+        anchors.verticalCenter: parent.verticalCenter
+        anchors.right: parent.left
+        state: "Visible"
+        states:[
+            State {
+                name: "Hidden"
+                PropertyChanges {
+                    target: hideLabel
+                    text: "Show"
+                }
+                AnchorChanges {
+                    target: root
+                    anchors.bottom: root.parent.bottom
+                    anchors.left: root.parent.right
+                    anchors.top: root.parent.top
+                }
+                PropertyChanges{
+                    target:root
+                    anchors.margins: pt2px(20)
+                }
+            },
+            State {
+                name: "Visible"
+                PropertyChanges {
+                    target: hideLabel
+                    text: "Hide"
+                }
+                AnchorChanges {
+                    target: root
+                    anchors.bottom: root.parent.bottom
+                    anchors.right: root.parent.right
+                    anchors.top: root.parent.top
+                }
+                PropertyChanges{
+                    target:root
+                    anchors.margins: pt2px(20)
+                }
+            }
+        ]
+        transitions: Transition {
+            AnchorAnimation { duration: 500 }
+        }
+        color:"#2f3439"
+        height:  Math.max(parent.width * 0.25,hideLabel.width*1.2)
+        width: parent.width * 0.05
+        Label{
+            id:hideLabel
+            text: "Hide"
+            font.pixelSize: parent.width*0.75
+            color: "#F8F8F8"
+            rotation: -90
+            anchors.centerIn: parent
+        }
+        MouseArea{
+            anchors.fill: parent
+            onClicked: hideButton.state==="Visible" ? hideButton.state="Hidden":                                                    hideButton.state="Visible"
+        }
+    }
+
+
     Rectangle{
         anchors.centerIn: parent
         width: busyIndicator.width*1.2
