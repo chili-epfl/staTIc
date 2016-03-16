@@ -295,7 +295,7 @@ void DetectionTask::doWork()
         millisElapsed += millis;
         fps = FPS_RATE*fps + (1.0f - FPS_RATE)*(1000.0f/millis);
         if(millisElapsed >= FPS_PRINT_PERIOD){
-            //qDebug("Chilitags is running at %f FPS",fps);
+            //qDebug("Aruco is running at %f FPS",fps);
             millisElapsed = 0;
         }
 #endif

@@ -31,10 +31,10 @@ Entity {
         nearPlane : 0.1
         farPlane : clippingPlaneSlider.value
 
-        top: 0.1*(chilitags.projectionMatrix.m23/chilitags.projectionMatrix.m11)
-        bottom: -0.1*(chilitags.projectionMatrix.m23/chilitags.projectionMatrix.m11)
-        left: -0.1*(chilitags.projectionMatrix.m13/chilitags.projectionMatrix.m22)
-        right: 0.1*(chilitags.projectionMatrix.m13/chilitags.projectionMatrix.m22)
+        top: 0.1*(aruco.projectionMatrix.m23/aruco.projectionMatrix.m11)
+        bottom: -0.1*(aruco.projectionMatrix.m23/aruco.projectionMatrix.m11)
+        left: -0.1*(aruco.projectionMatrix.m13/aruco.projectionMatrix.m22)
+        right: 0.1*(aruco.projectionMatrix.m13/aruco.projectionMatrix.m22)
 
         position: Qt.vector3d( 0.0, 0.0, 0 )
         upVector: Qt.vector3d( 0.0, 1.0, 0.0 )

@@ -85,7 +85,7 @@ signals:
     void objectsReady(const PoseMap& poses);
 private:
     bool m_pause;
-    QThread workerThread;               ///< The thread that Chilitags will work in
+    QThread workerThread;               ///< The thread that Aruco will work in
     DetectionTask* task = NULL;         ///< The loop method and parameter container
     //GLuint fbo=0;                         ///< FBO used in android to move a texture to the memory
     ArucoDetector* m_detector;

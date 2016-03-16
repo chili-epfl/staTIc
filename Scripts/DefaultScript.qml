@@ -3,7 +3,6 @@ import QtQuick.Controls 1.3
 import QtMultimedia 5.5
 import QtQuick.Layouts 1.1
 import QtQuick.Scene3D 2.0
-import Chilitags 1.0
 import ArucoDetector 1.0
 import ArucoObject 1.0
 
@@ -321,10 +320,6 @@ Item{
         id:structure_tag
         objectId: "Default"
         Component.onCompleted: aruco.registerObserver(structure_tag)
-     }
-
-     Chilitags{
-         id:chilitags
      }
 
 
