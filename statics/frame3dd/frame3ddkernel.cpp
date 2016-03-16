@@ -63,6 +63,19 @@ Frame3DDKernel::Frame3DDKernel(QObject* parent):
     m_minForce=0;
 }
 
+Frame3DDKernel::~Frame3DDKernel()
+{
+    m_lazyupdateTimer.stop();
+    m_interior_point_loads.clear();
+    m_node_loads.clear();
+    m_uniformly_distributed_loads.clear();
+    m_trapezoidal_loads.clear();
+    m_beams.clear();
+    m_joints.clear();
+}
+
+
+
 bool Frame3DDKernel::readStructure(QString path){
 
     bool is2d=true;

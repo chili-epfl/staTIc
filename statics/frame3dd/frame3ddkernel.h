@@ -15,7 +15,7 @@ class Frame3DDKernel : public AbstractStaticsModule
     Q_OBJECT
 public:
     Frame3DDKernel(QObject* parent=0);
-
+    ~Frame3DDKernel();
     virtual qreal maxForce(){return m_maxForce;}
     virtual qreal minForce(){return m_minForce;}
 

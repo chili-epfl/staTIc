@@ -94,9 +94,9 @@ Entity {
 
 
         /*Tools*/
-        ConcentratedForce{
+//        ConcentratedForce{
 
-        }
+//        }
 
         /*Scaffold{
 

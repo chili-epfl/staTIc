@@ -19,6 +19,7 @@ import Warehouse3D 1.0
 Item{
     id: applicationRoot
     anchors.fill: parent
+    signal pageExit();
     property alias currentViewFilter: viewFilterBar.selection
 
     property alias maxForce : staticsmodule.maxForce
@@ -233,7 +234,7 @@ Item{
              Scene3D {
                  anchors.fill: parent
                  focus: true
-                 aspects: ["input","physics"]
+                 aspects: ["input"]
                  //aspects:["input"]
                  multisample:true
                  DefaultScriptScene3D {
@@ -274,6 +275,18 @@ Item{
                     MouseArea{
                         anchors.fill: parent
                         onClicked: camDevice.isRunning = !camDevice.isRunning
+                    }
+                }
+                Image {
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.margins: 10
+                    width: 50
+                    height: 50
+                    source: "qrc:/icons/Icons/back.png"
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked:pageExit()
                     }
                 }
              }
