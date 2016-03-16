@@ -285,6 +285,31 @@ Item{
                         onClicked:pageExit()
                     }
                 }
+                Slider{
+                    id:clippingPlaneSlider
+                    anchors.left: parent.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    orientation: Qt.Vertical
+                    height: parent.height*0.3
+                    value: 1000
+                    stepSize: 100
+                    minimumValue: 100
+                    maximumValue: 3000
+                    tickmarksEnabled: true
+
+                }
+                Rectangle{
+                    anchors.left: clippingPlaneSlider.right
+                    anchors.leftMargin: 15
+                    anchors.top: clippingPlaneSlider.top
+                    height: clippingPlaneSlider.height
+                    Label{
+                        text: "Depth Culling: "+clippingPlaneSlider.value/10+"cm"
+                        color: "#F8F8F8"
+                        rotation: 90
+                        anchors.centerIn: parent
+                    }
+                }
              }
          }
      }

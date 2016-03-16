@@ -29,7 +29,7 @@ Entity {
         objectName: "camera"
         projectionType: CameraLens.FrustumProjection
         nearPlane : 0.1
-        farPlane : 100000
+        farPlane : clippingPlaneSlider.value
 
         top: 0.1*(chilitags.projectionMatrix.m23/chilitags.projectionMatrix.m11)
         bottom: -0.1*(chilitags.projectionMatrix.m23/chilitags.projectionMatrix.m11)
