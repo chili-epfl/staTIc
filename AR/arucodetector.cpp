@@ -9,11 +9,17 @@ ArucoDetector::ArucoDetector(QQuickItem *parent):
     m_pause=false;
     m_focalLength=700.0;
     m_cameraResolution=QSizeF(640,480);
+//    m_projectionMatrix=QMatrix4x4(
+//        m_focalLength,    0,              m_cameraResolution.width()/2, 0 ,
+//        0,              m_focalLength,    m_cameraResolution.height()/2, 0,
+//        0,              0,              1,  0,
+//        0,              0,              0,  1
+//                );
     m_projectionMatrix=QMatrix4x4(
-        m_focalLength,    0,              m_cameraResolution.width()/2, 0 ,
-        0,              m_focalLength,    m_cameraResolution.height()/2, 0,
-        0,              0,              1,  0,
-        0,              0,              0,  1
+                6.1581830541937018e+02, 0., 3.3236459446643443e+02 ,0,
+                0., 6.1843429607293592e+02, 2.3152070795454719e+02,0,
+                0,              0,              1,  0,
+                0,              0,              0,  1
                 );
     addConfigurationFile(QUrl());
 }

@@ -167,6 +167,10 @@ void ArucoDetectorThread::setPause(bool val)
 DetectionTask::DetectionTask(QMatrix4x4 projectionMatrix)
 {
     m_distCoeff=cv::Mat();
+    m_distCoeff=(cv::Mat_<float>(1,5) <<
+                 4.1105624753282284e-02, 7.9058604507765057e-02,
+                       -2.7890683219554159e-03, 2.8142764725885486e-04,
+                       -4.0278534170454272e-01);
     setProjectionMatrix(projectionMatrix);
     m_dictionary= cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_1000);
 
