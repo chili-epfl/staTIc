@@ -1,8 +1,10 @@
 #include "arucodetector.h"
 #include <QXmlStreamReader>
 #include "arucodetectorthread.h"
-ArucoDetector::ArucoDetector(QQuickItem *parent)
+ArucoDetector::ArucoDetector(QQuickItem *parent):
+    QAbstractVideoFilter(parent)
 {
+
     qRegisterMetaType<PoseMap>("PoseMap");
     m_pause=false;
     m_focalLength=700.0;
@@ -16,12 +18,17 @@ ArucoDetector::ArucoDetector(QQuickItem *parent)
     addConfigurationFile(QUrl());
 }
 
+ArucoDetector::~ArucoDetector(){
+   qDebug()<<"Destroy";
+   //emit destroying();
+}
+
 QVideoFilterRunnable *ArucoDetector::createFilterRunnable()
 {
     ArucoDetectorThread* thread=new ArucoDetectorThread(this);
     thread->start();
     thread->setPause(m_pause);
-    connect(this,SIGNAL(destroyed(QObject*)),thread,SLOT(deleteLater()));
+    connect(this,SIGNAL(destroying()),thread,SLOT(deleteLater()));
     connect(this,SIGNAL(pauseChanged(bool)),thread,SLOT(setPause(bool)));
     connect(thread,SIGNAL(objectsReady(PoseMap)),this,SLOT(notifyObservers(PoseMap)));
     return thread;

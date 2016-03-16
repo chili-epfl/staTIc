@@ -23,8 +23,9 @@ ArucoDetectorThread::ArucoDetectorThread(ArucoDetector* detector,QObject *parent
 ArucoDetectorThread::~ArucoDetectorThread()
 {
     stop();
-    task->deleteLater();
+    delete task;
     task=NULL;
+    qDebug()<<"Destroy thread";
 }
 
 QVideoFrame ArucoDetectorThread::run(QVideoFrame *input, const QVideoSurfaceFormat &surfaceFormat, QVideoFilterRunnable::RunFlags flags)
@@ -173,7 +174,7 @@ DetectionTask::DetectionTask(QMatrix4x4 projectionMatrix)
 
 DetectionTask::~DetectionTask()
 {
-
+    qDebug()<<"Destroy task";
 }
 
 void DetectionTask::presentFrame(cv::Mat frame)

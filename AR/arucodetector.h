@@ -30,11 +30,13 @@ public:
         return m_boards;
     }
 
+    ~ArucoDetector();
 signals:
 
     void projectionMatrixChanged();
 
     void pauseChanged(bool val);
+    void destroying();
 
 public slots:
     Q_INVOKABLE void unregisterObserver(ArucoObject* o);
