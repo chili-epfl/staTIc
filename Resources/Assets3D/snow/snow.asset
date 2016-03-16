@@ -1,5 +1,5 @@
-thumbnail:texture.png
+thumbnail:preview.png
 main_asset_url:snow.obj
 main_asset_diffuse_map_url:texture.png
-weight:50
-extent:-12,12
+weight:30
+extent:-20,20

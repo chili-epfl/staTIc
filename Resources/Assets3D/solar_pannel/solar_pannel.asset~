@@ -1,5 +1,5 @@
-thumbnail:preview.jpg
+thumbnail:preview.png
 main_asset_url:Solar.obj
 main_asset_diffuse_map_url:Solar.png
-weight:50
-extent:-10,10
+weight:20
+extent:-50,50

@@ -1,5 +1,5 @@
-thumbnail:watertank.jpg
+thumbnail:preview.jpg
 main_asset_url:watertank.obj
 main_asset_diffuse_map_url:watertank.png
-weight:50
-extent:-12,12
+weight:30
+extent:-15,15

@@ -193,6 +193,13 @@ DISTFILES += \
     Resources/Assets3D/solar_pannel/solar_pannel.asset \
     Resources/Assets3D/tonweight/watertank.asset \
     Resources/Assets3D/waterTank/watertank.asset \
-    Resources/Materials/material1.material
+    Resources/Materials/material1.material \
+    Resources/Assets3D/tonweight/tonweight.asset~ \
+    Resources/Assets3D/tonweight/preview.jpg \
+    Resources/Assets3D/waterTank/preview.jpg \
+    Resources/Assets3D/girl/preview.png \
+    Resources/Assets3D/snow/preview.png \
+    Resources/Assets3D/solar_pannel/preview.png \
+    Resources/Assets3D/tonweight/tonweight.asset
 
 

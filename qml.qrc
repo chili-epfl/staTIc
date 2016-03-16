@@ -26,6 +26,7 @@
         <file>Icons/synch_pressed.png</file>
         <file>Icons/realto_logo.png</file>
         <file>Icons/material_design.png</file>
+        <file>Icons/back.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>Images/mainbanner.png</file>
