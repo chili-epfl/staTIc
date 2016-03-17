@@ -66,6 +66,7 @@ private:
     cv::Mat m_distCoeff;
     cv::Mat m_cv_projectionMatrix;
     int test=0;
+    cv::Ptr<cv::aruco::DetectorParameters> m_detector_params;
 };
 
 

@@ -173,7 +173,9 @@ DetectionTask::DetectionTask(QMatrix4x4 projectionMatrix)
                        -4.0278534170454272e-01);
     setProjectionMatrix(projectionMatrix);
     m_dictionary= cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_1000);
-
+    m_detector_params=cv::aruco::DetectorParameters::create();
+    m_detector_params->polygonalApproxAccuracyRate=0.04;
+    m_detector_params->doCornerRefinement=true;
 }
 
 DetectionTask::~DetectionTask()
@@ -261,7 +263,7 @@ void DetectionTask::doWork()
             //Unlock the lock so that we can present a new frame while it's estimating
             frameLock.unlock();
             poseMap.clear();
-            cv::aruco::detectMarkers(nextFrame,m_dictionary,m_markerCorners,m_markerIds);
+            cv::aruco::detectMarkers(nextFrame,m_dictionary,m_markerCorners,m_markerIds,m_detector_params);
             for(int i=0;i<m_boards.size();i++){
                 if(cv::aruco::estimatePoseBoard(m_markerCorners,m_markerIds,m_boards[i],m_cv_projectionMatrix,
                                              m_distCoeff,rvec,tvec)){
