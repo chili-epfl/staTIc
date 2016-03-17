@@ -46,7 +46,7 @@ class AbstractStaticsModule : public QObject
 
 public:
 
-    enum Status{NOT_LOADED,LOADED};
+    enum Status{NOT_LOADED,LOADED,ERROR};
 
     enum Stability{UNSTABLE,DETERMINATE,INDETERMINATE};
 

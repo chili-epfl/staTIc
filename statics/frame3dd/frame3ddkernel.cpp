@@ -85,6 +85,7 @@ bool Frame3DDKernel::readStructure(QString path){
     QFile inputFile(path);
     if (!inputFile.open(QIODevice::ReadOnly | QIODevice::Text)){
         qDebug()<<"Failed to open structure file";
+        setStatus(Status::ERROR);
         return false;
     }
 
@@ -96,6 +97,7 @@ bool Frame3DDKernel::readStructure(QString path){
     m_modelScale=line.split(separator).at(0).toDouble(&ok);
     if(!ok){
         qWarning("Fail to read model scale factor");
+        setStatus(Status::ERROR);
         return false;
     }
     /*Get number of nodes*/
@@ -103,6 +105,7 @@ bool Frame3DDKernel::readStructure(QString path){
     int number_nodes=line.split(separator).at(0).toInt(&ok);
     if(!ok){
         qWarning("Fail to read number of nodes");
+        setStatus(Status::ERROR);
         return false;
     }
     m_joints.reserve(number_nodes);
@@ -114,24 +117,28 @@ bool Frame3DDKernel::readStructure(QString path){
         if(line_parts.size()!=5){
             qWarning("Issue reading node line:");
             qWarning(line.toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         qreal x=line_parts[1].toFloat(&ok);
         if(!ok){
             qWarning("Fail to convert coordinate:");
             qWarning(line_parts[1].toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         qreal y=line_parts[2].toFloat(&ok);
         if(!ok){
             qWarning("Fail to convert coordinate:");
             qWarning(line_parts[2].toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         qreal z=line_parts[3].toFloat(&ok);
         if(!ok){
             qWarning("Fail to convert coordinate:");
             qWarning(line_parts[3].toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         if(z!=0){
@@ -161,10 +168,12 @@ bool Frame3DDKernel::readStructure(QString path){
     if(!ok){
         qWarning("Fail to read number of reactions");
         qWarning(line.toStdString().c_str());
+        setStatus(Status::ERROR);
         return false;
     }
     if(number_reactions<0 || number_reactions >DoF/6){
         qWarning("Invalid number of reactions");
+        setStatus(Status::ERROR);
         return false;
     }
     /*Get reactions*/
@@ -174,53 +183,62 @@ bool Frame3DDKernel::readStructure(QString path){
         if(line_parts.size()!=7){
             qWarning("Issue reading reaction line:");
             qWarning(line.toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         bool support_x=(line_parts[1].toInt(&ok)==0) ? false : true;
         if(!ok){
             qWarning("Fail to convert support");
             qWarning(line_parts[1].toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         bool support_y=(line_parts[2].toInt(&ok)==0) ? false : true;
         if(!ok){
             qWarning("Fail to convert support");
             qWarning(line_parts[2].toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         bool support_z=(line_parts[3].toInt(&ok)==0) ? false : true;
         if(!ok){
             qWarning("Fail to convert support");
             qWarning(line_parts[3].toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         bool support_xx=(line_parts[4].toInt(&ok)==0) ? false : true;
         if(!ok){
             qWarning("Fail to convert support");
             qWarning(line_parts[4].toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         bool support_yy=(line_parts[5].toInt(&ok)==0) ? false : true;
         if(!ok){
             qWarning("Fail to convert support");
             qWarning(line_parts[5].toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         bool support_zz=(line_parts[6].toInt(&ok)==0) ? false : true;
         if(!ok){
             qWarning("Fail to convert support");
             qWarning(line_parts[6].toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         int jointIndex=line_parts[0].toInt(&ok);
         if(!ok){
             qWarning("Fail to read joint support");
             qWarning(line_parts[0].toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         if(jointIndex>=m_joints.size() ||jointIndex<0){
             qWarning("Invalid support index:");
             qWarning()<<jointIndex;
+            setStatus(Status::ERROR);
             return false;
         }
         if(is2d)
@@ -239,10 +257,12 @@ bool Frame3DDKernel::readStructure(QString path){
     if(!ok){
         qWarning("Fail to read number of elements");
         qWarning(line.toStdString().c_str());
+        setStatus(Status::ERROR);
         return false;
     }
     if(number_nodes>number_beams+1){
         qWarning("Not enough elements");
+        setStatus(Status::ERROR);
         return false;
     }
     m_beams.reserve(number_beams);
@@ -253,18 +273,21 @@ bool Frame3DDKernel::readStructure(QString path){
         if(line_parts.size()!=6){
             qWarning("Issue reading element line:");
             qWarning(line.toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         int joint_index_1=line_parts[1].toInt(&ok);
         if(!ok){
             qWarning("Fail to convert extreme index");
             qWarning(line_parts[1].toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         int joint_index_2=line_parts[2].toInt(&ok);
         if(!ok){
             qWarning("Fail to convert extreme index");
             qWarning(line_parts[2].toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         if(joint_index_1==joint_index_2 ||
@@ -274,6 +297,7 @@ bool Frame3DDKernel::readStructure(QString path){
             qWarning("Invalid etreme index:");
             qWarning()<<joint_index_1;
             qWarning()<<joint_index_2;
+            setStatus(Status::ERROR);
             return false;
         }
         JointPtr first=m_joints.at(joint_index_1);
@@ -342,18 +366,21 @@ bool Frame3DDKernel::readStructure(QString path){
         if(!ok){
             qWarning("Fail to convert area x element");
             qWarning(line_parts[3].toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         qreal area_y=line_parts[4].toDouble(&ok);
         if(!ok){
             qWarning("Fail to convert area y element");
             qWarning(line_parts[4].toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         QString materialID=line_parts[5];
         if(materialID.isEmpty()){
             qWarning("Fail to convert material");
             qWarning(line_parts[5].toStdString().c_str());
+            setStatus(Status::ERROR);
             return false;
         }
         BeamPtr beam=createBeam(first,second,QSizeF(area_x,area_y),materialID,line_parts[0]);
@@ -378,6 +405,7 @@ void Frame3DDKernel::update(){
 }
 /**/
 void Frame3DDKernel::solve(){
+    if(m_status!=Status::LOADED) return;
 
     vec3	*xyz;		// X,Y,Z node coordinates (global)
 
