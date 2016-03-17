@@ -58,20 +58,25 @@ void ScenarioListModel::setSource(){
         if(it.fileInfo().isDir()&& it.fileName()!="." && it.fileName()!=".."){
             name=it.fileInfo().baseName();
             QDirIterator it2(it.fileInfo().canonicalFilePath());
+            bool foundObj=false;
             while(it2.hasNext()){
                 it2.next();
-                if(it2.fileInfo().baseName()==name && it2.fileInfo().suffix()=="structure"){
-                    structure=QUrl::fromLocalFile(m_source+"/"+name+"/"+it2.fileInfo().fileName());
+                if(it2.fileInfo().suffix()=="structure"){
+                    structure=QUrl::fromLocalFile(m_source+"/"+it.fileInfo().fileName()+"/"+it2.fileInfo().fileName());
                 }
                 else if(it2.fileInfo().suffix()=="png")
-                    thumb=QUrl::fromLocalFile(m_source+"/"+name+"/"+it2.fileInfo().fileName());
-                else if(it2.fileInfo().suffix()=="dae")
-                    asset=QUrl::fromLocalFile(m_source+"/"+name+"/"+it2.fileInfo().fileName());
+                    thumb=QUrl::fromLocalFile(m_source+"/"+it.fileInfo().fileName()+"/"+it2.fileInfo().fileName());
+                else if(it2.fileInfo().suffix()=="dae" && !foundObj)
+                    asset=QUrl::fromLocalFile(m_source+"/"+it.fileInfo().fileName()+"/"+it2.fileInfo().fileName());
+                else if( it2.fileInfo().suffix()=="obj"){
+                    asset=QUrl::fromLocalFile(m_source+"/"+it.fileInfo().fileName()+"/"+it2.fileInfo().fileName());
+                    foundObj=true;
+                }
                 else if(it2.fileInfo().suffix()=="yml")
-                    tagConfiguration=QUrl::fromLocalFile(m_source+"/"+name+"/"+it2.fileInfo().fileName());
+                    tagConfiguration=QUrl::fromLocalFile(m_source+"/"+it.fileInfo().fileName()+"/"+it2.fileInfo().fileName());
             }
         }
-        if(!name.isEmpty() && !structure.isEmpty() && !thumb.isEmpty() && !asset.isEmpty() && !tagConfiguration.isEmpty()){
+        if(!name.isEmpty() && !structure.isEmpty() && !thumb.isEmpty() && !asset.isEmpty()){
             m_scenariosNames.append(name);
             m_scenariosStructures[name]=structure;
             m_scenariosThumbs[name]=thumb;
