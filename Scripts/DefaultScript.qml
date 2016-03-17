@@ -64,7 +64,7 @@ Item{
         State {
             name: "Loading3DModel"
             when: firstInit && staticsmodule.status==Frame3DDKernel.LOADED &&
-                  scene3D.structureLoader.status!=SceneLoader.Loaded
+                  !scene3D.structureLoaded
             PropertyChanges {
                 restoreEntryValues:false
                 target: loadingAnimation_text
@@ -79,7 +79,7 @@ Item{
         },
         State {
             name: "LoadingVMManager"
-            when: firstInit && scene3D.structureLoader.status==SceneLoader.Loaded
+            when: firstInit && scene3D.structureLoaded
             PropertyChanges {
                 restoreEntryValues:false
                 target: loadingAnimation_text
@@ -155,7 +155,11 @@ Item{
         onStatusChanged: {
             if(firstInit && status==Frame3DDKernel.LOADED){
                 loadingAnimation_text.text="Loading Scenario";
-                scene3D.structureLoader.source=structure3DAsset;
+                scene3D.structureLoaderURL=structure3DAsset;
+            }
+            else if(status==Frame3DDKernel.ERROR){
+                loadingAnimation_text.text="Error";
+                pageExit();
             }
         }
     }
@@ -259,6 +263,7 @@ Item{
                 }
 
                 Image {
+                    id:ar_button
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     anchors.margins: 10
@@ -270,6 +275,20 @@ Item{
                     MouseArea{
                         anchors.fill: parent
                         onClicked: camDevice.isRunning = !camDevice.isRunning
+                    }
+                }
+                Image {
+                    anchors.bottom: parent.bottom
+                    anchors.left: ar_button.right
+                    anchors.margins: 10
+                    width: 100
+                    height: 100
+                    source: scene3D.ghostMode?
+                            "qrc:/icons/Icons/ghost_Mode_on.png" :
+                            "qrc:/icons/Icons/ghost_Mode_OFF.png"
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: scene3D.ghostMode = !scene3D.ghostMode
                     }
                 }
                 Image {

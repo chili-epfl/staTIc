@@ -14,8 +14,21 @@ import "qrc:/ui/UI/"
 Entity {
     id: sceneRoot
 
-    property alias structureLoader : structureLoader
+    property url structureLoaderURL
+    onStructureLoaderURLChanged: {
+       if(structureLoaderURL.toString().search(".dae")!=-1){
+           structureLoader.source=structureLoaderURL;
+           structureLoaded=Qt.binding(function(){return structureLoader.status==SceneLoader.Loaded})
+       }
+       else if(structureLoaderURL.toString().search(".obj")!=-1){
+           meshStructure.source=structureLoaderURL;
+           structureLoaded=true;
+       }
+    }
+    property bool structureLoaded: false
     property alias structureEntity: structureEntity
+
+    property bool ghostMode: false
     property int globalNumericAnimation;
     QQ2.NumberAnimation on globalNumericAnimation{
         duration: 10000
@@ -70,10 +83,7 @@ Entity {
     Entity {
         id:structureEntity
 
-        SceneLoader{
-            id:structureLoader
-            objectName: "structureLoader"
-        }
+
 
         Transform {
             id: structureLoaderTransform
@@ -88,8 +98,29 @@ Entity {
             }
         }
 
-        components: [ structureLoaderTransform ]
+        components: [structureLoaderTransform ]
+        Entity{
+            enabled:ghostMode
+            Mesh{
+                id:meshStructure
+            }
+            SceneLoader{
+                id:structureLoader
+                objectName: "structureLoader"
+            }
+            PhongAlphaMaterial {
+                id:material
+                ambient:  "#783e0b"
+                diffuse:"grey"
+                specular:"black"
+                alpha:0.80
+            }
+            components: structureLoader.status==SceneLoader.Loaded?
+                            [structureLoader]:
+                            [meshStructure, material]
 
+
+        }
 
 
 

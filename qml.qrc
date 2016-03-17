@@ -28,6 +28,8 @@
         <file>Icons/material_design.png</file>
         <file>Icons/back.png</file>
         <file>Icons/cuttingPlane.png</file>
+        <file>Icons/ghost_Mode_on.png</file>
+        <file>Icons/ghost_Mode_OFF.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>Images/mainbanner.png</file>
