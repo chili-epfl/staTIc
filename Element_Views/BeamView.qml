@@ -29,7 +29,7 @@ Entity{
     onBeamSizeChanged: apply_animation.start();
 
     property size realBeamSize
-
+    property size tangibleSection: "34x17"
     property int axialForceType: 0 //-1 compression,0 nul, 1 tension
 
     /*The stress relative to th esize and material.

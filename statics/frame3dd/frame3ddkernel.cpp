@@ -270,7 +270,7 @@ bool Frame3DDKernel::readStructure(QString path){
     for(int i=0;i<number_beams;i++){
         line=readLine(&inputStream);
         QStringList line_parts=line.split(separator);
-        if(line_parts.size()!=6){
+        if(line_parts.size()!=8){
             qWarning("Issue reading element line:");
             qWarning(line.toStdString().c_str());
             setStatus(Status::ERROR);
@@ -383,7 +383,22 @@ bool Frame3DDKernel::readStructure(QString path){
             setStatus(Status::ERROR);
             return false;
         }
+        qreal tangibleWidth=line_parts[6].toDouble(&ok);
+        if(!ok){
+            qWarning("Fail to convert Tangible Width");
+            qWarning(line_parts[6].toStdString().c_str());
+            setStatus(Status::ERROR);
+            return false;
+        }
+        qreal tangibleHeight=line_parts[7].toDouble(&ok);
+        if(!ok){
+            qWarning("Fail to convert Tangible Height");
+            qWarning(line_parts[7].toStdString().c_str());
+            setStatus(Status::ERROR);
+            return false;
+        }
         BeamPtr beam=createBeam(first,second,QSizeF(area_x,area_y),materialID,line_parts[0]);
+        beam->setTangibleSection(QSizeF(tangibleWidth,tangibleHeight));
     }
     solve();
     setStatus(Status::LOADED);

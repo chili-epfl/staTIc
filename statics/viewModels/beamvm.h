@@ -23,6 +23,7 @@ public slots:
     void onScaleFactorUpdated();
     void onSegmentsChanged();
     void onParametersChanged();
+    void onTangibleSectionChanged();
 
     /*These come from the VM*/
     void onMaterialChangedVMSide();

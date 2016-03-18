@@ -40,7 +40,7 @@ Beam::Beam(JointPtr extreme1, JointPtr extreme2,MaterialsManager* mm,QString nam
     m_extreme2=extreme2;
     m_length=extreme1->position().distanceToPoint(extreme2->position());
     m_materialsManager=mm;
-
+    m_tangibleSection=QSizeF(34,17);
     connect(m_extreme1.data(),SIGNAL(destroyed(QObject*)),this,SIGNAL(killMe()));
     connect(m_extreme2.data(),SIGNAL(destroyed(QObject*)),this,SIGNAL(killMe()));
     m_lazy_signal_emitter.setInterval(500);
@@ -384,6 +384,14 @@ void Beam::setDensity(qreal d)
 qreal Beam::scaledLength()
 {
     return m_length*AbstractStaticsModule::modelScale();
+}
+
+void Beam::setTangibleSection(QSizeF val)
+{
+    if(val!=m_tangibleSection){
+        m_tangibleSection=val;
+        emit tangibleSectionChanged();
+    }
 }
 
 void Beam::cloneProperties(BeamPtr beam){

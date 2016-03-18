@@ -38,10 +38,12 @@ Entity{
     property vector2d extent: Qt.vector2d(-5,5)
 
     property bool dragging: false;
+    property vector3d offsetAugmentation: Qt.vector3d(rootEntity.parent.tangibleSection.height/2,0,
+                                                      -rootEntity.parent.tangibleSection.width/2)
     onDraggingChanged: {
         if(dragging && rootEntity.parent!=null){
             transform.translation=Qt.binding(function(){
-                return Qt.vector3d(7.5,0,-17.5).plus(rootEntity.parent.current_anchor_position);
+                return offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
             })
         }
         else
@@ -51,7 +53,7 @@ Entity{
     Transform{
         id:transform
         rotation:fromAxisAndAngle(Qt.vector3d(0, 0, 1), -90)
-        translation:Qt.vector3d(7.5,0,-17.5)
+        translation:offsetAugmentation
         onTranslationChanged:{
                     resetTimer.restart()
         }
@@ -67,7 +69,7 @@ Entity{
             if(applicationRoot.currentViewFilter=='DESIGNER')
                 infobox.current_item=rootEntity
             rootEntity.parent.drag_anchor_enabled=true;
-            rootEntity.parent.current_anchor_position=transform.translation.plus(Qt.vector3d(-7.5,0,+17.5))
+            rootEntity.parent.current_anchor_position=transform.translation.minus(offsetAugmentation)
             dragging=true;
         }
         onReleased: {

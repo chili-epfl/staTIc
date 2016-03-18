@@ -24,6 +24,8 @@ BeamVM::BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     connect(m_beam.data(),SIGNAL(hasBeenSplit()),this,SLOT(onBeamSplit()));
     connect(m_beam.data(),SIGNAL(segmentsChanged()),this,SLOT(onSegmentsChanged()));
     connect(m_beam.data(),SIGNAL(parametersChanged()),this,SLOT(onParametersChanged()));
+    connect(m_beam.data(),SIGNAL(tangibleSectionChanged()),this,SLOT(onTangibleSectionChanged()));
+
     /*Material*/
     connect(m_component3D,SIGNAL(materialIDChanged()),this,SLOT(onMaterialChangedVMSide()));
     /*Size*/
@@ -58,6 +60,7 @@ void BeamVM::initView(){
     onParametersChanged();
     onBeamAxialStressChanged();
     onSegmentsChanged();
+    onTangibleSectionChanged();
     append_3D_resources(m_component3D);
     m_component3D->setParent(m_sceneRoot);
 }
@@ -68,6 +71,14 @@ void BeamVM::onParametersChanged(){
         m_component3D->setProperty("beamSize",beam_str_ref->scaledSize());
         m_component3D->setProperty("realBeamSize",beam_str_ref->size());
         m_component3D->setProperty("materialID",beam_str_ref->materialID());
+    }
+}
+
+void BeamVM::onTangibleSectionChanged()
+{
+    BeamPtr beam_str_ref=m_beam.toStrongRef();
+    if(m_component3D){
+        m_component3D->setProperty("tangibleSection",beam_str_ref->tangibleSection());
     }
 }
 

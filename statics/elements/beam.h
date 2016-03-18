@@ -53,6 +53,9 @@ public:
     qreal length(){return m_length;}
     qreal scaledLength();
 
+    QSizeF tangibleSection(){return m_tangibleSection;}
+    void setTangibleSection(QSizeF val);
+
     void cloneProperties(QSharedPointer<Beam> beam);
 
     void split();
@@ -79,6 +82,7 @@ public slots:
 
 signals:
     void parametersChanged();
+    void tangibleSectionChanged();
     void stressChanged();
 
     void segmentsChanged();
@@ -144,6 +148,7 @@ private:
     QList<QVector4D> m_stress_segments;
 
     QSizeF m_size;
+    QSizeF m_tangibleSection;
 
     WeakJointPtr m_extreme1,m_extreme2;
 
