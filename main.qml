@@ -111,6 +111,7 @@ Item {
 
             ListView{
                 orientation: Qt.Horizontal
+                highlightMoveDuration:400
                 id: gridview
                 clip:true
                 spacing: 10
