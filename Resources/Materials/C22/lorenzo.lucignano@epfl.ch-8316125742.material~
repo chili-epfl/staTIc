@@ -1,0 +1,13 @@
+UniqueID:bjjfdgfcxjkdxjqwlk;
+Name:Conifers(C18);
+Density:0.380e-9;
+Price:1;
+Young:9000;
+G:560;
+fc0:18;
+fc90:2.2;
+ft0:11;
+ft90:0.4;
+fmk:18;
+fvk:3.4;
+TextureImage:texture.png;

@@ -1,0 +1,13 @@
+UniqueID:srstdwresrsdcssrwddcwdc;
+Name:Conifers(C40);
+Density:0.500e-9;
+Price:1;
+Young:12000;
+G:750;
+fc0:23;
+fc90:2.7;
+ft0:18;
+ft90:0.4;
+fmk:30;
+fvk:4;
+TextureImage:texture.png;

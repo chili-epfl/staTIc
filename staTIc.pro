@@ -194,6 +194,27 @@ DISTFILES += \
     Resources/Assets3D/girl/preview.png \
     Resources/Assets3D/snow/preview.png \
     Resources/Assets3D/solar_pannel/preview.png \
-    Resources/Assets3D/tonweight/tonweight.asset
+    Resources/Assets3D/tonweight/tonweight.asset \
+    Resources/Materials/C18/lorenzo.lucignano@epfl.ch-8316125742.material~ \
+    Resources/Materials/C22/lorenzo.lucignano@epfl.ch-8316125742.material~ \
+    Resources/Materials/C30/lorenzo.lucignano@epfl.ch-8316125742.material~ \
+    Resources/Materials/C40/lorenzo.lucignano@epfl.ch-8316125742.material~ \
+    Resources/Materials/D30/lorenzo.lucignano@epfl.ch-8316125742.material~ \
+    Resources/Materials/D50/lorenzo.lucignano@epfl.ch-8316125742.material~ \
+    Resources/Materials/D70/lorenzo.lucignano@epfl.ch-8316125742.material~ \
+    Resources/Materials/C18/texture.png \
+    Resources/Materials/C22/texture.png \
+    Resources/Materials/C30/texture.png \
+    Resources/Materials/C40/texture.png \
+    Resources/Materials/D30/texture.png \
+    Resources/Materials/D50/texture.png \
+    Resources/Materials/D70/texture.png \
+    Resources/Materials/C18/lorenzo.lucignano@epfl.ch-8316125742.material \
+    Resources/Materials/C22/lorenzo.lucignano@epfl.ch-8316125742.material \
+    Resources/Materials/C30/lorenzo.lucignano@epfl.ch-8316125742.material \
+    Resources/Materials/C40/lorenzo.lucignano@epfl.ch-8316125742.material \
+    Resources/Materials/D30/lorenzo.lucignano@epfl.ch-8316125742.material \
+    Resources/Materials/D50/lorenzo.lucignano@epfl.ch-8316125742.material \
+    Resources/Materials/D70/lorenzo.lucignano@epfl.ch-8316125742.material
 
 

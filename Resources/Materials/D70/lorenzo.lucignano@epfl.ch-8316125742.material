@@ -1,0 +1,13 @@
+UniqueID:aasszcftewqassdewwsawedxzxe;
+Name:Broadleaf(D70);
+Density:1.080e-9;
+Price:1;
+Young:20000;
+G:1250;
+fc0:34;
+fc90:13.5;
+ft0:42;
+ft90:0.6;
+fmk:70;
+fvk:5;
+TextureImage:texture.png;

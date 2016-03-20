@@ -1,0 +1,13 @@
+UniqueID:lorenzo.lucignano@epfl.ch-8316125742;
+Name:Gio;
+Density:1e-9;
+Price:1;
+Young:7000;
+G:440;
+fc0:10;
+fc90:10;
+ft0:10;
+ft90:10;
+fmk:10;
+fvk:10;
+TextureImage:lorenzo.lucignano@epfl.ch-8316125742.png;
