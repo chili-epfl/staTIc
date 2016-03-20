@@ -17,7 +17,7 @@ public:
     int rowCount(const QModelIndex &parent)const;
     QVariant data(const QModelIndex &index, int role)const;
     Q_INVOKABLE QVariant get(int index, QString info) const;
-
+    Q_INVOKABLE void reloadResources();
 private:
     void setSource();
     QString m_source;

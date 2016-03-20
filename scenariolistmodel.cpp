@@ -42,8 +42,18 @@ QVariant ScenarioListModel::get(int index, QString info)const{
 
 }
 
+void ScenarioListModel::reloadResources()
+{
+    setSource();
+}
+
 
 void ScenarioListModel::setSource(){
+    m_scenariosNames.clear();
+    m_scenariosStructures.clear();
+    m_scenariosThumbs.clear();
+    m_scenarios3DAsset.clear();
+    m_scenariosTagConfiguration.clear();
     m_source=scenariosPath;
     QDirIterator it(m_source);
     QString name;
@@ -85,4 +95,7 @@ void ScenarioListModel::setSource(){
         }
 
     }
+
+    emit dataChanged(this->createIndex(0,0),this->createIndex(m_scenariosNames.count(),0));
+
 }

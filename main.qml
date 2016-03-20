@@ -25,6 +25,15 @@ Item {
         id:resourcesFetcher
         hostUrl: "http://localhost:3003/api/carpenterData"
         username: "lollo"
+        onLoadingChanged: if(!loading) scenarioListModel.reloadResources();
+    }
+    ScenarioListModel{
+        id:scenarioListModel
+        onDataChanged:
+        {
+            gridview.model="null"
+            gridview.model=scenarioListModel
+        }
     }
 
     Loader{
@@ -82,7 +91,8 @@ Item {
                     color: "#55FFFF99"
                     width: gridRect.height; height:gridRect.height
                     ColumnLayout{
-                        Item{
+                        Item{                id:scenarioListView
+
                             //Layout.alignment: Qt.AlignCenter
                             Layout.preferredHeight:  gridRect.height-2*caption.font.pixelSize;
                             Layout.preferredWidth: gridRect.height;
@@ -116,7 +126,7 @@ Item {
                 clip:true
                 spacing: 10
                 anchors.fill: parent
-                model: ScenarioListModel{ }
+                model: scenarioListModel
                 highlight: Rectangle { color: "lightsteelblue"; radius: 2 }
                 delegate:modelDelegate
 
@@ -131,16 +141,6 @@ Item {
         Item{
             Layout.preferredWidth: parent.width
             Layout.preferredHeight: parent.height*0.1
-            Button {
-                text: "Button"
-                onClicked: {
-                    if(gridview.currentIndex !=-1){
-                        scriptLoader.source="qrc:/scripts/Scripts/DefaultScript.qml"
-                    }
-                }
-                anchors.right: parent.right
-                anchors.rightMargin: 10
-            }
 
             Image{
                 width: 100
@@ -159,12 +159,14 @@ Item {
                 width: 100
                 height: 100
                 source: "qrc:/icons/Icons/material_design.png"
+                anchors.right: parent.right
                 anchors.bottom:  parent.bottom
-                anchors.horizontalCenter: parent.horizontalCenter
                 anchors.rightMargin: 10
                 MouseArea{
                     anchors.fill: parent
-                    onClicked: materialDesigner.visible=true
+                    onClicked: if(gridview.currentIndex !=-1){
+                                   scriptLoader.source="qrc:/scripts/Scripts/DefaultScript.qml"
+                               }
                 }
             }
         }
