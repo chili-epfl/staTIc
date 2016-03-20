@@ -9,7 +9,7 @@ MaterialsManager::MaterialsManager(QObject *parent):
     /*Creating default material*/
     Material default_material;
     default_material.set("Conifers(C14)",QUrl("qrc:/images/Images/woodbackground.png"),
-                         20,0.385e-9,7000,440,8,16,14,0.4,2,3);
+                         20,0.350e-9,7000,440,8,16,14,0.4,2,3);
     default_material.uniqueID="default";
 
     m_materials[default_material.uniqueID]=default_material;
@@ -69,7 +69,8 @@ MaterialsManager::MaterialsManager(QObject *parent):
                                 if(!ok) qDebug()<<"Convertion error:"<<part;
                             }
                             else if(property[0]=="TextureImage") {
-                                material.texture_img="qrc"+materialsDir+property[1];
+                                material.texture_img=QUrl::fromLocalFile(it.fileInfo().canonicalPath()+
+                                                                         "/"+property[1]);
                             }
                             else if(property[0]=="ft0") {
                                 bool ok;
