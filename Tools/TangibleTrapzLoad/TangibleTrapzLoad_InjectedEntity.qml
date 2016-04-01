@@ -5,8 +5,9 @@ Entity {
     property url asset3DMeshURL:"qrc:/tools/Tools/TangibleTrapzLoad/tonweight.obj";
     property url asset3DTextureURL:"qrc:/tools/Tools/TangibleTrapzLoad/texture.png";
     property vector3d relativePosition: Qt.vector3d(0,0,0)
-    property vector3d offsetAugmentation: parent ? Qt.vector3d(parent.tangibleSection.height/2,0,
-                                                      -parent.tangibleSection.width/2) : Qt.vector3d(0,0,0)
+//    property vector3d offsetAugmentation: parent ? Qt.vector3d(parent.tangibleSection.height/2,0,
+//                                                      -parent.tangibleSection.width/2) : Qt.vector3d(0,0,0)
+    property vector3d offsetAugmentation: Qt.vector3d(0,0,0)
     property bool selected : false;
     Transform{
           id:transform

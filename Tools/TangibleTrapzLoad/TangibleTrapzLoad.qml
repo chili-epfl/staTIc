@@ -12,6 +12,7 @@ Entity {
     property vector3d globalPosition:collisionTransform.translation
 
     property vector3d prev_position:Qt.vector3d(0,0,0)
+    property size tangibleSection: "0x0"
     signal positionChanged();
 
     onGlobalPositionChanged: {
@@ -75,6 +76,36 @@ Entity {
             if(applicationRoot.currentViewFilter=='DESIGNER')
                 infobox.current_item=rootEntity
         }
+    }
+
+    EntityLoader{
+        id:entity_loader
+        source:"qrc:/tools/Tools/TangibleTrapzLoad/TangibleTrapzLoad_InjectedEntity.qml"
+        QQ2.Binding{
+            target: entity_loader.entity
+            when: entity_loader.entity
+            property:"offsetAugmentation"
+            value: Qt.vector3d(tangibleSection.height/2,0,-tangibleSection.width/2)
+        }
+        QQ2.Binding{
+            target: entity_loader.entity
+            when: entity_loader.entity
+            property:"selected"
+            value: selected
+        }
+        QQ2.Binding{
+            target: entity_loader.entity
+            when: entity_loader.entity
+            property:"asset3DTextureURL"
+            value: asset3DTextureURL
+        }
+        QQ2.Binding{
+            target: entity_loader.entity
+            when: entity_loader.entity
+            property:"asset3DMeshURL"
+            value: asset3DMeshURL
+        }
+
     }
 
     components:[objectPicker,collisionSphere,transparentMaterial,sphereBody,collisionTransform]

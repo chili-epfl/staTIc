@@ -67,16 +67,17 @@ void TangibleTrapzLoad::onCollision(Physics::PhysicsCollisionEventPtr e)
             onForceChanged();
             updatePosition();
             /*Injecting an Entity in the beam representation*/
-            create3DComponent(beam_vm->component3D(),e->contactPointOnTargetLocal());
+            //create3DComponent(beam_vm->component3D(),e->contactPointOnTargetLocal());
             /*........*/
-
+            m_parentEntity->setProperty("tangibleSection",beam_vm->component3D()->property("tangibleSection"));
             m_forceUpdate=false;
         }
     }
     if(!m_target.isNull() && m_target==e->target()){
         m_delay_deleter.stop();
         m_forceUpdate=false;
-        m_component3D->setProperty("relativePosition",QVector3D(0,e->contactPointOnTargetLocal().y(),0));
+        if(m_component3D)
+            m_component3D->setProperty("relativePosition",QVector3D(0,e->contactPointOnTargetLocal().y(),0));
         updatePosition();
     }
 }
@@ -101,6 +102,7 @@ void TangibleTrapzLoad::reset()
         m_VMManager->staticsModule()->removeTPZLoad(m_trapezoidalForce.toStrongRef());
     m_trapezoidalForce.clear();
     clear3DComponent();
+    m_parentEntity->setProperty("tangibleSection",QSize(0,0));
 
 }
 
