@@ -61,7 +61,7 @@ void BeamVM::initView(){
     onBeamAxialStressChanged();
     onSegmentsChanged();
     onTangibleSectionChanged();
-    append_3D_resources(m_component3D);
+    append_3D_resources(m_component3D,true);
     m_component3D->setParent(m_sceneRoot);
 }
 
