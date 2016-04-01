@@ -253,13 +253,14 @@ void DetectionTask::doWork()
 #ifdef QT_DEBUG
     QElapsedTimer timer;
     float fps = 0.0f;
-    int millisElapsed = 0;
-    int millis;
+    long millisElapsed = 0;
+    long millis;
     timer.start();
 #endif
 
     frameLock.lock();
-    cv::Mat rvec,tvec;
+    cv::Mat rvec;
+    cv::Mat tvec(3, 1, CV_64F);
     cv::Mat rmat;
     PoseMap poseMap;
     while(running){
@@ -294,12 +295,14 @@ void DetectionTask::doWork()
                     }else{
                         QString string_id=QString::number(m_markerIds[i]);
                         LinearKalmanFilter* filter;
+
                         if(!m_LKFilters.contains(string_id)){
                             filter=new LinearKalmanFilter();
                             m_LKFilters[string_id]=filter;
                         }
                         else
                             filter=m_LKFilters[string_id];
+
                         tvec.at <double>(0) = tvecs[0].operator [](0);
                         tvec.at <double>(1) = tvecs[0].operator [](1);
                         tvec.at <double>(2) = tvecs[0].operator [](2);
@@ -331,12 +334,14 @@ void DetectionTask::doWork()
                     }
                     else{
                         LinearKalmanFilter* filter;
+
                         if(!m_LKFilters.contains(m_board_names[i])){
                             filter=new LinearKalmanFilter();
                             m_LKFilters[m_board_names[i]]=filter;
                         }
                         else
                             filter=m_LKFilters[m_board_names[i]];
+
                         filter->fillMeasurements(tvec,rmat);
                         filter->updateKalmanFilter(tvec,rmat);
                         poseMap[m_board_names[i]]=
@@ -364,12 +369,14 @@ void DetectionTask::doWork()
         //frameLock.lock() is performed by wait above
 
 #ifdef QT_DEBUG
-        millis = (int)timer.restart();
+        millis = (long)timer.restart();
         millisElapsed += millis;
-        fps = FPS_RATE*fps + (1.0f - FPS_RATE)*(1000.0f/millis);
-        if(millisElapsed >= FPS_PRINT_PERIOD){
-            //qDebug("Aruco is running at %f FPS",fps);
-            millisElapsed = 0;
+        if(millis>0){
+            fps = FPS_RATE*fps + (1.0f - FPS_RATE)*(1000.0f/millis);
+            if(millisElapsed >= FPS_PRINT_PERIOD){
+                qDebug("Aruco is running at %f FPS",fps);
+                millisElapsed = 0;
+            }
         }
 #endif
     }

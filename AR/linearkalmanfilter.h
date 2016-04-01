@@ -1,7 +1,12 @@
 #ifndef LINEARKALMANFILTER_H
 #define LINEARKALMANFILTER_H
-
+/*
+    Kalman Filetr from OpenCv Tutorial
+    http://docs.opencv.org/3.1.0/dc/d2c/tutorial_real_time_pose.html#gsc.tab=0
+    samples/cpp/tutorial_code/calib3d/real_time_pose_estimation/
+*/
 #include <opencv2/video/tracking.hpp>
+
 class LinearKalmanFilter
 {
 public:
@@ -17,7 +22,7 @@ private:
     int nStates = 18;            // the number of states
     int nMeasurements = 6;       // the number of measured states
     int nInputs = 0;             // the number of control actions
-    double dt = 0.125;           // time between measurements (1/FPS)
+    double dt = 0.06666;           // time between measurements (1/FPS)
     void init();
 
 };
