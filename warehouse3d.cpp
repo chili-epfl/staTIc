@@ -104,6 +104,12 @@ QVariant Warehouse3D::get(int index, QString info) const
         else
             return QVariant();
     }
+    if(info.compare("main_asset_diffuse_map_url",Qt::CaseInsensitive)==0){
+        if(m_objectsIndexes[index].properties.contains("main_asset_diffuse_map_url"))
+            return m_objectsIndexes[index].properties["main_asset_diffuse_map_url"];
+        else
+            return QVariant();
+    }
     if(info.compare("weight",Qt::CaseInsensitive)==0){
         if(m_objectsIndexes[index].properties.contains("weight"))
             return m_objectsIndexes[index].properties["weight"];
