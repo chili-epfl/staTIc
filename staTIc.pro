@@ -47,7 +47,8 @@ SOURCES += main.cpp \
     AR/arucodetector.cpp \
     AR/arucodetectorthread.cpp \
     AR/arucoobject.cpp \
-    Tools/TangibleTrapzLoad/tangibletrapzload.cpp
+    Tools/TangibleTrapzLoad/tangibletrapzload.cpp \
+    AR/linearkalmanfilter.cpp
 
 
 HEADERS += \
@@ -97,7 +98,8 @@ HEADERS += \
     AR/arucodetector.h \
     AR/arucodetectorthread.h \
     AR/arucoobject.h \
-    Tools/TangibleTrapzLoad/tangibletrapzload.h
+    Tools/TangibleTrapzLoad/tangibletrapzload.h \
+    AR/linearkalmanfilter.h
 
 
 RESOURCES += qml.qrc

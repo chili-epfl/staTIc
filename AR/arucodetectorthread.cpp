@@ -182,6 +182,8 @@ DetectionTask::DetectionTask(QMatrix4x4 projectionMatrix)
 DetectionTask::~DetectionTask()
 {
     qDebug()<<"Destroy task";
+    Q_FOREACH(LinearKalmanFilter* f, m_LKFilters.values())
+        delete f;
 }
 
 void DetectionTask::presentFrame(cv::Mat frame)
@@ -258,7 +260,7 @@ void DetectionTask::doWork()
 
     frameLock.lock();
     cv::Mat rvec,tvec;
-    cv::Matx33d rmat;
+    cv::Mat rmat;
     PoseMap poseMap;
     while(running){
 
@@ -281,13 +283,36 @@ void DetectionTask::doWork()
                     cv::aruco::estimatePoseSingleMarkers(corners,m_singleTagSizes[m_markerIds[i]],m_cv_projectionMatrix,m_distCoeff,
                             rvecs,tvecs);
                     cv::Rodrigues(rvecs[0], rmat);
-                    poseMap[QString::number(m_markerIds[i])]=
-                            QMatrix4x4(
-                                (qreal)rmat(0,0),    (qreal)rmat(0,1),    (qreal)rmat(0,2),    (qreal)tvecs[0].operator [](0),
-                                -(qreal)rmat(1,0),    -(qreal)rmat(1,1),   -(qreal)rmat(1,2),    -(qreal)tvecs[0].operator [](1),
-                                -(qreal)rmat(2,0),    -(qreal)rmat(2,1),    -(qreal)rmat(2,2),    -(qreal)tvecs[0].operator [](2),
+                    if(!m_use_filter){
+                        poseMap[QString::number(m_markerIds[i])]=
+                                QMatrix4x4(
+                                    (qreal)rmat.at<double>(0,0),    (qreal)rmat.at<double>(0,1),    (qreal)rmat.at<double>(0,2),    (qreal)tvecs[0].operator [](0),
+                                    -(qreal)rmat.at<double>(1,0),    -(qreal)rmat.at<double>(1,1),   -(qreal)rmat.at<double>(1,2),    -(qreal)tvecs[0].operator [](1),
+                                    -(qreal)rmat.at<double>(2,0),    -(qreal)rmat.at<double>(2,1),    -(qreal)rmat.at<double>(2,2),    -(qreal)tvecs[0].operator [](2),
                                 0,                          0,                          0,                          1
                                 );
+                    }else{
+                        QString string_id=QString::number(m_markerIds[i]);
+                        LinearKalmanFilter* filter;
+                        if(!m_LKFilters.contains(string_id)){
+                            filter=new LinearKalmanFilter();
+                            m_LKFilters[string_id]=filter;
+                        }
+                        else
+                            filter=m_LKFilters[string_id];
+                        tvec.at <double>(0) = tvecs[0].operator [](0);
+                        tvec.at <double>(1) = tvecs[0].operator [](1);
+                        tvec.at <double>(2) = tvecs[0].operator [](2);
+                        filter->fillMeasurements(tvec,rmat);
+                        filter->updateKalmanFilter(tvec,rmat);
+                        poseMap[QString::number(m_markerIds[i])]=
+                                QMatrix4x4(
+                                    (qreal)rmat.at<double>(0,0),    (qreal)rmat.at<double>(0,1),    (qreal)rmat.at<double>(0,2),    (qreal)tvec.at<double>(0),
+                                    -(qreal)rmat.at<double>(1,0),    -(qreal)rmat.at<double>(1,1),   -(qreal)rmat.at<double>(1,2),    -(qreal)tvec.at<double>(1),
+                                    -(qreal)rmat.at<double>(2,0),    -(qreal)rmat.at<double>(2,1),    -(qreal)rmat.at<double>(2,2),    -(qreal)tvec.at<double>(2),
+                                    0,                          0,                          0,                          1
+                                    );
+                    }
                 }
             }
 
@@ -295,13 +320,33 @@ void DetectionTask::doWork()
                 if(cv::aruco::estimatePoseBoard(m_markerCorners,m_markerIds,m_boards[i],m_cv_projectionMatrix,
                                              m_distCoeff,rvec,tvec)){
                     cv::Rodrigues(rvec, rmat);
-                    poseMap[m_board_names[i]]=
-                            QMatrix4x4(
-                                (qreal)rmat(0,0),    (qreal)rmat(0,1),    (qreal)rmat(0,2),    (qreal)tvec.at<double>(0),
-                                -(qreal)rmat(1,0),    -(qreal)rmat(1,1),   -(qreal)rmat(1,2),    -(qreal)tvec.at<double>(1),
-                                -(qreal)rmat(2,0),    -(qreal)rmat(2,1),    -(qreal)rmat(2,2),    -(qreal)tvec.at<double>(2),
-                                0,                          0,                          0,                          1
-                                );
+                    if(!m_use_filter){
+                        poseMap[m_board_names[i]]=
+                                QMatrix4x4(
+                                    (qreal)rmat.at<double>(0,0),    (qreal)rmat.at<double>(0,1),    (qreal)rmat.at<double>(0,2),    (qreal)tvec.at<double>(0),
+                                    -(qreal)rmat.at<double>(1,0),    -(qreal)rmat.at<double>(1,1),   -(qreal)rmat.at<double>(1,2),    -(qreal)tvec.at<double>(1),
+                                    -(qreal)rmat.at<double>(2,0),    -(qreal)rmat.at<double>(2,1),    -(qreal)rmat.at<double>(2,2),    -(qreal)tvec.at<double>(2),
+                                    0,                          0,                          0,                          1
+                                    );
+                    }
+                    else{
+                        LinearKalmanFilter* filter;
+                        if(!m_LKFilters.contains(m_board_names[i])){
+                            filter=new LinearKalmanFilter();
+                            m_LKFilters[m_board_names[i]]=filter;
+                        }
+                        else
+                            filter=m_LKFilters[m_board_names[i]];
+                        filter->fillMeasurements(tvec,rmat);
+                        filter->updateKalmanFilter(tvec,rmat);
+                        poseMap[m_board_names[i]]=
+                                QMatrix4x4(
+                                    (qreal)rmat.at<double>(0,0),    (qreal)rmat.at<double>(0,1),    (qreal)rmat.at<double>(0,2),    (qreal)tvec.at<double>(0),
+                                    -(qreal)rmat.at<double>(1,0),    -(qreal)rmat.at<double>(1,1),   -(qreal)rmat.at<double>(1,2),    -(qreal)tvec.at<double>(1),
+                                    -(qreal)rmat.at<double>(2,0),    -(qreal)rmat.at<double>(2,1),    -(qreal)rmat.at<double>(2,2),    -(qreal)tvec.at<double>(2),
+                                    0,                          0,                          0,                          1
+                                    );
+                    }
 //                    cv::Mat debug=nextFrame.clone();
 //                    cv::cvtColor(debug,debug,CV_GRAY2RGB);
 //                    cv::aruco::drawAxis(debug,m_cv_projectionMatrix,m_distCoeff,rvec,tvec,10);

@@ -12,7 +12,7 @@
 #include<opencv2/core.hpp>
 #include<opencv2/aruco.hpp>
 #include <opencv2/aruco/dictionary.hpp>
-
+#include "linearkalmanfilter.h"
 
 class ArucoDetector;
 
@@ -75,6 +75,9 @@ private:
     cv::Mat m_cv_projectionMatrix;
     int test=0;
     cv::Ptr<cv::aruco::DetectorParameters> m_detector_params;
+    bool m_use_filter=true;
+    QHash<QString,LinearKalmanFilter*> m_LKFilters;
+
 };
 
 
