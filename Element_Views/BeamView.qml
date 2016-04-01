@@ -231,7 +231,7 @@ Entity{
        CylinderMesh{
            enabled: true
            id:pBodyMesh
-           radius: 10
+           radius: 15
            length: rootEntity.length
        }
        PhysicsBodyInfo{

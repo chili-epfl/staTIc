@@ -9,6 +9,8 @@ import "qrc:/"
 
 import "qrc:/tools/Tools/ConcentratedForce"
 import "qrc:/tools/Tools/Scaffold"
+import "qrc:/tools/Tools/TangibleTrapzLoad"
+
 import "qrc:/ui/UI/"
 
 Entity {
@@ -82,9 +84,6 @@ Entity {
 
     Entity {
         id:structureEntity
-
-
-
         Transform {
             id: structureLoaderTransform
             readonly property matrix4x4 boardAlign:Qt.matrix4x4(0,0,1,0,
@@ -96,9 +95,22 @@ Entity {
                 m=m.times(boardAlign)
                 return m;
             }
+
         }
 
-        components: [structureLoaderTransform ]
+        Transform{
+            id:test
+            rotation:structureLoaderTransform.rotation
+            translation:structureLoaderTransform.translation
+            QQ2.Behavior on rotation{
+                QuaternionAnimation{
+                    onToChanged: console.log("2")
+                }
+            }
+        }
+
+        components: [test]
+
         Entity{
             enabled:ghostMode
             Mesh{
@@ -125,6 +137,7 @@ Entity {
 
 
         /*Tools*/
+
 //        ConcentratedForce{
 
 //        }
@@ -134,10 +147,13 @@ Entity {
         }*/
 
 
+        TangibleTrapzLoad{
 
+        }
 
 
     }
+
 
 
 

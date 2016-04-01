@@ -2,6 +2,7 @@
     <qresource prefix="/">
         <file>main.qml</file>
         <file>AR/board.yml</file>
+        <file>AR/singleTags.yml</file>
     </qresource>
     <qresource prefix="/icons">
         <file>Icons/ic_keyboard_arrow_up_black_36px.svg</file>
@@ -87,6 +88,10 @@
         <file>Tools/Scaffold/Scaffold.qml</file>
         <file>Tools/Scaffold/Anchor.qml</file>
         <file>Tools/BeamRemover/BeamRemover.qml</file>
+        <file>Tools/TangibleTrapzLoad/TangibleTrapzLoad.qml</file>
+        <file>Tools/TangibleTrapzLoad/TangibleTrapzLoad_InjectedEntity.qml</file>
+        <file>Tools/TangibleTrapzLoad/texture.png</file>
+        <file>Tools/TangibleTrapzLoad/tonweight.obj</file>
     </qresource>
     <qresource prefix="/soundeffects">
         <file>AR/SoundEffects/crash_wood_1.mp3</file>

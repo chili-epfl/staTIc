@@ -15,6 +15,7 @@
 #include "Tools/ConcentratedForce/concentratedforce.h"
 #include "Tools/Scaffold/scaffold.h"
 #include "Tools/BeamRemover/beamremover.h"
+#include "Tools/TangibleTrapzLoad/tangibletrapzload.h"
 
 #include "AR/deformingbeammesh.h"
 
@@ -84,6 +85,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<ConcentratedForce>("QuickConcentratedForce", 1, 0, "QuickConcentratedForce");
     qmlRegisterType<Scaffold>("QuickScaffold", 1, 0, "QuickScaffold");
     qmlRegisterType<BeamRemover>("QuickBeamRemover", 1, 0, "QuickBeamRemover");
+    qmlRegisterType<TangibleTrapzLoad>("QuickTangibleTPZLoad", 1, 0, "QuickTangibleTPZLoad");
 
 
     qmlRegisterType<DeformingBeamMesh>("DeformingBeamMesh", 1, 0, "DeformingBeamMesh");

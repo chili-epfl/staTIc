@@ -237,7 +237,7 @@ Item{
              Scene3D {
                  anchors.fill: parent
                  focus: true
-                 aspects: ["input"]
+                 aspects: ["input","physics"]
                  //aspects:["input"]
                  multisample:true
                  DefaultScriptScene3D {

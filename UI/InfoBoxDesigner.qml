@@ -126,7 +126,12 @@ Rectangle {
                                             vmFrame3DDManager.produceTPZForce(current_item,warehouse3d.get(catalog_grid.currentIndex,"properties"))
                                             //current_item=instantiator.createEntity(current_item,"qrc:/element_views/Element_Views/TrapezoidalForce.qml")
                                         }
+                                        if(current_item.type=="trapezoidalForceTangible"){
+                                            current_item.weight=warehouse3d.get(catalog_grid.currentIndex,"weight")
+                                            current_item.asset3DMeshURL=warehouse3d.get(catalog_grid.currentIndex,"main_asset_url")
+                                            current_item.asset3DTextureURL=warehouse3d.get(catalog_grid.currentIndex,"main_asset_diffuse_map_url")
 
+                                        }
                                     }
                                 }
                             }

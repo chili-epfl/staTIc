@@ -46,7 +46,8 @@ SOURCES += main.cpp \
     resourcesfetcher.cpp \
     AR/arucodetector.cpp \
     AR/arucodetectorthread.cpp \
-    AR/arucoobject.cpp
+    AR/arucoobject.cpp \
+    Tools/TangibleTrapzLoad/tangibletrapzload.cpp
 
 
 HEADERS += \
@@ -95,7 +96,8 @@ HEADERS += \
     static_global.h \
     AR/arucodetector.h \
     AR/arucodetectorthread.h \
-    AR/arucoobject.h
+    AR/arucoobject.h \
+    Tools/TangibleTrapzLoad/tangibletrapzload.h
 
 
 RESOURCES += qml.qrc
