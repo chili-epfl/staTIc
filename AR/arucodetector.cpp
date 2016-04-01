@@ -6,22 +6,23 @@ ArucoDetector::ArucoDetector(QQuickItem *parent):
 {
 
     qRegisterMetaType<PoseMap>("PoseMap");
+
     m_pause=false;
     m_focalLength=700.0;
     m_cameraResolution=QSizeF(640,480);
-//    m_projectionMatrix=QMatrix4x4(
-//        m_focalLength,    0,              m_cameraResolution.width()/2, 0 ,
-//        0,              m_focalLength,    m_cameraResolution.height()/2, 0,
-//        0,              0,              1,  0,
-//        0,              0,              0,  1
-//                );
     m_projectionMatrix=QMatrix4x4(
-                6.1581830541937018e+02, 0., 3.3236459446643443e+02 ,0,
-                0., 6.1843429607293592e+02, 2.3152070795454719e+02,0,
-                0,              0,              1,  0,
-                0,              0,              0,  1
+        m_focalLength,    0,              m_cameraResolution.width()/2, 0 ,
+        0,              m_focalLength,    m_cameraResolution.height()/2, 0,
+        0,              0,              1,  0,
+        0,              0,              0,  1
                 );
-    addConfigurationFile(QUrl());
+//    m_projectionMatrix=QMatrix4x4(
+//                6.1581830541937018e+02, 0., 3.3236459446643443e+02 ,0,
+//                0., 6.1843429607293592e+02, 2.3152070795454719e+02,0,
+//                0,              0,              1,  0,
+//                0,              0,              0,  1
+//                );
+    loadConfigurationFiles();
 }
 
 ArucoDetector::~ArucoDetector(){
@@ -47,41 +48,7 @@ QMatrix4x4 ArucoDetector::getProjectionMatrix() const
 
 void ArucoDetector::addConfigurationFile(QUrl url)
 {
-    //QFile configFile(url.toLocalFile());
-    QFile configFile(":/AR/board.yml");
-    configFile.open(QFile::ReadOnly);
-    if(configFile.isOpen()){
-        cv::FileStorage fs(configFile.readAll().toStdString(), cv::FileStorage::READ | cv::FileStorage::MEMORY);
-        cv::aruco::Board board;
-        board.dictionary=cv::aruco::getPredefinedDictionary(
-                    cv::aruco::PREDEFINED_DICTIONARY_NAME((int)fs["dictionary"]));
-        fs["ids"]>>board.ids;
-        std::vector<cv::Point3f> points;
-        fs["points"]>>points;
-        for(int i=0;i<points.size();i++){
-            if(i%4==0) board.objPoints.push_back(std::vector<cv::Point3f>());
-            board.objPoints[i/4].push_back(points[i]);
-        }
-        fs.release();
-        m_boards["Default"]=board;
-//        for(int i=0;i<test.ids.size();i++)
-//            std::cout<<test.ids.at(i)<<"\n";
-//        for(int i=0;i<test.objPoints.size();i++)
-//            for(int j=0;j<test.objPoints.at(i).size();j++)
-//                std::cout<<test.objPoints.at(i).at(j)<<"\n";
 
-//        QXmlStreamReader xmlReader;//(configFile);
-//        while (!xmlReader.atEnd()) {
-//              xmlReader.readNext();
-//        }
-//        if (xmlReader.hasError()) {
-//            qDebug()<<"Reading error:"<<xmlReader.errorString()<<
-//                      "/n At line:"<<xmlReader.lineNumber();
-//        }
-    }else{
-        qDebug()<<"Can't open file:"<<url.toLocalFile();
-    }
-    configFile.close();
 }
 
 
@@ -145,5 +112,65 @@ void ArucoDetector::notifyObservers(const PoseMap &poses)
         }
     }
 
+}
+
+void ArucoDetector::loadConfigurationFiles()
+{
+    QFile configFile(":/AR/board.yml");
+    configFile.open(QFile::ReadOnly);
+    if(configFile.isOpen()){
+        cv::FileStorage fs(configFile.readAll().toStdString(), cv::FileStorage::READ | cv::FileStorage::MEMORY);
+        cv::aruco::Board board;
+        board.dictionary=cv::aruco::getPredefinedDictionary(
+                    cv::aruco::PREDEFINED_DICTIONARY_NAME((int)fs["dictionary"]));
+        fs["ids"]>>board.ids;
+        std::vector<cv::Point3f> points;
+        fs["points"]>>points;
+        for(int i=0;i<points.size();i++){
+            if(i%4==0) board.objPoints.push_back(std::vector<cv::Point3f>());
+            board.objPoints[i/4].push_back(points[i]);
+        }
+        fs.release();
+        m_boards["Default"]=board;
+//        for(int i=0;i<test.ids.size();i++)
+//            std::cout<<test.ids.at(i)<<"\n";
+//        for(int i=0;i<test.objPoints.size();i++)
+//            for(int j=0;j<test.objPoints.at(i).size();j++)
+//                std::cout<<test.objPoints.at(i).at(j)<<"\n";
+
+//        QXmlStreamReader xmlReader;//(configFile);
+//        while (!xmlReader.atEnd()) {
+//              xmlReader.readNext();
+//        }
+//        if (xmlReader.hasError()) {
+//            qDebug()<<"Reading error:"<<xmlReader.errorString()<<
+//                      "/n At line:"<<xmlReader.lineNumber();
+//        }
+    }else{
+        qDebug()<<"Can't open file :/AR/board.yml";
+    }
+    configFile.close();
+
+    /**/
+    configFile.setFileName(":/AR/singleTags.yml");
+    configFile.open(QFile::ReadOnly);
+    if(configFile.isOpen()){
+        cv::FileStorage fs(configFile.readAll().toStdString(), cv::FileStorage::READ | cv::FileStorage::MEMORY);
+        cv::FileNode n=fs["tags"];
+        if (n.type() != cv::FileNode::SEQ)
+        {
+            qDebug() << "Cannot read tag list";
+            return ;
+        }
+        cv::FileNodeIterator it = n.begin(), it_end = n.end(); // Go through the node
+        for (; it != it_end; ++it){
+            SingleTag tag;
+            tag.id=(int)(*it)["id"];
+            tag.size=(double)(*it)["size"];
+            m_singleTagList.append(tag);
+        }
+    }else{
+        qDebug()<<"Can't open file :/AR/singleMarkers.yml";
+    }
 }
 

@@ -29,7 +29,9 @@ public:
     BoardMap getBoards(){
         return m_boards;
     }
-
+    QList<SingleTag> singleTagList(){
+        return m_singleTagList;
+    }
     ~ArucoDetector();
 signals:
 
@@ -44,14 +46,19 @@ public slots:
     void updateObserver(QString prevObjId);
     void notifyObservers(const PoseMap& poses);
 private:
-    QMultiHash<QString, ArucoObject*> m_observers;
-    BoardMap m_boards;
 
+    void loadConfigurationFiles();
+    QMultiHash<QString, ArucoObject*> m_observers;
+
+    BoardMap m_boards;
+    QList<SingleTag> m_singleTagList;
     bool m_pause;
     qreal m_focalLength;
     QSizeF m_cameraResolution;
     /*This is actually a 3x3 matrix...*/
     QMatrix4x4 m_projectionMatrix;
+
+
 };
 
 #endif // ARUCODETECTOR_H

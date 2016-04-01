@@ -13,6 +13,7 @@ ArucoDetectorThread::ArucoDetectorThread(ArucoDetector* detector,QObject *parent
     m_pause=false;
     task = new DetectionTask(m_detector->getProjectionMatrix());
     task->setBoards(m_detector->getBoards());
+    task->setSingleTagList(m_detector->singleTagList());
     task->moveToThread(&workerThread);
     connect(&workerThread, SIGNAL(started()), task, SLOT(doWork()));
     connect(task, SIGNAL(objectsReady(PoseMap)),
@@ -236,6 +237,13 @@ void DetectionTask::setBoards(BoardMap boards)
     }
 }
 
+void DetectionTask::setSingleTagList(QList<SingleTag> list)
+{
+    Q_FOREACH(SingleTag t,list){
+        m_singleTagSizes[t.id]=t.size;
+    }
+}
+
 void DetectionTask::doWork()
 {
     running = true;
@@ -264,6 +272,25 @@ void DetectionTask::doWork()
             frameLock.unlock();
             poseMap.clear();
             cv::aruco::detectMarkers(nextFrame,m_dictionary,m_markerCorners,m_markerIds,m_detector_params);
+
+            for(int i=0;i<m_markerIds.size();i++){
+                if(m_singleTagSizes.contains(m_markerIds[i])){
+                    std::vector< std::vector<cv::Point2f> > corners;
+                    std::vector< cv::Vec3d > rvecs,tvecs;
+                    corners.push_back(m_markerCorners[i]);
+                    cv::aruco::estimatePoseSingleMarkers(corners,m_singleTagSizes[m_markerIds[i]],m_cv_projectionMatrix,m_distCoeff,
+                            rvecs,tvecs);
+                    cv::Rodrigues(rvecs[0], rmat);
+                    poseMap[QString::number(m_markerIds[i])]=
+                            QMatrix4x4(
+                                (qreal)rmat(0,0),    (qreal)rmat(0,1),    (qreal)rmat(0,2),    (qreal)tvecs[0].operator [](0),
+                                -(qreal)rmat(1,0),    -(qreal)rmat(1,1),   -(qreal)rmat(1,2),    -(qreal)tvecs[0].operator [](1),
+                                -(qreal)rmat(2,0),    -(qreal)rmat(2,1),    -(qreal)rmat(2,2),    -(qreal)tvecs[0].operator [](2),
+                                0,                          0,                          0,                          1
+                                );
+                }
+            }
+
             for(int i=0;i<m_boards.size();i++){
                 if(cv::aruco::estimatePoseBoard(m_markerCorners,m_markerIds,m_boards[i],m_cv_projectionMatrix,
                                              m_distCoeff,rvec,tvec)){
@@ -280,7 +307,6 @@ void DetectionTask::doWork()
 //                    cv::aruco::drawAxis(debug,m_cv_projectionMatrix,m_distCoeff,rvec,tvec,10);
 //                    cv::imwrite("test.png",debug);
                 }
-
             }
 
             frameLock.lock();

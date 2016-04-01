@@ -19,6 +19,12 @@ class ArucoDetector;
 typedef QHash<QString,QMatrix4x4> PoseMap;
 typedef QHash<QString,cv::aruco::Board> BoardMap;
 
+struct SingleTag{
+    int id;
+    qreal size;
+};
+
+
 class DetectionTask : public QObject{
 Q_OBJECT
 public:
@@ -29,6 +35,7 @@ public:
 
     void setProjectionMatrix(QMatrix4x4 m);
     void setBoards(BoardMap boards);
+    void setSingleTagList(QList<SingleTag> list);
 public slots:
     void doWork();
 signals:
@@ -60,6 +67,7 @@ private:
 
     std::vector<cv::Ptr<cv::aruco::Board> > m_boards;
     QStringList m_board_names;
+    QHash<int,qreal> m_singleTagSizes;
     cv::Ptr< cv::aruco::Dictionary> m_dictionary;
     std::vector< int > m_markerIds;
     std::vector< std::vector<cv::Point2f> > m_markerCorners;
