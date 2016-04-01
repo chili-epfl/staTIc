@@ -13,6 +13,7 @@ public:
     ~BeamVM();
 
     WeakBeamPtr beam(){return m_beam;}
+    Qt3DCore::QEntity* component3D(){return m_component3D;}
 
 public slots:        
 
