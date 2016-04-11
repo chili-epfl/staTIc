@@ -219,6 +219,7 @@ DISTFILES += \
     Resources/Materials/C40/lorenzo.lucignano@epfl.ch-8316125742.material \
     Resources/Materials/D30/lorenzo.lucignano@epfl.ch-8316125742.material \
     Resources/Materials/D50/lorenzo.lucignano@epfl.ch-8316125742.material \
-    Resources/Materials/D70/lorenzo.lucignano@epfl.ch-8316125742.material
+    Resources/Materials/D70/lorenzo.lucignano@epfl.ch-8316125742.material \
+    load.yml
 
 
