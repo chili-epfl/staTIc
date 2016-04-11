@@ -334,11 +334,14 @@ Item{
      ArucoDetector{
         id:aruco
 
+        //pause: backgroundsubtraction.entropy<200
      }
      ArucoObject{
         id:structure_tag
         objectId: "Default"
-        Component.onCompleted: aruco.registerObserver(structure_tag)
+        Component.onCompleted: {
+            aruco.registerObserver(structure_tag)
+        }
      }
 
 

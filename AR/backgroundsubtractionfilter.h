@@ -15,9 +15,24 @@ public:
     }
 public slots:
     void doWork(const cv::Mat &mat) {
-        m_pMOG2->apply(mat, m_fgMaskMOG2);
-        cv::medianBlur(m_fgMaskMOG2,m_fgMaskMOG2,3);
-        emit resultReady((qreal)cv::countNonZero(m_fgMaskMOG2)/(m_fgMaskMOG2.cols*m_fgMaskMOG2.rows));
+        emit resultReady(varianceOfLaplacian(mat));
+//        m_pMOG2->apply(mat, m_fgMaskMOG2);
+//        cv::medianBlur(m_fgMaskMOG2,m_fgMaskMOG2,3);
+//        emit resultReady((qreal)cv::countNonZero(m_fgMaskMOG2)/(m_fgMaskMOG2.cols*m_fgMaskMOG2.rows));
+    }
+    // OpenCV port of 'LAPV' algorithm (Pech2000)
+    double varianceOfLaplacian(const cv::Mat& src)
+    {
+        cv::Mat lap;
+        cv::Laplacian(src, lap, CV_8U);
+
+        //cv::convertScaleAbs(lap,lap);
+
+        cv::Scalar mu, sigma;
+        cv::meanStdDev(lap, mu, sigma);
+
+        double focusMeasure = sigma.val[0]*sigma.val[0];
+        return focusMeasure;
     }
 signals:
     void resultReady(qreal result);

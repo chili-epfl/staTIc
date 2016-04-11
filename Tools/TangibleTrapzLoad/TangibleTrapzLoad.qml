@@ -31,8 +31,9 @@ Entity {
 
     ArucoObject{
        id:tag
-       objectId: "200"
+       objectId: "203"
        QQ2.Component.onCompleted: aruco.registerObserver(this)
+       onRotationChanged: console.log(rotation)
     }
 
     /*Graphical rapresentation*/
@@ -43,13 +44,15 @@ Entity {
     }
     Transform{
         id:collisionTransform
-        matrix: {
-            var m = Qt.matrix4x4();
-            //m.rotate(-180, Qt.vector3d(1, 0, 0))
-            m=m.times(structureLoaderTransform.matrix.inverted().times(tag.poseMatrix))
-            //m.rotate(180, Qt.vector3d(1, 0, 0))
-            return m;
-        }
+        translation:tag.translation
+        rotation:tag.rotationQuaternion;
+//        matrix: {
+//            var m = Qt.matrix4x4();
+//            //m.rotate(-180, Qt.vector3d(1, 0, 0))
+//            m=m.times(structureLoaderTransform.matrix.inverted().times(tag.poseMatrix))
+//            //m.rotate(180, Qt.vector3d(1, 0, 0))
+//            return m;
+//        }
 
     }
     PhongAlphaMaterial{
@@ -85,7 +88,7 @@ Entity {
             target: entity_loader.entity
             when: entity_loader.entity
             property:"offsetAugmentation"
-            value: Qt.vector3d(tangibleSection.height/2,0,-tangibleSection.width/2)
+            value: Qt.vector3d(0,tangibleSection.height/2,-tangibleSection.width/2)//tangibleSection.height/2
         }
         QQ2.Binding{
             target: entity_loader.entity

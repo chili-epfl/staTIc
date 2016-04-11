@@ -86,30 +86,14 @@ Entity {
         id:structureEntity
         Transform {
             id: structureLoaderTransform
-            readonly property matrix4x4 boardAlign:Qt.matrix4x4(0,0,1,0,
-                                                                1,0,0,0,
-                                                                0,1,0,0,
-                                                                0,0,0,1);
-            matrix:{
-                var m=structure_tag.poseMatrix
-                m=m.times(boardAlign)
-                return m;
-            }
+            rotation:structure_tag.rotationQuaternion
+            translation:structure_tag.translation
+            QQ2.Component.onCompleted:
+                structure_tag.appendQuaternion(fromAxisAndAngle(1,1,1,120))
 
         }
 
-        Transform{
-            id:test
-            rotation:structureLoaderTransform.rotation
-            translation:structureLoaderTransform.translation
-            QQ2.Behavior on rotation{
-                QuaternionAnimation{
-                    onToChanged: console.log("2")
-                }
-            }
-        }
-
-        components: [test]
+        components: [structureLoaderTransform]
 
         Entity{
             enabled:ghostMode
@@ -145,12 +129,8 @@ Entity {
         /*Scaffold{
 
         }*/
-
-
-        TangibleTrapzLoad{
-
-        }
-
+    }
+    TangibleTrapzLoad{
 
     }
 

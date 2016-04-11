@@ -12,11 +12,14 @@
 #include<opencv2/core.hpp>
 #include<opencv2/aruco.hpp>
 #include <opencv2/aruco/dictionary.hpp>
+#include <QPair>
+#include <QQuaternion>
 #include "linearkalmanfilter.h"
 
 class ArucoDetector;
 
-typedef QHash<QString,QMatrix4x4> PoseMap;
+typedef QPair<QVector3D,QQuaternion> Pose;
+typedef QHash<QString,Pose> PoseMap;
 typedef QHash<QString,cv::aruco::Board> BoardMap;
 
 struct SingleTag{
@@ -77,7 +80,7 @@ private:
     cv::Ptr<cv::aruco::DetectorParameters> m_detector_params;
     bool m_use_filter=true;
     QHash<QString,LinearKalmanFilter*> m_LKFilters;
-
+    QQuaternion m_rotationOpencvToOpenGL=QQuaternion::fromAxisAndAngle(1,0,0,180);
 };
 
 

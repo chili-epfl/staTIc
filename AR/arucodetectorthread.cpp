@@ -5,7 +5,8 @@
 #include <opencv2/calib3d.hpp>
 #include <opencv2/highgui.hpp>
 #include <QMatrix4x4>
-
+#include <iostream>
+#include <algorithm>
 ArucoDetectorThread::ArucoDetectorThread(ArucoDetector* detector,QObject *parent):
     QObject(parent)
 {
@@ -259,10 +260,19 @@ void DetectionTask::doWork()
 #endif
 
     frameLock.lock();
-    cv::Mat rvec;
+    cv::Mat rvec(3, 1, CV_64F);
     cv::Mat tvec(3, 1, CV_64F);
-    cv::Mat rmat;
+    cv::Mat rmat,lap,lap_ROI;
+    qreal norm;
+    cv::Scalar mu, sigma;
+    float roll,pitch,yaw;
+    QQuaternion measur_quad;
     PoseMap poseMap;
+    int min_x,min_y,max_x,max_y;
+
+    QHash<int,QList<double> > sharpness_tags;
+    QList<double> sort_list;
+    double focusMeasure;
     while(running){
 
         //Process frame if possible
@@ -275,23 +285,52 @@ void DetectionTask::doWork()
             frameLock.unlock();
             poseMap.clear();
             cv::aruco::detectMarkers(nextFrame,m_dictionary,m_markerCorners,m_markerIds,m_detector_params);
+            cv::Laplacian(nextFrame,lap,CV_32F);
+            for(int i=0;i<m_markerIds.size();i++){
+                min_x=10000000;
+                min_y=10000000;
+                max_x=-1;
+                max_y=-1;
+                for(int j=0;j<m_markerCorners[i].size();j++){
+                    if(m_markerCorners[i][j].x>max_x)
+                        max_x=m_markerCorners[i][j].x;
+                    if(m_markerCorners[i][j].x<min_x)
+                        min_x=m_markerCorners[i][j].x;
+                    if(m_markerCorners[i][j].y>max_y)
+                        max_y=m_markerCorners[i][j].y;
+                    if(m_markerCorners[i][j].y<min_y)
+                        min_y=m_markerCorners[i][j].y;
+                }
+                lap_ROI=lap(cv::Rect(min_x,min_y,max_x-min_x,max_y-min_y));
+                cv::meanStdDev(lap_ROI, mu, sigma);
+                focusMeasure = sigma.val[0]*sigma.val[0];
+                sharpness_tags[m_markerIds[i]].append(focusMeasure);
+
+                if(sharpness_tags[m_markerIds[i]].size()>5)
+                    sharpness_tags[m_markerIds[i]].removeFirst();
+                sort_list.clear();
+                sort_list.append(sharpness_tags[m_markerIds[i]]);
+                std::sort(sort_list.begin(),sort_list.end());
+                if(sort_list.size()>1 && focusMeasure<0.8*sort_list.at(sort_list.size()/2-1)){
+                    m_markerIds[i]=502100;
+                }
+            }
 
             for(int i=0;i<m_markerIds.size();i++){
                 if(m_singleTagSizes.contains(m_markerIds[i])){
+
                     std::vector< std::vector<cv::Point2f> > corners;
                     std::vector< cv::Vec3d > rvecs,tvecs;
                     corners.push_back(m_markerCorners[i]);
                     cv::aruco::estimatePoseSingleMarkers(corners,m_singleTagSizes[m_markerIds[i]],m_cv_projectionMatrix,m_distCoeff,
                             rvecs,tvecs);
-                    cv::Rodrigues(rvecs[0], rmat);
+                    norm=cv::norm(rvecs[0]);
+                    measur_quad=QQuaternion::fromAxisAndAngle(rvecs[0].operator [](0)/norm,rvecs[0].operator [](1)/norm,rvecs[0].operator [](2)/norm,180.0*norm/CV_PI);
+
                     if(!m_use_filter){
-                        poseMap[QString::number(m_markerIds[i])]=
-                                QMatrix4x4(
-                                    (qreal)rmat.at<double>(0,0),    (qreal)rmat.at<double>(0,1),    (qreal)rmat.at<double>(0,2),    (qreal)tvecs[0].operator [](0),
-                                    -(qreal)rmat.at<double>(1,0),    -(qreal)rmat.at<double>(1,1),   -(qreal)rmat.at<double>(1,2),    -(qreal)tvecs[0].operator [](1),
-                                    -(qreal)rmat.at<double>(2,0),    -(qreal)rmat.at<double>(2,1),    -(qreal)rmat.at<double>(2,2),    -(qreal)tvecs[0].operator [](2),
-                                0,                          0,                          0,                          1
-                                );
+                        poseMap[QString::number(m_markerIds[i])]=Pose(QVector3D((qreal)tvecs[0].operator [](0),-(qreal)tvecs[0].operator [](1),-(qreal)tvecs[0].operator [](2)),
+                                                       m_rotationOpencvToOpenGL* measur_quad);
+
                     }else{
                         QString string_id=QString::number(m_markerIds[i]);
                         LinearKalmanFilter* filter;
@@ -306,15 +345,18 @@ void DetectionTask::doWork()
                         tvec.at <double>(0) = tvecs[0].operator [](0);
                         tvec.at <double>(1) = tvecs[0].operator [](1);
                         tvec.at <double>(2) = tvecs[0].operator [](2);
-                        filter->fillMeasurements(tvec,rmat);
-                        filter->updateKalmanFilter(tvec,rmat);
-                        poseMap[QString::number(m_markerIds[i])]=
-                                QMatrix4x4(
-                                    (qreal)rmat.at<double>(0,0),    (qreal)rmat.at<double>(0,1),    (qreal)rmat.at<double>(0,2),    (qreal)tvec.at<double>(0),
-                                    -(qreal)rmat.at<double>(1,0),    -(qreal)rmat.at<double>(1,1),   -(qreal)rmat.at<double>(1,2),    -(qreal)tvec.at<double>(1),
-                                    -(qreal)rmat.at<double>(2,0),    -(qreal)rmat.at<double>(2,1),    -(qreal)rmat.at<double>(2,2),    -(qreal)tvec.at<double>(2),
-                                    0,                          0,                          0,                          1
-                                    );
+
+
+                        measur_quad.getEulerAngles(&pitch,&yaw,&roll);
+
+                        rvec.at <double>(0) = pitch;
+                        rvec.at <double>(1) = yaw;
+                        rvec.at <double>(2) = roll;
+
+                        filter->fillMeasurements(tvec,rvec);
+                        filter->updateKalmanFilter(tvec,rvec);
+                        poseMap[QString::number(m_markerIds[i])]=Pose(QVector3D((qreal)tvecs[0].operator [](0),-(qreal)tvecs[0].operator [](1),-(qreal)tvecs[0].operator [](2)),
+                                                       m_rotationOpencvToOpenGL* measur_quad.fromEulerAngles(rvec.at <double>(0),rvec.at <double>(1),rvec.at <double>(2)));
                     }
                 }
             }
@@ -322,15 +364,11 @@ void DetectionTask::doWork()
             for(int i=0;i<m_boards.size();i++){
                 if(cv::aruco::estimatePoseBoard(m_markerCorners,m_markerIds,m_boards[i],m_cv_projectionMatrix,
                                              m_distCoeff,rvec,tvec)){
-                    cv::Rodrigues(rvec, rmat);
+                    norm=cv::norm(rvec);
+                    measur_quad=QQuaternion::fromAxisAndAngle(rvec.at<double>(0)/norm,rvec.at<double>(1)/norm,rvec.at<double>(2)/norm,180.0*norm/CV_PI);
                     if(!m_use_filter){
-                        poseMap[m_board_names[i]]=
-                                QMatrix4x4(
-                                    (qreal)rmat.at<double>(0,0),    (qreal)rmat.at<double>(0,1),    (qreal)rmat.at<double>(0,2),    (qreal)tvec.at<double>(0),
-                                    -(qreal)rmat.at<double>(1,0),    -(qreal)rmat.at<double>(1,1),   -(qreal)rmat.at<double>(1,2),    -(qreal)tvec.at<double>(1),
-                                    -(qreal)rmat.at<double>(2,0),    -(qreal)rmat.at<double>(2,1),    -(qreal)rmat.at<double>(2,2),    -(qreal)tvec.at<double>(2),
-                                    0,                          0,                          0,                          1
-                                    );
+                        poseMap[m_board_names[i]]=Pose(QVector3D((qreal)tvec.at<double>(0),-(qreal)tvec.at<double>(1),-(qreal)tvec.at<double>(2)),
+                                                       m_rotationOpencvToOpenGL*measur_quad);
                     }
                     else{
                         LinearKalmanFilter* filter;
@@ -342,16 +380,19 @@ void DetectionTask::doWork()
                         else
                             filter=m_LKFilters[m_board_names[i]];
 
-                        filter->fillMeasurements(tvec,rmat);
-                        filter->updateKalmanFilter(tvec,rmat);
-                        poseMap[m_board_names[i]]=
-                                QMatrix4x4(
-                                    (qreal)rmat.at<double>(0,0),    (qreal)rmat.at<double>(0,1),    (qreal)rmat.at<double>(0,2),    (qreal)tvec.at<double>(0),
-                                    -(qreal)rmat.at<double>(1,0),    -(qreal)rmat.at<double>(1,1),   -(qreal)rmat.at<double>(1,2),    -(qreal)tvec.at<double>(1),
-                                    -(qreal)rmat.at<double>(2,0),    -(qreal)rmat.at<double>(2,1),    -(qreal)rmat.at<double>(2,2),    -(qreal)tvec.at<double>(2),
-                                    0,                          0,                          0,                          1
-                                    );
+                        measur_quad.getEulerAngles(&pitch,&yaw,&roll);
+
+                        rvec.at <double>(0) = pitch;
+                        rvec.at <double>(1) = yaw;
+                        rvec.at <double>(2) = roll;
+
+                        filter->fillMeasurements(tvec,rvec);
+                        filter->updateKalmanFilter(tvec,rvec);
+                        poseMap[m_board_names[i]]= Pose(QVector3D((qreal)tvec.at<double>(0),-(qreal)tvec.at<double>(1),-(qreal)tvec.at<double>(2)),
+                                                        m_rotationOpencvToOpenGL*measur_quad.fromEulerAngles(rvec.at <double>(0),rvec.at <double>(1),rvec.at <double>(2)));
+
                     }
+                    //qDebug()<< poseMap[m_board_names[i]];
 //                    cv::Mat debug=nextFrame.clone();
 //                    cv::cvtColor(debug,debug,CV_GRAY2RGB);
 //                    cv::aruco::drawAxis(debug,m_cv_projectionMatrix,m_distCoeff,rvec,tvec,10);
@@ -374,7 +415,7 @@ void DetectionTask::doWork()
         if(millis>0){
             fps = FPS_RATE*fps + (1.0f - FPS_RATE)*(1000.0f/millis);
             if(millisElapsed >= FPS_PRINT_PERIOD){
-                qDebug("Aruco is running at %f FPS",fps);
+                //qDebug("Aruco is running at %f FPS",fps);
                 millisElapsed = 0;
             }
         }

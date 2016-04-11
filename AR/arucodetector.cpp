@@ -102,7 +102,8 @@ void ArucoDetector::notifyObservers(const PoseMap &poses)
     Q_FOREACH(QString key, m_observers.keys()){
         if(poses.contains(key)){
             Q_FOREACH(ArucoObject* observer, m_observers.values(key)){
-                observer->setPoseMatrix(poses[key]);
+                Pose p=poses[key];
+                observer->setPose(p.first,p.second);
                 observer->setVisible(true);
             }
         }
@@ -151,6 +152,40 @@ void ArucoDetector::loadConfigurationFiles()
     }
     configFile.close();
 
+    configFile.setFileName(":/load.yml");
+    configFile.open(QFile::ReadOnly);
+    if(configFile.isOpen()){
+        cv::FileStorage fs(configFile.readAll().toStdString(), cv::FileStorage::READ | cv::FileStorage::MEMORY);
+        cv::aruco::Board board;
+        board.dictionary=cv::aruco::getPredefinedDictionary(
+                    cv::aruco::PREDEFINED_DICTIONARY_NAME((int)fs["dictionary"]));
+        fs["ids"]>>board.ids;
+        std::vector<cv::Point3f> points;
+        fs["points"]>>points;
+        for(int i=0;i<points.size();i++){
+            if(i%4==0) board.objPoints.push_back(std::vector<cv::Point3f>());
+            board.objPoints[i/4].push_back(points[i]);
+        }
+        fs.release();
+        m_boards["load"]=board;
+//        for(int i=0;i<test.ids.size();i++)
+//            std::cout<<test.ids.at(i)<<"\n";
+//        for(int i=0;i<test.objPoints.size();i++)
+//            for(int j=0;j<test.objPoints.at(i).size();j++)
+//                std::cout<<test.objPoints.at(i).at(j)<<"\n";
+
+//        QXmlStreamReader xmlReader;//(configFile);
+//        while (!xmlReader.atEnd()) {
+//              xmlReader.readNext();
+//        }
+//        if (xmlReader.hasError()) {
+//            qDebug()<<"Reading error:"<<xmlReader.errorString()<<
+//                      "/n At line:"<<xmlReader.lineNumber();
+//        }
+    }else{
+        qDebug()<<"Can't open file :/load.yml";
+    }
+    configFile.close();
     /**/
     configFile.setFileName(":/AR/singleTags.yml");
     configFile.open(QFile::ReadOnly);

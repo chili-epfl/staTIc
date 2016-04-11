@@ -17,6 +17,7 @@ public:
     void updateKalmanFilter(cv::Mat &translation_estimated, cv::Mat &rotation_estimated);
 
 private:
+    float findClosestAngle(float from, float to);
     cv::Mat measurements;
     cv::KalmanFilter KF;         // instantiate Kalman Filter
     int nStates = 18;            // the number of states

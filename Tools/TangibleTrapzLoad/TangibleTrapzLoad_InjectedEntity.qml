@@ -12,7 +12,7 @@ Entity {
     Transform{
           id:transform
           translation:offsetAugmentation.plus(relativePosition);
-          rotation:fromAxisAndAngle(Qt.vector3d(0, 0, 1), -90)
+          //rotation:fromAxisAndAngle(Qt.vector3d(0, 0, 1), -90)
     }
     Mesh{
         id:assetMesh

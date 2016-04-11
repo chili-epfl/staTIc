@@ -1,5 +1,5 @@
 #include "linearkalmanfilter.h"
-
+#include <QDebug>
 LinearKalmanFilter::LinearKalmanFilter()
 {
     init();
@@ -10,7 +10,11 @@ void LinearKalmanFilter::init()
     KF.init(nStates, nMeasurements, nInputs, CV_64F);                 // init Kalman Filter
 
     cv::setIdentity(KF.processNoiseCov, cv::Scalar::all(1e-5));       // set process noise
-    cv::setIdentity(KF.measurementNoiseCov, cv::Scalar::all(1e-2));   // set measurement noise
+    cv::setIdentity(KF.measurementNoiseCov, cv::Scalar::all(1e-5));   // set measurement noise
+    KF.measurementNoiseCov.at<double>(3,3)=1e-4;
+    KF.measurementNoiseCov.at<double>(4,4)=1e-4;
+    KF.measurementNoiseCov.at<double>(5,5)=1e-4;
+
     cv::setIdentity(KF.errorCovPost, cv::Scalar::all(1));             // error covariance
 
 
@@ -101,8 +105,13 @@ void LinearKalmanFilter::updateKalmanFilter(cv::Mat &translation_estimated, cv::
   eulers_estimated.at<double>(2) = estimated.at<double>(11);
 
   // Convert estimated quaternion to rotation matrix
-  rotation_estimated = euler2rot(eulers_estimated);
+  rotation_estimated = eulers_estimated;
 
+}
+
+float LinearKalmanFilter::findClosestAngle(float from, float to)
+{
+    return (from + fmod(to - from + 180.f, 360.f)-180.f);
 }
 
 /**********************************************************************************************************/
@@ -116,9 +125,9 @@ void LinearKalmanFilter::fillMeasurements( const cv::Mat &translation_measured, 
   measurements.at<double>(0) = translation_measured.at<double>(0); // x
   measurements.at<double>(1) = translation_measured.at<double>(1); // y
   measurements.at<double>(2) = translation_measured.at<double>(2); // z
-  measurements.at<double>(3) = measured_eulers.at<double>(0);      // roll
-  measurements.at<double>(4) = measured_eulers.at<double>(1);      // pitch
-  measurements.at<double>(5) = measured_eulers.at<double>(2);      // yaw
+  measurements.at<double>(3) = findClosestAngle(measurements.at<double>(3),rotation_measured.at<double>(0));      // roll
+  measurements.at<double>(4) = findClosestAngle(measurements.at<double>(4),rotation_measured.at<double>(1));      // pitch
+  measurements.at<double>(5) = findClosestAngle(measurements.at<double>(5),rotation_measured.at<double>(2));      // yaw
 }
 
 // Converts a given Rotation Matrix to Euler angles
@@ -157,7 +166,6 @@ cv::Mat LinearKalmanFilter::rot2euler(const cv::Mat & rotationMatrix)
   euler.at<double>(0) = x;
   euler.at<double>(1) = y;
   euler.at<double>(2) = z;
-
   return euler;
 }
 
@@ -202,3 +210,5 @@ cv::Mat LinearKalmanFilter::euler2rot(const cv::Mat & euler)
 
   return rotationMatrix;
 }
+
+
