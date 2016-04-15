@@ -85,13 +85,13 @@ void TrapezoidalForceVM::initView(Qt3DCore::QEntity* parentEntity,QVariantHash p
     m_qqmlcontext->setContextObject(forceView);
     m_component3D=forceView;
     //QQmlEngine::setObjectOwnership(m_component3D,QQmlEngine::JavaScriptOwnership);
-    onForceChanged();
-    onRelativePositionChanged();
     setProperties(properties);
     connect(m_component3D,SIGNAL(globalForceChanged()),this,SLOT(onForceChanged()));
     connect(m_component3D,SIGNAL(relativeLocalPositionChanged()),SLOT(onRelativePositionChanged()));
     connect(m_component3D,SIGNAL(extentChanged()),SLOT(onRelativePositionChanged()));
     m_qqmlcomponent->completeCreate();
     m_component3D->setParent(parentEntity);
+    onForceChanged();
+    onRelativePositionChanged();
 
 }
