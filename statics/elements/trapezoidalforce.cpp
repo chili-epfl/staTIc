@@ -46,7 +46,7 @@ void TrapezoidalForce::setForce(QVector3D force)
     BeamPtr ptr=m_beam.toStrongRef();
     if(!ptr.isNull()){
         if(force!=m_force && !force.isNull()){
-            m_force=force/ptr->size().width();
+            m_force=force/(ptr->size().width());
             emit forceChanged();
         }
     }
@@ -71,7 +71,7 @@ void TrapezoidalForce::positionOnBeam(QVector3D &begin, QVector3D &end)
 {
     BeamPtr ptr=m_beam.toStrongRef();
     if(!ptr.isNull()){
-        QVector2D relativeExtent=m_extent/ptr->length();
+        QVector2D relativeExtent=100*m_extent/ptr->length();
         begin=QVector3D(qMax(0.0f,m_relative_position.x()+relativeExtent.x()),
                         qMax(0.0f,m_relative_position.y()+relativeExtent.x()),
                         qMax(0.0f,m_relative_position.z()+relativeExtent.x()))*ptr->length();
