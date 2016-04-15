@@ -4,11 +4,15 @@ import QtQuick 2.3 as QQ2
 Entity{
     id:rootEntity
     readonly property string type: "trapezoidalForce"
-    property vector3d globalForce: Qt.vector3d(0,-weight*9800,0);
+    property vector3d globalForce: Qt.vector3d(0,-weight*9800/(Math.abs(extent.x -extent.y)),0);
 
+    onGlobalForceChanged: console.log(globalForce)
+    onWeightChanged: console.log(weight)
+    onExtentChanged: console.log(extent)
     property url asset3DMeshURL;
     property url asset3DTextureURL;
     property real weight
+    property vector2d extent
 
     signal killMe();
 
@@ -34,8 +38,7 @@ Entity{
 //    }
 
     /*Force is acting in the y direction*/
-    property vector3d relativeLocalPosition:Qt.vector3d(0,-transform.translation.y/rootEntity.parent.length + 0.5,0)
-    property vector2d extent: Qt.vector2d(-5,5)
+    property vector3d relativeLocalPosition:Qt.vector3d(-transform.translation.y/rootEntity.parent.length + 0.5,-transform.translation.y/rootEntity.parent.length + 0.5,-transform.translation.y/rootEntity.parent.length + 0.5)
 
     property bool dragging: false;
     property vector3d offsetAugmentation: Qt.vector3d(rootEntity.parent.tangibleSection.height/2,0,

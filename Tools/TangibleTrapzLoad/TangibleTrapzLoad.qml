@@ -8,7 +8,7 @@ Entity {
     id:rootEntity
     readonly property string type: "trapezoidalForceTangible"
 
-    property vector3d globalForce: Qt.vector3d(0,-weight*9800,0);
+    property vector3d globalForce: Qt.vector3d(0,-weight*9.8/(Math.abs(extent.x -extent.y)),0);
     property vector3d globalPosition:collisionTransform.translation
 
     property vector3d prev_position:Qt.vector3d(0,0,0)
@@ -25,7 +25,7 @@ Entity {
     property url asset3DMeshURL:"qrc:/tools/Tools/TangibleTrapzLoad/tonweight.obj";
     property url asset3DTextureURL:"qrc:/tools/Tools/TangibleTrapzLoad/texture.png";
     property real weight:10;
-    property vector2d extent: Qt.vector2d(-10,10)
+    property vector2d extent: Qt.vector2d(-100,100)
 
     property bool selected: infobox.current_item==rootEntity? true: false
 

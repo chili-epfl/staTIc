@@ -145,7 +145,8 @@ void TangibleTrapzLoad::updatePosition(){
         beamDir.normalize();
         QVector3D globalPosition=m_parentEntity->property("globalPosition").value<QVector3D>()-e1.toStrongRef()->scaledPosition();
         qreal projection=QVector3D::dotProduct(globalPosition,beamDir);
-        QVector3D localPosition(0,fabs(projection/trp_f_ptr->beam().toStrongRef()->scaledLength()),0);
+        qreal lP=fabs(projection/trp_f_ptr->beam().toStrongRef()->scaledLength());
+        QVector3D localPosition(lP,lP,lP);
         trp_f_ptr->setRelativePosition(localPosition,m_parentEntity->property("extent").value<QVector2D>());
     }
 }
