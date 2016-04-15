@@ -5,7 +5,7 @@ import QtQuick.Layouts 1.1
 import QtQuick.Scene3D 2.0
 import ArucoDetector 1.0
 import ArucoObject 1.0
-
+import QuaternionHelper 1.0
 import Qt3D.Render 2.0
 
 import BackgroundSubtraction 1.0
@@ -29,6 +29,9 @@ Item{
     property url structureUrl;
     property url structure3DAsset;
     property url structureTagConfig;
+    QuaternionHelper{
+        id:quaternion_helper
+    }
 
     state: "LoadingCamera"
     states: [
