@@ -16,6 +16,7 @@
 #include "Tools/Scaffold/scaffold.h"
 #include "Tools/BeamRemover/beamremover.h"
 #include "Tools/TangibleTrapzLoad/tangibletrapzload.h"
+#include "Tools/Snow/snow.h"
 
 #include "AR/deformingbeammesh.h"
 
@@ -24,7 +25,7 @@
 #include "static_global.h"
 #include "AR/arucodetector.h"
 #include "AR/arucoobject.h"
-
+#include "AR/quaternionhelper.h"
 int main(int argc, char *argv[])
 {
 //    QApplication app(argc, argv);
@@ -77,6 +78,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<ArucoDetector>("ArucoDetector",1,0,"ArucoDetector");
     qmlRegisterType<ArucoObject>("ArucoObject",1,0,"ArucoObject");
 
+    qmlRegisterType<QuaternionHelper>("QuaternionHelper",1,0,"QuaternionHelper");
 
     //qmlRegisterType<MaterialSetter>("MaterialSetter", 1, 0, "MaterialSetter");
     //qmlRegisterType<PhysicsSetter>("PhysicsSetter", 1, 0, "PhysicsSetter");
@@ -86,6 +88,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<Scaffold>("QuickScaffold", 1, 0, "QuickScaffold");
     qmlRegisterType<BeamRemover>("QuickBeamRemover", 1, 0, "QuickBeamRemover");
     qmlRegisterType<TangibleTrapzLoad>("QuickTangibleTPZLoad", 1, 0, "QuickTangibleTPZLoad");
+    qmlRegisterType<Snow>("QuickSnow", 1, 0, "QuickSnow");
 
 
     qmlRegisterType<DeformingBeamMesh>("DeformingBeamMesh", 1, 0, "DeformingBeamMesh");

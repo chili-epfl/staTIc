@@ -10,6 +10,7 @@ import "qrc:/"
 import "qrc:/tools/Tools/ConcentratedForce"
 import "qrc:/tools/Tools/Scaffold"
 import "qrc:/tools/Tools/TangibleTrapzLoad"
+import "qrc:/tools/Tools/Snow"
 
 import "qrc:/ui/UI/"
 
@@ -77,6 +78,10 @@ Entity {
 
             }
 
+        },
+        PhysicsWorldInfo{
+            gravity: Qt.vector3d(0,0,0);
+            scaleFactor: 1
         }
 
     ]
@@ -86,11 +91,11 @@ Entity {
         id:structureEntity
         Transform {
             id: structureLoaderTransform
+//            translation:Qt.vector3d(0,-100,-1000)
             rotation:structure_tag.rotationQuaternion
             translation:structure_tag.translation
             QQ2.Component.onCompleted:
                 structure_tag.appendQuaternion(fromAxisAndAngle(1,1,1,120))
-
         }
 
         components: [structureLoaderTransform]
@@ -129,11 +134,13 @@ Entity {
         /*Scaffold{
 
         }*/
+//        Snow{
+//        }
     }
-    TangibleTrapzLoad{
 
-    }
+//    TangibleTrapzLoad{
 
+//    }
 
 
 
