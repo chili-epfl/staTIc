@@ -128,9 +128,9 @@ Rectangle {
                                         }
                                         if(current_item.type=="trapezoidalForceTangible"){
                                             current_item.weight=warehouse3d.get(catalog_grid.currentIndex,"weight")
+                                            current_item.extent=warehouse3d.get(catalog_grid.currentIndex,"extent")
                                             current_item.asset3DMeshURL=warehouse3d.get(catalog_grid.currentIndex,"main_asset_url")
                                             current_item.asset3DTextureURL=warehouse3d.get(catalog_grid.currentIndex,"main_asset_diffuse_map_url")
-
                                         }
                                     }
                                 }

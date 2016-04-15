@@ -116,6 +116,12 @@ QVariant Warehouse3D::get(int index, QString info) const
         else
             return QVariant();
     }
+    if(info.compare("extent",Qt::CaseInsensitive)==0){
+        if(m_objectsIndexes[index].properties.contains("extent"))
+            return m_objectsIndexes[index].properties["extent"];
+        else
+            return QVariant();
+    }
     return QVariant();
 }
 
