@@ -159,13 +159,10 @@ void Frame3DDVMManager::generateSoundEffects()
     if(m_staticsModule){
         qreal max=0;
         Q_FOREACH(BeamPtr beam,m_staticsModule->beams()){
-            qreal shear1,axial1,shear2,axial2;
-            beam->stressRatio(axial1,shear1,1);
-            beam->stressRatio(axial2,shear2,2);
-            max=qMax(max,shear1);
-            max=qMax(max,shear2);
-            max=qMax(max,axial1);
-            max=qMax(max,axial2);
+            qreal shear,axial;
+            beam->stressRatio(axial,shear,3);
+            max=qMax(max,shear);
+            max=qMax(max,axial);
         }
 
         if(max>1){

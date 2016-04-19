@@ -4,11 +4,8 @@ import QtQuick 2.3 as QQ2
 Entity{
     id:rootEntity
     readonly property string type: "trapezoidalForce"
-    property vector3d globalForce: Qt.vector3d(0,-weight*9800/(Math.abs(extent.x -extent.y)),0);
+    property vector3d globalForce: Qt.vector3d(0,-weight*9.8,0);
 
-    onGlobalForceChanged: console.log(globalForce)
-    onWeightChanged: console.log(weight)
-    onExtentChanged: console.log(extent)
     property url asset3DMeshURL;
     property url asset3DTextureURL;
     property real weight

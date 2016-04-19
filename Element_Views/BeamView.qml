@@ -35,7 +35,7 @@ Entity{
     /*The stress relative to th esize and material.
      *If it's 1 or more, it is above the limits*/
     property real relativeAxialStress: 0
-    //onRelativeAxialStressChanged: console.log(rootEntity.objectName+":"+relativeAxialStress)
+    onRelativeAxialStressChanged: console.log(rootEntity.objectName+":"+relativeAxialStress)
     property matrix4x4 poseMatrix
 
     function computeTransform(){
@@ -228,21 +228,33 @@ Entity{
     Entity{
        id:physicBody
        objectName: rootEntity.objectName
-       CylinderMesh{
+       CuboidMesh{
            enabled: true
            id:pBodyMesh
-           radius: 15
-           length: rootEntity.length
+           xExtent: 30
+           zExtent: 30
+           yExtent: rootEntity.length
+
        }
+//       CylinderMesh{
+//           enabled: true
+//           id:pBodyMesh
+//           radius: 15
+//           length: rootEntity.length
+//       }
        PhysicsBodyInfo{
            id:pBody
            kinematic:true
+           mass: 10
+           friction: 500
+           restitution: 0
        }
        PhongAlphaMaterial{
            id:transparentMaterial
            alpha:0.0
        }
        components: [pBodyMesh,pBody,transparentMaterial]
+
     }
 
     /*Pickers and Dragging anchors*/

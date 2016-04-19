@@ -87,15 +87,12 @@ void BeamVM::onBeamAxialStressChanged(){
     if(m_component3D){
         int axial_type;
         qreal axial_force, dummy;
-        beam_str_ref->ForcesAndMoments(axial_type,axial_force,dummy,dummy,dummy,dummy,dummy,-1);
+        beam_str_ref->ForcesAndMoments(axial_type,axial_force,dummy,dummy,dummy,dummy,dummy,3);
         m_component3D->setProperty("axialForceType",axial_type);
         m_component3D->setProperty("axialForce",fabs(axial_force));
-        qreal axial_stress1,axial_stress2;
-        beam_str_ref->stressRatio(axial_stress1,dummy,1);
-        beam_str_ref->stressRatio(axial_stress2,dummy,2);
-
-        m_component3D->setProperty("relativeAxialStress",qMax(axial_stress1,axial_stress2));
-
+        qreal axial_stress;
+        beam_str_ref->stressRatio(axial_stress,dummy,3);
+        m_component3D->setProperty("relativeAxialStress",axial_stress);
 
     }
 }

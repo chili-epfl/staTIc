@@ -98,7 +98,7 @@ private:
 
 
 
-    /*THES ARE NOT SETTERS*/
+    /*THES ARE NOT relativeAxialStressSETTERS*/
     qreal computeTorsionShearConstant(QSizeF size=QSizeF()); // C
     qreal computeCrossSectionalArea(QSizeF size=QSizeF());// Ax
     qreal computeShearAreaY(qreal Ax=-1);//Ay
@@ -131,6 +131,23 @@ private:
 
     qreal m_z_moment_extreme_1;
     qreal m_z_moment_extreme_2;
+
+
+    /*Absolute peaks in the frame(Positive!)*/
+    qreal m_peak_axial_force;
+    qreal m_peak_axial_type;
+    qreal m_peak_shear_y;
+    qreal m_peak_shear_z;
+    qreal m_peak_y_moment;
+    qreal m_peak_z_moment;
+    qreal m_peak_axial_moment;
+
+    qreal m_peak_axial_stress;
+    qreal m_peak_shear_y_stress;
+    qreal m_peak_shear_z_stress;
+    qreal m_peak_bending_stress;
+    qreal m_peak_torsional_stress;
+
 
     qreal m_axial_stress_extreme1;
     qreal m_bending_stress_extreme1;

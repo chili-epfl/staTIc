@@ -22,6 +22,14 @@ QVector3D TrapezoidalForce::forceLocal()
     WeakJointPtr e1,e2;
     m_beam.toStrongRef()->extremes(e1,e2);
     QVector3D c=e2.toStrongRef()->position()-e1.toStrongRef()->position();
+    QVector3D force=m_force;
+
+    if(fabs(m_extent.x()-m_extent.y())>m_beam.toStrongRef()->length()){
+        force/=m_beam.toStrongRef()->length();
+    }
+    else {
+        force/=fabs(m_extent.x()-m_extent.y());
+    }
     c.normalize();
 
     QMatrix4x4 mat;
@@ -38,18 +46,16 @@ QVector3D TrapezoidalForce::forceLocal()
         mat.setRow(2,QVector4D(-c.z()/den,0,c.x()/den,0));
         mat.setRow(3,QVector4D(0,0,0,1));
     }
-    return mat.mapVector(m_force);
+    return mat.mapVector(force);
 }
 
 void TrapezoidalForce::setForce(QVector3D force)
 {
-    BeamPtr ptr=m_beam.toStrongRef();
-    if(!ptr.isNull()){
-        if(force!=m_force && !force.isNull()){
-            m_force=force/(ptr->size().width());
-            emit forceChanged();
-        }
+    if(force!=m_force && !force.isNull()){
+        m_force=force;
+        emit forceChanged();
     }
+
 }
 
 void TrapezoidalForce::setRelativePosition(QVector3D relativePosition, QVector2D extent)
@@ -71,7 +77,7 @@ void TrapezoidalForce::positionOnBeam(QVector3D &begin, QVector3D &end)
 {
     BeamPtr ptr=m_beam.toStrongRef();
     if(!ptr.isNull()){
-        QVector2D relativeExtent=100*m_extent/ptr->length();
+        QVector2D relativeExtent=m_extent/ptr->length();
         begin=QVector3D(qMax(0.0f,m_relative_position.x()+relativeExtent.x()),
                         qMax(0.0f,m_relative_position.y()+relativeExtent.x()),
                         qMax(0.0f,m_relative_position.z()+relativeExtent.x()))*ptr->length();

@@ -1267,7 +1267,21 @@ void Frame3DDKernel::write_internal_forces (
             //                        Dx[i], Dy[i], Dz[i], Rx[i] );
         }
         m_beams[m-1]->setStressSegment(segments);
-
+        int type=0;
+        if(maxNx>0 && minNx>0)
+            type=1;
+        else if(maxNx<0 && minNx<0)
+            type=-1;
+        else if( maxNx>0 && minNx<0){
+            qWarning("Internal axial forces are not coherent");
+        }
+        m_beams[m-1]->setForcesAndMoments(type,qMax(fabs(maxNx),fabs(minNx)),
+                                          qMax(fabs(maxVy),fabs(minVy)),
+                                          qMax(fabs(maxVz),fabs(minVz)),
+                                          qMax(fabs(maxTx),fabs(minTx)),
+                                          qMax(fabs(maxMy),fabs(minMy)),
+                                          qMax(fabs(maxMz),fabs(minMz)),
+                                          3);
         // free memory
         free_dvector(x,0,nx);
         free_dvector(Nx,0,nx);
@@ -1469,20 +1483,21 @@ void Frame3DDKernel::assemble_loads (
         n=active_beams.indexOf(trz_load->beam().toStrongRef())+1;
         QVector3D begin,end;
         trz_load->positionOnBeam(begin,end);
+        QVector3D localForce=trz_load->forceLocal();
         W[1][i][1] = (double) n;
         W[1][i][2]=begin.x();//xx1
         W[1][i][3]=end.x();//xx2
-        W[1][i][4]=trz_load->forceLocal().x();//wx1
-        W[1][i][5]=trz_load->forceLocal().x();//wx1
+        W[1][i][4]=localForce.x();//wx1
+        W[1][i][5]=localForce.x();//wx1
         if(m_is2D){
             W[1][i][6]=begin.y();
             W[1][i][7]=end.y();
-            W[1][i][8]=trz_load->forceLocal().y();
-            W[1][i][9]=trz_load->forceLocal().y();
+            W[1][i][8]=localForce.y();
+            W[1][i][9]=localForce.y();
             W[1][i][10]=begin.z();
             W[1][i][11]=end.z();
-            W[1][i][12]=trz_load->forceLocal().z();
-            W[1][i][13]=trz_load->forceLocal().z();
+            W[1][i][12]=localForce.z();
+            W[1][i][13]=localForce.z();
         }else{
 
 //            W[1][i][6]=begin.z();
@@ -1495,12 +1510,12 @@ void Frame3DDKernel::assemble_loads (
 //            W[1][i][13]=trz_load->forceLocal().y();
             W[1][i][6]=begin.y();
             W[1][i][7]=end.y();
-            W[1][i][8]=trz_load->forceLocal().y();
-            W[1][i][9]=trz_load->forceLocal().y();
+            W[1][i][8]=localForce.y();
+            W[1][i][9]=localForce.y();
             W[1][i][10]=begin.z();
             W[1][i][11]=end.z();
-            W[1][i][12]=-trz_load->forceLocal().z();
-            W[1][i][13]=-trz_load->forceLocal().z();
+            W[1][i][12]=-localForce.z();
+            W[1][i][13]=-localForce.z();
 
         }
 

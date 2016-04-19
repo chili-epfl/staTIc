@@ -110,7 +110,7 @@ void JointVM::createEntityForBeam(BeamPtr b){
 
     int axial_type;
     qreal axial_force, dummy;
-    b->ForcesAndMoments(axial_type,axial_force,dummy,dummy,dummy,dummy,dummy,-1);
+    b->ForcesAndMoments(axial_type,axial_force,dummy,dummy,dummy,dummy,dummy,extreme_of_joint);
     beamView->setProperty("axialForceType",axial_type);
     beamView->setProperty("axialForce",fabs(axial_force));
 
@@ -124,7 +124,6 @@ void JointVM::createEntityForBeam(BeamPtr b){
     beamView->setProperty("axialForce_extreme2",axial_force);
     beamView->setProperty("shearYForce_extreme2",shearY);
     beamView->setProperty("shearZForce_extreme2",shearZ);
-
 
     connect(b.data(),SIGNAL(stressChanged()),this,SLOT(onConnectedBeamStressChanged()));
     //if the beam is destroyed, the notification will arrive through ConnectedBeamsChanged
@@ -146,9 +145,7 @@ void JointVM::onConnectedBeamStressChanged(){
     if(component3D==Q_NULLPTR) return;
     int axial_type;
     qreal axial_force, dummy;
-    beam->ForcesAndMoments(axial_type,axial_force,dummy,dummy,dummy,dummy,dummy,-1);
-    component3D->setProperty("axialForceType",axial_type);
-    component3D->setProperty("axialForce",fabs(axial_force));
+
 
     WeakJointPtr e1,e2;
     beam->extremes(e1,e2);
@@ -169,6 +166,9 @@ void JointVM::onConnectedBeamStressChanged(){
     component3D->setProperty("axialForce_extreme1",axial_force);
     component3D->setProperty("shearYForce_extreme1",shearY);
     component3D->setProperty("shearZForce_extreme1",shearZ);
+
+    component3D->setProperty("axialForceType",axial_type);
+    component3D->setProperty("axialForce",fabs(axial_force));
 
     beam->ForcesAndMoments(axial_type,axial_force,shearY,shearZ,dummy,dummy,dummy,extreme_not_on_joint);
     component3D->setProperty("axialForce_extreme2",axial_force);

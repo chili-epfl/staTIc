@@ -8,7 +8,7 @@ Entity {
     id:rootEntity
     readonly property string type: "trapezoidalForceTangible"
 
-    property vector3d globalForce: Qt.vector3d(0,-weight*9.8/(Math.abs(extent.x -extent.y)),0);
+    property vector3d globalForce: Qt.vector3d(0,-weight*9.8,0);
     property vector3d globalPosition:collisionTransform.translation
 
     property vector3d prev_position:Qt.vector3d(0,0,0)
