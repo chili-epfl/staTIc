@@ -72,8 +72,9 @@ private:
     QStringList m_board_names;
     QHash<int,qreal> m_singleTagSizes;
     cv::Ptr< cv::aruco::Dictionary> m_dictionary;
-    std::vector< int > m_markerIds;
+    std::vector< int > m_markerIds,m_markerIds_prev;
     std::vector< std::vector<cv::Point2f> > m_markerCorners;
+    std::vector<cv::Point2f> m_markerCorners_prev,m_tracked_corners;
     cv::Mat m_distCoeff;
     cv::Mat m_cv_projectionMatrix;
     int test=0;

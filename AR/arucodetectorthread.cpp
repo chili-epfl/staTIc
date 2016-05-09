@@ -177,7 +177,8 @@ DetectionTask::DetectionTask(QMatrix4x4 projectionMatrix)
     m_dictionary= cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_1000);
     m_detector_params=cv::aruco::DetectorParameters::create();
     m_detector_params->polygonalApproxAccuracyRate=0.04;
-    m_detector_params->doCornerRefinement=true;
+    m_detector_params->doCornerRefinement=false;
+    //m_detector_params->adaptiveThreshWinSizeMax=3;
 }
 
 DetectionTask::~DetectionTask()
@@ -263,13 +264,16 @@ void DetectionTask::doWork()
     cv::Mat rvec(3, 1, CV_64F);
     cv::Mat tvec(3, 1, CV_64F);
     cv::Mat rmat,lap,lap_ROI;
+    cv::Mat prev_Image;
+
     qreal norm;
     cv::Scalar mu, sigma;
     float roll,pitch,yaw;
     QQuaternion measur_quad;
     PoseMap poseMap;
     int min_x,min_y,max_x,max_y;
-
+    std::vector<uchar> status;
+    std::vector<float> err;
     QHash<int,QList<double> > sharpness_tags;
     QList<double> sort_list;
     double focusMeasure;
@@ -284,7 +288,38 @@ void DetectionTask::doWork()
             //Unlock the lock so that we can present a new frame while it's estimating
             frameLock.unlock();
             poseMap.clear();
+//            if(!prev_Image.empty() && m_markerIds_prev.size()>0){
+//                cv::calcOpticalFlowPyrLK(prev_Image,nextFrame,m_markerCorners_prev,m_tracked_corners,status,err);
+//            }
             cv::aruco::detectMarkers(nextFrame,m_dictionary,m_markerCorners,m_markerIds,m_detector_params);
+//            bool skip=false;
+//            for(int i=0;i<m_markerIds_prev.size();i++){
+//                if(status[i*4]==0 || status[i*4+1]==0
+//                   || status[i*4+2]==0 || status[i*4+2]==0  ) continue;
+//                if(m_tracked_corners[i*4].x<=0 || m_tracked_corners[i*4].x>=nextFrame.cols
+//                        ||m_tracked_corners[i*4].y<=0 || m_tracked_corners[i*4].y>=nextFrame.rows
+//                        || m_tracked_corners[i*4+1].x<=0 || m_tracked_corners[i*4+1].x>=nextFrame.cols
+//                        ||m_tracked_corners[i*4+1].y<=0 || m_tracked_corners[i*4+1].y>=nextFrame.rows
+//                        || m_tracked_corners[i*4+2].x<=0 || m_tracked_corners[i*4+2].x>=nextFrame.cols
+//                        ||m_tracked_corners[i*4+2].y<=0 || m_tracked_corners[i*4+2].y>=nextFrame.rows
+//                        || m_tracked_corners[i*4+3].x<=0 || m_tracked_corners[i*4+3].x>=nextFrame.cols
+//                        ||m_tracked_corners[i*4+3].y<=0 || m_tracked_corners[i*4+3].y>=nextFrame.rows) continue;
+//                skip=false;
+//                for(int j=0;j<m_markerIds.size();j++){
+//                    if(m_markerIds[j]==m_markerIds_prev[i]){
+//                        skip=true;
+//                        break;
+//                    }
+//                }
+//                if(skip) continue;
+//                m_markerIds.push_back(m_markerIds_prev[i]);
+//                std::vector<cv::Point2f> tmp;
+//                tmp.push_back(m_tracked_corners[i*4]);
+//                tmp.push_back(m_tracked_corners[i*4+1]);
+//                tmp.push_back(m_tracked_corners[i*4+2]);
+//                tmp.push_back(m_tracked_corners[i*4+3]);
+//                m_markerCorners.push_back(tmp);
+//            }
             cv::Laplacian(nextFrame,lap,CV_32F);
             for(int i=0;i<m_markerIds.size();i++){
                 min_x=10000000;
@@ -306,19 +341,18 @@ void DetectionTask::doWork()
                 focusMeasure = sigma.val[0]*sigma.val[0];
                 sharpness_tags[m_markerIds[i]].append(focusMeasure);
 
-                if(sharpness_tags[m_markerIds[i]].size()>5)
+                if(sharpness_tags[m_markerIds[i]].size()>16)
                     sharpness_tags[m_markerIds[i]].removeFirst();
                 sort_list.clear();
                 sort_list.append(sharpness_tags[m_markerIds[i]]);
                 std::sort(sort_list.begin(),sort_list.end());
-                if(sort_list.size()>1 && focusMeasure<0.8*sort_list.at(sort_list.size()/2-1)){
+                if(sort_list.size()==16 && focusMeasure>(sort_list.at(12)+1.5*(sort_list.at(12)-sort_list.at(3))) ){
                     m_markerIds[i]=502100;
                 }
             }
 
             for(int i=0;i<m_markerIds.size();i++){
                 if(m_singleTagSizes.contains(m_markerIds[i])){
-
                     std::vector< std::vector<cv::Point2f> > corners;
                     std::vector< cv::Vec3d > rvecs,tvecs;
                     corners.push_back(m_markerCorners[i]);
@@ -359,9 +393,16 @@ void DetectionTask::doWork()
                                                        m_rotationOpencvToOpenGL* measur_quad.fromEulerAngles(rvec.at <double>(0),rvec.at <double>(1),rvec.at <double>(2)));
                     }
                 }
+                else{
+                    QString string_id=QString::number(m_markerIds[i]);
+                    if(m_LKFilters.contains(string_id)){
+                        m_LKFilters[string_id]->updateKalmanFilter(tvec,rvec);
+                    }
+                }
             }
 
             for(int i=0;i<m_boards.size();i++){
+                float err;
                 if(cv::aruco::estimatePoseBoard(m_markerCorners,m_markerIds,m_boards[i],m_cv_projectionMatrix,
                                              m_distCoeff,rvec,tvec)){
                     norm=cv::norm(rvec);
@@ -398,8 +439,21 @@ void DetectionTask::doWork()
 //                    cv::aruco::drawAxis(debug,m_cv_projectionMatrix,m_distCoeff,rvec,tvec,10);
 //                    cv::imwrite("test.png",debug);
                 }
+                else{
+                    if(m_LKFilters.contains(m_board_names[i])){
+                        m_LKFilters[m_board_names[i]]->updateKalmanFilter(tvec,rvec);
+                    }
+                }
             }
-
+//            prev_Image=nextFrame;
+//            m_markerIds_prev=m_markerIds;
+//            m_markerCorners_prev.clear();
+//            for(int i=0;i<m_markerCorners.size();i++){
+//                m_markerCorners_prev.push_back(m_markerCorners[i][0]);
+//                m_markerCorners_prev.push_back(m_markerCorners[i][1]);
+//                m_markerCorners_prev.push_back(m_markerCorners[i][2]);
+//                m_markerCorners_prev.push_back(m_markerCorners[i][3]);
+//            }
             frameLock.lock();
             emit objectsReady(poseMap);
         }

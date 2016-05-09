@@ -6,7 +6,7 @@
     samples/cpp/tutorial_code/calib3d/real_time_pose_estimation/
 */
 #include <opencv2/video/tracking.hpp>
-
+#include <QList>
 class LinearKalmanFilter
 {
 public:
@@ -25,7 +25,8 @@ private:
     int nInputs = 0;             // the number of control actions
     double dt = 0.06666;           // time between measurements (1/FPS)
     void init();
-
+    bool measurementsAvailable;
+    QList<double> a1,a2,a3,x,y,z,sort_list;
 };
 
 #endif // LINEARKALMANFILTER_H
