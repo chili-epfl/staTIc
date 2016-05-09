@@ -9,6 +9,9 @@ class QuaternionHelper : public QObject
 public:
     explicit QuaternionHelper(QObject *parent = 0);
     Q_INVOKABLE QVector3D rotateVector(QQuaternion q,QVector3D v);
+    Q_INVOKABLE QQuaternion product(QQuaternion q1,QQuaternion q2);
+    Q_INVOKABLE QQuaternion invert(QQuaternion q);
+
 signals:
 
 public slots:
