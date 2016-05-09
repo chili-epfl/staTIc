@@ -4,7 +4,7 @@ import Qt3D.Input 2.0
 
 import QtQuick 2.0 as QQ2
 import QtPhysics.unofficial 1.0
-
+import "qrc:/ui"
 Entity{
     id:rootEntity
 
@@ -35,30 +35,92 @@ Entity{
     /*The stress relative to th esize and material.
      *If it's 1 or more, it is above the limits*/
     property real relativeAxialStress: 0
-    onRelativeAxialStressChanged: console.log(rootEntity.objectName+":"+relativeAxialStress)
-    property matrix4x4 poseMatrix
 
-    function computeTransform(){
-        var a=Qt.vector3d(0,1,0);
-        var b=extreme1.minus(extreme2).normalized();
-        var axb=a.crossProduct(b);
-        var result=Qt.matrix4x4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
-        if(axb.x!==0 || axb.y!==0 || axb.z!==0){
-            var tmp_ssc=ssc(axb);
-            result=result.plus(tmp_ssc).plus(tmp_ssc.times(tmp_ssc).times((1-a.dotProduct(b))/Math.pow(axb.length(),2)));
-            result.m44=1;
-        }else{
-            if(b.y===-1){
-                result.m11=-1;
-                result.m22=-1;
+    property matrix4x4 poseMatrix
+    property quaternion quaternionTest;
+    property vector3d translationTest;
+    Entity{
+        NumberEntity{
+            id:number_entity
+            number:relativeAxialStress
+
+            QQ2.Behavior on number{
+                QQ2.NumberAnimation{
+                    duration:2000
+                }
+            }
+//            QQ2.Behavior on number{
+//                QQ2.SequentialAnimation{
+//                    QQ2.ParallelAnimation{
+//                        QQ2.NumberAnimation{
+//                            duration:200
+//                            easing: Easing.OutExpo
+//                            target: number_entity.color
+//                            property:"alpha"
+//                            to:1
+//                        }
+//                        QQ2.NumberAnimation{
+//                            duration:2000
+//                        }
+//                    }
+//                    QQ2.NumberAnimation{
+//                        duration:5000
+//                        easing: Easing.InExpo
+//                        target: number_entity.color
+//                        property:"alpha"
+//                        to:0
+//                    }
+//                }
+//            }
+            color:PhongAlphaMaterial{
+                  diffuse:Qt.hsla(Math.max(0.33*(1-number_entity.number),0),1,0.5)
+                  alpha:text_color_alpha
             }
         }
-        var center=extreme1.plus(extreme2).times(0.5);
-        result.m14=center.x;
-        result.m24=center.y;
-        result.m34=center.z;
-        poseMatrix=result;
+        Transform{
+            id:text_transform
+            translation:Qt.vector3d(10,0,0)
+            rotation:quaternion_helper.invert(quaternionTest)
+            scale: 2
+        }
+        components:[text_transform]
     }
+
+//    function computeTransform(){
+//        var a=Qt.vector3d(0,1,0);
+//        var b=extreme1.minus(extreme2).normalized();
+//        var axb=a.crossProduct(b);
+//        var result=Qt.matrix4x4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+//        if(axb.x!==0 || axb.y!==0 || axb.z!==0){
+//            var tmp_ssc=ssc(axb);
+//            result=result.plus(tmp_ssc).plus(tmp_ssc.times(tmp_ssc).times((1-a.dotProduct(b))/Math.pow(axb.length(),2)));
+//            result.m44=1;
+//        }else{
+//            if(b.y===-1){
+//                result.m11=-1;
+//                result.m22=-1;
+//            }
+//        }
+//        var center=extreme1.plus(extreme2).times(0.5);
+//        result.m14=center.x;
+//        result.m24=center.y;
+//        result.m34=center.z;
+//        poseMatrix=result;
+//    }
+    function computeTransform(){
+        var b=extreme2.minus(extreme1).normalized();
+        quaternionTest=transform.fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+        if(b.x!=1 && b.x!=-1){
+            var axis=Qt.vector3d(1,0,0).crossProduct(b).normalized();
+            var angle=Math.acos(Qt.vector3d(1,0,0).dotProduct(b));
+            quaternionTest=quaternion_helper.product(transform.fromAxisAndAngle(axis, angle*180.0/Math.PI),quaternionTest)
+        }
+        var center=extreme1.plus(extreme2).times(0.5);
+        translationTest.x=center.x;
+        translationTest.y=center.y;
+        translationTest.z=center.z;
+    }
+
     function ssc(v){
         var matrix=Qt.matrix4x4(0, -v.z, v.y, 0,
                                 v.z, 0, -v.x, 0,
@@ -98,7 +160,9 @@ Entity{
 
     Transform{
         id:transform
-        matrix: poseMatrix
+        rotation:quaternionTest
+        translation:translationTest
+        //matrix: poseMatrix
     }
 
     components: [transform]
@@ -139,8 +203,8 @@ Entity{
             property real s: relativeAxialStress > 0.0001 ? Math.min(relativeAxialStress+0.15,1) : relativeAxialStress
             property real h: axialForceType>0 ? (0)/360 : (240)/360
             ambient:Qt.hsla(h,s,0.5)
-            diffuse:"grey"
-            specular:"black"
+            //diffuse:"black"
+            //specular:ambient
             shininess:0
             alpha:0.85
             QQ2.Behavior on ambient{
