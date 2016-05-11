@@ -174,15 +174,8 @@ DISTFILES += \
     Resources/Assets3D/solar_pannel/Solar.obj \
     Resources/Assets3D/tonweight/tonweight.obj \
     Resources/Assets3D/waterTank/watertank.obj \
-    Resources/Assets3D/girl/girl.asset~ \
-    Resources/Assets3D/jacuzzi/jacuzzi.asset~ \
-    Resources/Assets3D/snow/snow.asset~ \
-    Resources/Assets3D/solar_pannel/solar_pannel.asset~ \
-    Resources/Assets3D/tonweight/watertank.asset~ \
-    Resources/Assets3D/waterTank/watertank.asset~ \
     Resources/Assets3D/girl/texture.jpg \
     Resources/Assets3D/jacuzzi/jacuzzi.jpg \
-    Resources/Assets3D/solar_pannel/preview.jpg \
     Resources/Materials/oak.jpeg \
     Resources/Assets3D/jacuzzi/layout.png \
     Resources/Assets3D/snow/texture.png \
@@ -196,7 +189,6 @@ DISTFILES += \
     Resources/Assets3D/tonweight/watertank.asset \
     Resources/Assets3D/waterTank/watertank.asset \
     Resources/Materials/material1.material \
-    Resources/Assets3D/tonweight/tonweight.asset~ \
     Resources/Assets3D/tonweight/preview.jpg \
     Resources/Assets3D/waterTank/preview.jpg \
     Resources/Assets3D/girl/preview.png \
