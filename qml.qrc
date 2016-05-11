@@ -32,6 +32,8 @@
         <file>Icons/cuttingPlane.png</file>
         <file>Icons/ghost_Mode_on.png</file>
         <file>Icons/ghost_Mode_OFF.png</file>
+        <file>Icons/show_stress_off.png</file>
+        <file>Icons/show_stress_on.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>Images/mainbanner.png</file>
@@ -42,6 +44,10 @@
         <file>Images/coordinate_system.png</file>
         <file>Images/coordinate_system_pressed.png</file>
         <file>Images/designer.png</file>
+        <file>Images/beam_section.png</file>
+        <file>Images/analysis_mode.png</file>
+        <file>Images/compression.png</file>
+        <file>Images/tension.png</file>
     </qresource>
     <qresource prefix="/element_views">
         <file>Element_Views/AnimationUnitDy.qml</file>
@@ -83,6 +89,7 @@
         <file>UI/InfoBoxDesigner.qml</file>
         <file>SynchDialogBox.qml</file>
         <file>MaterialDesigner.qml</file>
+        <file>NumberEntity.qml</file>
     </qresource>
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>
@@ -108,5 +115,31 @@
         <file>AR/SoundEffects/creak_low_2.ogg</file>
         <file>AR/SoundEffects/creak_low_3.ogg</file>
         <file>AR/SoundEffects/creak_low_4.ogg</file>
+    </qresource>
+    <qresource prefix="/UIMesh">
+        <file>3DObjects/8.obj</file>
+        <file>3DObjects/9.obj</file>
+        <file>3DObjects/7.obj</file>
+        <file>3DObjects/6.obj</file>
+        <file>3DObjects/5.obj</file>
+        <file>3DObjects/4.obj</file>
+        <file>3DObjects/2.obj</file>
+        <file>3DObjects/3.obj</file>
+        <file>3DObjects/dot.obj</file>
+        <file>3DObjects/1.obj</file>
+        <file>3DObjects/0.obj</file>
+        <file>3DObjects/O.obj</file>
+        <file>3DObjects/N.obj</file>
+        <file>3DObjects/M.obj</file>
+        <file>3DObjects/L.obj</file>
+        <file>3DObjects/I.obj</file>
+        <file>3DObjects/H.obj</file>
+        <file>3DObjects/G.obj</file>
+        <file>3DObjects/F.obj</file>
+        <file>3DObjects/E.obj</file>
+        <file>3DObjects/D.obj</file>
+        <file>3DObjects/C.obj</file>
+        <file>3DObjects/B.obj</file>
+        <file>3DObjects/A.obj</file>
     </qresource>
 </RCC>

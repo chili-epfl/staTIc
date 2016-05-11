@@ -13,6 +13,16 @@ Entity {
 
     property var segments: []
     property bool play: true
+
+    property string extreme1_name;
+    property string extreme2_name;
+    onExtreme1_nameChanged:
+        if(extreme1_name.length>0)
+            extreme1_mesh.source= "qrc:/UIMesh/3DObjects/"+extreme1_name+".obj"
+    onExtreme2_nameChanged:
+        if(extreme2_name.length>0)
+            extreme2_mesh.source= "qrc:/UIMesh/3DObjects/"+extreme2_name+".obj"
+
     onPlayChanged: {
         if(!play)
             deformingMeshMaterial.state=0
@@ -23,7 +33,7 @@ Entity {
     property alias panMode: cameraController.panMode
 
     onResizeChanged: {
-        camera.position=Qt.vector3d( 0.0, 0.0, (0.8*(deformingMesh.length))/Math.tan(camera.fieldOfView/2) )
+        camera.position=Qt.vector3d( 0.0, 0.0, (0.9*(deformingMesh.length))/Math.tan(camera.fieldOfView/2) )
         camera.upVector= Qt.vector3d( 0.0, 1.0, 0.0 )
         camera.viewCenter= Qt.vector3d( 0.0, 0.0, 0.0 )
         resize=false;
@@ -121,6 +131,7 @@ Entity {
 //            }
 
             QQ2.SequentialAnimation {
+
                 loops: 1//QQ2.Animation.Infinite
                 running: play
 
@@ -206,29 +217,35 @@ Entity {
             id:extremeSphere
             radius: Math.min(deformingMesh.size.height,deformingMesh.size.width)/3
         }
+        Mesh{
+            id:extreme1_mesh
+        }
+        Mesh{
+            id:extreme2_mesh
+        }
         Entity{
             property var material: PhongMaterial{
                 ambient:"#980000"
-                diffuse:"black"
-                specular:"black"
                 shininess:0
             }
             property var transform: Transform{
-                translation:Qt.vector3d(-extremeSphere.radius-0.05*deformingMesh.length,0,0)
+                translation:Qt.vector3d(-20-0.05*deformingMesh.length,0,0)
+                rotation:fromEulerAngles(-90,-90,-90)
+                scale:2
             }
-            components: [extremeSphere,material,transform]
+            components: [extreme1_mesh,material,transform]
         }
         Entity{
             property var material: PhongMaterial{
                 ambient:"#479800"
-                diffuse:"black"
-                specular:"black"
                 shininess:0
             }
             property var transform: Transform{
-                translation:Qt.vector3d(extremeSphere.radius+(1.05)*deformingMesh.length,0,0)
+                translation:Qt.vector3d(10+(1.05)*deformingMesh.length,0,0)
+                rotation:fromEulerAngles(-90,-90,-90)
+                scale:2
             }
-            components: [extremeSphere,material,transform]
+            components: [extreme2_mesh,material,transform]
         }
         Entity{
             property var material: PhongMaterial{

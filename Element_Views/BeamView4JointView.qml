@@ -70,8 +70,6 @@ Entity{
             globalForceExtreme1=ab.plus(shearY).plus(shearZ);
 
 
-
-
     }
 
     property real scaleFactor: Math.min(2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 1,3)
@@ -132,6 +130,7 @@ Entity{
     }
 
     Entity{
+        enabled: root.axialForceType!==0
         AnimationUnitDx{
             unitId: 0
             unitMesh: tiny_arrow

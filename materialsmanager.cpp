@@ -181,7 +181,9 @@ QVariant MaterialsManager::get(int index, QString info) const
     else if(info.compare("fvk",Qt::CaseInsensitive)==0){
         return m_materials[m_materialsIndex[index]].fvk;
     }
-
+    else if(info.compare("name",Qt::CaseInsensitive)==0){
+        return m_materials[m_materialsIndex[index]].name;
+    }
 
 
     return QVariant();
@@ -223,7 +225,9 @@ QVariant MaterialsManager::get(QString uniqueID, QString info) const
     else if(info.compare("fvk",Qt::CaseInsensitive)==0){
         return m_materials[uniqueID].fvk;
     }
-
+    else if(info.compare("name",Qt::CaseInsensitive)==0){
+        return m_materials[uniqueID].name;
+    }
 
     return QVariant();
 

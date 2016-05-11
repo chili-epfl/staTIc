@@ -17,8 +17,12 @@ Entity{
     property vector3d extreme1
     property vector3d extreme2
 
+    property string extreme1_name;
+    property string extreme2_name;
+
     onExtreme1Changed: computeTransform()
     onExtreme2Changed: computeTransform()
+
 
     property real length: extreme1.minus(extreme2).length()
 
@@ -49,37 +53,14 @@ Entity{
                     duration:2000
                 }
             }
-//            QQ2.Behavior on number{
-//                QQ2.SequentialAnimation{
-//                    QQ2.ParallelAnimation{
-//                        QQ2.NumberAnimation{
-//                            duration:200
-//                            easing: Easing.OutExpo
-//                            target: number_entity.color
-//                            property:"alpha"
-//                            to:1
-//                        }
-//                        QQ2.NumberAnimation{
-//                            duration:2000
-//                        }
-//                    }
-//                    QQ2.NumberAnimation{
-//                        duration:5000
-//                        easing: Easing.InExpo
-//                        target: number_entity.color
-//                        property:"alpha"
-//                        to:0
-//                    }
-//                }
-//            }
             color:PhongAlphaMaterial{
                   diffuse:Qt.hsla(Math.max(0.33*(1-number_entity.number),0),1,0.5)
-                  alpha:text_color_alpha
+                  alpha:infobox.current_item == rootEntity || sceneRoot.show_stress_ratio ? 1 : text_color_alpha
             }
         }
         Transform{
             id:text_transform
-            translation:Qt.vector3d(10,0,0)
+            translation:Qt.vector3d(10,0,10)
             rotation:quaternion_helper.invert(quaternionTest)
             scale: 2
         }
@@ -135,10 +116,10 @@ Entity{
         id:mainMesh
         radius: 1
         length: 25
-        enabled:  applicationRoot.currentViewFilter=='DESIGNER'
+        enabled:  true/*applicationRoot.currentViewFilter=='DESIGNER'
                   && infobox.current_item == rootEntity
                   && backgroundsubtraction.entropy < .10
-                  ? true : false
+                  ? true : false*/
     }
 
     QQ2.NumberAnimation{
@@ -188,12 +169,12 @@ Entity{
     /*Overview related part*/
     Entity{
         id:overview_entity
-        enabled: backgroundsubtraction.entropy < .10
+        enabled: true/*backgroundsubtraction.entropy < .10
                  && (
                     (applicationRoot.currentViewFilter=='BEAM'
                         && (infobox.current_item == null || infobox.current_item == rootEntity))
                      || applicationRoot.currentViewFilter=='DESIGNER')
-                 ? true : false
+                 ? true : false*/
         SphereMesh{
             id:overview_mesh
             radius: 10
@@ -228,6 +209,7 @@ Entity{
 
     /*-----Reference bodies----*/
     Entity{
+        enabled: false
         components: [
             SphereMesh{
                 id:extreme1Ref
@@ -248,6 +230,7 @@ Entity{
             } ]
     }
     Entity{
+        enabled: false
         components: [
             SphereMesh{
                 id:extreme2Ref
@@ -342,8 +325,8 @@ Entity{
         alpha:0.00
     }
     Entity{
-        enabled: applicationRoot.currentViewFilter=='BEAM' ||
-                 applicationRoot.currentViewFilter=='DESIGNER' ? true : false
+        enabled: true /*applicationRoot.currentViewFilter=='BEAM' ||
+                 applicationRoot.currentViewFilter=='DESIGNER' ? true : false*/
         property Transform transform: Transform{
             rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
         }
@@ -352,7 +335,11 @@ Entity{
             onEntered: {current_anchor_position=Qt.vector3d(0,0,0);
                         }
             onClicked: {
-                if(parent.enabled)
+                if(parent.enabled && applicationRoot.currentViewFilter!='DESIGNER'){
+                    applicationRoot.currentViewFilter='BEAM'
+                    infobox.current_item=rootEntity
+                }
+                else if(parent.enabled && applicationRoot.currentViewFilter=='DESIGNER')
                     infobox.current_item=rootEntity
             }
         }
@@ -361,8 +348,8 @@ Entity{
     NodeInstantiator {
         model: (length-40)/(4*(drag_mesh.radius+2))-1;
         delegate:Entity{
-            enabled: applicationRoot.currentViewFilter=='BEAM' ||
-                     applicationRoot.currentViewFilter=='DESIGNER' ? true : false
+            enabled: true/*applicationRoot.currentViewFilter=='BEAM' ||
+                     applicationRoot.currentViewFilter=='DESIGNER' ? true : false*/
             property Transform transform: Transform{
                 rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
                 translation:Qt.vector3d(0,(index+1)*(2*(drag_mesh.radius+2)),0)
@@ -381,8 +368,8 @@ Entity{
     NodeInstantiator {
         model: (length-40)/(4*(drag_mesh.radius+2))-1;
         delegate:Entity{
-            enabled: applicationRoot.currentViewFilter=='BEAM' ||
-                     applicationRoot.currentViewFilter=='DESIGNER' ? true : false
+            enabled: true/*applicationRoot.currentViewFilter=='BEAM' ||
+                     applicationRoot.currentViewFilter=='DESIGNER' ? true : false*/
              property Transform transform: Transform{
                 id:drag_transform
                 rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)

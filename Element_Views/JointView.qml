@@ -8,12 +8,12 @@ Entity{
 
     property var connected_beams: []
 
-    property bool visible:  backgroundsubtraction.entropy < .10
+    property bool visible:  true/*backgroundsubtraction.entropy < .10
                             && (
                                (applicationRoot.currentViewFilter=='JOINT'
                                    && (infobox.current_item == null || infobox.current_item == root))
                                 || applicationRoot.currentViewFilter=='DESIGNER')
-                            ? true : false
+                            ? true : false*/
 
     property vector3d position
     property vector3d reaction
@@ -96,15 +96,42 @@ Entity{
            radius: 10
        }
 
-       property ObjectPicker objectPicker: ObjectPicker {
-                   hoverEnabled: false
-                   onClicked: {
-                       if(root.visible)
-                            infobox.current_item=root
-                   }
-       }
-       components: [objectPickerMesh,objectPicker]
+
+       components: [objectPickerMesh]
     }
+
+    Entity{
+
+        Mesh{
+            id:label_mesh
+            source: "qrc:/UIMesh/3DObjects/"+root.objectName+".obj"
+        }
+        Transform{
+            id:label_transform
+            translation:Qt.vector3d(0,10,5)
+            rotation:fromEulerAngles(0,-90,-90)/*quaternion_helper.invert(structure_tag.rotationQuaternion)*/
+            scale: 2
+        }
+        PhongMaterial{
+            id:label_material
+            ambient:"#2C3539"
+
+        }
+        ObjectPicker {
+            id:label_picker
+            hoverEnabled: false
+            onClicked: {
+                if(applicationRoot.currentViewFilter!='DESIGNER'){
+                    applicationRoot.currentViewFilter='JOINT'
+                    infobox.current_item=root
+                }
+            }
+        }
+        components: [label_mesh,label_transform,label_material,label_picker]
+
+    }
+
+
 
     Mesh{
         id:tiny_arrow

@@ -13,6 +13,7 @@ import "qrc:/tools/Tools/TangibleTrapzLoad"
 import "qrc:/tools/Tools/Snow"
 
 import "qrc:/ui/UI/"
+import "qrc:/ui"
 
 Entity {
     id: sceneRoot
@@ -32,6 +33,7 @@ Entity {
     property alias structureEntity: structureEntity
 
     property bool ghostMode: false
+    property bool show_stress_ratio:false
     property int globalNumericAnimation;
     QQ2.NumberAnimation on globalNumericAnimation{
         duration: 10000
@@ -40,6 +42,13 @@ Entity {
         running: true
         loops: QQ2.Animation.Infinite
     }
+
+
+
+
+
+
+
     Camera {
         id: camera
         objectName: "camera"
@@ -95,7 +104,8 @@ Entity {
             rotation:structure_tag.rotationQuaternion
             translation:structure_tag.translation
             QQ2.Component.onCompleted:
-                structure_tag.appendQuaternion(fromAxisAndAngle(1,1,1,120))
+                //structure_tag.appendQuaternion(fromAxisAndAngle(1,1,1,120))
+                structure_tag.appendQuaternion(fromAxisAndAngle(1,0,0,90))
         }
 
         components: [structureLoaderTransform]
@@ -136,6 +146,9 @@ Entity {
         }*/
 //        Snow{
 //        }
+
+
+
     }
 
 //    TangibleTrapzLoad{

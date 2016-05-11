@@ -286,6 +286,45 @@ Entity {
         /*End Solution 1*/
 
         /*Solution 2*/
+//        Entity{
+//            TorusMesh{
+//                id:inner_level_edge_mesh
+//                minorRadius: 0.1
+//                radius: 5
+//            }
+//            PhongMaterial{
+//                id:edge_material
+//                ambient:"black"
+//                diffuse:"black"
+//            }
+//            components: [inner_level_edge_mesh,edge_material]
+//        }
+//        Entity{
+//            TorusMesh{
+//                id:outer_level_edge_mesh
+//                minorRadius: inner_level_edge_mesh.minorRadius
+//                radius: 2*inner_level_edge_mesh.radius
+//            }
+//            components: [outer_level_edge_mesh,edge_material]
+
+//            Entity{
+//                SphereMesh{
+//                    id:green_bubble_mesh
+//                    radius: outer_level_edge_mesh.radius-0.1
+
+//                }
+//                PhongAlphaMaterial{
+//                    id:green_bubble_material
+//                    ambient:"#b3ff00"
+//                    diffuse:"#b3ff00"
+//                    alpha:0.6
+//                }
+
+//                components: [green_bubble_mesh,green_bubble_material]
+
+//            }
+//        }
+
 
         Entity{
            enabled: true;
@@ -356,7 +395,7 @@ Entity {
     }
     DiffuseMapMaterial {
                 id: test_material
-                diffuse: "qrc:/materials/statics/Materials/oak.jpeg"
+                diffuse: "qrc:/images/Images/woodbackground.png"
                 specular: Qt.rgba( 0.2, 0.2, 0.2, 1.0 )
                 shininess: 2.0
     }

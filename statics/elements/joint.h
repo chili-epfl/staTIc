@@ -58,6 +58,7 @@ private:
     QList<WeakBeamPtr> m_connected_beams;
 
     bool  m_support_X,m_support_Y,m_support_Z,m_support_XX,m_support_YY,m_support_ZZ;
+
 };
 
 typedef QSharedPointer<Joint> JointPtr;

@@ -56,6 +56,8 @@ void BeamVM::initView(){
 
     m_component3D->setProperty("extreme1",extreme1.toStrongRef()->scaledPosition());
     m_component3D->setProperty("extreme2",extreme2.toStrongRef()->scaledPosition());
+    m_component3D->setProperty("extreme1_name",extreme1.toStrongRef()->objectName());
+    m_component3D->setProperty("extreme2_name",extreme2.toStrongRef()->objectName());
 
     onParametersChanged();
     onBeamAxialStressChanged();

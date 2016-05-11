@@ -44,13 +44,13 @@ Rectangle{
         }
         ListElement {
             name: "BEAM"
-            imageSource: "qrc:/images/Images/wood_beam.png"
+            imageSource: "qrc:/images/Images/analysis_mode.png"
         }
 
-        ListElement {
-            name: "JOINT"
-            imageSource: "qrc:/images/Images/wood_joint.png"
-        }
+//        ListElement {
+//            name: "JOINT"
+//            imageSource: "qrc:/images/Images/wood_joint.png"
+//        }
 
     }
 

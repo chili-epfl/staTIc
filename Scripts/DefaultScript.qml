@@ -33,6 +33,27 @@ Item{
         id:quaternion_helper
     }
 
+    property real text_color_alpha:0.0
+    SequentialAnimation{
+        id:text_animation
+        NumberAnimation{
+            duration:200
+            easing: Easing.OutExpo
+            target: applicationRoot
+            property:"text_color_alpha"
+            from:0.0
+            to:1
+        }
+        PauseAnimation { duration: 3000 }
+        NumberAnimation{
+            duration:5000
+            easing: Easing.InExpo
+            target: applicationRoot
+            property:"text_color_alpha"
+            to:0
+        }
+    }
+
     state: "LoadingCamera"
     states: [
         State {
@@ -165,6 +186,7 @@ Item{
                 pageExit();
             }
         }
+        onUpdated: text_animation.restart()
     }
 
     property alias materialsManager: staticsmodule.materialsManager
@@ -188,7 +210,7 @@ Item{
          imageCapture.resolution: "640x480" //Android sets the viewfinder resolution as the capture one
          viewfinder.resolution:"640x480"
          focus {
-                     focusMode: Camera.FocusMacro
+                     focusMode: Camera.FocusContinuous
                      focusPointMode: Camera.FocusPointAuto
                  }
          imageProcessing {
@@ -263,6 +285,65 @@ Item{
                 InfoBox{
                     id:infobox
                     width:Math.max(parent.width/3,pt2px(142))//5cm
+
+                }
+                Item{
+                    id:legend_item
+                    anchors.bottom: parent.top
+                    width: parent.width
+                    height: parent.parent.border.width
+                        Text{
+                            width: parent.width/2
+                            text:"Axial Forces:"
+                            font.family: "Arial"
+                            font.bold: true
+                            color:"white"
+                            font.pixelSize: legend_item.height/2
+                            fontSizeMode: Text.Fit;
+                            anchors.right: parent.horizontalCenter
+                            anchors.verticalCenter: parent.verticalCenter
+                            horizontalAlignment: Image.AlignRight
+                            anchors.rightMargin: 5
+                        }
+                        Image{
+                            id:compression_image
+                            anchors.left: parent.horizontalCenter
+                            anchors.verticalCenter: parent.verticalCenter
+                            height: legend_item.height/3
+                            fillMode: Image.PreserveAspectFit
+                            source:"qrc:/images/Images/compression.png"
+                            anchors.leftMargin: 20
+                        }
+                        Text{
+                            id:compression_label
+                            anchors.left: compression_image.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            text:"Compression"
+                            font.family: "Arial"
+                            color:"white"
+                            font.pixelSize: legend_item.height/3
+                            fontSizeMode: Text.Fit;
+                            anchors.leftMargin: 2
+                        }
+                        Image{
+                            id:tension_image
+                            anchors.left: compression_label.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            height:  legend_item.height/3
+                            fillMode: Image.PreserveAspectFit
+                            source:"qrc:/images/Images/tension.png"
+                            anchors.leftMargin: 10
+                        }
+                        Text{
+                            anchors.left: tension_image.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            text:"Tension"
+                            font.family: "Arial"
+                            color:"white"
+                            font.pixelSize: legend_item.height/3
+                            fontSizeMode: Text.Fit;
+                            anchors.leftMargin: 2
+                        }
                 }
 
                 Image {
@@ -281,6 +362,7 @@ Item{
                     }
                 }
                 Image {
+                    id:ghostMode_button
                     anchors.bottom: parent.bottom
                     anchors.left: ar_button.right
                     anchors.margins: 10
@@ -292,6 +374,20 @@ Item{
                     MouseArea{
                         anchors.fill: parent
                         onClicked: scene3D.ghostMode = !scene3D.ghostMode
+                    }
+                }
+                Image {
+                    anchors.bottom: parent.bottom
+                    anchors.left: ghostMode_button.right
+                    anchors.margins: 10
+                    width: 100
+                    height: 100
+                    source: scene3D.show_stress_ratio?
+                                "qrc:/icons/Icons/show_stress_on.png" :
+                                "qrc:/icons/Icons/show_stress_off.png"
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: scene3D.show_stress_ratio = !scene3D.show_stress_ratio
                     }
                 }
                 Image {
