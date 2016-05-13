@@ -1,7 +1,11 @@
 #include "linearkalmanfilter.h"
 #include <QDebug>
-LinearKalmanFilter::LinearKalmanFilter()
+LinearKalmanFilter::LinearKalmanFilter():
+    m_last_est_rvec(3, 1, CV_64F),
+    m_last_est_tvec(3, 1, CV_64F)
+
 {
+    estimate_was_measurement_based=false;
     measurementsAvailable=false;
     init();
 }
@@ -9,7 +13,7 @@ LinearKalmanFilter::LinearKalmanFilter()
 void LinearKalmanFilter::init()
 {
     KF.init(nStates, nMeasurements, nInputs, CV_64F);                 // init Kalman Filter
-    cv::setIdentity(KF.processNoiseCov, cv::Scalar::all(1e-4));       // set process noise
+    cv::setIdentity(KF.processNoiseCov, cv::Scalar::all(1e-3));       // set process noise
     cv::setIdentity(KF.measurementNoiseCov, cv::Scalar::all(1e-3));   // set measurement noise
     KF.measurementNoiseCov.at<double>(3,3)=1e-3;
     KF.measurementNoiseCov.at<double>(4,4)=1e-3;
@@ -93,21 +97,31 @@ void LinearKalmanFilter::updateKalmanFilter(cv::Mat &translation_estimated, cv::
     // The "correct" phase that is going to use the predicted value and our measurement
 
     cv::Mat estimated;
-    if(measurementsAvailable)
+    if(measurementsAvailable){
+        estimate_was_measurement_based=true;
         estimated= KF.correct(measurements);
-    else
+    }
+    else{
+        estimate_was_measurement_based=false;
         estimated=prediction;
-
+    }
     // Estimated translation
     translation_estimated.at<double>(0) = estimated.at<double>(0);
     translation_estimated.at<double>(1) = estimated.at<double>(1);
     translation_estimated.at<double>(2) = estimated.at<double>(2);
 
+    m_last_est_tvec.at<double>(0) = estimated.at<double>(0);
+    m_last_est_tvec.at<double>(1) = estimated.at<double>(1);
+    m_last_est_tvec.at<double>(2) = estimated.at<double>(2);
+
     // Estimated euler angles
-    cv::Mat eulers_estimated(3, 1, CV_64F);
-    eulers_estimated.at<double>(0) = estimated.at<double>(9);
-    eulers_estimated.at<double>(1) = estimated.at<double>(10);
-    eulers_estimated.at<double>(2) = estimated.at<double>(11);
+    rotation_estimated.at<double>(0) = estimated.at<double>(9);
+    rotation_estimated.at<double>(1) = estimated.at<double>(10);
+    rotation_estimated.at<double>(2) = estimated.at<double>(11);
+
+    m_last_est_rvec.at<double>(0) = estimated.at<double>(9);
+    m_last_est_rvec.at<double>(1) = estimated.at<double>(10);
+    m_last_est_rvec.at<double>(2) = estimated.at<double>(11);
 
     //  double a1_sum=0,a2_sum=0,a3_sum=0;
     //  for(int i=0;i<a1.size();i++){
@@ -122,11 +136,21 @@ void LinearKalmanFilter::updateKalmanFilter(cv::Mat &translation_estimated, cv::
     //  eulers_estimated.at<double>(1) = a2_sum;
     //  eulers_estimated.at<double>(2) = a3_sum;
     // Convert estimated quaternion to rotation matrix
-    rotation_estimated = eulers_estimated;
 
 
     measurementsAvailable=false;
 
+}
+
+void LinearKalmanFilter::getLastEstimation(cv::Mat &translation_estimated, cv::Mat &rotation_estimated)
+{
+    translation_estimated.at<double>(0) = m_last_est_tvec.at<double>(0);
+    translation_estimated.at<double>(1) = m_last_est_tvec.at<double>(1);
+    translation_estimated.at<double>(2) = m_last_est_tvec.at<double>(2);
+
+    rotation_estimated.at<double>(0) = m_last_est_rvec.at<double>(0);
+    rotation_estimated.at<double>(1) = m_last_est_rvec.at<double>(1);
+    rotation_estimated.at<double>(2) = m_last_est_rvec.at<double>(2);
 }
 
 float LinearKalmanFilter::findClosestAngle(float from, float to)

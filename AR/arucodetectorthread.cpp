@@ -169,10 +169,15 @@ void ArucoDetectorThread::setPause(bool val)
 DetectionTask::DetectionTask(QMatrix4x4 projectionMatrix)
 {
     m_distCoeff=cv::Mat();
-    m_distCoeff=(cv::Mat_<float>(1,5) <<
-                 4.1105624753282284e-02, 7.9058604507765057e-02,
-                       -2.7890683219554159e-03, 2.8142764725885486e-04,
-                       -4.0278534170454272e-01);
+//    m_distCoeff=(cv::Mat_<float>(1,5) <<
+//                 4.1105624753282284e-02, 7.9058604507765057e-02,
+//                       -2.7890683219554159e-03, 2.8142764725885486e-04,
+//                       -4.0278534170454272e-01);
+
+    m_distCoeff=(cv::Mat_<float>(1,5) <<1.1224532617510330e-01, -2.2484405532605575e-01,
+                 3.1964984777861946e-03, -8.4539818221493670e-03,
+                 -6.8592421730318237e-02);
+
     setProjectionMatrix(projectionMatrix);
     m_dictionary= cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_1000);
     m_detector_params=cv::aruco::DetectorParameters::create();
@@ -292,7 +297,7 @@ void DetectionTask::doWork()
 //                cv::calcOpticalFlowPyrLK(prev_Image,nextFrame,m_markerCorners_prev,m_tracked_corners,status,err);
 //            }
             cv::aruco::detectMarkers(nextFrame,m_dictionary,m_markerCorners,m_markerIds,m_detector_params);
-//            bool skip=false;
+            //            bool skip=false;
 //            for(int i=0;i<m_markerIds_prev.size();i++){
 //                if(status[i*4]==0 || status[i*4+1]==0
 //                   || status[i*4+2]==0 || status[i*4+2]==0  ) continue;
@@ -403,8 +408,23 @@ void DetectionTask::doWork()
 
             for(int i=0;i<m_boards.size();i++){
                 float err;
+                bool useGuess=false;
+                if(m_use_filter && m_LKFilters.contains(m_board_names[i]) && m_LKFilters[m_board_names[i]]->isLastEstimationBasedOnMeasurement()){
+                    useGuess=true;
+                    LinearKalmanFilter* filter=m_LKFilters[m_board_names[i]];
+                    filter->getLastEstimation(tvec,rvec);
+                    QQuaternion q=QQuaternion::fromEulerAngles(rvec.at<double>(0),rvec.at<double>(1),rvec.at<double>(2));
+                    QVector3D axis;
+                    float angle;
+                    q.getAxisAndAngle(&axis,&angle);
+                    rvec.at <double>(0) = axis.x()*CV_PI*angle/180;
+                    rvec.at <double>(1) = axis.y()*CV_PI*angle/180;
+                    rvec.at <double>(2) = axis.z()*CV_PI*angle/180;
+                }
+
                 if(cv::aruco::estimatePoseBoard(m_markerCorners,m_markerIds,m_boards[i],m_cv_projectionMatrix,
-                                             m_distCoeff,rvec,tvec)){
+                                             m_distCoeff,rvec,tvec,useGuess)){
+                    qDebug()<<err;
                     norm=cv::norm(rvec);
                     measur_quad=QQuaternion::fromAxisAndAngle(rvec.at<double>(0)/norm,rvec.at<double>(1)/norm,rvec.at<double>(2)/norm,180.0*norm/CV_PI);
                     if(!m_use_filter){

@@ -58,7 +58,8 @@ private:
     /*This is actually a 3x3 matrix...*/
     QMatrix4x4 m_projectionMatrix;
 
-
+    QTime m_time;
+    int m_ticks=0;
 };
 
 #endif // ARUCODETECTOR_H

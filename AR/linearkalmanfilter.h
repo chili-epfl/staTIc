@@ -15,7 +15,8 @@ public:
     static cv::Mat rot2euler(const cv::Mat &rotationMatrix);
     void fillMeasurements(const cv::Mat &translation_measured, const cv::Mat &rotation_measured);
     void updateKalmanFilter(cv::Mat &translation_estimated, cv::Mat &rotation_estimated);
-
+    void getLastEstimation(cv::Mat &translation_estimated, cv::Mat &rotation_estimated);
+    bool isLastEstimationBasedOnMeasurement(){return estimate_was_measurement_based;}
 private:
     float findClosestAngle(float from, float to);
     cv::Mat measurements;
@@ -23,10 +24,13 @@ private:
     int nStates = 18;            // the number of states
     int nMeasurements = 6;       // the number of measured states
     int nInputs = 0;             // the number of control actions
-    double dt = 0.06666;           // time between measurements (1/FPS)
+    double dt = 1.0/15.0;           // time between measurements (1/FPS)
     void init();
-    bool measurementsAvailable;
+    bool measurementsAvailable,estimate_was_measurement_based;
     QList<double> a1,a2,a3,x,y,z,sort_list;
+
+    cv::Mat m_last_est_rvec,m_last_est_tvec;
+
 };
 
 #endif // LINEARKALMANFILTER_H

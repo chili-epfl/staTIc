@@ -8,21 +8,22 @@ ArucoDetector::ArucoDetector(QQuickItem *parent):
     qRegisterMetaType<PoseMap>("PoseMap");
 
     m_pause=false;
-    m_focalLength=700.0;
+    m_focalLength=700;
     m_cameraResolution=QSizeF(640,480);
-    m_projectionMatrix=QMatrix4x4(
-        m_focalLength,    0,              m_cameraResolution.width()/2, 0 ,
-        0,              m_focalLength,    m_cameraResolution.height()/2, 0,
-        0,              0,              1,  0,
-        0,              0,              0,  1
-                );
 //    m_projectionMatrix=QMatrix4x4(
-//                6.1581830541937018e+02, 0., 3.3236459446643443e+02 ,0,
-//                0., 6.1843429607293592e+02, 2.3152070795454719e+02,0,
-//                0,              0,              1,  0,
-//                0,              0,              0,  1
+//        m_focalLength,    0,              m_cameraResolution.width()/2, 0 ,
+//        0,              m_focalLength,    m_cameraResolution.height()/2, 0,
+//        0,              0,              1,  0,
+//        0,              0,              0,  1
 //                );
+    m_projectionMatrix=QMatrix4x4(
+                6.1029330646666438e+02, 0., 319.5 ,0,
+                0., 6.1038146342831521e+02, 239.5,0,
+                0,              0,              1,  0,
+                0,              0,              0,  1
+                );
     loadConfigurationFiles();
+    m_time.start();
 }
 
 ArucoDetector::~ArucoDetector(){
@@ -99,6 +100,13 @@ void ArucoDetector::updateObserver(QString prevObjId)
 
 void ArucoDetector::notifyObservers(const PoseMap &poses)
 {
+//    if(m_time.elapsed()>1000){
+//        qDebug()<<m_ticks;
+//        m_ticks=1;
+//        m_time.restart();
+//    }else{
+//        m_ticks++;
+//    }
     Q_FOREACH(QString key, m_observers.keys()){
         if(poses.contains(key)){
             Q_FOREACH(ArucoObject* observer, m_observers.values(key)){
