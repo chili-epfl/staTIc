@@ -39,5 +39,5 @@ FP vec3 adsModel( const FP vec3 pos, const FP vec3 n )
 
 void main()
 {
-        gl_FragColor = vec4( adsModel( position, normalize( normal ) ), alpha );
+        gl_FragColor = vec4( adsModel( position, normalize( normal ) ), 0 );
 }

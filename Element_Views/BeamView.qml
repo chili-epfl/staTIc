@@ -5,6 +5,7 @@ import Qt3D.Input 2.0
 import QtQuick 2.0 as QQ2
 import QtPhysics.unofficial 1.0
 import "qrc:/ui"
+import "qrc:/opengl/Opengl"
 Entity{
     id:rootEntity
 
@@ -148,6 +149,36 @@ Entity{
 
     components: [transform]
 
+    Entity{
+        components: [Mesh{
+            source:"qrc:/UIMesh/3DObjects/spring.obj"
+        },
+            Transform{
+                //z:width,x:height,y:lenght
+                //scale3D:Qt.vector3d(17/9,1,35/9)
+                scale3D: axialForceType > 0 ? Qt.vector3d(1,1 + Math.min(relativeAxialStress,1),1) : Qt.vector3d(1,1 -0.8* Math.min(relativeAxialStress,1),1)
+                QQ2.Behavior on scale3D{
+                    QQ2.Vector3dAnimation{
+                        duration: 500
+                    }
+                }
+            }
+        ,
+            PhongMaterial{
+            ambient: "#333333"
+            }
+        ]
+    }
+//    Entity{
+//        components: [CuboidMesh{
+//            xExtent: 17
+//            zExtent: 35
+//            yExtent: 80
+//        },
+//            TransparentMaterial{
+//            }
+//        ]
+//    }
 
     Entity{
 
@@ -176,6 +207,7 @@ Entity{
                      || applicationRoot.currentViewFilter=='DESIGNER')
                  ? true : false*/
         SphereMesh{
+            enabled: false
             id:overview_mesh
             radius: 10
         }
@@ -278,7 +310,7 @@ Entity{
        CuboidMesh{
            enabled: true
            id:pBodyMesh
-           xExtent: 30
+           xExtent: 17
            zExtent: 30
            yExtent: rootEntity.length
 
@@ -298,7 +330,7 @@ Entity{
        }
        PhongAlphaMaterial{
            id:transparentMaterial
-           alpha:0.0
+           alpha:0
        }
        components: [pBodyMesh,pBody,transparentMaterial]
 

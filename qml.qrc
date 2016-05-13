@@ -141,5 +141,6 @@
         <file>3DObjects/C.obj</file>
         <file>3DObjects/B.obj</file>
         <file>3DObjects/A.obj</file>
+        <file>3DObjects/spring.obj</file>
     </qresource>
 </RCC>

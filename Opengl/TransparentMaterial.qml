@@ -1,6 +1,6 @@
 
-import Qt3D 2.0
-import Qt3D.Renderer 2.0
+import Qt3D.Core 2.0
+import Qt3D.Render 2.0
 
 Material {
     id: alphaMaterial
@@ -24,59 +24,30 @@ Material {
 
         ShaderProgram {
             id: alphaPhong
-            vertexShaderCode: loadSource("qrc:/opengl/opengl/phongalpha.vert")
-            fragmentShaderCode: loadSource("qrc:/opengl/opengl/phongalpha.frag")
+            vertexShaderCode: loadSource("qrc:/opengl/Opengl/phongalpha.vert")
+            fragmentShaderCode: loadSource("qrc:/opengl/Opengl/phongalpha.frag")
         }
 
         techniques: [
             Technique
             {
-                openGLFilter {
-                    api: OpenGLFilter.Desktop
-                    profile: OpenGLFilter.None
-                    majorVersion: 2
-                    minorVersion: 0
+                graphicsApiFilter {
+                    api: GraphicsApiFilter.OpenGL
+                    profile: GraphicsApiFilter.CoreProfile
+                    majorVersion: 3
+                    minorVersion: 1
                 }
 
-                renderPasses: RenderPass {
-                    renderStates: [
-                        CullFace { mode : CullFace.Back },
-                        DepthTest { func: DepthTest.Less },
-                        DepthMask { mask: false },
-                        BlendState {
-                            srcRGB: BlendState.SrcAlpha
-                            dstRGB: BlendState.OneMinusSrcAlpha
-                        }
-                        ,BlendEquation {mode: BlendEquation.FuncAdd}
-                    ]
+                annotations: [ Annotation { name: "renderingStyle"; value: "forward" } ]
+                renderPasses: [
+                    RenderPass {
 
-                    shaderProgram: alphaPhong
-                }
-            },
-            Technique
-            {
-                openGLFilter {
-                    api: OpenGLFilter.ES
-                    profile: OpenGLFilter.None
-                    majorVersion: 2
-                    minorVersion: 0
-                }
 
-                renderPasses: RenderPass {
-                    renderStates: [
-                        CullFace { mode : CullFace.Back },
-                        DepthTest { func: DepthTest.Less },
-                        DepthMask { mask: false },
-                        BlendState {
-                            srcRGB: BlendState.SrcAlpha
-                            dstRGB: BlendState.OneMinusSrcAlpha
-                        }
-                        ,BlendEquation {mode: BlendEquation.FuncAdd}
-                    ]
+                        shaderProgram: alphaPhong
+                    }
+                ]
 
-                    shaderProgram: alphaPhong
-                }
-            }
+           }
         ]
     }
 }
