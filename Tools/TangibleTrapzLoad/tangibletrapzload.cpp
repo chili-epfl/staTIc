@@ -67,7 +67,7 @@ void TangibleTrapzLoad::onCollision(Physics::PhysicsCollisionEventPtr e)
             onForceChanged();
             updatePosition();
             /*Injecting an Entity in the beam representation*/
-            //create3DComponent(beam_vm->component3D(),e->contactPointOnTargetLocal());
+            create3DComponent(beam_vm->component3D(),e->contactPointOnTargetLocal());
             /*........*/
             m_parentEntity->setProperty("tangibleSection",beam_vm->component3D()->property("tangibleSection"));
             m_forceUpdate=false;

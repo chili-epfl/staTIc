@@ -31,9 +31,8 @@ Entity {
 
     ArucoObject{
        id:tag
-       objectId: "203"
+       objectId: "load"
        QQ2.Component.onCompleted: aruco.registerObserver(this)
-       onRotationChanged: console.log(rotation)
     }
 
     /*Graphical rapresentation*/
@@ -81,35 +80,35 @@ Entity {
         }
     }
 
-    EntityLoader{
-        id:entity_loader
-        source:"qrc:/tools/Tools/TangibleTrapzLoad/TangibleTrapzLoad_InjectedEntity.qml"
-        QQ2.Binding{
-            target: entity_loader.entity
-            when: entity_loader.entity
-            property:"offsetAugmentation"
-            value: Qt.vector3d(0,tangibleSection.height/2,-tangibleSection.width/2)//tangibleSection.height/2
-        }
-        QQ2.Binding{
-            target: entity_loader.entity
-            when: entity_loader.entity
-            property:"selected"
-            value: selected
-        }
-        QQ2.Binding{
-            target: entity_loader.entity
-            when: entity_loader.entity
-            property:"asset3DTextureURL"
-            value: asset3DTextureURL
-        }
-        QQ2.Binding{
-            target: entity_loader.entity
-            when: entity_loader.entity
-            property:"asset3DMeshURL"
-            value: asset3DMeshURL
-        }
+//    EntityLoader{
+//        id:entity_loader
+//        source:"qrc:/tools/Tools/TangibleTrapzLoad/TangibleTrapzLoad_InjectedEntity.qml"
+//        QQ2.Binding{
+//            target: entity_loader.entity
+//            when: entity_loader.entity
+//            property:"offsetAugmentation"
+//            value: Qt.vector3d(0,17/2,-34/2)//tangibleSection.height/2
+//        }
+//        QQ2.Binding{
+//            target: entity_loader.entity
+//            when: entity_loader.entity
+//            property:"selected"
+//            value: selected
+//        }
+//        QQ2.Binding{
+//            target: entity_loader.entity
+//            when: entity_loader.entity
+//            property:"asset3DTextureURL"
+//            value: asset3DTextureURL
+//        }
+//        QQ2.Binding{
+//            target: entity_loader.entity
+//            when: entity_loader.entity
+//            property:"asset3DMeshURL"
+//            value: asset3DMeshURL
+//        }
 
-    }
+//    }
 
     components:[objectPicker,collisionSphere,transparentMaterial,sphereBody,collisionTransform]
 
