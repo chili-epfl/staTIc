@@ -80,7 +80,7 @@ Rectangle{
                 }
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: {layoutView.currentIndex = index;root.state=name;}
+                    onClicked: {layoutView.currentIndex = index;root.state=name;infobox.current_item=null}
                 }
             }
             highlight: Rectangle { color: "lightsteelblue"; radius: 5 ; border.color: "red"}

@@ -423,8 +423,7 @@ void DetectionTask::doWork()
                 }
 
                 if(cv::aruco::estimatePoseBoard(m_markerCorners,m_markerIds,m_boards[i],m_cv_projectionMatrix,
-                                             m_distCoeff,rvec,tvec,useGuess)){
-                    qDebug()<<err;
+                                             m_distCoeff,rvec,tvec,useGuess,cv::SOLVEPNP_EPNP)){
                     norm=cv::norm(rvec);
                     measur_quad=QQuaternion::fromAxisAndAngle(rvec.at<double>(0)/norm,rvec.at<double>(1)/norm,rvec.at<double>(2)/norm,180.0*norm/CV_PI);
                     if(!m_use_filter){
