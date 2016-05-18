@@ -18,7 +18,6 @@
 #include "common.h"
 #include "eig.h"
 #include "HPGmatrix.h"
-#include "HPGutil.h"
 #include "NRutil.h"
 #include "coordtrans.h"
 
