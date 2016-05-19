@@ -297,6 +297,7 @@ void DetectionTask::doWork()
 //                cv::calcOpticalFlowPyrLK(prev_Image,nextFrame,m_markerCorners_prev,m_tracked_corners,status,err);
 //            }
             cv::aruco::detectMarkers(nextFrame,m_dictionary,m_markerCorners,m_markerIds,m_detector_params);
+
             //            bool skip=false;
 //            for(int i=0;i<m_markerIds_prev.size();i++){
 //                if(status[i*4]==0 || status[i*4+1]==0
@@ -355,6 +356,30 @@ void DetectionTask::doWork()
                     m_markerIds[i]=502100;
                 }
             }
+            for(int i=0;i<m_markerIds.size();i++){
+                m_tag_ages[m_markerIds.at(i)]=0;
+                m_tags_corners_history[m_markerIds.at(i)]=m_markerCorners.at(i);
+            }
+
+            Q_FOREACH(int id, m_tag_ages){
+                if(m_tag_ages[id]<-5){
+                    m_tag_ages.remove(id);
+                    m_tags_corners_history.remove(id);
+                }
+                else if(m_tag_ages[id]<0){
+                    m_tag_ages[id]=m_tag_ages[id]-1;
+                    m_markerIds.push_back(id);
+                    m_markerCorners.push_back(m_tags_corners_history[id]);
+                }
+            }
+
+
+            bool points_are_cooplanar=true;
+            for(int i=0;i<m_markerIds.size();i++)
+                if(m_markerIds.at(i)%2==0){
+                    points_are_cooplanar=false;
+                    break;
+                }
 
             for(int i=0;i<m_markerIds.size();i++){
                 if(m_singleTagSizes.contains(m_markerIds[i])){
@@ -421,9 +446,10 @@ void DetectionTask::doWork()
                     rvec.at <double>(1) = axis.y()*CV_PI*angle/180;
                     rvec.at <double>(2) = axis.z()*CV_PI*angle/180;
                 }
-
+                int flag=cv::SOLVEPNP_EPNP;
+                if(points_are_cooplanar) flag=0;
                 if(cv::aruco::estimatePoseBoard(m_markerCorners,m_markerIds,m_boards[i],m_cv_projectionMatrix,
-                                             m_distCoeff,rvec,tvec,useGuess,cv::SOLVEPNP_EPNP)){
+                                             m_distCoeff,rvec,tvec,useGuess,flag)){
                     norm=cv::norm(rvec);
                     measur_quad=QQuaternion::fromAxisAndAngle(rvec.at<double>(0)/norm,rvec.at<double>(1)/norm,rvec.at<double>(2)/norm,180.0*norm/CV_PI);
                     if(!m_use_filter){

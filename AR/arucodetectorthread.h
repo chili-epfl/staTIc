@@ -82,6 +82,8 @@ private:
     bool m_use_filter=true;
     QHash<QString,LinearKalmanFilter*> m_LKFilters;
     QQuaternion m_rotationOpencvToOpenGL=QQuaternion::fromAxisAndAngle(1,0,0,180);
+    QHash<int,int> m_tag_ages;
+    QHash<int, std::vector<cv::Point2f>  > m_tags_corners_history;
 };
 
 
