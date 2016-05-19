@@ -175,6 +175,7 @@ DetectionTask::DetectionTask(QMatrix4x4 projectionMatrix)
 //                       -4.0278534170454272e-01);
 
 #if VIDEOFORMAT == 43
+
     m_distCoeff=(cv::Mat_<float>(1,5) <<1.1224532617510330e-01, -2.2484405532605575e-01,
                  3.1964984777861946e-03, -8.4539818221493670e-03,
                  -6.8592421730318237e-02);
