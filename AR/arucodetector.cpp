@@ -16,12 +16,21 @@ ArucoDetector::ArucoDetector(QQuickItem *parent):
 //        0,              0,              1,  0,
 //        0,              0,              0,  1
 //                );
+#if VIDEOFORMAT == 43
     m_projectionMatrix=QMatrix4x4(
                 6.1029330646666438e+02, 0., 319.5 ,0,
                 0., 6.1038146342831521e+02, 239.5,0,
                 0,              0,              1,  0,
                 0,              0,              0,  1
                 );
+#else
+    m_projectionMatrix=QMatrix4x4(
+                5.7446355001778966e+02, 0., 3.9950000000000000e+02 ,0,
+                0., 5.7415636327290406e+02, 2.2350000000000000e+02,0,
+                0,              0,              1,  0,
+                0,              0,              0,  1
+                );
+#endif
     loadConfigurationFiles();
     m_time.start();
 }

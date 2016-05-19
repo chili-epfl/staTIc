@@ -209,6 +209,8 @@ Item{
          }
          imageCapture.resolution: "640x480" //Android sets the viewfinder resolution as the capture one
          viewfinder.resolution:"640x480"
+//         imageCapture.resolution: "800x448" //Android sets the viewfinder resolution as the capture one
+//         viewfinder.resolution:"800x448"
          focus {
                      focusMode: Camera.FocusContinuous
                      focusPointMode: Camera.FocusPointAuto
@@ -251,8 +253,8 @@ Item{
          anchors.fill: parent
          source: camDevice
          filters:[aruco]
-         fillMode:VideoOutput.PreserveAspectCrop
-         onContentRectChanged: console.log(contentRect)
+         fillMode:VideoOutput.PreserveAspectFit
+
          Rectangle{
              anchors.fill: parent
              color:"#00000000"
@@ -260,12 +262,9 @@ Item{
                            Math.sqrt(4*(parent.width+parent.height)*(parent.width+parent.height)
                                      -16*(1-0.8)*(parent.width*parent.height))) //80% of screen
              border.color: "#80000000"
+
              Scene3D {
-                 x:viewFinder.contentRect.x
-                 y:viewFinder.contentRect.y
-                 width: viewFinder.contentRect.width
-                 height:  viewFinder.contentRect.height
-                 //anchors.fill: parent
+                 anchors.fill: parent
                  focus: true
                  aspects: ["input","physics"]
                  //aspects:["input"]
@@ -274,6 +273,7 @@ Item{
                      id:scene3D
                  }
              }
+
              Rectangle{
                 anchors.centerIn: parent
                 width: parent.width -2*parent.border.width
