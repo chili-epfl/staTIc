@@ -361,7 +361,7 @@ void DetectionTask::doWork()
                 m_tags_corners_history[m_markerIds.at(i)]=m_markerCorners.at(i);
             }
 
-            Q_FOREACH(int id, m_tag_ages){
+            Q_FOREACH(int id, m_tag_ages.keys()){
                 if(m_tag_ages[id]<-5){
                     m_tag_ages.remove(id);
                     m_tags_corners_history.remove(id);
@@ -370,6 +370,9 @@ void DetectionTask::doWork()
                     m_tag_ages[id]=m_tag_ages[id]-1;
                     m_markerIds.push_back(id);
                     m_markerCorners.push_back(m_tags_corners_history[id]);
+                }
+                else{
+                    m_tag_ages[id]=m_tag_ages[id]-1;
                 }
             }
 
