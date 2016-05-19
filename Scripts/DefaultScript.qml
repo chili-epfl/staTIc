@@ -252,6 +252,7 @@ Item{
          source: camDevice
          filters:[aruco]
          fillMode:VideoOutput.PreserveAspectCrop
+         onContentRectChanged: console.log(contentRect)
          Rectangle{
              anchors.fill: parent
              color:"#00000000"
@@ -260,7 +261,11 @@ Item{
                                      -16*(1-0.8)*(parent.width*parent.height))) //80% of screen
              border.color: "#80000000"
              Scene3D {
-                 anchors.fill: parent
+                 x:viewFinder.contentRect.x
+                 y:viewFinder.contentRect.y
+                 width: viewFinder.contentRect.width
+                 height:  viewFinder.contentRect.height
+                 //anchors.fill: parent
                  focus: true
                  aspects: ["input","physics"]
                  //aspects:["input"]
