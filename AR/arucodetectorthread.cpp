@@ -174,10 +174,15 @@ DetectionTask::DetectionTask(QMatrix4x4 projectionMatrix)
 //                       -2.7890683219554159e-03, 2.8142764725885486e-04,
 //                       -4.0278534170454272e-01);
 
+#if VIDEOFORMAT == 4_3
     m_distCoeff=(cv::Mat_<float>(1,5) <<1.1224532617510330e-01, -2.2484405532605575e-01,
                  3.1964984777861946e-03, -8.4539818221493670e-03,
                  -6.8592421730318237e-02);
-
+#else
+    m_distCoeff=(cv::Mat_<float>(1,5) <<1.0634465971291887e-01, -2.5039862307498616e-02,
+                 1.5413114762228067e-03, -8.6609040453171499e-03,
+                 -1.0291179278991518e+00 );
+#endif
     setProjectionMatrix(projectionMatrix);
     m_dictionary= cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_1000);
     m_detector_params=cv::aruco::DetectorParameters::create();
@@ -377,13 +382,17 @@ void DetectionTask::doWork()
             }
 
 
-            bool points_are_cooplanar=true;
+            bool found_even=false;
+            bool found_odd=false;
             for(int i=0;i<m_markerIds.size();i++)
                 if(m_markerIds.at(i)%2==0){
-                    points_are_cooplanar=false;
+                    found_even=true;
                     break;
                 }
-
+                else{
+                    found_odd=true;
+                }
+            bool points_are_cooplanar=!(found_even && found_odd);
             for(int i=0;i<m_markerIds.size();i++){
                 if(m_singleTagSizes.contains(m_markerIds[i])){
                     std::vector< std::vector<cv::Point2f> > corners;

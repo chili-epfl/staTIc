@@ -1,7 +1,7 @@
 TEMPLATE = app
 
 QT += qml quick widgets 3dcore 3drender 3dinput multimedia network
-
+DEFINES += VIDEOFORMAT=4_3
 CONFIG += c++11
 SOURCES += main.cpp \
     #statics/two_dimentions/twodimensionalstaticsmodule.cpp \

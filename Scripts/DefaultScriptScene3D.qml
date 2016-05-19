@@ -44,11 +44,6 @@ Entity {
     }
 
 
-
-
-
-
-
     Camera {
         id: camera
         objectName: "camera"
@@ -84,9 +79,8 @@ Entity {
                 id: viewport
                 clearColor: "transparent"
                 camera:camera
-
+                viewportRect:Qt.rect(0, 0, 1, 1)
             }
-
         },
         PhysicsWorldInfo{
             gravity: Qt.vector3d(0,0,0);
