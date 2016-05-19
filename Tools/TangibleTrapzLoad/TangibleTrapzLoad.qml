@@ -31,20 +31,25 @@ Entity {
 
     ArucoObject{
        id:tag
-       objectId: "load"
+       objectId: "240"
        QQ2.Component.onCompleted: aruco.registerObserver(this)
+       onTranslationChanged: console.log(translation)
     }
 
     /*Graphical rapresentation*/
-    SphereMesh{
+    CuboidMesh{
         id:collisionSphere
         enabled: true
-        radius:15
+        property real radius:15
+        xExtent: 15
+        yExtent: 15
+        zExtent: 15
     }
     Transform{
         id:collisionTransform
         translation:tag.translation
         rotation:tag.rotationQuaternion;
+
 //        matrix: {
 //            var m = Qt.matrix4x4();
 //            //m.rotate(-180, Qt.vector3d(1, 0, 0))
@@ -54,9 +59,9 @@ Entity {
 //        }
 
     }
-    PhongAlphaMaterial{
+    PhongMaterial{
         id:transparentMaterial
-        alpha:0.5
+        //alpha:0.5
     }
     PhysicsBodyInfo{
         id:sphereBody
@@ -67,7 +72,7 @@ Entity {
     QuickTangibleTPZLoad{
         id: quickTPZ
         vmManager:vmFrame3DDManager
-        emittingBodyInfo:sphereBody
+        //emittingBodyInfo:sphereBody
         parentEntity:rootEntity
 
     }

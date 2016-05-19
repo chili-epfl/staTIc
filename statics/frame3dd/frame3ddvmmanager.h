@@ -20,9 +20,11 @@ public:
     Qt3DCore::QEntity* getEntity3D(Qt3DCore::QNodeId id);
     AbstractElementViewModel* getAssociatedVM(Qt3DCore::QNodeId id);
     AbstractElementViewModel* getAssociatedVM(Qt3DCore::QEntity*);
+    Q_INVOKABLE Qt3DCore::QEntity *getEntity3D(QString entity_name);
 
     /*Factory methods invoked by the QML side mainly*/
     Q_INVOKABLE void produceTPZForce(Qt3DCore::QEntity* parentEntity, QVariantHash properties=QVariantHash());
+
 
 
 protected slots:
@@ -42,6 +44,7 @@ private:
     Frame3DDKernel* m_staticsModule;
     QHash<Qt3DCore::QEntity*, AbstractElementViewModel*> m_Entity3D2ViewModel;
     QHash<Qt3DCore::QNodeId, Qt3DCore::QEntity* > m_entityID2Entity3D;
+    QHash<QString, Qt3DCore::QEntity* > m_entityNameMap;
 
     QList<qreal> m_previousStresses;
 
