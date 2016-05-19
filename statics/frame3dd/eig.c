@@ -36,7 +36,6 @@
 #include "eig.h"
 #include "common.h" 
 #include "HPGmatrix.h"
-#include "HPGutil.h"
 #include "NRutil.h"
 
 /* #define EIG_DEBUG */

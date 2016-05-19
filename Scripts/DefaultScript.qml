@@ -251,7 +251,7 @@ Item{
          anchors.fill: parent
          source: camDevice
          filters:[aruco]
-
+         fillMode:VideoOutput.PreserveAspectCrop
          Rectangle{
              anchors.fill: parent
              color:"#00000000"
