@@ -35,6 +35,11 @@ Entity {
     property bool ghostMode: false
     property bool show_stress_ratio:false
     property int globalNumericAnimation;
+
+    property real cameraScaleX:1;
+    property real cameraScaleY:1;
+
+
     QQ2.NumberAnimation on globalNumericAnimation{
         duration: 10000
         from:0
@@ -51,10 +56,12 @@ Entity {
         nearPlane : 0.1
         farPlane : clippingPlaneSlider.value
 
-        top: 0.1*(aruco.projectionMatrix.m23/aruco.projectionMatrix.m11)
-        bottom: -0.1*(aruco.projectionMatrix.m23/aruco.projectionMatrix.m11)
-        left: -0.1*(aruco.projectionMatrix.m13/aruco.projectionMatrix.m22)
-        right: 0.1*(aruco.projectionMatrix.m13/aruco.projectionMatrix.m22)
+
+
+        top: 0.1*(aruco.projectionMatrix.m23/(cameraScaleX*aruco.projectionMatrix.m11))
+        bottom: -0.1*(aruco.projectionMatrix.m23/(cameraScaleX*aruco.projectionMatrix.m11))
+        left: -0.1*(aruco.projectionMatrix.m13/(cameraScaleY*aruco.projectionMatrix.m22))
+        right: 0.1*(aruco.projectionMatrix.m13/(cameraScaleY*aruco.projectionMatrix.m22))
 
         position: Qt.vector3d( 0.0, 0.0, 0 )
         upVector: Qt.vector3d( 0.0, 1.0, 0.0 )

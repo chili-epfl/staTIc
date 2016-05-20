@@ -253,8 +253,9 @@ Item{
          anchors.fill: parent
          source: camDevice
          filters:[aruco]
-         fillMode:VideoOutput.PreserveAspectFit
-
+         fillMode:VideoOutput.PreserveAspectCrop
+         onContentRectChanged: {console.log("content",contentRect)
+                                console.log("source",sourceRect)}
          Rectangle{
              anchors.fill: parent
              color:"#00000000"
@@ -264,6 +265,13 @@ Item{
              border.color: "#80000000"
 
              Scene3D {
+                 id:scene3DContainer
+                 onWidthChanged: console.log("window",width,height)
+                 onHeightChanged: console.log("window",width,height)
+//                 x:viewFinder.contentRect.x
+//                 y:viewFinder.contentRect.y
+//                 width: viewFinder.contentRect.width
+//                 height:  viewFinder.contentRect.height
                  anchors.fill: parent
                  focus: true
                  aspects: ["input","physics"]
@@ -271,6 +279,8 @@ Item{
                  multisample:true
                  DefaultScriptScene3D {
                      id:scene3D
+                     cameraScaleX: viewFinder.contentRect.height/scene3DContainer.height
+                     cameraScaleY: viewFinder.contentRect.width/scene3DContainer.width
                  }
              }
 
