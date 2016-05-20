@@ -198,7 +198,7 @@ Entity{
         }
         property Transform offset:Transform{
             rotation:quaternion_helper.product(fromAxisAndAngle(1,0,0,90),fromAxisAndAngle(0,1,0,-90))
-            translation:Qt.vector3d(-10,0,0)
+            translation:Qt.vector3d(-12,0,0)
         }
         components: [mesh,offset,color]
    }
@@ -208,7 +208,7 @@ Entity{
         }
         property Transform offset:Transform{
             rotation:quaternion_helper.product(fromAxisAndAngle(1,0,0,90),fromAxisAndAngle(0,1,0,-90))
-            translation:Qt.vector3d(-2,0,0)
+            translation:Qt.vector3d(-6,0,0)
         }
         components: [mesh,offset,color]
    }
@@ -231,7 +231,7 @@ Entity{
         }
         property Transform offset:Transform{
             rotation:quaternion_helper.product(fromAxisAndAngle(1,0,0,90),fromAxisAndAngle(0,1,0,-90))
-            translation:Qt.vector3d(6,0,0)
+            translation:Qt.vector3d(0,0,0)
         }
         components: [mesh,offset,color]
    }
@@ -242,7 +242,7 @@ Entity{
         }
         property Transform offset:Transform{
             rotation:quaternion_helper.product(fromAxisAndAngle(1,0,0,90),fromAxisAndAngle(0,1,0,-90))
-            translation:Qt.vector3d(14,0,0)
+            translation:Qt.vector3d(6,0,0)
         }
         components: [mesh,offset,color]
    }

@@ -50,13 +50,11 @@ Entity {
 
 
     Camera {
-        id: camera
+        id: scene_camera
         objectName: "camera"
         projectionType: CameraLens.FrustumProjection
         nearPlane : 0.1
         farPlane : clippingPlaneSlider.value
-
-
 
         top: 0.1*(aruco.projectionMatrix.m23/(cameraScaleX*aruco.projectionMatrix.m11))
         bottom: -0.1*(aruco.projectionMatrix.m23/(cameraScaleX*aruco.projectionMatrix.m11))
@@ -81,13 +79,37 @@ Entity {
 
     components: [
         FrameGraph {
-            activeFrameGraph:
-                ForwardRenderer {
-                id: viewport
-                clearColor: "transparent"
-                camera:camera
-                viewportRect:Qt.rect(0, 0, 1, 1)
+            activeFrameGraph:TechniqueFilter {
+                objectName : "techniqueFilter"
+
+                // Select the forward rendering Technique of any used Effect
+                requires: [ Annotation { name: "renderingStyle"; value: "forward" } ]
+
+                // Use the whole viewport
+                Viewport {
+                    id: viewport
+                    objectName : "viewport"
+                    rect: Qt.rect(0.0, 0.0, 1.0, 1.0)
+                    clearColor: "transparent"
+
+                    // Use the specified camera
+                    CameraSelector {
+                        id : cameraSelector
+                        objectName : "cameraSelector"
+                        camera: scene_camera
+                        ClearBuffer {
+                            buffers : ClearBuffer.ColorDepthBuffer
+                            SortMethod {
+                                criteria: [
+                                    SortCriterion { sort: SortCriterion.StateChangeCost },
+                                    SortCriterion { sort: SortCriterion.Material }
+                                ]
+                            }
+                        }
+                    }
+                }
             }
+
         },
         PhysicsWorldInfo{
             gravity: Qt.vector3d(0,0,0);

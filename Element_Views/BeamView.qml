@@ -43,6 +43,7 @@ Entity{
 
     property matrix4x4 poseMatrix
     property quaternion quaternionTest;
+    onQuaternionTestChanged: console.log(quaternionTest)
     property vector3d translationTest;
     Entity{
         NumberEntity{
@@ -60,8 +61,8 @@ Entity{
             }
         }
         Transform{
-            id:text_transform
-            translation:Qt.vector3d(10,0,10)
+            id:text_transform            
+            translation:Qt.vector3d(0,0,20)
             rotation:quaternion_helper.invert(quaternionTest)
             scale: 2
         }
@@ -115,7 +116,7 @@ Entity{
 
     CylinderMesh{
         id:mainMesh
-        radius: 1
+        radius: 5
         length: 25
         enabled:  true/*applicationRoot.currentViewFilter=='DESIGNER'
                   && infobox.current_item == rootEntity
@@ -150,6 +151,7 @@ Entity{
     components: [transform]
 
     Entity{
+        enabled: true;
         components: [Mesh{
             source:"qrc:/UIMesh/3DObjects/spring.obj"
         },
@@ -166,6 +168,7 @@ Entity{
         ,
             PhongMaterial{
             ambient: "#333333"
+
             }
         ]
     }

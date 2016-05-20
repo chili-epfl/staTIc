@@ -254,8 +254,6 @@ Item{
          source: camDevice
          filters:[aruco]
          fillMode:VideoOutput.PreserveAspectCrop
-         onContentRectChanged: {console.log("content",contentRect)
-                                console.log("source",sourceRect)}
          Rectangle{
              anchors.fill: parent
              color:"#00000000"
@@ -266,12 +264,6 @@ Item{
 
              Scene3D {
                  id:scene3DContainer
-                 onWidthChanged: console.log("window",width,height)
-                 onHeightChanged: console.log("window",width,height)
-//                 x:viewFinder.contentRect.x
-//                 y:viewFinder.contentRect.y
-//                 width: viewFinder.contentRect.width
-//                 height:  viewFinder.contentRect.height
                  anchors.fill: parent
                  focus: true
                  aspects: ["input","physics"]

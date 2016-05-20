@@ -259,30 +259,30 @@ void Beam::setForcesAndMoments(int axial_type,qreal Nx, qreal Vy, qreal Vz,
         m_lazy_signal_emitter.start();
     }
 
-    qDebug()<<"Beam:"<<objectName();
-    qDebug()<<"Axial stress extreme 1:"<<m_axial_stress_extreme1;
-    qDebug()<<"Shear stress extreme 1:"<<m_shear_stress_y_extreme1;
-    qDebug()<<"Shear stress extreme 1:"<<m_shear_stress_z_extreme1;
-    qDebug()<<"Bending Stress extreme 1:"<<m_bending_stress_extreme1;
-    qDebug()<<"Axial force extreme 1:"<<m_axial_force_extreme_1;
-    qDebug()<<"Axial shear y extreme 1:"<<m_shear_y_extreme_1;
-    qDebug()<<"Axial shear z extreme 1:"<<m_shear_z_extreme_1;
-    qDebug()<<"Torque extreme 1:"<<m_axial_moment_extreme_1;
-    qDebug()<<"Momentum y extreme 1:"<<m_y_moment_extreme_1;
-    qDebug()<<"Momentum z extreme 1:"<<m_z_moment_extreme_1;
+//    qDebug()<<"Beam:"<<objectName();
+//    qDebug()<<"Axial stress extreme 1:"<<m_axial_stress_extreme1;
+//    qDebug()<<"Shear stress extreme 1:"<<m_shear_stress_y_extreme1;
+//    qDebug()<<"Shear stress extreme 1:"<<m_shear_stress_z_extreme1;
+//    qDebug()<<"Bending Stress extreme 1:"<<m_bending_stress_extreme1;
+//    qDebug()<<"Axial force extreme 1:"<<m_axial_force_extreme_1;
+//    qDebug()<<"Axial shear y extreme 1:"<<m_shear_y_extreme_1;
+//    qDebug()<<"Axial shear z extreme 1:"<<m_shear_z_extreme_1;
+//    qDebug()<<"Torque extreme 1:"<<m_axial_moment_extreme_1;
+//    qDebug()<<"Momentum y extreme 1:"<<m_y_moment_extreme_1;
+//    qDebug()<<"Momentum z extreme 1:"<<m_z_moment_extreme_1;
 
-    qDebug()<<"Axial stress extreme 2:"<<m_axial_stress_extreme2;
-    qDebug()<<"Shear stress extreme 2:"<<m_shear_stress_y_extreme2;
-    qDebug()<<"Shear stress extreme 2:"<<m_shear_stress_z_extreme2;
-    qDebug()<<"Bending Stress extreme 2:"<<m_bending_stress_extreme2;
+//    qDebug()<<"Axial stress extreme 2:"<<m_axial_stress_extreme2;
+//    qDebug()<<"Shear stress extreme 2:"<<m_shear_stress_y_extreme2;
+//    qDebug()<<"Shear stress extreme 2:"<<m_shear_stress_z_extreme2;
+//    qDebug()<<"Bending Stress extreme 2:"<<m_bending_stress_extreme2;
 
-    qDebug()<<"Axial force extreme 2:"<<m_axial_force_extreme_2;
-    qDebug()<<"Axial shear y extreme 2:"<<m_shear_y_extreme_2;
-    qDebug()<<"Axial shear z extreme 2:"<<m_shear_z_extreme_2;
-    qDebug()<<"Torque extreme 2:"<<m_axial_moment_extreme_2;
-    qDebug()<<"Momentum y extreme 2:"<<m_y_moment_extreme_2;
-    qDebug()<<"Momentum z extreme 2:"<<m_z_moment_extreme_2;
-    qDebug()<<m_Sy<<" "<<m_Sz;
+//    qDebug()<<"Axial force extreme 2:"<<m_axial_force_extreme_2;
+//    qDebug()<<"Axial shear y extreme 2:"<<m_shear_y_extreme_2;
+//    qDebug()<<"Axial shear z extreme 2:"<<m_shear_z_extreme_2;
+//    qDebug()<<"Torque extreme 2:"<<m_axial_moment_extreme_2;
+//    qDebug()<<"Momentum y extreme 2:"<<m_y_moment_extreme_2;
+//    qDebug()<<"Momentum z extreme 2:"<<m_z_moment_extreme_2;
+//    qDebug()<<m_Sy<<" "<<m_Sz;
 
 
 }
