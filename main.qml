@@ -39,7 +39,7 @@ Item {
     Loader{
         id:scriptLoader
         property bool valid: item !== null
-        asynchronous: true
+        asynchronous: false
         anchors.fill: parent
         onLoaded: {
             intromenu.visible=false;
