@@ -342,9 +342,29 @@ Item{
                             anchors.leftMargin: 10
                         }
                         Text{
+                            id:tension_label
                             anchors.left: tension_image.right
                             anchors.verticalCenter: parent.verticalCenter
                             text:"Tension"
+                            font.family: "Arial"
+                            color:"white"
+                            font.pixelSize: legend_item.height/3
+                            fontSizeMode: Text.Fit;
+                            anchors.leftMargin: 2
+                        }
+                        Image{
+                            id:support_image
+                            anchors.left: tension_label.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            height:  legend_item.height/3
+                            fillMode: Image.PreserveAspectFit
+                            source:"qrc:/images/Images/support.png"
+                            anchors.leftMargin: 10
+                        }
+                        Text{
+                            anchors.left: support_image.right
+                            anchors.verticalCenter: parent.verticalCenter
+                            text:"Support"
                             font.family: "Arial"
                             color:"white"
                             font.pixelSize: legend_item.height/3

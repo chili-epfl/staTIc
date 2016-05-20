@@ -48,6 +48,7 @@
         <file>Images/analysis_mode.png</file>
         <file>Images/compression.png</file>
         <file>Images/tension.png</file>
+        <file>Images/support.png</file>
     </qresource>
     <qresource prefix="/element_views">
         <file>Element_Views/AnimationUnitDy.qml</file>
