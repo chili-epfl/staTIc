@@ -2,6 +2,7 @@ import QtQuick 2.0
 import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
 import QtQuick.Controls.Styles 1.4
+import QtGraphicalEffects 1.0
 
 Rectangle {
     id:root
@@ -172,9 +173,22 @@ Rectangle {
                             clip: true
                             spacing: 10
                             delegate: Rectangle{
+
                                 width: materialItem.width-20
                                 height: (materialItem.width-20)/3
                                 color:"#2f3439";
+                                SequentialAnimation on color{
+                                    id:feedback_animation_material
+                                    running: false
+                                    ColorAnimation{
+                                        to: "green"
+                                        duration: 750
+                                    }
+                                    ColorAnimation{
+                                        to: "#2f3439"
+                                        duration: 750
+                                    }
+                                }
                                 MouseArea{
                                     anchors.fill: parent
                                     onClicked: materials_list.currentIndex=index;
@@ -212,6 +226,7 @@ Rectangle {
                                             Text {
                                                 color: "white"
                                                 text: "Density:"+materialsManager.get(index,"Density")                                }
+
                                         }
                                         Image{
                                             visible: materials_list.currentIndex==index
@@ -225,6 +240,7 @@ Rectangle {
                                                 anchors.fill: parent
                                                 onClicked:{
                                                     if(current_item!=null && current_item.type=="beam"){
+                                                            feedback_animation_material.start();
                                                             current_item.materialID=materialsManager.get(index,"UniqueID")
                                                     }
                                                 }
@@ -249,6 +265,18 @@ Rectangle {
                             color:"#2f3439";
                             anchors.margins: 10
                             anchors.fill: parent
+                            SequentialAnimation on color{
+                                id:feedback_animation_size
+                                running: false
+                                ColorAnimation{
+                                    to: "green"
+                                    duration: 750
+                                }
+                                ColorAnimation{
+                                    to: "#2f3439"
+                                    duration: 750
+                                }
+                            }
                             Text {
                                 id:caption_size
                                 color: "white"
@@ -321,7 +349,8 @@ Rectangle {
                                     anchors.fill: parent
                                     onClicked:{
                                         if(current_item!=null && current_item.type=="beam"){
-                                                current_item.realBeamSize=Qt.size(w.text,h.text);
+                                            feedback_animation_size.start();
+                                            current_item.realBeamSize=Qt.size(w.text,h.text);
                                         }
                                     }
                                 }
