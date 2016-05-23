@@ -34,6 +34,8 @@
         <file>Icons/ghost_Mode_OFF.png</file>
         <file>Icons/show_stress_off.png</file>
         <file>Icons/show_stress_on.png</file>
+        <file>Icons/apply_load.png</file>
+        <file>Icons/apply_load_pressed.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>Images/mainbanner.png</file>

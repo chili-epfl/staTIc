@@ -121,10 +121,12 @@ Entity{
             id:label_picker
             hoverEnabled: false
             onClicked: {
+                sceneRoot.mouseEventHasBeenAccepted=true;
                 if(applicationRoot.currentViewFilter!='DESIGNER'){
                     applicationRoot.currentViewFilter='JOINT'
                     infobox.current_item=root
                 }
+
             }
         }
         components: [label_mesh,label_transform,label_material,label_picker]

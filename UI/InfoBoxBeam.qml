@@ -9,7 +9,7 @@ Rectangle {
     property var current_item
     color: "transparent"
     onCurrent_itemChanged: {
-        if(current_item != null && current_item.segments){
+        if(current_item != 0 && current_item.segments){
             title.text="Beam "+ current_item.objectName;
             infoboxscene3d.extreme1_name=current_item.extreme1_name;
             infoboxscene3d.extreme2_name=current_item.extreme2_name;
@@ -18,12 +18,19 @@ Rectangle {
             //            statusInfo.val=Qt.binding(function(){return current_item.status;})
             //            weightInfo.val=Qt.binding(function(){return current_item.weight;})
             //            priceInfo.val=Qt.binding(function(){return current_item.price;})
-            infoboxscene3d.segments=Qt.binding(function(){
-                return current_item.segments;})
-            infoboxscene3d.beamSize=Qt.binding(function(){
-                return current_item.beamSize;})
-            infoboxscene3d.beamLength=Qt.binding(function(){
-                return current_item.length;})
+//            infoboxscene3d.segments=Qt.binding(function(){
+//                if(current_item != null && current_item.segments)
+//                    return current_item.segments;
+//                else
+//                    return [];
+//            })
+//            infoboxscene3d.beamSize=Qt.binding(function(){
+//                if(current_item != null && current_item.segments)
+//                    return current_item.beamSize;})
+//            infoboxscene3d.beamLength=Qt.binding(function(){
+//                if(current_item != null && current_item.segments)
+//                    return current_item.length;
+//            })
         }
     }
 
@@ -71,6 +78,19 @@ Rectangle {
                 InfoBoxScene3DBeam {
                     id:infoboxscene3d
                     exagerate:exagerateSlider.value
+                    Binding on beamSize {
+                        when: current_item!=0 && current_item.type=="beam"
+                        value:current_item.beamSize
+                    }
+
+                    Binding on segments {
+                        when: current_item!=0 && current_item.type=="beam"
+                        value:current_item.segments
+                    }
+                    Binding on beamLength {
+                        when: current_item!=0 && current_item.type=="beam"
+                        value:current_item.length
+                    }
                 }
             }
 
@@ -108,7 +128,8 @@ Rectangle {
                             anchors.fill: parent
                             fillMode: Image.PreserveAspectFit
                             source: "qrc:/images/Images/beam_section.png"
-                            rotation: current_item.realBeamSize.width > current_item.realBeamSize.height ? 90:0
+                            rotation:current_item!=0 && current_item.type=="beam" && current_item.realBeamSize.width > current_item.realBeamSize.height ? 90:0
+
                         }
                         Item {
                             width: beam_section_image.rotation==0 ? beam_section_image.paintedWidth :beam_section_image.paintedHeight
@@ -119,7 +140,7 @@ Rectangle {
                                 width: parent.width
                                 anchors.topMargin: 1
                                 color:"black"
-                                text: qsTr("w: ")+current_item.realBeamSize.width+"mm"
+                                text: current_item!=0 && current_item.type=="beam" ? qsTr("w: ")+current_item.realBeamSize.width+"mm" : ""
                                 anchors.top: parent.top
                                 horizontalAlignment:Text.AlignHCenter
                                 fontSizeMode: Text.Fit;
@@ -129,7 +150,7 @@ Rectangle {
                             Text{
                                 width: parent.height
                                 color:"black"
-                                text: qsTr("h: ")+current_item.realBeamSize.height+"mm"
+                                text:current_item!=0 && current_item.type=="beam"? qsTr("h: ")+current_item.realBeamSize.height+"mm" :""
                                 anchors.top: parent.bottom
                                 anchors.left: parent.left
                                 rotation: -90

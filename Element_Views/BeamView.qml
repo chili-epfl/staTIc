@@ -43,7 +43,6 @@ Entity{
 
     property matrix4x4 poseMatrix
     property quaternion quaternionTest;
-    onQuaternionTestChanged: console.log(quaternionTest)
     property vector3d translationTest;
     Entity{
         NumberEntity{
@@ -370,12 +369,14 @@ Entity{
             onEntered: {current_anchor_position=Qt.vector3d(0,0,0);
                         }
             onClicked: {
+                sceneRoot.mouseEventHasBeenAccepted=true;
                 if(parent.enabled && applicationRoot.currentViewFilter!='DESIGNER'){
                     applicationRoot.currentViewFilter='BEAM'
                     infobox.current_item=rootEntity
                 }
                 else if(parent.enabled && applicationRoot.currentViewFilter=='DESIGNER')
                     infobox.current_item=rootEntity
+
             }
         }
         components: [drag_mesh,drag_material,this.transform,objectPicker]

@@ -17,21 +17,29 @@ Rectangle{
             name: "BEAM"
             PropertyChanges {
                 target: infobox
-                current_item: null
+                current_item: 0
+            }
+            PropertyChanges {
+                target: infobox
+                lateral_visibility: "Visible"
             }
         },
         State{
             name:"JOINT"
             PropertyChanges {
                 target: infobox
-                current_item: null
+                current_item: 0
             }
         },
         State{
             name:"DESIGNER"
             PropertyChanges {
                 target: infobox
-                current_item: null
+                current_item: 0
+            }
+            PropertyChanges {
+                target: infobox
+                lateral_visibility: "Visible"
             }
         }
     ]
@@ -80,7 +88,7 @@ Rectangle{
                 }
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: {layoutView.currentIndex = index;root.state=name;infobox.current_item=null}
+                    onClicked: {layoutView.currentIndex = index;root.state=name;infobox.current_item=0}
                 }
             }
             highlight: Rectangle { color: "lightsteelblue"; radius: 5 ; border.color: "red"}

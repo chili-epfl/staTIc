@@ -27,7 +27,7 @@ Entity {
     property real weight:10;
     property vector2d extent: Qt.vector2d(-100,100)
 
-    property bool selected: infobox.current_item==rootEntity? true: false
+    property bool selected: infobox.current_item==rootEntity ? true: false
 
     ArucoObject{
        id:tag
@@ -80,6 +80,7 @@ Entity {
         id:objectPicker
         hoverEnabled: false
         onClicked: {
+            sceneRoot.mouseEventHasBeenAccepted=true;
             if(applicationRoot.currentViewFilter=='DESIGNER')
                 infobox.current_item=rootEntity
         }

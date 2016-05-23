@@ -11,7 +11,7 @@ Entity {
     property alias zoom: cameraController.zoom
     property bool resize: false
 
-    property var segments: []
+    property var segments: {}
     property bool play: true
 
     property string extreme1_name;

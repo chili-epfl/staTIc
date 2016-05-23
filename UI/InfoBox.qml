@@ -4,7 +4,9 @@ import QtQuick.Layouts 1.1
 import QtQuick.Controls 1.4
 Rectangle {
     id:root
-    property var current_item
+    property var current_item:0;
+    property alias lateral_visibility:hideButton.state
+
     state: "designer"
     states: [
         State {
@@ -33,22 +35,26 @@ Rectangle {
     onCurrent_itemChanged: {
         if(applicationRoot.currentViewFilter=='DESIGNER'){
             state="designer"
-            loader.item.current_item=Qt.binding(function(){return current_item})
         }
-        else if(current_item != null){
+        else if(current_item != 0){
             if(applicationRoot.currentViewFilter=='BEAM' && current_item.type==="beam"){
                 state="beam";
+                lateral_visibility="Visible"
             }
             else if(applicationRoot.currentViewFilter=='JOINT' && current_item.type==="joint"){
                 state="joint"
+                lateral_visibility="Visible"
             }
          }
+        else{
+
+        }
     }
 
     color:"transparent"
     radius:5
-    visible:applicationRoot.currentViewFilter=='DESIGNER'?
-                true : current_item!=null
+    visible:applicationRoot.currentViewFilter=='DESIGNER' ?
+                true : current_item != 0
 
     Rectangle{
         //close button
@@ -69,7 +75,7 @@ Rectangle {
         height: width
         MouseArea{
             anchors.fill: parent
-            onClicked: { root.current_item=null;}
+            onClicked: { root.current_item=0;}
         }
     }
 
@@ -130,7 +136,7 @@ Rectangle {
         }
         MouseArea{
             anchors.fill: parent
-            onClicked: hideButton.state==="Visible" ? hideButton.state="Hidden":                                                    hideButton.state="Visible"
+            onClicked: hideButton.state==="Visible" ? hideButton.state="Hidden": hideButton.state="Visible"
         }
     }
 
@@ -153,6 +159,7 @@ Rectangle {
         anchors.fill:parent
         asynchronous: true
         onLoaded: item.current_item=Qt.binding(function(){return current_item})
+
     }
 
 }

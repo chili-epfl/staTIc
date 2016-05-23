@@ -15,7 +15,7 @@ Rectangle {
         hasReaction=false;
         infoboxScene3D.resetBeams();
         infoboxScene3D.beam_poses=[];
-        if(current_item != null && current_item.connected_beams){
+        if(current_item != 0 && current_item.type=="joint"){
             title.text="Joint "+ current_item.objectName;
             for(var i=0;i<current_item.connected_beams.length;i++){
                 forceListModel.append({isAdded:true,

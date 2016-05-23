@@ -6,9 +6,9 @@ import QtGraphicalEffects 1.0
 
 Rectangle {
     id:root
-    property var current_item
+    property var current_item: 0
     onCurrent_itemChanged: {
-        if(current_item!=null &&
+        if(current_item!=0 &&
             current_item.type==="beam" &&
                 tab_view.currentIndex===1)
                 tab_view.getTab(1).item.currentIndex=materialsManager.get(current_item.materialID ,"Index");
@@ -107,7 +107,11 @@ Rectangle {
                                     onClicked:{
                                         if(current_item.type==="trapezoidalForce"){
                                             current_item.killMe();
-                                            current_item=null;
+                                            infobox.current_item=0;
+                                        }
+                                        else{
+                                            suggestion_box.text="You need to select a load first"
+                                            suggestion_box_container.state="Visible"
                                         }
                                     }
                                 }
@@ -118,7 +122,7 @@ Rectangle {
                                 anchors.left: object_delete_icon.right
                                 width: Math.min((parent.width-20)/2,parent.height)
                                 height: width
-                                source: object_apply_button.pressed ? "qrc:/icons/Icons/apply_pressed.png":"qrc:/icons/Icons/apply.png"
+                                source: object_apply_button.pressed ? "qrc:/icons/Icons/apply_load_pressed.png":"qrc:/icons/Icons/apply_load.png"
                                 MouseArea{
                                     id:object_apply_button
                                     anchors.fill: parent
@@ -132,6 +136,10 @@ Rectangle {
                                             current_item.extent=warehouse3d.get(catalog_grid.currentIndex,"extent")
                                             current_item.asset3DMeshURL=warehouse3d.get(catalog_grid.currentIndex,"main_asset_url")
                                             current_item.asset3DTextureURL=warehouse3d.get(catalog_grid.currentIndex,"main_asset_diffuse_map_url")
+                                        }
+                                        else{
+                                            suggestion_box.text="You need to select a beam first"
+                                            suggestion_box_container.state="Visible"
                                         }
                                     }
                                 }
@@ -239,7 +247,7 @@ Rectangle {
                                                 id:material_apply_button
                                                 anchors.fill: parent
                                                 onClicked:{
-                                                    if(current_item!=null && current_item.type=="beam"){
+                                                    if(current_item!=0 && current_item.type=="beam"){
                                                             feedback_animation_material.start();
                                                             current_item.materialID=materialsManager.get(index,"UniqueID")
                                                     }
@@ -293,7 +301,7 @@ Rectangle {
                                 anchors.verticalCenter: x.verticalCenter
                                 anchors.right: x.left
                                 anchors.rightMargin: 25
-                                text: current_item!=null &&
+                                text: current_item!=0 &&
                                       current_item.type=="beam"?current_item.realBeamSize.width:100
                                 maximumLength: 5
                                 validator: DoubleValidator {bottom: 1; top: 50000;}
@@ -316,7 +324,7 @@ Rectangle {
                                 anchors.left: x.right
                                 anchors.leftMargin: 25
                                 width: parent.width/2-50
-                                text:current_item!=null &&
+                                text:current_item!=0 &&
                                      current_item.type=="beam"?current_item.realBeamSize.height:100
                                 validator: DoubleValidator {bottom: 1; top: 50000;}
                             }
@@ -348,7 +356,7 @@ Rectangle {
                                     id:size_apply_button
                                     anchors.fill: parent
                                     onClicked:{
-                                        if(current_item!=null && current_item.type=="beam"){
+                                        if(current_item!=0 && current_item.type=="beam"){
                                             feedback_animation_size.start();
                                             current_item.realBeamSize=Qt.size(w.text,h.text);
                                         }

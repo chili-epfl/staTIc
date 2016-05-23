@@ -17,7 +17,7 @@ import "qrc:/ui"
 
 Entity {
     id: sceneRoot
-
+    property alias mouseEventHasBeenAccepted: deselection_guard.eventHasBeenAccepted
     property url structureLoaderURL
     onStructureLoaderURLChanged: {
        if(structureLoaderURL.toString().search(".dae")!=-1){
@@ -70,9 +70,12 @@ Entity {
 //        controlledCamera: camera
 //    }
 
-//    MouseController {
-//        id: mouseController
-//    }
+    MouseController {
+        id: mouseController
+    }
+
+
+
 //    CameraController{
 //        camera: camera
 //    }
@@ -115,8 +118,30 @@ Entity {
             gravity: Qt.vector3d(0,0,0);
             scaleFactor: 1
         }
-
     ]
+
+   Entity{
+       id:deselection_guard
+       property bool eventHasBeenAccepted:false;
+       QQ2.Timer{
+            id:guard_delay
+            running: false
+            interval: 200
+            onTriggered:{
+                if(!deselection_guard.eventHasBeenAccepted)
+                    infobox.current_item=0;
+                deselection_guard.eventHasBeenAccepted=false;
+            }
+       }
+       MouseInput{
+           id:mouseInput
+           controller: mouseController
+           onReleased: {
+               guard_delay.restart();
+           }
+       }
+       components:[mouseInput]
+   }
 
 
     Entity {
