@@ -58,12 +58,15 @@ void DeformingBeamMesh::setKeyframes(int n_frames)
     }
 }
 
-void DeformingBeamMesh::setDisplacements(QList<QVector4D> displacements)
+void DeformingBeamMesh::setDisplacements(QVariant displacements)
 {
-    if(displacements.size()>2){
-        m_displacements=displacements;
-        update();
-        emit displacementsChanged();
+    if(displacements.canConvert<QList<QVector4D> >()){
+        QList<QVector4D> _disp=displacements.value<QList<QVector4D> >();
+        if(_disp.size()>2){
+            m_displacements=_disp;
+            update();
+            emit displacementsChanged();
+        }
     }
 }
 
