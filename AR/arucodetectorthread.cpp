@@ -8,7 +8,8 @@
 #include <iostream>
 #include <algorithm>
 ArucoDetectorThread::ArucoDetectorThread(ArucoDetector* detector,QObject *parent):
-    QObject(parent)
+    QObject(parent),
+    gl(nullptr)
 {
     m_detector=detector;
     m_pause=false;
@@ -17,8 +18,13 @@ ArucoDetectorThread::ArucoDetectorThread(ArucoDetector* detector,QObject *parent
     task->setSingleTagList(m_detector->singleTagList());
     task->moveToThread(&workerThread);
     connect(&workerThread, SIGNAL(started()), task, SLOT(doWork()));
+
     connect(task, SIGNAL(objectsReady(PoseMap)),
             this, SIGNAL(objectsReady(PoseMap)));
+    connect(task, SIGNAL(projectionMatrixChanged(QMatrix4x4)),
+            this, SIGNAL(projectionMatrixChanged(QMatrix4x4)));
+    connect(task, SIGNAL(cameraResolutionChanged(QSizeF)),
+            this, SIGNAL(cameraResolutionChanged(QSizeF)));
     //TODO: update projection matrix and boards;
 }
 
@@ -102,6 +108,18 @@ QVideoFrame ArucoDetectorThread::run(QVideoFrame *input, const QVideoSurfaceForm
                             const_cast<uchar*>(input->bits())).clone();
                 task->presentFrame(mat);
             }
+            else if(pixelFormat==QVideoFrame::PixelFormat::Format_BGR32) {
+                QImage img( input->bits(),
+                                   input->width(),
+                            input->height(),
+                            input->bytesPerLine(),
+                            QImage::Format_RGB32);
+                img=img.convertToFormat(QImage::Format_Grayscale8);
+                mat=cv::Mat(img.height(), img.width(), CV_8UC1,
+                            const_cast<uchar*>(img.constBits()), img.bytesPerLine()).clone();
+                task->presentFrame(mat);
+
+            }
             else{
                 qWarning()<<" Handle: NoHandle, unsupported pixel format:"<<pixelFormat;
             }
@@ -112,32 +130,79 @@ QVideoFrame ArucoDetectorThread::run(QVideoFrame *input, const QVideoSurfaceForm
         }
         break;
     case QAbstractVideoBuffer::GLTextureHandle:
-        if ( pixelFormat == QVideoFrame::Format_BGR32){
-            /*QImage img(input->width(),input->height(),QImage::Format_RGBA8888);
-            GLuint textureId = input->handle().value<GLuint>();
-            QOpenGLContext *ctx = QOpenGLContext::currentContext();
-            QOpenGLFunctions *f = ctx->functions();
-            //GLuint fbo;
-            if(fbo==0)
-                f->glGenFramebuffers(1, &fbo);
-            GLuint prevFbo;
-            f->glGetIntegerv(GL_FRAMEBUFFER_BINDING, (GLint *) &prevFbo);
-            f->glBindFramebuffer(GL_FRAMEBUFFER, fbo);
-            f->glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureId, 0);
-            f->glPixelStorei(GL_PACK_ALIGNMENT,4);
-            f->glReadPixels(0, 0, input->width(), input->height(), GL_RGBA, GL_UNSIGNED_BYTE, img.bits());
-            f->glBindFramebuffer(GL_FRAMEBUFFER, prevFbo);
-            cv::Mat mat=cv::Mat(img.height(), img.width(), CV_8UC4,
-                                const_cast<uchar*>(img.constBits()), img.bytesPerLine()).clone();
-            task->presentFrame(mat);*/
+    {
+        int outputHeight=480;
+        auto outputWidth(outputHeight * input->width() / input->height());
+
+        if (gl == nullptr) {
+
+            auto context(QOpenGLContext::currentContext());
+            gl = context->extraFunctions();
+
+            auto version(context->isOpenGLES() ? "#version 300 es\n" : "#version 130\n");
+
+            QString vertex(version);
+            qDebug()<<vertex;
+            vertex += R"(
+                      out vec2 coord;
+                      void main(void) {
+                      int id = gl_VertexID;
+                      coord = vec2((id << 1) & 2, id & 2);
+                      gl_Position = vec4(coord * 2.0 - 1.0, 0.0, 1.0);
+                      }
+                      )";
+
+            QString fragment(version);
+            fragment += R"(
+                        in lowp vec2 coord;
+                        uniform sampler2D image;
+                        const lowp vec3 luma = vec3(0.2126, 0.7152, 0.0722);
+                        out lowp float fragment;
+                        void main(void) {
+                        lowp vec3 color = texture(image, coord).rgb;
+                        fragment = dot(color, luma);
+                        }
+                        )";
+
+            program.addShaderFromSourceCode(QOpenGLShader::Vertex, vertex);
+            program.addShaderFromSourceCode(QOpenGLShader::Fragment, fragment);
+            program.link();
+            imageLocation = program.uniformLocation("image");
+
+            gl->glGenRenderbuffers(1, &renderbuffer);
+            gl->glBindRenderbuffer(GL_RENDERBUFFER, renderbuffer);
+            gl->glRenderbufferStorage(GL_RENDERBUFFER, QOpenGLTexture::R8_UNorm, outputWidth, outputHeight);
+            gl->glBindRenderbuffer(GL_RENDERBUFFER, 0);
+
+            gl->glGenFramebuffers(1, &framebuffer);
+            gl->glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+            gl->glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, renderbuffer);
+            gl->glBindFramebuffer(GL_FRAMEBUFFER, 0);
         }
-        else{
-            qWarning()<<"Handle: GLTextureHandle, unsupported pixel format:"<<pixelFormat;
-        }
+
+        gl->glActiveTexture(GL_TEXTURE0);
+        gl->glBindTexture(QOpenGLTexture::Target2D, input->handle().toUInt());
+        gl->glGenerateMipmap(QOpenGLTexture::Target2D);
+        gl->glTexParameteri(QOpenGLTexture::Target2D, GL_TEXTURE_MIN_FILTER, QOpenGLTexture::LinearMipMapLinear);
+
+        program.bind();
+        program.setUniformValue(imageLocation, 0);
+        program.enableAttributeArray(0);
+        gl->glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+        gl->glViewport(0, 0, outputWidth, outputHeight);
+        gl->glDisable(GL_BLEND);
+        gl->glDrawArrays(GL_TRIANGLES, 0, 3);
+
+        cv::Mat mat(outputHeight, outputWidth, CV_8UC1);
+        gl->glPixelStorei(GL_PACK_ALIGNMENT, 1);
+        gl->glReadPixels(0, 0, outputWidth, outputHeight, QOpenGLTexture::Red, QOpenGLTexture::UInt8, mat.data);
+        task->presentFrame(mat.clone());
+    }
         break;
     default:
         qWarning()<<"Unsupported Video Frame Handle:"<<handle;
         break;
+
     }
 
     return *input;
@@ -166,7 +231,8 @@ void ArucoDetectorThread::setPause(bool val)
 }
 
 
-DetectionTask::DetectionTask(QMatrix4x4 projectionMatrix)
+DetectionTask::DetectionTask(QMatrix4x4 projectionMatrix):
+    m_cameraResolution(640,480)
 {
     m_distCoeff=cv::Mat();
 //    m_distCoeff=(cv::Mat_<float>(1,5) <<
@@ -277,7 +343,7 @@ void DetectionTask::doWork()
     cv::Mat rmat,lap,lap_ROI;
     cv::Mat prev_Image;
 
-    qreal norm;
+    double norm;
     cv::Scalar mu, sigma;
     float roll,pitch,yaw;
     QQuaternion measur_quad;
@@ -292,6 +358,9 @@ void DetectionTask::doWork()
 
         //Process frame if possible
         if(nextFrameAvailable){
+
+
+
             //Signal that we're consuming the next frame now
             nextFrameAvailable = false;
             state = BUSY;
@@ -302,8 +371,27 @@ void DetectionTask::doWork()
 //            if(!prev_Image.empty() && m_markerIds_prev.size()>0){
 //                cv::calcOpticalFlowPyrLK(prev_Image,nextFrame,m_markerCorners_prev,m_tracked_corners,status,err);
 //            }
-            cv::aruco::detectMarkers(nextFrame,m_dictionary,m_markerCorners,m_markerIds,m_detector_params);
+//            QString tets_name="/storage/emulated/legacy/staTIc/Resources/lol"+QString::number(rand())+".png";
+//            cv::imwrite(tets_name.toStdString(),nextFrame.clone());
+            if(m_cameraResolution!=QSizeF(nextFrame.cols,nextFrame.rows)){
+                m_cameraResolution=QSizeF(nextFrame.cols,nextFrame.rows);
+                setProjectionMatrix(QMatrix4x4(
+                                        6.1029330646666438e+02, 0., nextFrame.cols/2.0 ,0,
+                                        0., 6.1038146342831521e+02, nextFrame.rows/2.0,0,
+                                        0,              0,              1,  0,
+                                        0,              0,              0,  1
+                                        ));
 
+                emit projectionMatrixChanged(QMatrix4x4(
+                                                 6.1029330646666438e+02, 0., nextFrame.cols/2.0 ,0,
+                                                 0., 6.1038146342831521e+02, nextFrame.rows/2.0,0,
+                                                 0,              0,              1,  0,
+                                                 0,              0,              0,  1
+                                                 ));
+                emit cameraResolutionChanged(m_cameraResolution);
+            }
+
+            cv::aruco::detectMarkers(nextFrame,m_dictionary,m_markerCorners,m_markerIds,m_detector_params);
             //            bool skip=false;
 //            for(int i=0;i<m_markerIds_prev.size();i++){
 //                if(status[i*4]==0 || status[i*4+1]==0
@@ -464,7 +552,7 @@ void DetectionTask::doWork()
                 if(cv::aruco::estimatePoseBoard(m_markerCorners,m_markerIds,m_boards[i],m_cv_projectionMatrix,
                                              m_distCoeff,rvec,tvec,useGuess,flag)){
                     norm=cv::norm(rvec);
-                    measur_quad=QQuaternion::fromAxisAndAngle(rvec.at<double>(0)/norm,rvec.at<double>(1)/norm,rvec.at<double>(2)/norm,180.0*norm/CV_PI);
+                    measur_quad=QQuaternion::fromAxisAndAngle((qreal) (rvec.at<double>(0)/norm),(qreal) (rvec.at<double>(1)/norm),(qreal) (rvec.at<double>(2)/norm),180.0*(qreal)norm/CV_PI);
                     if(!m_use_filter){
                         poseMap[m_board_names[i]]=Pose(QVector3D((qreal)tvec.at<double>(0),-(qreal)tvec.at<double>(1),-(qreal)tvec.at<double>(2)),
                                                        m_rotationOpencvToOpenGL*measur_quad);
@@ -489,13 +577,12 @@ void DetectionTask::doWork()
                         filter->updateKalmanFilter(tvec,rvec);
                         poseMap[m_board_names[i]]= Pose(QVector3D((qreal)tvec.at<double>(0),-(qreal)tvec.at<double>(1),-(qreal)tvec.at<double>(2)),
                                                         m_rotationOpencvToOpenGL*measur_quad.fromEulerAngles(rvec.at <double>(0),rvec.at <double>(1),rvec.at <double>(2)));
-
                     }
                     //qDebug()<< poseMap[m_board_names[i]];
 //                    cv::Mat debug=nextFrame.clone();
 //                    cv::cvtColor(debug,debug,CV_GRAY2RGB);
 //                    cv::aruco::drawAxis(debug,m_cv_projectionMatrix,m_distCoeff,rvec,tvec,10);
-//                    cv::imwrite("test.png",debug);
+//                    cv::imwrite("/storage/emulated/legacy/staTIc/Resources/lol.png",nextFrame.clone());
                 }
                 else{
                     if(m_LKFilters.contains(m_board_names[i])){

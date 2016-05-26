@@ -10,17 +10,16 @@
 class ArucoDetector : public QAbstractVideoFilter
 {
     Q_OBJECT
-    //Q_PROPERTY(QVariantMap tags READ getTags NOTIFY tagsChanged)? if we don't know the size, what is the pose???
     Q_PROPERTY(QMatrix4x4 projectionMatrix READ getProjectionMatrix NOTIFY projectionMatrixChanged)
+    Q_PROPERTY(QSizeF cameraResolution READ cameraResolution NOTIFY cameraResolutionChanged)
     Q_PROPERTY(bool pause READ pause WRITE setPause NOTIFY pauseChanged)
 public:
     ArucoDetector(QQuickItem *parent = 0);
     QVideoFilterRunnable *createFilterRunnable();
 
     QMatrix4x4 getProjectionMatrix() const;
-
+    QSizeF cameraResolution() const;
     Q_INVOKABLE void addConfigurationFile(QUrl url);
-
     Q_INVOKABLE void registerObserver(ArucoObject* o);
 
     bool pause(){return m_pause;}
@@ -39,12 +38,14 @@ signals:
 
     void pauseChanged(bool val);
     void destroying();
-
+    void cameraResolutionChanged();
 public slots:
     Q_INVOKABLE void unregisterObserver(ArucoObject* o);
     void unregisterDestroyedObserver(QObject* o);
     void updateObserver(QString prevObjId);
     void notifyObservers(const PoseMap& poses);
+    void setProjectionMatrix(QMatrix4x4);
+    void setCameraResoltion(QSizeF);
 private:
 
     void loadConfigurationFiles();

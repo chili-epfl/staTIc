@@ -8,15 +8,8 @@ ArucoDetector::ArucoDetector(QQuickItem *parent):
     qRegisterMetaType<PoseMap>("PoseMap");
 
     m_pause=false;
-    m_focalLength=700;
     m_cameraResolution=QSizeF(640,480);
-//    m_projectionMatrix=QMatrix4x4(
-//        m_focalLength,    0,              m_cameraResolution.width()/2, 0 ,
-//        0,              m_focalLength,    m_cameraResolution.height()/2, 0,
-//        0,              0,              1,  0,
-//        0,              0,              0,  1
-//                );
-#if VIDEOFORMAT == 43
+ #if VIDEOFORMAT == 43
     m_projectionMatrix=QMatrix4x4(
                 6.1029330646666438e+02, 0., 319.5 ,0,
                 0., 6.1038146342831521e+02, 239.5,0,
@@ -48,12 +41,35 @@ QVideoFilterRunnable *ArucoDetector::createFilterRunnable()
     connect(this,SIGNAL(destroying()),thread,SLOT(deleteLater()));
     connect(this,SIGNAL(pauseChanged(bool)),thread,SLOT(setPause(bool)));
     connect(thread,SIGNAL(objectsReady(PoseMap)),this,SLOT(notifyObservers(PoseMap)));
+    connect(thread,SIGNAL(projectionMatrixChanged(QMatrix4x4)),this,SLOT(setProjectionMatrix(QMatrix4x4)));
+    connect(thread,SIGNAL(cameraResolutionChanged(QSizeF)),this,SLOT(setCameraResoltion(QSizeF)));
+
     return thread;
 }
 
 QMatrix4x4 ArucoDetector::getProjectionMatrix() const
 {
     return m_projectionMatrix;
+}
+
+QSizeF ArucoDetector::cameraResolution() const
+{
+    return m_cameraResolution;
+}
+
+void ArucoDetector::setProjectionMatrix(QMatrix4x4 m)
+{
+    m_projectionMatrix=m;
+    emit projectionMatrixChanged();
+}
+
+void ArucoDetector::setCameraResoltion(QSizeF cameraResolution)
+{
+    if(cameraResolution!=m_cameraResolution){
+        m_cameraResolution=cameraResolution;
+        emit cameraResolutionChanged();
+
+    }
 }
 
 void ArucoDetector::addConfigurationFile(QUrl url)
@@ -135,9 +151,21 @@ void ArucoDetector::notifyObservers(const PoseMap &poses)
 void ArucoDetector::loadConfigurationFiles()
 {
     QFile configFile(":/AR/board.yml");
-    configFile.open(QFile::ReadOnly);
+    configFile.open(QIODevice::ReadOnly| QIODevice::Text);
     if(configFile.isOpen()){
+#ifdef ANDROID
+        QFile tmp_file("/storage/emulated/legacy/staTIc/tmp_file_board.yml");
+        tmp_file.open(QIODevice::WriteOnly);
+        QTextStream tmp_stream(&tmp_file);
+        while (!configFile.atEnd()) {
+            tmp_stream << configFile.readLine();
+        }
+        tmp_stream.flush();
+        tmp_file.close();
+        cv::FileStorage fs("/storage/emulated/legacy/staTIc/tmp_file_board.yml", cv::FileStorage::READ);
+#else
         cv::FileStorage fs(configFile.readAll().toStdString(), cv::FileStorage::READ | cv::FileStorage::MEMORY);
+#endif
         cv::aruco::Board board;
         board.dictionary=cv::aruco::getPredefinedDictionary(
                     cv::aruco::PREDEFINED_DICTIONARY_NAME((int)fs["dictionary"]));
@@ -167,12 +195,27 @@ void ArucoDetector::loadConfigurationFiles()
     }else{
         qDebug()<<"Can't open file :/AR/board.yml";
     }
-    configFile.close();
+    configFile.close(); 
+    #ifdef ANDROID
+    QFile::remove("/storage/emulated/legacy/staTIc/tmp_file_board.yml");
+    #endif
 
     configFile.setFileName(":/load.yml");
     configFile.open(QFile::ReadOnly);
     if(configFile.isOpen()){
+#ifdef ANDROID
+        QFile tmp_file("/storage/emulated/legacy/staTIc/tmp_file_load.yml");
+        tmp_file.open(QIODevice::WriteOnly);
+        QTextStream tmp_stream(&tmp_file);
+        while (!configFile.atEnd()) {
+            tmp_stream << configFile.readLine();
+        }
+        tmp_stream.flush();
+        tmp_file.close();
+        cv::FileStorage fs("/storage/emulated/legacy/staTIc/tmp_file_load.yml", cv::FileStorage::READ);
+#else
         cv::FileStorage fs(configFile.readAll().toStdString(), cv::FileStorage::READ | cv::FileStorage::MEMORY);
+#endif
         cv::aruco::Board board;
         board.dictionary=cv::aruco::getPredefinedDictionary(
                     cv::aruco::PREDEFINED_DICTIONARY_NAME((int)fs["dictionary"]));
@@ -203,11 +246,26 @@ void ArucoDetector::loadConfigurationFiles()
         qDebug()<<"Can't open file :/load.yml";
     }
     configFile.close();
+#ifdef ANDROID
+    QFile::remove("/storage/emulated/legacy/staTIc/tmp_file_load.yml");
+#endif
     /**/
     configFile.setFileName(":/AR/singleTags.yml");
     configFile.open(QFile::ReadOnly);
     if(configFile.isOpen()){
+#ifdef ANDROID
+        QFile tmp_file("/storage/emulated/legacy/staTIc/tmp_file_singleTags.yml");
+        tmp_file.open(QIODevice::WriteOnly);
+        QTextStream tmp_stream(&tmp_file);
+        while (!configFile.atEnd()) {
+            tmp_stream << configFile.readLine();
+        }
+        tmp_stream.flush();
+        tmp_file.close();
+        cv::FileStorage fs("/storage/emulated/legacy/staTIc/tmp_file_singleTags.yml", cv::FileStorage::READ);
+#else
         cv::FileStorage fs(configFile.readAll().toStdString(), cv::FileStorage::READ | cv::FileStorage::MEMORY);
+#endif
         cv::FileNode n=fs["tags"];
         if (n.type() != cv::FileNode::SEQ)
         {
@@ -224,5 +282,8 @@ void ArucoDetector::loadConfigurationFiles()
     }else{
         qDebug()<<"Can't open file :/AR/singleMarkers.yml";
     }
+#ifdef ANDROID
+    QFile::remove("/storage/emulated/legacy/staTIc/tmp_file_singleTags.yml");
+#endif
 }
 

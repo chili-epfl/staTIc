@@ -16,6 +16,10 @@
 #include <QQuaternion>
 #include "linearkalmanfilter.h"
 
+#include <QOpenGLExtraFunctions>
+#include <QOpenGLShaderProgram>
+#include <QOpenGLTexture>
+
 class ArucoDetector;
 
 typedef QPair<QVector3D,QQuaternion> Pose;
@@ -43,6 +47,8 @@ public slots:
     void doWork();
 signals:
     void objectsReady(const PoseMap& poses);
+    void projectionMatrixChanged(const QMatrix4x4&);
+    void cameraResolutionChanged(const QSizeF&);
 
 private:
 
@@ -67,7 +73,7 @@ private:
     bool nextFrameAvailable = false;    ///< Whether the next frame is ready and in place
     bool running = false;               ///< Whether the should keep running, we don't need a mutex for this
 
-
+    QSizeF m_cameraResolution;
     std::vector<cv::Ptr<cv::aruco::Board> > m_boards;
     QStringList m_board_names;
     QHash<int,qreal> m_singleTagSizes;
@@ -101,12 +107,20 @@ public slots:
     void setPause(bool val);
 signals:
     void objectsReady(const PoseMap& poses);
+    void projectionMatrixChanged(const QMatrix4x4&);
+    void cameraResolutionChanged(const QSizeF&);
 private:
     bool m_pause;
     QThread workerThread;               ///< The thread that Aruco will work in
     DetectionTask* task = NULL;         ///< The loop method and parameter container
     //GLuint fbo=0;                         ///< FBO used in android to move a texture to the memory
     ArucoDetector* m_detector;
+
+    QOpenGLExtraFunctions* gl;
+    QOpenGLShaderProgram program;
+    GLint imageLocation;
+    GLuint framebuffer;
+    GLuint renderbuffer;
 };
 
 
