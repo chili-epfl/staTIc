@@ -4,6 +4,8 @@ import QtQuick.Controls.Styles 1.4
 import QtQuick.Controls 1.2
 import QtQuick.Scene3D 2.0
 import QtQuick.Layouts 1.1
+import "qrc:/ui/UI"
+
 Rectangle {
     id:root
     property var current_item
@@ -175,15 +177,17 @@ Rectangle {
                     Text {
                         id:forceList_label
                         text: beam ? "Force from beam " + beam.objectName : "Reaction force from support"
-                        fontSizeMode: Text.HorizontalFit;
+                        fontSizeMode: Text.Fit;
                         minimumPixelSize: 10;
-                        font.pixelSize: forceList_switch.height;
                         color: "white"
+                        width: parent.width-forceList_switch.width-10
                     }
                     Switch{
                         id:forceList_switch
                         anchors.right: parent.right
                         checked: true
+                        style: CustomSwitchStyle{
+                        }
                         property vector3d forceVectorDel: (beam) ? beam.globalForceExtreme1 : joint.reaction
                         onForceVectorDelChanged: updateSumOfForces()
                         onCheckedChanged:

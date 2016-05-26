@@ -58,7 +58,8 @@ Rectangle {
 
     Rectangle{
         //close button
-        visible: applicationRoot.currentViewFilter!='DESIGNER'
+
+        visible: false//applicationRoot.currentViewFilter!='DESIGNER'
         z:1
         anchors.right: parent.right
         anchors.top: parent.top
@@ -99,7 +100,7 @@ Rectangle {
                 }
                 PropertyChanges{
                     target:root
-                    anchors.margins: pt2px(20)
+                    anchors.leftMargin: hideLabel.height*2
                 }
             },
             State {
@@ -116,7 +117,7 @@ Rectangle {
                 }
                 PropertyChanges{
                     target:root
-                    anchors.margins: pt2px(20)
+                    anchors.margins: 10
                 }
             }
         ]

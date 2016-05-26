@@ -18,10 +18,31 @@ Rectangle {
         id:tab_view
         anchors.fill: parent
         style:TabViewStyle {
+            tabOverlap: 0
             frame: Rectangle {
                 color: "transparent"
             }
+            tab:Rectangle {
+                color: styleData.selected ? "steelblue" :"#F0F0F0"
+                border.color:  color
+                implicitWidth: Math.min(text.implicitWidth + 4, styleData.availableWidth)
+                implicitHeight: pt2px(14)
+                radius: 2
+                Text {
+                    id: text
+                    anchors.centerIn: parent
+                    width: Math.min(implicitWidth,parent.width)
+                    height: parent.height
+                    text: styleData.title
+                    color: styleData.selected ? "white" : "black"
+                    fontSizeMode: Text.Fit
+                    wrapMode: Text.WordWrap
+                    verticalAlignment: Text.AlignVCenter
+
+                }
+            }
         }
+
         Tab{
             title: "Catalog"
             Rectangle{
@@ -70,8 +91,12 @@ Rectangle {
                                     anchors.top: image.bottom
                                     Text{
                                         anchors.centerIn: parent
+                                        height: parent.height
                                         color: "#F0F0F0"
                                         text:"Weight:"+warehouse3d.get(index,"weight")+"Kg"
+                                        fontSizeMode: Text.Fit
+                                        verticalAlignment: Text.AlignVCenter
+                                        horizontalAlignment: Text.AlignHCenter
                                     }
                                 }
                                 MouseArea{
@@ -175,13 +200,13 @@ Rectangle {
                         radius: 1
                         ListView{
                             id:materials_list
+                            focus: true
                             anchors.fill: parent;
                             anchors.margins: 10
                             model: materialsManager
                             clip: true
                             spacing: 10
                             delegate: Rectangle{
-
                                 width: materialItem.width-20
                                 height: (materialItem.width-20)/3
                                 color:"#2f3439";
@@ -222,18 +247,34 @@ Rectangle {
                                         Layout.fillWidth: true
                                         Layout.preferredHeight: parent.height
                                         ColumnLayout{
+                                            anchors.fill: parent
                                             Layout.margins: 5
                                             Text {
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
                                                 color: "white"
                                                 text: display
+                                                fontSizeMode: Text.Fit
+                                                font.pointSize: 12
                                             }
                                             Text {
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
                                                 color: "white"
                                                 text: "Price:"+materialsManager.get(index,"Price")
+                                                fontSizeMode: Text.Fit
+                                                font.pointSize: 12
+
                                             }
                                             Text {
+                                                Layout.fillHeight: true
+                                                Layout.fillWidth: true
                                                 color: "white"
-                                                text: "Density:"+materialsManager.get(index,"Density")                                }
+                                                text: "Density:"+materialsManager.get(index,"Density").toLocaleString()
+                                                fontSizeMode: Text.Fit
+                                                font.pointSize: 12
+
+                                            }
 
                                         }
                                         Image{
@@ -298,6 +339,7 @@ Rectangle {
                             }
                             TextField{
                                 id:w
+                                focus:false
                                 anchors.verticalCenter: x.verticalCenter
                                 anchors.right: x.left
                                 anchors.rightMargin: 25
@@ -319,6 +361,7 @@ Rectangle {
 
                             TextField{
                                 id:h
+                                focus:false
                                 maximumLength: 5
                                 anchors.verticalCenter: x.verticalCenter
                                 anchors.left: x.right
