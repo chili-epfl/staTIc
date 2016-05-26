@@ -4,6 +4,7 @@ import QtQuick.Controls.Styles 1.4
 import QtQuick.Controls 1.2
 import QtQuick.Scene3D 2.0
 import QtQuick.Layouts 1.1
+import "qrc:/ui/UI"
 Rectangle {
     id:root
     property var current_item
@@ -189,45 +190,45 @@ Rectangle {
                     //                    }
                 }
             }
-            Image{
-                id:animationIcon
-                states: [
-                    State {
-                        name: "play"
-                        PropertyChanges {
-                            target: animationIcon
-                            source: "qrc:/icons/Icons/pause.svg"
-                        }
-                        PropertyChanges {
-                            target: infoboxscene3d
-                            play: true
-                        }
-                    },
-                    State {
-                        name: "pause"
-                        PropertyChanges {
-                            target: animationIcon
-                            source: "qrc:/icons/Icons/play.svg"
-                        }
-                        PropertyChanges {
-                            target: infoboxscene3d
-                            play: false
-                        }
-                    }
-                ]
+//            Image{
+//                id:animationIcon
+//                states: [
+//                    State {
+//                        name: "play"
+//                        PropertyChanges {
+//                            target: animationIcon
+//                            source: "qrc:/icons/Icons/pause.svg"
+//                        }
+//                        PropertyChanges {
+//                            target: infoboxscene3d
+//                            play: true
+//                        }
+//                    },
+//                    State {
+//                        name: "pause"
+//                        PropertyChanges {
+//                            target: animationIcon
+//                            source: "qrc:/icons/Icons/play.svg"
+//                        }
+//                        PropertyChanges {
+//                            target: infoboxscene3d
+//                            play: false
+//                        }
+//                    }
+//                ]
 
-                state: "play"
-                anchors.bottom: parent.bottom
-                anchors.right: parent.right
-                anchors.margins: 30
-                source: "qrc:/icons/Icons/play.svg"
-                width: 75
-                height: 75
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked: parent.state=="play"? parent.state="pause" : parent.state="play"
-                }
-            }
+//                state: "play"
+//                anchors.bottom: parent.bottom
+//                anchors.right: parent.right
+//                anchors.margins: 30
+//                source: "qrc:/icons/Icons/play.svg"
+//                width: 75
+//                height: 75
+//                MouseArea{
+//                    anchors.fill: parent
+//                    onClicked: parent.state=="play"? parent.state="pause" : parent.state="play"
+//                }
+//            }
 
 
             //----------Navigation UI-----------------
@@ -308,6 +309,8 @@ Rectangle {
                 anchors.bottom: parent.bottom
                 anchors.horizontalCenter:  parent.horizontalCenter
                 height: 35
+                style: CustomSwitchStyle{
+                }
                 checked: true
                 onCheckedChanged: {
                     infoboxscene3d.panMode=checked;
