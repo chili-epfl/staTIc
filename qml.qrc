@@ -93,6 +93,7 @@
         <file>SynchDialogBox.qml</file>
         <file>MaterialDesigner.qml</file>
         <file>NumberEntity.qml</file>
+        <file>UI/CustomSwitchStyle.qml</file>
     </qresource>
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>

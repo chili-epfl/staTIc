@@ -140,7 +140,7 @@ Item{
         running: false;
         interval: 2000
     }
-    Component.onCompleted: camDevice.deviceId=QtMultimedia.availableCameras[1].deviceId
+    Component.onCompleted: camDevice.deviceId=QtMultimedia.availableCameras[0].deviceId
 
     /*Loading animation*/
     Rectangle{
@@ -151,7 +151,7 @@ Item{
         Image {
             anchors.centerIn: parent
             id: loadingLogo
-            width: parent.width/3
+            width: parent.height/3
             height: width
             source:"qrc:/icons/Icons/LOADING.png"
         }
@@ -161,7 +161,7 @@ Item{
            anchors.top: loadingLogo.bottom
            text: "Loading Camera"
            color: "white"
-           font.pixelSize: pt2px(15)
+           font.pointSize: 15
         }
         ProgressBar{
             id:loadingAnimation_progressbar
@@ -205,8 +205,9 @@ Item{
                  staticsmodule.sourceUrl=structureUrl;
              }
          }
-         imageCapture.resolution: "640x480" //Android sets the viewfinder resolution as the capture one
-         viewfinder.resolution:"640x480"
+
+         //imageCapture.resolution: "640x480" //Android sets the viewfinder resolution as the capture one
+         //viewfinder.resolution:"640x480"
 //         imageCapture.resolution: "800x448" //Android sets the viewfinder resolution as the capture one
 //         viewfinder.resolution:"800x448"
          focus {
@@ -286,11 +287,10 @@ Item{
                     id:viewFilterBar
                     anchors.horizontalCenter: parent.horizontalCenter
                 }
-
                 InfoBox{
                     id:infobox
-                    width:Math.max(parent.width/3,pt2px(142))//5cm
-
+//                    width:Math.max(parent.width/3,pt2px(142))//5cm
+                      width: parent.width/3;
                 }
                 Item{
                     id:legend_item
@@ -512,11 +512,14 @@ Item{
                     anchors.leftMargin: 15
                     anchors.top: clippingPlaneSlider.top
                     height: clippingPlaneSlider.height
-                    Label{
-                        text: "Depth Culling: "+clippingPlaneSlider.value/10+"cm"
+                    Text{
+                        text: !clippingPlaneSlider.pressed ? "Depth Culling" : clippingPlaneSlider.value/10+"cm"
                         color: "#F8F8F8"
                         rotation: 90
                         anchors.centerIn: parent
+                        fontSizeMode: Text.Fit
+                        font.pointSize: 14
+
                     }
                 }
              }

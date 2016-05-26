@@ -125,23 +125,29 @@ LIBS += -lQtPhysicsUnofficial
 
 android {
     #INCLUDEPATH += $(ANDROID_STANDALONE_TOOLCHAIN)/sysroot/usr/include
-    INCLUDEPATH += /home/chili/opencv/platforms/build-android/install/sdk/native/jni/include
+    INCLUDEPATH += /home/chili/opencv/android-build/install/sdk/native/jni/include
+    INCLUDEPATH += /home/chili/Downloads/bullet3-2.83.5/build-android/install/include
+    INCLUDEPATH += /home/chili/Downloads/bullet3-2.83.5/build-android/install/include/bullet
 
-    #LIBS += -L$(ANDROID_STANDALONE_TOOLCHAIN)/sysroot/usr/lib
-    LIBS += -L/home/chili/opencv/platforms/build-android/install/sdk/native/libs/armeabi-v7a/
+    LIBS += -L/home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a
+    LIBS += -L/home/chili/Downloads/bullet3-2.83.5/build-android/install/lib
 
     ANDROID_EXTRA_LIBS = \
-        /home/chili/opencv/platforms/build-android/install/sdk/native/libs/armeabi-v7a/libopencv_core.so \
-        /home/chili/opencv/platforms/build-android/install/sdk/native/libs/armeabi-v7a/libopencv_imgproc.so \
-        /home/chili/opencv/platforms/build-android/install/sdk/native/libs/armeabi-v7a/libopencv_imgcodecs.so \
-        /home/chili/opencv/platforms/build-android/install/sdk/native/libs/armeabi-v7a/libopencv_flann.so \
-        /home/chili/opencv/platforms/build-android/install/sdk/native/libs/armeabi-v7a/libopencv_ml.so \
-        /home/chili/opencv/platforms/build-android/install/sdk/native/libs/armeabi-v7a/libopencv_features2d.so \
-        /home/chili/opencv/platforms/build-android/install/sdk/native/libs/armeabi-v7a/libopencv_calib3d.so \
-        /home/chili/opencv/platforms/build-android/install/sdk/native/libs/armeabi-v7a/libopencv_video.so \
-        /home/chili/opencv/platforms/build-android/install/sdk/native/libs/armeabi-v7a/libopencv_videoio.so \
-        /home/chili/opencv/platforms/build-android/install/sdk/native/libs/armeabi-v7a/libopencv_highgui.so \
-        /home/chili/android-ndk-r10d/toolchains/arm-linux-androideabi-4.9/prebuilt/linux-x86_64/user/lib/libassimp.so
+        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_core.so \
+        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_imgproc.so \
+        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_imgcodecs.so \
+        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_flann.so \
+        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_ml.so \
+        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_features2d.so \
+        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_calib3d.so \
+        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_video.so \
+        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_videoio.so \
+        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_highgui.so \
+        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_aruco.so \
+        /home/chili/Downloads/bullet3-2.83.5/build-android/install/lib/libLinearMath.so \
+        /home/chili/Downloads/bullet3-2.83.5/build-android/install/lib/libBulletCollision.so \
+        /home/chili/Downloads/bullet3-2.83.5/build-android/install/lib/libBulletDynamics.so \
+        /home/chili/Downloads/bullet3-2.83.5/build-android/install/lib/libBulletSoftBody.so
 
 
     ANDROID_PERMISSIONS += \
@@ -149,8 +155,6 @@ android {
 
     ANDROID_FEATURES += \
         android.hardware.camera
-
-
 }
 !android{
     INCLUDEPATH += /home/chili/opencv/build-linux/install/include
@@ -216,6 +220,15 @@ DISTFILES += \
     Resources/Materials/D30/lorenzo.lucignano@epfl.ch-8316125742.material \
     Resources/Materials/D50/lorenzo.lucignano@epfl.ch-8316125742.material \
     Resources/Materials/D70/lorenzo.lucignano@epfl.ch-8316125742.material \
-    load.yml
+    load.yml \
+    android/AndroidManifest.xml \
+    android/gradle/wrapper/gradle-wrapper.jar \
+    android/gradlew \
+    android/res/values/libs.xml \
+    android/build.gradle \
+    android/gradle/wrapper/gradle-wrapper.properties \
+    android/gradlew.bat
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
 

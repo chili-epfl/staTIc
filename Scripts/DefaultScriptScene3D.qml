@@ -23,6 +23,7 @@ Entity {
        if(structureLoaderURL.toString().search(".dae")!=-1){
            structureLoader.source=structureLoaderURL;
            structureLoaded=Qt.binding(function(){return structureLoader.status==SceneLoader.Loaded})
+           structureLoaded=true
        }
        else if(structureLoaderURL.toString().search(".obj")!=-1){
            meshStructure.source=structureLoaderURL;
@@ -105,7 +106,8 @@ Entity {
                             SortMethod {
                                 criteria: [
                                     SortCriterion { sort: SortCriterion.StateChangeCost },
-                                    SortCriterion { sort: SortCriterion.Material }
+                                    SortCriterion { sort: SortCriterion.Material },
+                                    SortCriterion { sort: SortCriterion.BackToFront }
                                 ]
                             }
                         }

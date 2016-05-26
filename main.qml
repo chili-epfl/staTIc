@@ -85,39 +85,6 @@ Item {
             Layout.preferredHeight: parent.height*0.6
             Layout.alignment: Qt.AlignCenter
 
-            Component{
-                id:modelDelegate
-                Rectangle{
-                    color: "#55FFFF99"
-                    width: gridRect.height; height:gridRect.height
-                    ColumnLayout{
-                        Item{                id:scenarioListView
-
-                            //Layout.alignment: Qt.AlignCenter
-                            Layout.preferredHeight:  gridRect.height-2*caption.font.pixelSize;
-                            Layout.preferredWidth: gridRect.height;
-                            Image {
-                                anchors.fill: parent
-                                anchors.margins: 10
-                                fillMode: Image.PreserveAspectFit
-                                source: decoration;
-                            }
-                        }
-                        Item{
-                            //Layout.alignment: Qt.AlignCenter
-                            Layout.preferredHeight:caption.font.pixelSize
-                            Layout.minimumWidth: gridRect.height
-                            Text { id:caption ; text: display; font.pixelSize: pt2px(11);
-                                anchors.centerIn: parent
-                            }
-                        }
-                        MouseArea {
-                            anchors.fill: parent
-                            onClicked: gridview.currentIndex = index
-                        }
-                    }
-                }
-            }
 
             ListView{
                 orientation: Qt.Horizontal
@@ -128,7 +95,42 @@ Item {
                 anchors.fill: parent
                 model: scenarioListModel
                 highlight: Rectangle { color: "lightsteelblue"; radius: 2 }
-                delegate:modelDelegate
+                delegate: Rectangle{
+                    color: "#55FFFF99"
+                    width: gridRect.height; height:gridRect.height
+                    ColumnLayout{
+                        anchors.fill: parent
+                        Item{
+                            id:scenarioListView
+                            //Layout.alignment: Qt.AlignCenter
+                            Layout.preferredHeight:  0.8*parent.height;
+                            Layout.preferredWidth: parent.height;
+                            Image {
+                                anchors.fill: parent
+                                anchors.margins: 10
+                                fillMode: Image.PreserveAspectFit
+                                source: decoration;
+                            }
+                        }
+                        Item{
+                            //Layout.alignment: Qt.AlignCenter
+                            Layout.preferredHeight:  0.2*parent.height;
+                            Layout.preferredWidth: parent.height;
+                            Text {
+                                id:caption;
+                                text: display;
+                                anchors.fill: parent
+                                fontSizeMode: Text.Fit
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                            }
+                        }
+                        MouseArea {
+                            anchors.fill: parent
+                            onClicked: gridview.currentIndex = index
+                        }
+                    }
+                }
 
                 flickableChildren: MouseArea {
                     anchors.fill: parent
