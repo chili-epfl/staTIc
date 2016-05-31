@@ -51,13 +51,12 @@ signals:
     void cameraResolutionChanged(const QSizeF&);
 
 private:
+    void calibrateCamera();
 
 #ifdef QT_DEBUG
     const float FPS_RATE = 0.9f;            ///< Rate of using the older FPS estimates
     const int FPS_PRINT_PERIOD = 500;       ///< Period of printing the FPS estimate, in milliseconds
 #endif
-
-
     enum State{
         NONE,               ///< Invalid state, new frames will not be presented
         BUSY,               ///< Currently busy
@@ -90,6 +89,11 @@ private:
     QQuaternion m_rotationOpencvToOpenGL=QQuaternion::fromAxisAndAngle(1,0,0,180);
     QHash<int,int> m_tag_ages;
     QHash<int, std::vector<cv::Point2f>  > m_tags_corners_history;
+
+    std::vector< std::vector<cv::Point2f> > m_calibration_2d_points;
+    std::vector< std::vector<cv::Point3f> > m_calibration_3d_points;
+    QSet<QVector3D> m_camera_poses;
+
 };
 
 
@@ -115,6 +119,8 @@ private:
     DetectionTask* task = NULL;         ///< The loop method and parameter container
     //GLuint fbo=0;                         ///< FBO used in android to move a texture to the memory
     ArucoDetector* m_detector;
+    cv::Mat cv_inputFrame;
+
 
     QOpenGLExtraFunctions* gl;
     QOpenGLShaderProgram program;

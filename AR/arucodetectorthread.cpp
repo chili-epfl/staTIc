@@ -88,7 +88,6 @@ QVideoFrame ArucoDetectorThread::run(QVideoFrame *input, const QVideoSurfaceForm
     switch (handle) {
     case QAbstractVideoBuffer::NoHandle: ///< Mainly desktop configuration
         if(input->map(QAbstractVideoBuffer::ReadOnly)){
-            cv::Mat mat;
             if( QVideoFrame::imageFormatFromPixelFormat(pixelFormat)!=QImage::Format_Invalid ){
                 QImage img( input->bits(),
                                    input->width(),
@@ -96,17 +95,17 @@ QVideoFrame ArucoDetectorThread::run(QVideoFrame *input, const QVideoSurfaceForm
                             input->bytesPerLine(),
                             QVideoFrame::imageFormatFromPixelFormat(pixelFormat));
                 img=img.convertToFormat(QImage::Format_Grayscale8);
-                mat=cv::Mat(img.height(), img.width(), CV_8UC1,
-                            const_cast<uchar*>(img.constBits()), img.bytesPerLine()).clone();
-                task->presentFrame(mat);
+                cv_inputFrame=cv::Mat(img.height(), img.width(), CV_8UC1,
+                            const_cast<uchar*>(img.constBits()), img.bytesPerLine());
+                task->presentFrame(cv_inputFrame.clone());
             }
             else if (pixelFormat == QVideoFrame::PixelFormat::Format_YUV420P ||
                      pixelFormat == QVideoFrame::PixelFormat::Format_NV21 ||
                      pixelFormat == QVideoFrame::PixelFormat::Format_NV12
                      ) {
-                mat=cv::Mat(input->height(), input->width(),CV_8UC1 ,
-                            const_cast<uchar*>(input->bits())).clone();
-                task->presentFrame(mat);
+                cv_inputFrame=cv::Mat(input->height(), input->width(),CV_8UC1 ,
+                            const_cast<uchar*>(input->bits()));
+                task->presentFrame(cv_inputFrame.clone());
             }
             else if(pixelFormat==QVideoFrame::PixelFormat::Format_BGR32) {
                 QImage img( input->bits(),
@@ -115,9 +114,9 @@ QVideoFrame ArucoDetectorThread::run(QVideoFrame *input, const QVideoSurfaceForm
                             input->bytesPerLine(),
                             QImage::Format_RGB32);
                 img=img.convertToFormat(QImage::Format_Grayscale8);
-                mat=cv::Mat(img.height(), img.width(), CV_8UC1,
-                            const_cast<uchar*>(img.constBits()), img.bytesPerLine()).clone();
-                task->presentFrame(mat);
+                cv_inputFrame=cv::Mat(img.height(), img.width(), CV_8UC1,
+                            const_cast<uchar*>(img.constBits()), img.bytesPerLine());
+                task->presentFrame(cv_inputFrame.clone());
 
             }
             else{
@@ -131,7 +130,7 @@ QVideoFrame ArucoDetectorThread::run(QVideoFrame *input, const QVideoSurfaceForm
         break;
     case QAbstractVideoBuffer::GLTextureHandle:
     {
-        int outputHeight=480;
+        int outputHeight=768;
         auto outputWidth(outputHeight * input->width() / input->height());
 
         if (gl == nullptr) {
@@ -142,7 +141,6 @@ QVideoFrame ArucoDetectorThread::run(QVideoFrame *input, const QVideoSurfaceForm
             auto version(context->isOpenGLES() ? "#version 300 es\n" : "#version 130\n");
 
             QString vertex(version);
-            qDebug()<<vertex;
             vertex += R"(
                       out vec2 coord;
                       void main(void) {
@@ -153,10 +151,12 @@ QVideoFrame ArucoDetectorThread::run(QVideoFrame *input, const QVideoSurfaceForm
                       )";
 
             QString fragment(version);
+
+            /*Assuming bgr32 color format*/
             fragment += R"(
                         in lowp vec2 coord;
                         uniform sampler2D image;
-                        const lowp vec3 luma = vec3(0.2126, 0.7152, 0.0722);
+                        const lowp vec3 luma = vec3(0.1140, 0.5870,0.2989 );
                         out lowp float fragment;
                         void main(void) {
                         lowp vec3 color = texture(image, coord).rgb;
@@ -193,10 +193,10 @@ QVideoFrame ArucoDetectorThread::run(QVideoFrame *input, const QVideoSurfaceForm
         gl->glDisable(GL_BLEND);
         gl->glDrawArrays(GL_TRIANGLES, 0, 3);
 
-        cv::Mat mat(outputHeight, outputWidth, CV_8UC1);
+        cv_inputFrame.create(outputHeight, outputWidth, CV_8UC1);
         gl->glPixelStorei(GL_PACK_ALIGNMENT, 1);
-        gl->glReadPixels(0, 0, outputWidth, outputHeight, QOpenGLTexture::Red, QOpenGLTexture::UInt8, mat.data);
-        task->presentFrame(mat.clone());
+        gl->glReadPixels(0, 0, outputWidth, outputHeight, QOpenGLTexture::Red, QOpenGLTexture::UInt8, cv_inputFrame.data);
+        task->presentFrame(cv_inputFrame.clone());
     }
         break;
     default:
@@ -253,9 +253,11 @@ DetectionTask::DetectionTask(QMatrix4x4 projectionMatrix):
     setProjectionMatrix(projectionMatrix);
     m_dictionary= cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_1000);
     m_detector_params=cv::aruco::DetectorParameters::create();
-    m_detector_params->polygonalApproxAccuracyRate=0.04;
+    //m_detector_params->polygonalApproxAccuracyRate=0.04;
     m_detector_params->doCornerRefinement=false;
-    //m_detector_params->adaptiveThreshWinSizeMax=3;
+    m_detector_params->adaptiveThreshWinSizeMax=13;
+    m_detector_params->adaptiveThreshWinSizeMin=3;
+    //m_detector_params->minMarkerPerimeterRate=0.05;
 }
 
 DetectionTask::~DetectionTask()
@@ -276,7 +278,7 @@ void DetectionTask::presentFrame(cv::Mat frame)
 
             //Currently processing, copy buffer over the next frame
         case BUSY:
-            nextFrame = frame.clone(); //TODO: We're screwed if this thing does not memcpy the buffer behind the curtains
+            nextFrame = frame;
             nextFrameAvailable = true;
             break;
 
@@ -342,7 +344,9 @@ void DetectionTask::doWork()
     cv::Mat tvec(3, 1, CV_64F);
     cv::Mat rmat,lap,lap_ROI;
     cv::Mat prev_Image;
-
+    cv::Mat ROI_image;
+    cv::Rect roi;
+    bool init=false;
     double norm;
     cv::Scalar mu, sigma;
     float roll,pitch,yaw;
@@ -354,13 +358,11 @@ void DetectionTask::doWork()
     QHash<int,QList<double> > sharpness_tags;
     QList<double> sort_list;
     double focusMeasure;
+    bool points_are_cooplanar;
     while(running){
 
         //Process frame if possible
         if(nextFrameAvailable){
-
-
-
             //Signal that we're consuming the next frame now
             nextFrameAvailable = false;
             state = BUSY;
@@ -368,30 +370,39 @@ void DetectionTask::doWork()
             //Unlock the lock so that we can present a new frame while it's estimating
             frameLock.unlock();
             poseMap.clear();
-//            if(!prev_Image.empty() && m_markerIds_prev.size()>0){
-//                cv::calcOpticalFlowPyrLK(prev_Image,nextFrame,m_markerCorners_prev,m_tracked_corners,status,err);
-//            }
+
 //            QString tets_name="/storage/emulated/legacy/staTIc/Resources/lol"+QString::number(rand())+".png";
 //            cv::imwrite(tets_name.toStdString(),nextFrame.clone());
+
             if(m_cameraResolution!=QSizeF(nextFrame.cols,nextFrame.rows)){
                 m_cameraResolution=QSizeF(nextFrame.cols,nextFrame.rows);
                 setProjectionMatrix(QMatrix4x4(
-                                        6.1029330646666438e+02, 0., nextFrame.cols/2.0 ,0,
-                                        0., 6.1038146342831521e+02, nextFrame.rows/2.0,0,
+                                        700, 0., nextFrame.cols/2.0 ,0,
+                                        0., 700, nextFrame.rows/2.0,0,
                                         0,              0,              1,  0,
                                         0,              0,              0,  1
                                         ));
 
                 emit projectionMatrixChanged(QMatrix4x4(
-                                                 6.1029330646666438e+02, 0., nextFrame.cols/2.0 ,0,
-                                                 0., 6.1038146342831521e+02, nextFrame.rows/2.0,0,
+                                                 700, 0., nextFrame.cols/2.0 ,0,
+                                                 0., 700, nextFrame.rows/2.0,0,
                                                  0,              0,              1,  0,
                                                  0,              0,              0,  1
                                                  ));
                 emit cameraResolutionChanged(m_cameraResolution);
             }
+            if(!init){
+                roi=cv::Rect(nextFrame.cols-0.75*nextFrame.cols,nextFrame.rows-0.75*nextFrame.rows,
+                             0.75*nextFrame.cols,0.75*nextFrame.rows);
+                init=true;
+            }
+            m_markerCorners.clear();
+            m_markerIds.clear();
+            if(init){
+                ROI_image=nextFrame(roi);
+                cv::aruco::detectMarkers(ROI_image,m_dictionary,m_markerCorners,m_markerIds,m_detector_params);
+            }
 
-            cv::aruco::detectMarkers(nextFrame,m_dictionary,m_markerCorners,m_markerIds,m_detector_params);
             //            bool skip=false;
 //            for(int i=0;i<m_markerIds_prev.size();i++){
 //                if(status[i*4]==0 || status[i*4+1]==0
@@ -420,8 +431,8 @@ void DetectionTask::doWork()
 //                tmp.push_back(m_tracked_corners[i*4+3]);
 //                m_markerCorners.push_back(tmp);
 //            }
-            cv::Laplacian(nextFrame,lap,CV_32F);
-            for(int i=0;i<m_markerIds.size();i++){
+            cv::Laplacian(ROI_image,lap,CV_32F);
+            for(unsigned int  i=0;i<m_markerIds.size();i++){
                 min_x=10000000;
                 min_y=10000000;
                 max_x=-1;
@@ -450,7 +461,26 @@ void DetectionTask::doWork()
                     m_markerIds[i]=502100;
                 }
             }
-            for(int i=0;i<m_markerIds.size();i++){
+
+            if(m_markerIds.size() > 0){
+                for(unsigned int  i=0;i<m_markerIds.size();i++){
+                    m_markerCorners[i][0].x+=roi.x;
+                    m_markerCorners[i][0].y+=roi.y;
+
+                    m_markerCorners[i][1].x+=roi.x;
+                    m_markerCorners[i][1].y+=roi.y;
+
+                    m_markerCorners[i][2].x+=roi.x;
+                    m_markerCorners[i][2].y+=roi.y;
+
+                    m_markerCorners[i][3].x+=roi.x;
+                    m_markerCorners[i][3].y+=roi.y;
+                }
+            }
+
+
+
+            for(unsigned int  i=0;i<m_markerIds.size();i++){
                 m_tag_ages[m_markerIds.at(i)]=0;
                 m_tags_corners_history[m_markerIds.at(i)]=m_markerCorners.at(i);
             }
@@ -471,18 +501,7 @@ void DetectionTask::doWork()
             }
 
 
-            bool found_even=false;
-            bool found_odd=false;
-            for(int i=0;i<m_markerIds.size();i++)
-                if(m_markerIds.at(i)%2==0){
-                    found_even=true;
-                    break;
-                }
-                else{
-                    found_odd=true;
-                }
-            bool points_are_cooplanar=!(found_even && found_odd);
-            for(int i=0;i<m_markerIds.size();i++){
+            for(unsigned int  i=0;i<m_markerIds.size();i++){
                 if(m_singleTagSizes.contains(m_markerIds[i])){
                     std::vector< std::vector<cv::Point2f> > corners;
                     std::vector< cv::Vec3d > rvecs,tvecs;
@@ -532,10 +551,38 @@ void DetectionTask::doWork()
                 }
             }
 
-            for(int i=0;i<m_boards.size();i++){
-                float err;
+            for(unsigned int  i=0;i<m_boards.size();i++){
+
+                /*Check for cooplanarity. Assuming that z is the sam efor all the 4 points of a tag*/
+                points_are_cooplanar=true;
+                for(unsigned int j = 0; j < m_markerIds.size(); j++) {
+                    int currentId = m_markerIds[j];
+                    float marker_z;
+                    bool marker_z_init=false;
+                    if(!marker_z_init)
+                        for(unsigned int z = 0; z < m_boards[i]->ids.size(); z++) {
+                            if(currentId == m_boards[i]->ids[z]) {
+                                marker_z=m_boards[i]->objPoints[z][0].z;
+                                marker_z_init=true;
+                                break;
+                            }
+                        }
+                    else
+                        for(unsigned int z = 0; z < m_boards[i]->ids.size(); z++) {
+                            if(currentId == m_boards[i]->ids[z]) {
+                                if(marker_z!=m_boards[i]->objPoints[z][0].z){
+                                    points_are_cooplanar=false;
+                                    break;
+                                }
+                            }
+                        }
+                    if(points_are_cooplanar)
+                        break;
+                }
+
                 bool useGuess=false;
-                if(m_use_filter && m_LKFilters.contains(m_board_names[i]) && m_LKFilters[m_board_names[i]]->isLastEstimationBasedOnMeasurement()){
+
+                if(m_use_filter && points_are_cooplanar && m_LKFilters.contains(m_board_names[i]) && m_LKFilters[m_board_names[i]]->isLastEstimationBasedOnMeasurement()){
                     useGuess=true;
                     LinearKalmanFilter* filter=m_LKFilters[m_board_names[i]];
                     filter->getLastEstimation(tvec,rvec);
@@ -547,12 +594,14 @@ void DetectionTask::doWork()
                     rvec.at <double>(1) = axis.y()*CV_PI*angle/180;
                     rvec.at <double>(2) = axis.z()*CV_PI*angle/180;
                 }
-                int flag=cv::SOLVEPNP_EPNP;
-                if(points_are_cooplanar) flag=0;
+                int solvepnp_flag=cv::SOLVEPNP_EPNP;
+                if(points_are_cooplanar)
+                    solvepnp_flag=cv::SOLVEPNP_ITERATIVE;
+
                 if(cv::aruco::estimatePoseBoard(m_markerCorners,m_markerIds,m_boards[i],m_cv_projectionMatrix,
-                                             m_distCoeff,rvec,tvec,useGuess,flag)){
+                                                m_distCoeff,rvec,tvec,useGuess,solvepnp_flag)){
                     norm=cv::norm(rvec);
-                    measur_quad=QQuaternion::fromAxisAndAngle((qreal) (rvec.at<double>(0)/norm),(qreal) (rvec.at<double>(1)/norm),(qreal) (rvec.at<double>(2)/norm),180.0*(qreal)norm/CV_PI);
+                    measur_quad=QQuaternion::fromAxisAndAngle((rvec.at<double>(0)/norm),(rvec.at<double>(1)/norm),(rvec.at<double>(2)/norm),180.0*norm/CV_PI);
                     if(!m_use_filter){
                         poseMap[m_board_names[i]]=Pose(QVector3D((qreal)tvec.at<double>(0),-(qreal)tvec.at<double>(1),-(qreal)tvec.at<double>(2)),
                                                        m_rotationOpencvToOpenGL*measur_quad);
@@ -575,8 +624,8 @@ void DetectionTask::doWork()
 
                         filter->fillMeasurements(tvec,rvec);
                         filter->updateKalmanFilter(tvec,rvec);
-                        poseMap[m_board_names[i]]= Pose(QVector3D((qreal)tvec.at<double>(0),-(qreal)tvec.at<double>(1),-(qreal)tvec.at<double>(2)),
-                                                        m_rotationOpencvToOpenGL*measur_quad.fromEulerAngles(rvec.at <double>(0),rvec.at <double>(1),rvec.at <double>(2)));
+                        QVector3D t((qreal)tvec.at<double>(0),-(qreal)tvec.at<double>(1),-(qreal)tvec.at<double>(2));
+                        poseMap[m_board_names[i]]= Pose(t,m_rotationOpencvToOpenGL*measur_quad.fromEulerAngles(rvec.at <double>(0),rvec.at <double>(1),rvec.at <double>(2)));
                     }
                     //qDebug()<< poseMap[m_board_names[i]];
 //                    cv::Mat debug=nextFrame.clone();
@@ -614,7 +663,7 @@ void DetectionTask::doWork()
         if(millis>0){
             fps = FPS_RATE*fps + (1.0f - FPS_RATE)*(1000.0f/millis);
             if(millisElapsed >= FPS_PRINT_PERIOD){
-                //qDebug("Aruco is running at %f FPS",fps);
+                qDebug("Aruco is running at %f FPS",fps);
                 millisElapsed = 0;
             }
         }

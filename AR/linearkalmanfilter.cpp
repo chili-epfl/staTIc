@@ -106,19 +106,21 @@ void LinearKalmanFilter::updateKalmanFilter(cv::Mat &translation_estimated, cv::
         estimated=prediction;
     }
     // Estimated translation
-    translation_estimated.at<double>(0) = estimated.at<double>(0);
-    translation_estimated.at<double>(1) = estimated.at<double>(1);
-    translation_estimated.at<double>(2) = estimated.at<double>(2);
-
+    if(!translation_estimated.empty()){
+        translation_estimated.at<double>(0) = estimated.at<double>(0);
+        translation_estimated.at<double>(1) = estimated.at<double>(1);
+        translation_estimated.at<double>(2) = estimated.at<double>(2);
+    }
     m_last_est_tvec.at<double>(0) = estimated.at<double>(0);
     m_last_est_tvec.at<double>(1) = estimated.at<double>(1);
     m_last_est_tvec.at<double>(2) = estimated.at<double>(2);
 
     // Estimated euler angles
-    rotation_estimated.at<double>(0) = estimated.at<double>(9);
-    rotation_estimated.at<double>(1) = estimated.at<double>(10);
-    rotation_estimated.at<double>(2) = estimated.at<double>(11);
-
+    if(!rotation_estimated.empty()){
+        rotation_estimated.at<double>(0) = estimated.at<double>(9);
+        rotation_estimated.at<double>(1) = estimated.at<double>(10);
+        rotation_estimated.at<double>(2) = estimated.at<double>(11);
+    }
     m_last_est_rvec.at<double>(0) = estimated.at<double>(9);
     m_last_est_rvec.at<double>(1) = estimated.at<double>(10);
     m_last_est_rvec.at<double>(2) = estimated.at<double>(11);
@@ -189,7 +191,7 @@ void LinearKalmanFilter::fillMeasurements( const cv::Mat &translation_measured, 
         sort_list.clear();
         sort_list.append(a1);
         std::sort(sort_list.begin(),sort_list.end());
-        if(measurements.at<double>(3)> sort_list.at(12)+1.5*(sort_list.at(12)- sort_list.at(3))
+        if(measurements.at<double>(3) > sort_list.at(12)+1.5*(sort_list.at(12)- sort_list.at(3))
                 || measurements.at<double>(3)< sort_list.at(3)-1.5*(sort_list.at(12)- sort_list.at(3)) )
             measurementsAvailable=false;
         else{
@@ -234,13 +236,13 @@ void LinearKalmanFilter::fillMeasurements( const cv::Mat &translation_measured, 
         }
     }
 
-    x.append(measurements.at<double>(0));
-    y.append(measurements.at<double>(1));
-    z.append(measurements.at<double>(2));
+        x.append(measurements.at<double>(0));
+        y.append(measurements.at<double>(1));
+        z.append(measurements.at<double>(2));
 
-    a1.append(measurements.at<double>(3));
-    a2.append(measurements.at<double>(4));
-    a3.append(measurements.at<double>(5));
+        a1.append(measurements.at<double>(3));
+        a2.append(measurements.at<double>(4));
+        a3.append(measurements.at<double>(5));
 
 
 }
