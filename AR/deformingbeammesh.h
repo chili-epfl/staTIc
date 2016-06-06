@@ -57,10 +57,13 @@ private:
     Qt3DRender::QBuffer *vertexDataBuffer;
     Qt3DRender::QBuffer *normalDataBuffer ;
     Qt3DRender::QBuffer *indexDataBuffer;
+    Qt3DRender::QBuffer *textureDataBuffer;
+
 
     Qt3DRender::QAttribute *positionAttribute;
     Qt3DRender::QAttribute *normalAttribute;
     Qt3DRender::QAttribute *indexAttribute;
+    Qt3DRender::QAttribute *uvtextureAttribute;
 
 
 };

@@ -12,9 +12,11 @@ DeformingBeamMesh::DeformingBeamMesh(Qt3DCore::QNode * parent):
     vertexDataBuffer(0),
     normalDataBuffer(0),
     indexDataBuffer(0),
+    textureDataBuffer(0),
     positionAttribute(0),
     normalAttribute(0),
-    indexAttribute(0)
+    indexAttribute(0),
+    uvtextureAttribute(0)
 {
     m_displacements.append(QVector4D(0,0,0,0));
     m_displacements.append(QVector4D(0,0,2,0));
@@ -93,8 +95,16 @@ void DeformingBeamMesh::init(){
     indexDataBuffer =
             new Qt3DRender::QBuffer(Qt3DRender::QBuffer::IndexBuffer, customGeometry);
 
+    textureDataBuffer=
+            new Qt3DRender::QBuffer(Qt3DRender::QBuffer::VertexBuffer, customGeometry);
+
+
+
     // Attributes
-    positionAttribute = new Qt3DRender::QAttribute();
+
+
+
+    positionAttribute = new Qt3DRender::QAttribute(customGeometry);
     positionAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
     positionAttribute->setBuffer(vertexDataBuffer);
     positionAttribute->setDataType(Qt3DRender::QAttribute::Float);
@@ -103,7 +113,7 @@ void DeformingBeamMesh::init(){
     positionAttribute->setByteStride(4 * sizeof(float));
     positionAttribute->setName(Qt3DRender::QAttribute::defaultPositionAttributeName());
 
-    normalAttribute = new Qt3DRender::QAttribute();
+    normalAttribute = new Qt3DRender::QAttribute(customGeometry);
     normalAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
     normalAttribute->setBuffer(normalDataBuffer);
     normalAttribute->setDataType(Qt3DRender::QAttribute::Float);
@@ -112,7 +122,7 @@ void DeformingBeamMesh::init(){
     normalAttribute->setByteStride(3 * sizeof(float));
     normalAttribute->setName(Qt3DRender::QAttribute::defaultNormalAttributeName());
 
-    indexAttribute = new Qt3DRender::QAttribute();
+    indexAttribute = new Qt3DRender::QAttribute(customGeometry);
     indexAttribute->setAttributeType(Qt3DRender::QAttribute::IndexAttribute);
     indexAttribute->setBuffer(indexDataBuffer);
     indexAttribute->setDataType(Qt3DRender::QAttribute::UnsignedShort);
@@ -120,10 +130,19 @@ void DeformingBeamMesh::init(){
     indexAttribute->setByteOffset(0);
     indexAttribute->setByteStride(0);
 
+    uvtextureAttribute=new Qt3DRender::QAttribute(customGeometry);
+    uvtextureAttribute->setName(Qt3DRender::QAttribute::defaultTextureCoordinateAttributeName());
+    uvtextureAttribute->setDataType(Qt3DRender::QAttribute::Float);
+    uvtextureAttribute->setDataSize(2);
+    uvtextureAttribute->setAttributeType(Qt3DRender::QAttribute::VertexAttribute);
+    uvtextureAttribute->setBuffer(textureDataBuffer);
+    uvtextureAttribute->setByteStride(2 * sizeof(float));
+    uvtextureAttribute->setByteOffset(0);
 
     customGeometry->addAttribute(positionAttribute);
     customGeometry->addAttribute(normalAttribute);
     customGeometry->addAttribute(indexAttribute);
+    customGeometry->addAttribute(uvtextureAttribute);
 
     this->setInstanceCount(1);
     this->setBaseVertex(0);
@@ -158,6 +177,10 @@ void DeformingBeamMesh::generateGeometry(){
     // 4 faces per segment, each split in 2, + 4 tringles on the externals, X keyframes
     indexBufferData.resize( (8 * m_segments + 12 )*  (m_keyFrames) * 3 * sizeof(ushort));
     ushort *rawIndexArray = reinterpret_cast<ushort *>(indexBufferData.data());
+
+    QByteArray uvtextureBufferData;
+    uvtextureBufferData.resize((8+4*(m_segments-1)) * (m_keyFrames) * (2) * sizeof(float));
+    float *rawUVTextureArray = reinterpret_cast<float *>(uvtextureBufferData.data());
 
     float step=m_length/m_segments;
     qreal half_h=m_size.height()/2;
@@ -441,13 +464,45 @@ void DeformingBeamMesh::generateGeometry(){
         rawNormalArray[idx++] = v.z();
     }
 
+
+    for(idx=0;idx<2*vertices.size();idx+=16){
+        rawUVTextureArray[idx]=0.0;
+        rawUVTextureArray[idx+1]=0.0;
+
+        rawUVTextureArray[idx+2]=0.0;
+        rawUVTextureArray[idx+3]=1.0;
+
+        rawUVTextureArray[idx+4]=0.0;
+        rawUVTextureArray[idx+5]=0.0;
+
+        rawUVTextureArray[idx+6]=0.0;
+        rawUVTextureArray[idx+7]=1.0;
+
+        rawUVTextureArray[idx+8]=1.0;
+        rawUVTextureArray[idx+9]=0.0;
+
+        rawUVTextureArray[idx+10]=1.0;
+        rawUVTextureArray[idx+11]=1.0;
+
+        rawUVTextureArray[idx+12]=1.0;
+        rawUVTextureArray[idx+13]=0.0;
+
+        rawUVTextureArray[idx+14]=1.0;
+        rawUVTextureArray[idx+15]=1.0;
+
+
+    }
+
+
     vertexDataBuffer->setData(vertexBufferData);
     normalDataBuffer->setData(normalBufferData);
     indexDataBuffer->setData(indexBufferData);
+    textureDataBuffer->setData(uvtextureBufferData);
 
     positionAttribute->setCount(vertices.size());
     normalAttribute->setCount(normals.size());
     indexAttribute->setCount(indices.size());
+    uvtextureAttribute->setCount(indices.size());
 
     //4 faces, 2 trigles per face, 3 indices per triangle
     this->setPrimitiveCount(indices.size());
