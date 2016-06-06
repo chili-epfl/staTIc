@@ -152,10 +152,17 @@ Entity {
 ////                }
 //            }
 //        }
-        PhongMaterial{
-            id:deformingMeshMaterial
-            diffuse:"#935208"
+//        PhongMaterial{
+//            id:deformingMeshMaterial
+//            diffuse:"#935208"
+//        }
+        DiffuseMapMaterial {
+                    id: deformingMeshMaterial
+                    diffuse: "qrc:/images/Images/woodbackground.png"
+                    specular: Qt.rgba( 0.2, 0.2, 0.2, 1.0 )
+                    shininess: 2.0
         }
+
         components: [deformingMesh,deformingMeshMaterial,deformingMeshTransformation]
 
         //Extreme planes
