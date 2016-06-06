@@ -206,8 +206,8 @@ Item{
              }
          }
 
-         //imageCapture.resolution: "640x480" //Android sets the viewfinder resolution as the capture one
-         //viewfinder.resolution:"640x480"
+         imageCapture.resolution: "1920x1440" //Android sets the viewfinder resolution as the capture one
+         viewfinder.resolution:"640x480"
 //         imageCapture.resolution: "800x448" //Android sets the viewfinder resolution as the capture one
 //         viewfinder.resolution:"800x448"
          focus {
@@ -242,7 +242,7 @@ Item{
          id: stillImage
          visible: camDevice.isRunning && camDevice.cameraStatus==Camera.ActiveStatus ? false:true
          anchors.fill: parent
-         fillMode: Image.PreserveAspectFit
+         fillMode: Image.PreserveAspectCrop
      }
 
      VideoOutput{
@@ -253,6 +253,7 @@ Item{
          source: camDevice
          filters:[aruco]
          fillMode:VideoOutput.PreserveAspectCrop
+
          Rectangle{
              anchors.fill: parent
              color:"#00000000"
@@ -268,10 +269,12 @@ Item{
                  aspects: ["input","physics"]
                  //aspects:["input"]
                  multisample:true
+
                  DefaultScriptScene3D {
                      id:scene3D
-                     cameraScaleX: viewFinder.contentRect.height/scene3DContainer.height
-                     cameraScaleY: viewFinder.contentRect.width/scene3DContainer.width
+                     property int factor_h:  Math.round(stillImage.sourceSize.height/ scene3DContainer.height)
+                     cameraScaleX: stillImage.visible ?  stillImage.sourceSize.height/ (Math.round(stillImage.sourceSize.height/ scene3DContainer.height) * scene3DContainer.height) : viewFinder.contentRect.height/scene3DContainer.height
+                     cameraScaleY: stillImage.visible ?  stillImage.sourceSize.width/ (Math.round(stillImage.sourceSize.width/ scene3DContainer.width) * scene3DContainer.width) : viewFinder.contentRect.width/scene3DContainer.width
                  }
              }
 
@@ -414,7 +417,6 @@ Item{
                         anchors.fill: parent
                         onClicked: {
                             scene3D.show_stress_ratio = !scene3D.show_stress_ratio
-
                         }
                     }
                 }
