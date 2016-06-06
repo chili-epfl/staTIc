@@ -15,7 +15,7 @@ class DeformingBeamMesh: public Qt3DRender::QGeometryRenderer
     Q_PROPERTY(int exagerate READ exagerate WRITE setExagerate NOTIFY exagerateChanged)
 public:
     DeformingBeamMesh(Qt3DCore::QNode * parent = 0);
-
+    ~DeformingBeamMesh();
     void setLength(qreal val);
     void setSegments(int val);
     void setSize(QSizeF size);
@@ -39,8 +39,9 @@ signals:
     void exagerateChanged();
 private:
     void init();
-    void generateGeometry();
     void update();
+private slots:
+    void generateGeometry();
 
 private:
     bool m_init;
@@ -57,14 +58,18 @@ private:
     Qt3DRender::QBuffer *vertexDataBuffer;
     Qt3DRender::QBuffer *normalDataBuffer ;
     Qt3DRender::QBuffer *indexDataBuffer;
-    Qt3DRender::QBuffer *textureDataBuffer;
+    Qt3DRender::QBuffer *uvtextureDataBuffer;
+
+    QByteArray vertexBufferData;
+    QByteArray normalBufferData;
+    QByteArray indexBufferData;
+    QByteArray uvtextureBufferData;
 
 
     Qt3DRender::QAttribute *positionAttribute;
     Qt3DRender::QAttribute *normalAttribute;
     Qt3DRender::QAttribute *indexAttribute;
     Qt3DRender::QAttribute *uvtextureAttribute;
-
 
 };
 
