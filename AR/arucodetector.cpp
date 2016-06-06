@@ -42,7 +42,7 @@ QVideoFilterRunnable *ArucoDetector::createFilterRunnable()
     connect(this,SIGNAL(pauseChanged(bool)),thread,SLOT(setPause(bool)));
     connect(thread,SIGNAL(objectsReady(PoseMap)),this,SLOT(notifyObservers(PoseMap)));
     connect(thread,SIGNAL(projectionMatrixChanged(QMatrix4x4)),this,SLOT(setProjectionMatrix(QMatrix4x4)));
-    connect(thread,SIGNAL(cameraResolutionChanged(QSizeF)),this,SLOT(setCameraResoltion(QSizeF)));
+    connect(thread,SIGNAL(cameraResolutionChanged(QSizeF)),this,SLOT(setCameraResolution(QSizeF)));
 
     return thread;
 }
@@ -63,7 +63,7 @@ void ArucoDetector::setProjectionMatrix(QMatrix4x4 m)
     emit projectionMatrixChanged();
 }
 
-void ArucoDetector::setCameraResoltion(QSizeF cameraResolution)
+void ArucoDetector::setCameraResolution(QSizeF cameraResolution)
 {
     if(cameraResolution!=m_cameraResolution){
         m_cameraResolution=cameraResolution;

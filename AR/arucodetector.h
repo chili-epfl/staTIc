@@ -45,7 +45,7 @@ public slots:
     void updateObserver(QString prevObjId);
     void notifyObservers(const PoseMap& poses);
     void setProjectionMatrix(QMatrix4x4);
-    void setCameraResoltion(QSizeF);
+    void setCameraResolution(QSizeF);
 private:
 
     void loadConfigurationFiles();
