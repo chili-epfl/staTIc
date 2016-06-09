@@ -10,6 +10,8 @@ const QString scenariosPath(extstr+"Resources/Scenarios/");
 const QString materialsPrivatePath(extstr+"Resources/Materials/Private/");
 const QString assets3DPrivatePath(extstr+"Resources/Assets3D/Private/");
 const QString scenariosPrivatePath(extstr+"Resources/Scenarios/Private/");
+const QString logFilesPath(extstr+"Resources/Private/log_files/");
+
 #else
 const QString materialsPath("Resources/Materials/");
 const QString assets3DPath("Resources/Assets3D/");
@@ -17,6 +19,8 @@ const QString scenariosPath("Resources/Scenarios/");
 const QString materialsPrivatePath("Resources/Materials/Private/");
 const QString assets3DPrivatePath("Resources/Assets3D/Private/");
 const QString scenariosPrivatePath("Resources/Scenarios/Private/");
+const QString logFilesPath("Resources/Private/log_files/");
+
 #endif
 
 #endif // STATIC_GLOBAL_H

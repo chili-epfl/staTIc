@@ -26,6 +26,7 @@
 #include "AR/arucodetector.h"
 #include "AR/arucoobject.h"
 #include "AR/quaternionhelper.h"
+#include "logger.h"
 int main(int argc, char *argv[])
 {
 //    QApplication app(argc, argv);
@@ -61,6 +62,8 @@ int main(int argc, char *argv[])
     QQuickView view;
 
     qRegisterMetaType<cv::Mat>("cv::Mat");
+
+    qmlRegisterType<Logger>("Logger", 1, 0, "Logger");
 
     qmlRegisterType<BackgroundSubtraction>("BackgroundSubtraction", 1, 0, "BackgroundSubtraction");
 

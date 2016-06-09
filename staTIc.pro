@@ -50,7 +50,8 @@ SOURCES += main.cpp \
     Tools/TangibleTrapzLoad/tangibletrapzload.cpp \
     AR/linearkalmanfilter.cpp \
     AR/quaternionhelper.cpp \
-    Tools/Snow/snow.cpp
+    Tools/Snow/snow.cpp \
+    logger.cpp
 
 
 HEADERS += \
@@ -103,7 +104,8 @@ HEADERS += \
     Tools/TangibleTrapzLoad/tangibletrapzload.h \
     AR/linearkalmanfilter.h \
     AR/quaternionhelper.h \
-    Tools/Snow/snow.h
+    Tools/Snow/snow.h \
+    logger.h
 
 
 RESOURCES += qml.qrc
