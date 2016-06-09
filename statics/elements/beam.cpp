@@ -55,7 +55,7 @@ Beam::Beam(JointPtr extreme1, JointPtr extreme2,MaterialsManager* mm,QString nam
     m_tangibleSection=QSizeF(34,17);
     connect(m_extreme1.data(),SIGNAL(destroyed(QObject*)),this,SIGNAL(killMe()));
     connect(m_extreme2.data(),SIGNAL(destroyed(QObject*)),this,SIGNAL(killMe()));
-    m_lazy_signal_emitter.setInterval(500);
+    m_lazy_signal_emitter.setInterval(200);
     connect(&m_lazy_signal_emitter,SIGNAL(timeout()),this,SLOT(lazy_update()));
 }
 
@@ -284,6 +284,8 @@ void Beam::setForcesAndMoments(int axial_type,qreal Nx, qreal Vy, qreal Vz,
 //    qDebug()<<"Momentum z extreme 2:"<<m_z_moment_extreme_2;
 //    qDebug()<<m_Sy<<" "<<m_Sz;
 
+//    qDebug()<<"Peak axial stress"<<m_peak_axial_stress;
+//    qDebug()<<"Peak bending stress"<<m_peak_bending_stress;
 
 }
 
@@ -363,7 +365,7 @@ void Beam::stressRatio(qreal& axialComponent, qreal& shearComponent, int extreme
         else{
             axialComponent+= m_axial_stress_extreme1/m_materialsManager->get(m_materialId,"fc0").toDouble();
         }
-        axialComponent+=fabs(m_bending_stress_extreme1)/(2*m_materialsManager->get(m_materialId,"fmk").toDouble());
+        axialComponent+=fabs(m_bending_stress_extreme1)/(m_materialsManager->get(m_materialId,"fmk").toDouble());
         axialComponent=fabs(axialComponent);
         shearComponent+=fabs(m_shear_stress_y_extreme1)/m_materialsManager->get(m_materialId,"fvk").toDouble();
         shearComponent+=fabs(m_shear_stress_z_extreme1)/m_materialsManager->get(m_materialId,"fvk").toDouble();
@@ -376,7 +378,7 @@ void Beam::stressRatio(qreal& axialComponent, qreal& shearComponent, int extreme
         else{
             axialComponent+= m_axial_stress_extreme2/m_materialsManager->get(m_materialId,"fc0").toDouble();
         }
-        axialComponent+=fabs(m_bending_stress_extreme2)/(2*m_materialsManager->get(m_materialId,"fmk").toDouble());
+        axialComponent+=fabs(m_bending_stress_extreme2)/(m_materialsManager->get(m_materialId,"fmk").toDouble());
         axialComponent=fabs(axialComponent);
         shearComponent+=fabs(m_shear_stress_y_extreme2)/m_materialsManager->get(m_materialId,"fvk").toDouble();
         shearComponent+=fabs(m_shear_stress_z_extreme2)/m_materialsManager->get(m_materialId,"fvk").toDouble();
@@ -389,7 +391,7 @@ void Beam::stressRatio(qreal& axialComponent, qreal& shearComponent, int extreme
         else{
             axialComponent+= m_peak_axial_stress/m_materialsManager->get(m_materialId,"fc0").toDouble();
         }
-        axialComponent+=fabs(m_peak_bending_stress)/(2*m_materialsManager->get(m_materialId,"fmk").toDouble());
+        axialComponent+=fabs(m_peak_bending_stress)/(m_materialsManager->get(m_materialId,"fmk").toDouble());
         axialComponent=fabs(axialComponent);
         shearComponent+=fabs(m_peak_shear_y_stress)/m_materialsManager->get(m_materialId,"fvk").toDouble();
         shearComponent+=fabs(m_peak_shear_z_stress)/m_materialsManager->get(m_materialId,"fvk").toDouble();

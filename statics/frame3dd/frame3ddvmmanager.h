@@ -50,6 +50,7 @@ private:
 
     QMediaPlayer m_player;
     QList<QUrl> m_effectList;
+    QTimer m_lazy_player_timer;
 };
 
 #endif // FRAME3DDVMMANAGER_H

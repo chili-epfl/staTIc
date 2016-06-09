@@ -13,15 +13,19 @@ Frame3DDVMManager::Frame3DDVMManager(QObject* parent):
     m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_4.ogg"));
     m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/crash_wood_1.ogg"));
     m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/crash_wood_2.ogg"));
-    connect(&m_player,SIGNAL(stateChanged(QMediaPlayer::State)),this,SLOT(playEffect(QMediaPlayer::State)));
+    //connect(&m_player,SIGNAL(stateChanged(QMediaPlayer::State)),this,SLOT(playEffect(QMediaPlayer::State)));
     connect(this,SIGNAL(staticsModuleChanged()),this,SLOT(initViewModels()));
     connect(this,SIGNAL(sceneRootChanged()),this,SLOT(initViewModels()));
+    m_lazy_player_timer.setInterval(500);
+    m_lazy_player_timer.setSingleShot(true);
+    connect(&m_lazy_player_timer,SIGNAL(timeout()),this,SLOT(generateSoundEffects()));
+    m_player.setVolume(50);
 }
 
 void Frame3DDVMManager::setStaticsModule(Frame3DDKernel *staticsModule){
     if(m_staticsModule!=staticsModule){
         m_staticsModule=staticsModule;
-        connect(m_staticsModule,SIGNAL(updated()),this,SLOT(generateSoundEffects()));
+        connect(m_staticsModule,SIGNAL(updated()),&m_lazy_player_timer,SLOT(start()));
         emit staticsModuleChanged();
     }
 }
@@ -176,7 +180,6 @@ void Frame3DDVMManager::generateSoundEffects()
             max=qMax(max,shear);
             max=qMax(max,axial);
         }
-
         if(max>1){
             qreal r=qrand()/RAND_MAX;
             int index=qRound(r+4);
