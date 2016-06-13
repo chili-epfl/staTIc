@@ -92,6 +92,7 @@ signals:
     void minForceChanged();
     void maxForceChanged();
     void updated();
+    void startingUpdate();
     void materialsManagerChanged();
     void is2DChanged();
 

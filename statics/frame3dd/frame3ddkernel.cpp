@@ -415,6 +415,7 @@ void Frame3DDKernel::setStatus(Status status){
 }
 
 void Frame3DDKernel::update(){
+    emit startingUpdate();
     m_lazyupdateTimer.start();
 }
 /**/
@@ -1281,6 +1282,9 @@ void Frame3DDKernel::write_internal_forces (
                                           qMax(fabs(maxMy),fabs(minMy)),
                                           qMax(fabs(maxMz),fabs(minMz)),
                                           3);
+
+        m_beams[m-1]->setPeakDisplacements(QVector4D(minDx,minDy,minDz,minRx),QVector4D(maxDx,maxDy,maxDz,maxRx));
+
         // free memory
         free_dvector(x,0,nx);
         free_dvector(Nx,0,nx);
