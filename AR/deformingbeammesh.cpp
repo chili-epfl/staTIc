@@ -18,17 +18,12 @@ DeformingBeamMesh::DeformingBeamMesh(Qt3DCore::QNode * parent):
     indexAttribute(0),
     uvtextureAttribute(0)
 {
-    m_lazy_updater.setInterval(500);
-    m_lazy_updater.setSingleShot(true);
-    connect(&m_lazy_updater,SIGNAL(timeout()),this,SLOT(generateGeometry()));
+
 }
 
 DeformingBeamMesh::~DeformingBeamMesh()
 {
-//    delete  vertexBufferData;
-//    delete normalBufferData;
-//    delete indexBufferData;
-//    delete uvtextureBufferData;
+
 }
 
 void DeformingBeamMesh::setLength(qreal val)
@@ -164,7 +159,6 @@ void DeformingBeamMesh::update(){
     if(m_displacements.size()<2) return;
     if(!m_init) init();
     generateGeometry();
-//    m_lazy_updater.start();
 }
 
 #ifndef ANIMATE
@@ -266,12 +260,6 @@ void DeformingBeamMesh::generateGeometry(){
         //Clock wise rotation because of frame3dd
         QVector3D v_rot(v.x(), cos_theta*_v.x()+sin_theta*_v.y(),-sin_theta*_v.x()+cos_theta*_v.y());
 
-//        /*3D case to be tested*/
-//        QVector3D v_final=v_rot+m_exagerate*disp.toVector3D();
-//        //Back to Opengl
-//        _final_vertices.push_back(QVector3D(v_final.x(),v_final.z(),-v_final.y()));
-
-        /*2D case:y is vertical displacement*/
         QVector3D v_final(v_rot.x(),v_rot.y(),-v_rot.z());
 
         v_final+=m_exagerate*disp.toVector3D();
