@@ -36,6 +36,8 @@
         <file>Icons/show_stress_on.png</file>
         <file>Icons/apply_load.png</file>
         <file>Icons/apply_load_pressed.png</file>
+        <file>Icons/show_displacement_off.png</file>
+        <file>Icons/show_displacement_on.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>Images/mainbanner.png</file>
@@ -92,8 +94,9 @@
         <file>UI/InfoBoxDesigner.qml</file>
         <file>SynchDialogBox.qml</file>
         <file>MaterialDesigner.qml</file>
-        <file>NumberEntity.qml</file>
+        <file>PercNumberEntity.qml</file>
         <file>UI/CustomSwitchStyle.qml</file>
+        <file>NumberEntity.qml</file>
     </qresource>
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>
@@ -147,5 +150,7 @@
         <file>3DObjects/A.obj</file>
         <file>3DObjects/spring.obj</file>
         <file>3DObjects/perc.obj</file>
+        <file>3DObjects/mm.obj</file>
+        <file>3DObjects/bar.obj</file>
     </qresource>
 </RCC>
