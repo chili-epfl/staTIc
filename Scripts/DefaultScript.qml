@@ -29,28 +29,30 @@ Item{
     property url structureUrl;
     property url structure3DAsset;
     property url structureTagConfig;
+
+
     QuaternionHelper{
         id:quaternion_helper
     }
 
-    property real text_color_alpha:0.0
-    SequentialAnimation{
-        id:text_animation
-        NumberAnimation{
-            duration:200
-            target: applicationRoot
-            property:"text_color_alpha"
-            from:0.0
-            to:1
-        }
-        PauseAnimation { duration: 3000 }
-        NumberAnimation{
-            duration:5000
-            target: applicationRoot
-            property:"text_color_alpha"
-            to:0
-        }
-    }
+//    property real text_color_alpha:0.0
+//    SequentialAnimation{
+//        id:text_animation
+//        NumberAnimation{
+//            duration:200
+//            target: applicationRoot
+//            property:"text_color_alpha"
+//            from:0.0
+//            to:1
+//        }
+//        PauseAnimation { duration: 3000 }
+//        NumberAnimation{
+//            duration:5000
+//            target: applicationRoot
+//            property:"text_color_alpha"
+//            to:0
+//        }
+//    }
 
     state: "LoadingCamera"
     states: [
@@ -140,7 +142,7 @@ Item{
         running: false;
         interval: 2000
     }
-    Component.onCompleted: camDevice.deviceId=QtMultimedia.availableCameras[0].deviceId
+    Component.onCompleted: camDevice.deviceId=QtMultimedia.availableCameras[1].deviceId
 
     /*Loading animation*/
     Rectangle{
@@ -184,7 +186,11 @@ Item{
                 pageExit();
             }
         }
-        onUpdated: text_animation.restart()
+        //onUpdated: text_animation.restart()
+        onStartingUpdate:{
+            scene3D.blinking_displacement=false;
+            scene3D.blinking_stress=false;
+        }
     }
 
     property alias materialsManager: staticsmodule.materialsManager
@@ -206,7 +212,8 @@ Item{
              }
          }
 
-         imageCapture.resolution: "1920x1440" //Android sets the viewfinder resolution as the capture one
+         //imageCapture.resolution: "1920x1440" //Android sets the viewfinder resolution as the capture one
+         imageCapture.resolution: "640x480"
          viewfinder.resolution:"640x480"
 //         imageCapture.resolution: "800x448" //Android sets the viewfinder resolution as the capture one
 //         viewfinder.resolution:"800x448"
@@ -405,6 +412,7 @@ Item{
                     }
                 }
                 Image {
+                    id:show_stress_button
                     anchors.bottom: parent.bottom
                     anchors.left: ghostMode_button.right
                     anchors.margins: 10
@@ -417,8 +425,69 @@ Item{
                         anchors.fill: parent
                         onClicked: {
                             scene3D.show_stress_ratio = !scene3D.show_stress_ratio
+                            if(scene3D.show_displacement && scene3D.show_stress_ratio)
+                                scene3D.show_displacement=false;
+                            scene3D.blinking_stress=false;
                         }
                     }
+                    Rectangle{
+                        visible: scene3D.blinking_stress>0
+                        width: parent.width
+                        height: parent.height
+                        radius: width/2
+                        color: "transparent"
+                        SequentialAnimation on color{
+                            running: scene3D.blinking_stress>0
+                            loops: -1
+                            ColorAnimation {
+                                to: scene3D.blinking_stress==1 ? Qt.rgba(1,0.64,0,0.8) : Qt.rgba(1,0,0,0.8)
+                                duration: 1000
+                            }
+                            ColorAnimation {
+                                to: scene3D.blinking_stress==1 ? Qt.rgba(1,0.64,0,0.2) : Qt.rgba(1,0,0,0.2)
+                                duration: 1000
+                            }
+                        }
+                   }
+
+                }
+                Image {
+                    anchors.bottom: parent.bottom
+                    anchors.left: show_stress_button.right
+                    anchors.margins: 10
+                    width: 100
+                    height: 100
+                    source: scene3D.show_displacement?
+                                "qrc:/icons/Icons/show_displacement_on.png" :
+                                "qrc:/icons/Icons/show_displacement_off.png"
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {
+                            scene3D.show_displacement = !scene3D.show_displacement
+                            if(scene3D.show_displacement && scene3D.show_stress_ratio)
+                                scene3D.show_stress_ratio=false
+                            scene3D.blinking_displacement=false;
+                        }
+                    }
+                    Rectangle{
+                        visible: scene3D.blinking_displacement>0
+                        width: parent.width
+                        height: parent.height
+                        radius: width/2
+                        color: "transparent"
+                        SequentialAnimation on color{
+                            running: scene3D.blinking_displacement>0
+                            loops: -1
+                            ColorAnimation {
+                                to: scene3D.blinking_displacement==1 ? Qt.rgba(1,0.64,0,0.8) : Qt.rgba(1,0,0,0.8)
+                                duration: 1000
+                            }
+                            ColorAnimation {
+                                to: scene3D.blinking_displacement==1 ? Qt.rgba(1,0.64,0,0.2) : Qt.rgba(1,0,0,0.2)
+                                duration: 1000
+                            }
+                        }
+                   }
                 }
                 Rectangle{
                     id:suggestion_box_container

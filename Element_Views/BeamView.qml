@@ -40,12 +40,38 @@ Entity{
     /*The stress relative to th esize and material.
      *If it's 1 or more, it is above the limits*/
     property real relativeAxialStress: 0
-
+    onRelativeAxialStressChanged:{
+        if(!sceneRoot.show_stress_ratio){
+            if(relativeAxialStress>=0.8)
+                scene3D.blinking_stress=2;
+            else if(relativeAxialStress>=0.5)
+                scene3D.blinking_stress=1;
+        }
+    }
+    property real dispY:0
+    property real dispZ:0
+    property real relativeDisplacementY:0
+    property real relativeDisplacementZ:0
+    onRelativeDisplacementYChanged:
+        if(!sceneRoot.show_displacement){
+                if(relativeDisplacementY>=0.8)
+                    scene3D.blinking_displacement=2;
+                else if(relativeDisplacementY>=0.5)
+                    scene3D.blinking_displacement=1;
+        }
+    onRelativeDisplacementZChanged:
+        if(!sceneRoot.show_displacement){
+            if(relativeDisplacementZ>=0.8)
+                scene3D.blinking_displacement=2;
+            else if(relativeDisplacementZ>=0.5)
+                scene3D.blinking_displacement=1;
+        }
     property matrix4x4 poseMatrix
     property quaternion quaternionTest;
     property vector3d translationTest;
     Entity{
-        NumberEntity{
+        enabled: sceneRoot.show_stress_ratio
+        PercNumberEntity{
             id:number_entity
             number:relativeAxialStress
 
@@ -54,19 +80,142 @@ Entity{
                     duration:2000
                 }
             }
-            color:PhongAlphaMaterial{
+            color:PhongMaterial{
                   diffuse:Qt.hsla(Math.max(0.33*(1-number_entity.number),0),1,0.5)
-                  alpha:infobox.current_item == rootEntity || sceneRoot.show_stress_ratio ? 1 : text_color_alpha
             }
         }
         Transform{
             id:text_transform            
             translation:Qt.vector3d(0,0,20)
             rotation:quaternion_helper.invert(quaternionTest)
-            scale: 2
+            scale: 10
         }
         components:[text_transform]
     }
+
+
+    Entity{
+        enabled: scene3D.show_displacement
+        //Y displacement
+        NumberEntity{
+            id:dispY_entity
+            number:dispY
+            color:PhongMaterial{
+                diffuse:Qt.hsla(Math.max(0.33*(1-relativeDisplacementY),0),1,0.5)
+            }
+            QQ2.Behavior on number{
+                QQ2.NumberAnimation{
+                    duration:2000
+                }
+            }
+        }
+        Entity{
+            components: [Mesh{
+                    source:"qrc:/UIMesh/3DObjects/mm.obj"
+                },
+                Transform{
+                    translation:Qt.vector3d(4.6,0,0)
+                    rotation:quaternion_helper.product(fromAxisAndAngle(1,0,0,90),fromAxisAndAngle(0,1,0,-90))
+                },
+                PhongMaterial{
+                ambient: "#333333"
+                }
+            ]
+        }
+
+        Entity{
+            components: [Mesh{
+                    source:"qrc:/UIMesh/3DObjects/bar.obj"
+                },
+                Transform{
+                    translation: {
+                        if(dispY_entity.number/10 >= 10)
+                            return  Qt.vector3d(-4.6,0,0)
+                        else if(dispY_entity.number/10 >= 1)
+                            return  Qt.vector3d(-3.6,0,0)
+                        else
+                            return  Qt.vector3d(-2.6,0,0)
+                    }
+                    rotation:quaternion_helper.product(fromAxisAndAngle(1,0,0,90),fromAxisAndAngle(0,1,0,-90))
+                },
+                PhongMaterial{
+                ambient: "#333333"
+                }
+            ]
+        }
+
+        components:[
+            Transform{
+                translation:Qt.vector3d(0,0,20)
+                rotation:fromAxisAndAngle(Qt.vector3d(0,0,1),-90)
+                scale: 10
+            }
+        ]
+
+
+        Entity{
+            //Z displacement
+            enabled: !staticsmodule.is2D
+            NumberEntity{
+                id:dispZ_entity
+                number:dispZ
+                color:PhongMaterial{
+                    diffuse:Qt.hsla(Math.max(0.33*(1-relativeDisplacementY),0),1,0.5)
+                }
+                QQ2.Behavior on number{
+                    QQ2.NumberAnimation{
+                        duration:2000
+                    }
+                }
+            }
+
+            Entity{
+                components: [Mesh{
+                        source:"qrc:/UIMesh/3DObjects/mm.obj"
+                    },
+                    Transform{
+                        translation: {
+                            if(dispZ_entity.number/10 >= 10)
+                                return  Qt.vector3d(-4.6,0,0)
+                            else if(dispZ_entity.number/10 >= 1)
+                                return  Qt.vector3d(-3.6,0,0)
+                            else
+                                return  Qt.vector3d(-2.6,0,0)
+                        }
+                        rotation:quaternion_helper.product(fromAxisAndAngle(1,0,0,90),fromAxisAndAngle(0,1,0,-90))
+                    },
+                    PhongMaterial{
+                    ambient: "#333333"
+                    }
+                ]
+            }
+
+            Entity{
+                components: [Mesh{
+                        source:"qrc:/UIMesh/3DObjects/bar.obj"
+                    },
+                    Transform{
+                        translation:Qt.vector3d(-4.6,0,0)
+                        rotation:quaternion_helper.product(fromAxisAndAngle(1,0,0,90),fromAxisAndAngle(0,1,0,-90))
+                    },
+                    PhongMaterial{
+                    ambient: "#333333"
+                    }
+                ]
+            }
+
+
+            components:[
+                Transform{
+                    //Keep in mind the scale factor...
+                    translation:Qt.vector3d(0,0.3,-2)
+                    rotation:fromAxisAndAngle(Qt.vector3d(1,0,0),-90)
+                }
+            ]
+        }
+
+    }
+
 
 //    function computeTransform(){
 //        var a=Qt.vector3d(0,1,0);
@@ -167,7 +316,6 @@ Entity{
         ,
             PhongMaterial{
             ambient: "#333333"
-
             }
         ]
     }

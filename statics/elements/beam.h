@@ -40,6 +40,10 @@ public:
     /*The proportion between the stress and the material limit values*/
     void stressRatio(qreal& axialComponent, qreal& shearComponent,int extreme);
 
+    void setPeakDisplacements(QVector4D min, QVector4D max);
+    void peakDisplacements(QVector4D& min, QVector4D& max);
+
+
 
     void setSize(QSizeF size);
     QSizeF size(){return m_size;}
@@ -161,8 +165,12 @@ private:
     qreal m_shear_stress_z_extreme2;
     qreal m_torsional_stess_extreme2;
 
+
     // dx,dy,dz,rotX
+    QVector4D m_min_disp,m_max_disp;
+    qreal m_relative_disp;
     QList<QVector4D> m_stress_segments;
+
 
     QSizeF m_size;
     QSizeF m_tangibleSection;

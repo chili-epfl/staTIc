@@ -34,7 +34,11 @@ Entity {
     property alias structureEntity: structureEntity
 
     property bool ghostMode: false
-    property bool show_stress_ratio:false
+    property bool show_stress_ratio:true
+    property bool show_displacement:false
+
+    property int blinking_stress:0;//1 medium,2 extreme
+    property int blinking_displacement:0;
     property int globalNumericAnimation;
 
     property real cameraScaleX:1;
@@ -146,6 +150,7 @@ Entity {
    }
 
 
+
     Entity {
         id:structureEntity
         Transform {
@@ -157,6 +162,7 @@ Entity {
                 //structure_tag.appendQuaternion(fromAxisAndAngle(1,1,1,120))
                 structure_tag.appendQuaternion(fromAxisAndAngle(1,0,0,90))
         }
+
 
         components: [structureLoaderTransform]
 
@@ -182,8 +188,6 @@ Entity {
 
 
         }
-
-
 
         /*Tools*/
 

@@ -402,6 +402,21 @@ void Beam::stressRatio(qreal& axialComponent, qreal& shearComponent, int extreme
     }
 }
 
+void Beam::setPeakDisplacements(QVector4D min, QVector4D max)
+{
+    if(m_min_disp!=min || m_max_disp!=max){
+        m_min_disp=min;
+        m_max_disp=max;
+        m_lazy_signal_emitter.start();
+    }
+}
+
+void Beam::peakDisplacements(QVector4D &min, QVector4D &max)
+{
+    min=m_min_disp;
+    max=m_max_disp;
+}
+
 void Beam::setSize(QSizeF size){
     if(m_size!=size){
         m_size=size;

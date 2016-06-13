@@ -95,7 +95,12 @@ void BeamVM::onBeamAxialStressChanged(){
         qreal axial_stress;
         beam_str_ref->stressRatio(axial_stress,dummy,3);
         m_component3D->setProperty("relativeAxialStress",axial_stress);
-
+        QVector4D min_disp,max_disp;
+        beam_str_ref->peakDisplacements(min_disp,max_disp);
+        m_component3D->setProperty("dispY",qMax(fabs(min_disp.y()),fabs(max_disp.y())));
+        m_component3D->setProperty("relativeDisplacementY",qMax(fabs(min_disp.y()),fabs(max_disp.y()))*250/beam_str_ref->length());
+        m_component3D->setProperty("dispZ",qMax(fabs(min_disp.z()),fabs(max_disp.z())));
+        m_component3D->setProperty("relativeDisplacementZ",qMax(fabs(min_disp.z()),fabs(max_disp.z()))*250/beam_str_ref->length());
     }
 }
 
