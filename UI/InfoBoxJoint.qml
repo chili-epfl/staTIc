@@ -8,6 +8,7 @@ import "qrc:/ui/UI"
 
 Rectangle {
     id:root
+
     property var current_item
 
     property bool hasReaction: false
@@ -159,7 +160,7 @@ Rectangle {
             color:"#2f3439"
             radius: 1
             Layout.preferredWidth: root.width
-            Layout.preferredHeight: 0.25*root.height
+            Layout.preferredHeight: 0.20*root.height
 
             ListModel{
                 id:forceListModel
@@ -181,11 +182,14 @@ Rectangle {
                         minimumPixelSize: 10;
                         color: "white"
                         width: parent.width-forceList_switch.width-10
+                        anchors.verticalCenter: forceList_switch.verticalCenter
                     }
                     Switch{
                         id:forceList_switch
                         anchors.right: parent.right
                         checked: true
+                        width: height*2
+                        height: forceList_label.height*2
                         style: CustomSwitchStyle{
                         }
                         property vector3d forceVectorDel: (beam) ? beam.globalForceExtreme1 : joint.reaction
