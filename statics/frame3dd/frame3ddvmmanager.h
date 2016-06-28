@@ -45,7 +45,7 @@ private slots:
     void playEffect(QMediaPlayer::State state);
 
 private:
-
+    bool m_dying;
     Frame3DDKernel* m_staticsModule;
     QHash<Qt3DCore::QEntity*, AbstractElementViewModel*> m_Entity3D2ViewModel;
     QHash<Qt3DCore::QNodeId, Qt3DCore::QEntity* > m_entityID2Entity3D;

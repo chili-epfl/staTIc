@@ -7,6 +7,7 @@ Frame3DDVMManager::Frame3DDVMManager(QObject* parent):
     m_staticsModule(Q_NULLPTR),
     m_player(this)
 {
+    m_dying=false;
     m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_1.ogg"));
     m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_2.ogg"));
     m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_3.ogg"));
@@ -24,6 +25,7 @@ Frame3DDVMManager::Frame3DDVMManager(QObject* parent):
 
 Frame3DDVMManager::~Frame3DDVMManager()
 {
+    m_dying=true;
     Q_FOREACH(QObject* o, m_dependent_objects){
         delete o;
     }
@@ -132,6 +134,7 @@ void Frame3DDVMManager::registerDependentObject(QObject *o)
 
 void Frame3DDVMManager::addPoolEntity(QString className, Qt3DCore::QEntity *e, QQmlContext *contex, QQmlComponent *component)
 {
+    if(m_dying) return;
     PoolEntity poolEntity;
     poolEntity.entity=e;
     poolEntity.component=component;
