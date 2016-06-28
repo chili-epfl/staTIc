@@ -3,79 +3,77 @@ import Qt3D.Render 2.0
 import QtPhysics.unofficial 1.0
 import QuickScaffold 1.0
 import QtQuick 2.3 as QQ2
+import ArucoObject 1.0
 
 Entity {
-//    QQ2.Component.onCompleted: {
-//        var array=chilitags.chiliobjects
-//        array.push(extreme1Tag)
-//        array.push(extreme2Tag)
-//        chilitags.chiliobjects=array;
-//    }
+    property ArucoObject extreme1_tag;
+    property ArucoObject extreme2_tag;
 
-//    Entity{
-//        ChilitagsObject{
-//            id:extreme1Tag
-//            name: "tag_5"
-//        }
-//        SphereMesh{
-//            enabled: false
-//            id:extreme1Mesh
-//            radius: 20
-//        }
-//        Transform{
-//          id:extreme1Transform
-//          matrix: {
-//              var m = Qt.matrix4x4();
-//              m.rotate(-180, Qt.vector3d(1, 0, 0))
-//              m*=structure_tag.transform.inverted().times(extreme1Tag.transform)
-//              m.rotate(180, Qt.vector3d(1, 0, 0))
-//              return m;
-//          }
+    components: [
+        Transform{
+            id:inv_rotation
+            rotation:quaternion_helper.invert(structureLoaderTransform.rotation)
+        }
+    ]
+    Entity{
+        components: [
+            Transform{
+                id:inv_transform
+                translation:structureLoaderTransform.translation.times(-1)
+            }
+        ]
 
-//        }
-//        PhysicsBodyInfo{
-//            id:extreme1Body
-//            kinematic:true
-//            inputTransform: extreme1Transform;
-//        }
-//        components:[extreme1Body,extreme1Mesh,extreme1Transform]
-//    }
 
-//    Entity{
-//        ChilitagsObject{
-//            id:extreme2Tag
-//            name: "tag_6"
-//        }
-//        SphereMesh{
-//            enabled: false
-//            id:extreme2Mesh
-//            radius: 20
-//        }
-//        Transform{
-//          id:extreme2Transform
-//          matrix: {
-//              var m = Qt.matrix4x4();
-//              m.rotate(-180, Qt.vector3d(1, 0, 0))
-//              m*=structure_tag.transform.inverted().times(extreme2Tag.transform)
-//              m.rotate(180, Qt.vector3d(1, 0, 0))
-//              return m;
-//          }
+        PhongAlphaMaterial{
+            id:material
+            alpha:1
+        }
+        Entity{
+            SphereMesh{
+                enabled: true
+                id:extreme1Mesh
+                radius: 10
+            }
+            Transform{
+                id:extreme1Transform
+                translation:extreme1_tag.translation
+            }
 
-//        }
-//        PhysicsBodyInfo{
-//            id:extreme2Body
-//            kinematic:true
-//            inputTransform: extreme2Transform;
-//        }
-//        components:[extreme2Body,extreme2Mesh,extreme2Transform]
-//    }
+            PhysicsBodyInfo{
+                id:extreme1Body
+                kinematic:true
+                inputTransform: extreme1Transform;
+            }
+            components:[extreme1Body,material,extreme1Mesh,extreme1Transform]
+        }
+        Entity{
 
-//    QuickScaffold{
-//        vmManager:vmFrame3DDManager
-//        extreme1: extreme1Body
-//        extreme2: extreme2Body
-//    }
+            SphereMesh{
+                enabled: true
+                id:extreme2Mesh
+                radius: 10
+            }
+            Transform{
+                id:extreme2Transform
+                translation:extreme2_tag.translation
+            }
 
+            PhysicsBodyInfo{
+                id:extreme2Body
+                kinematic:true
+                inputTransform: extreme2Transform;
+            }
+            components:[extreme2Body,material,extreme2Mesh,extreme2Transform]
+        }
+
+        QuickScaffold{
+            vmManager:vmFrame3DDManager
+            extreme1: extreme1Body
+            extreme2: extreme2Body
+            localExtreme1Pos:quaternion_helper.rotateVector(inv_rotation.rotation,extreme1_tag.translation.plus(inv_transform.translation))
+            localExtreme2Pos:quaternion_helper.rotateVector(inv_rotation.rotation,extreme2_tag.translation.plus(inv_transform.translation))
+        }
+    }
 
 }
 

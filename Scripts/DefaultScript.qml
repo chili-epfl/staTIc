@@ -6,8 +6,6 @@ import QtQuick.Scene3D 2.0
 import ArucoDetector 1.0
 import ArucoObject 1.0
 import QuaternionHelper 1.0
-import Qt3D.Render 2.0
-
 import BackgroundSubtraction 1.0
 
 import Frame3DDKernel 1.0
@@ -274,7 +272,7 @@ Item{
                  anchors.fill: parent
                  focus: true
                  aspects: ["input","physics"]
-                 //aspects:["input"]
+//                 aspects:["input"]
                  multisample:true
 
                  DefaultScriptScene3D {

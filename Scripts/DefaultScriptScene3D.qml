@@ -4,7 +4,7 @@ import Qt3D.Input 2.0
 
 import QtQuick 2.3 as QQ2
 import QtPhysics.unofficial 1.0
-
+import ArucoObject 1.0
 import "qrc:/"
 
 import "qrc:/tools/Tools/ConcentratedForce"
@@ -157,6 +157,8 @@ Entity {
             id: structureLoaderTransform
 //            translation:Qt.vector3d(0,-100,-1000)
             rotation:structure_tag.rotationQuaternion
+//            QuaternionAnimation on rotation{
+//            }
             translation:structure_tag.translation
             QQ2.Component.onCompleted:
                 //structure_tag.appendQuaternion(fromAxisAndAngle(1,1,1,120))
@@ -189,6 +191,27 @@ Entity {
 
         }
 
+        Scaffold{
+            extreme1_tag: ArucoObject{
+                objectId: "240"
+                QQ2.Component.onCompleted: aruco.registerObserver(this)
+            }
+            extreme2_tag: ArucoObject{
+                objectId: "241"
+                QQ2.Component.onCompleted: aruco.registerObserver(this)
+            }
+        }
+
+        Scaffold{
+            extreme1_tag: ArucoObject{
+                objectId: "242"
+                QQ2.Component.onCompleted: aruco.registerObserver(this)
+            }
+            extreme2_tag: ArucoObject{
+                objectId: "243"
+                QQ2.Component.onCompleted: aruco.registerObserver(this)
+            }
+        }
         /*Tools*/
 
 //        ConcentratedForce{
@@ -200,8 +223,6 @@ Entity {
         }*/
 //        Snow{
 //        }
-
-
 
     }
 
