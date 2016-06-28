@@ -407,13 +407,13 @@ Entity {
                         id:transform
                         matrix:{
                             var m=Qt.matrix4x4(beam_poses[index].m11,beam_poses[index].m12,
-                                               beam_poses[index].m13,beam_poses[index].m14,
+                                               beam_poses[index].m13,0,
                                                beam_poses[index].m21,beam_poses[index].m22,
-                                               beam_poses[index].m23,beam_poses[index].m24,
+                                               beam_poses[index].m23,0,
                                                beam_poses[index].m31,beam_poses[index].m32,
-                                               beam_poses[index].m33,beam_poses[index].m34,
+                                               beam_poses[index].m33,0,
                                                beam_poses[index].m41,beam_poses[index].m42,
-                                               beam_poses[index].m43,beam_poses[index].m44);
+                                               beam_poses[index].m43,1);
                             m.rotate(-90, Qt.vector3d(0, 0, 1))
                             m.translate(Qt.vector3d(0,0.5*axis_mesh.length,0));
                             return m

@@ -33,7 +33,6 @@ Entity{
 //        }
 //        return result.inverted();
 //    }
-
     /*Force is acting in the y direction*/
     property vector3d relativeLocalPosition:rootEntity.parent?
                                                 Qt.vector3d(-transform.translation.y/rootEntity.parent.length + 0.5,-transform.translation.y/rootEntity.parent.length + 0.5,-transform.translation.y/rootEntity.parent.length + 0.5):

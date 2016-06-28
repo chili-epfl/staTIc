@@ -12,6 +12,8 @@ class AbstractElementViewModel : public QObject
 public:
     explicit AbstractElementViewModel(Qt3DCore::QEntity* sceneRoot,QObject *parent = 0);
     virtual QList<Qt3DCore::QEntity*> getEntities();
+    virtual AbstractElement* element()=0;
+    virtual Qt3DCore::QEntity* component3D()=0;
 signals:
     void resourcesUpdated();
 protected:    

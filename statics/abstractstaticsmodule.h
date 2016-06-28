@@ -86,6 +86,10 @@ public:
 
     MaterialsManager* materialsManager(){return m_materialsManager;}
 
+    virtual QVector<JointPtr> joints()=0;
+    virtual QVector<BeamPtr> beams()=0;
+    virtual QVector<TrapezoidalForcePtr> TPLoads()=0;
+
 signals:
     void statusChanged();
     void stabilityChanged();

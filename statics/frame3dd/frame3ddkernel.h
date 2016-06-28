@@ -45,7 +45,7 @@ public:
 
     QVector<JointPtr> joints(){return m_joints;}
     QVector<BeamPtr> beams(){return m_beams;}
-
+    QVector<TrapezoidalForcePtr> TPLoads(){return m_trapezoidal_loads;}
 protected slots:
     virtual bool readStructure(QString path) ;
     virtual void update();
@@ -81,14 +81,14 @@ private:
                                float *Iy, float *Iz, float *E, float *G, float *p,
                                float *d, float gX, float gY, float gZ, int nU,
                                float **U, int nW, float **W, int nP, float **P,
-                               double *D, int shear, double error);
+                               double *D, int shear, double error, QVector<BeamPtr> active_beams);
 
     QVector<JointPtr> m_joints;
     QVector<BeamPtr> m_beams;
     QVector<NodeLoadPtr> m_node_loads;
     QVector<UniformlyDistributedLoadPtr> m_uniformly_distributed_loads;
     QVector<InteriorPointLoadPtr> m_interior_point_loads;
-    QList<TrapezoidalForcePtr> m_trapezoidal_loads;
+    QVector<TrapezoidalForcePtr> m_trapezoidal_loads;
 
     QVector3D m_gravity;
 

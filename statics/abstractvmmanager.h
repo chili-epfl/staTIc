@@ -29,7 +29,10 @@ public:
     virtual Qt3DCore::QEntity* getEntity3D(Qt3DCore::QNodeId id)=0;
     virtual AbstractElementViewModel* getAssociatedVM(Qt3DCore::QNodeId id)=0;
     virtual AbstractElementViewModel* getAssociatedVM(Qt3DCore::QEntity*)=0;
+    virtual AbstractElementViewModel *getAssociatedVM(AbstractElement *)=0;
+    virtual void registerDependentObject(QObject* o)=0;
     Q_INVOKABLE virtual Qt3DCore::QEntity* getEntity3D(QString entity_name)=0;
+
 protected slots:
     virtual void initViewModels()=0;
 

@@ -4,6 +4,7 @@ import QtPhysics.unofficial 1.0
 import QuickTangibleTPZLoad 1.0
 import QtQuick 2.3 as QQ2
 import ArucoObject 1.0
+
 Entity {
     id:rootEntity
     readonly property string type: "trapezoidalForceTangible"
@@ -24,6 +25,7 @@ Entity {
 
     property url asset3DMeshURL:"qrc:/tools/Tools/TangibleTrapzLoad/tonweight.obj";
     property url asset3DTextureURL:"qrc:/tools/Tools/TangibleTrapzLoad/texture.png";
+
     property real weight:10;
     property vector2d extent: Qt.vector2d(-100,100)
 

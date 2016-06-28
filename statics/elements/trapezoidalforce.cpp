@@ -88,3 +88,12 @@ void TrapezoidalForce::positionOnBeam(QVector3D &begin, QVector3D &end)
     }
 }
 
+void TrapezoidalForce::setBeam(BeamPtr beam)
+{
+    if(m_beam!=beam){
+        disconnect(m_beam.data());
+        m_beam=beam.toWeakRef();
+        connect(m_beam.data(),SIGNAL(destroyed(QObject*)),this, SIGNAL(killMe()));
+    }
+}
+

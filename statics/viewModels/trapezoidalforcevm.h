@@ -17,6 +17,11 @@ public:
     ~TrapezoidalForceVM();
     WeakTrapezoidalForcePtr trapezoidalForce(){return m_trapezoidalForce;}
     Q_INVOKABLE void setProperties(QVariantHash properties);
+    void setParentEntity(Qt3DCore::QEntity* parentEntity);
+    AbstractElement *element();
+    inline Qt3DCore::QEntity *component3D(){return m_component3D;}
+
+//    void setTrapezoidalForcePtr(TrapezoidalForcePtr force);
 public slots:
     void onForceChanged();
     void onRelativePositionChanged();

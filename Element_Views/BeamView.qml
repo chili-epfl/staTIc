@@ -8,7 +8,10 @@ import "qrc:/ui"
 import "qrc:/opengl/Opengl"
 Entity{
     id:rootEntity
-
+    onEnabledChanged: {
+        if(infobox.current_item == rootEntity)
+            infobox.current_item=0;
+    }
     readonly property string type: "beam"
 
     property string materialID
@@ -37,7 +40,7 @@ Entity{
     property size tangibleSection: "34x17"
     property int axialForceType: 0 //-1 compression,0 nul, 1 tension
 
-    /*The stress relative to th esize and material.
+    /*The stress relative to the size and material.
      *If it's 1 or more, it is above the limits*/
     property real relativeAxialStress: 0
     onRelativeAxialStressChanged:{
@@ -74,7 +77,6 @@ Entity{
         PercNumberEntity{
             id:number_entity
             number:relativeAxialStress
-
             QQ2.Behavior on number{
                 QQ2.NumberAnimation{
                     duration:2000

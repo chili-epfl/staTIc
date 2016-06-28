@@ -1,9 +1,11 @@
 import Qt3D.Core 2.0
 import Qt3D.Render 2.0
 import QtQuick 2.0 as QQ2
+
 Entity{
     id:root
-    property bool visible:  parent!=null ? parent.visible : false
+    property bool visible:  true
+    property vector3d position;
 
     property vector3d extreme1 //Always the joint extreme
     property vector3d extreme2
@@ -90,8 +92,7 @@ Entity{
 
     onExtreme1Changed: computeTransform()
     onExtreme2Changed: computeTransform()
-
-
+    onPositionChanged: computeTransform()
     function computeTransform(){
         var a=Qt.vector3d(1,0,0);
         var b=extreme2.minus(extreme1).normalized();
@@ -110,6 +111,9 @@ Entity{
                 result.translate(0,0,0.00001);
             }
         }
+        result.m14=position.x
+        result.m24=position.y
+        result.m34=position.z
         poseMatrix=result;
     }
 
@@ -191,111 +195,6 @@ Entity{
         components: [transform]
     }
 
-//    Entity{
-//        components: [
-//        SphereMesh{
-//            enabled: visible
-//            radius: forceRadius;
-//            },
-//        Transform{
-//            Translate{
-//                dx:(0*step+animationValue)%50
-//            }
-//            MatrixTransform{
-//                matrix: poseMatrix
-//            }
-//        }
-//        ]
-//    }
 
-//    Entity{
-//        components: [
-//        SphereMesh{
-//            enabled: visible
-//            radius: forceRadius;
-//            },
-//        Transform{
-//            Translate{
-//                dx:(1*step+animationValue)%50
-//            }
-//            MatrixTransform{
-//                matrix: poseMatrix
-//            }
-//        }
-//        ]
-//    }
-//    Entity{
-//        components: [
-//        SphereMesh{
-//            enabled: visible
-//            radius: forceRadius;
-//            },
-//        Transform{
-//            Translate{
-//                dx:(2*step+animationValue)%50
-//            }
-//            MatrixTransform{
-//                matrix: poseMatrix
-//            }
-//        }
-//        ]
-//    }
-//    Entity{
-//        components: [
-//        SphereMesh{
-//            enabled: visible
-//            radius: forceRadius;
-//            },
-//        Transform{
-//            Translate{
-//                dx:(3*step+animationValue)%50
-//            }
-//            MatrixTransform{
-//                matrix: poseMatrix
-//            }
-//        }
-//        ]
-//    }
-//    Entity{
-//        components: [
-//        SphereMesh{
-//            enabled: visible
-//            radius: forceRadius;
-//            },
-//        Transform{
-//            Translate{
-//                dx:(4*step+animationValue)%50
-//            }
-//            MatrixTransform{
-//                matrix: poseMatrix
-//            }
-//        }
-//        ]
-//    }
-
-
-//    NodeInstantiator{
-//        model:nModels
-//        //asynchronous:true
-//        delegate:
-//            Entity{
-//            id:animationUnit
-//            property int idx: index
-//            SphereMesh{
-//                enabled: visible
-//                id:auMesh
-//                radius: forceRadius;            }
-//            Transform{
-//                id:auTransform
-//                Translate{
-//                    dx:(idx*step+animationValue)%50
-//                }
-//                MatrixTransform{
-//                    matrix: poseMatrix
-//                }
-//            }
-//            components: [auMesh,auTransform]
-//        }
-//    }
 
 }

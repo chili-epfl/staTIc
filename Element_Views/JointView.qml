@@ -5,7 +5,10 @@ import QtQuick 2.3 as QQ2
 Entity{
     id:root
     readonly property string type: "joint"
-
+    onEnabledChanged: {
+        if(infobox.current_item == root)
+            infobox.current_item=0;
+    }
     property var connected_beams: []
 
     property bool visible:  true/*backgroundsubtraction.entropy < .10
@@ -104,7 +107,7 @@ Entity{
 
         Mesh{
             id:label_mesh
-            source: "qrc:/UIMesh/3DObjects/"+root.objectName+".obj"
+            source: root.objectName.length>0 ? "qrc:/UIMesh/3DObjects/"+root.objectName+".obj" :"qrc:/UIMesh/3DObjects/1.obj"
         }
         Transform{
             id:label_transform
@@ -210,122 +213,6 @@ Entity{
             }]
     }
 
-
-
-
-//    Entity{
-//        components: [
-//        SphereMesh{
-//            enabled: visible && reactionMagnitude>0
-//            id:ruMesh
-//            radius: forceRadius;
-//        },
-//        Transform{
-//            Translate{
-//                dx:((0)*step+animationValue)%distanceFromJoint
-//            }
-//            MatrixTransform{
-//                matrix: poseMatrix
-//            }
-//        }
-//        ]
-//    }
-
-//    Entity{
-//        components: [
-//        SphereMesh{
-//            enabled: visible && reactionMagnitude>0
-//            radius: forceRadius;
-//        },
-//        Transform{
-//            Translate{
-//                dx:((1)*step+animationValue)%distanceFromJoint
-//            }
-//            MatrixTransform{
-//                matrix: poseMatrix
-//            }
-//        }
-//        ]
-//    }
-//    Entity{
-//        components: [
-//        SphereMesh{
-//            enabled: visible && reactionMagnitude>0
-//            radius: forceRadius;
-//        },
-//        Transform{
-//            Translate{
-//                dx:((2)*step+animationValue)%distanceFromJoint
-//            }
-//            MatrixTransform{
-//                matrix: poseMatrix
-//            }
-//        }
-//        ]
-//    }
-//    Entity{
-//        components: [
-//        SphereMesh{
-//            enabled: visible && reactionMagnitude>0
-//            radius: forceRadius;
-//        },
-//        Transform{
-//            Translate{
-//                dx:((3)*step+animationValue)%distanceFromJoint
-//            }
-//            MatrixTransform{
-//                matrix: poseMatrix
-//            }
-//        }
-//        ]
-//    }
-//    Entity{
-//        components: [
-//        SphereMesh{
-//            enabled: visible && reactionMagnitude>0
-//            radius: forceRadius;
-//        },
-//        Transform{
-//            Translate{
-//                dx:((4)*step+animationValue)%distanceFromJoint
-//            }
-//            MatrixTransform{
-//                matrix: poseMatrix
-//            }
-//        }
-//        ]
-//    }
-
-
-
-
-
-
-
-//    NodeInstantiator{
-//        model:5
-//        //asynchronous:true
-//        delegate:
-//            Entity{
-//            id:reactionUnit
-//            property int idx: index
-//            SphereMesh{
-//                enabled: visible && reactionMagnitude>0
-//                id:ruMesh
-//                radius: forceRadius;
-//            }
-//            Transform{
-//                id:ruTransform
-//                Translate{
-//                    dx:((idx)*step+animationValue)%distanceFromJoint
-//                }
-//                MatrixTransform{
-//                    matrix: poseMatrix
-//                }
-//            }
-//            components: [ruMesh,ruTransform]
-//        }
-//    }
 
 }
 

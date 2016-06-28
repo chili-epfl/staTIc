@@ -10,12 +10,13 @@ class BeamVM : public AbstractElementViewModel
 
 public:
     explicit BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent=0);
+    explicit BeamVM(BeamPtr beam,Qt3DCore::QEntity* entity,QQmlComponent* component,QQmlContext* context,Qt3DCore::QEntity* sceneRoot, QObject* parent=0);
     ~BeamVM();
 
     WeakBeamPtr beam(){return m_beam;}
     Qt3DCore::QEntity* component3D(){return m_component3D;}
-
-public slots:        
+    AbstractElement* element();
+public slots:
 
     /*Slots for signals from the model*/
     void onBeamAxialStressChanged();

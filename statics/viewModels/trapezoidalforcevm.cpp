@@ -58,6 +58,53 @@ void TrapezoidalForceVM::setProperties(QVariantHash properties)
     }
 }
 
+void TrapezoidalForceVM::setParentEntity(Qt3DCore::QEntity *parentEntity)
+{
+    if(parentEntity!=Q_NULLPTR && m_component3D!=Q_NULLPTR){
+        QVariantHash properties;
+        if(m_component3D){
+            properties["weight"]= m_component3D->property("weight");
+            properties["extent"]= m_component3D->property("extent");
+            properties["main_asset_url"]= m_component3D->property("asset3DMeshURL");
+            properties["main_asset_diffuse_map_url"]= m_component3D->property("asset3DTextureURL");
+            m_component3D->setParent(Q_NODE_NULLPTR);
+            delete m_component3D;
+        }
+        if(m_qqmlcomponent)
+            delete m_qqmlcomponent;
+        if(m_qqmlcontext)
+            delete m_qqmlcontext;
+        m_qqmlcomponent=Q_NULLPTR;
+        m_qqmlcontext=Q_NULLPTR;
+        m_component3D=Q_NULLPTR;
+        initView(parentEntity,properties);
+        connect(m_trapezoidalForce.data(),SIGNAL(destroyed(QObject*)),m_component3D,SLOT(deleteLater()));
+        connect(m_component3D,SIGNAL(killMe()),this,SLOT(deleteLater()));
+        connect(m_component3D,SIGNAL(killMe()),m_trapezoidalForce.data(),SIGNAL(killMe()));
+    }
+}
+
+AbstractElement *TrapezoidalForceVM::element()
+{
+    if(m_trapezoidalForce.isNull())
+        return Q_NULLPTR;
+    else{
+        return m_trapezoidalForce.toStrongRef().data();
+    }
+}
+
+
+//void TrapezoidalForceVM::setTrapezoidalForcePtr(TrapezoidalForcePtr force)
+//{
+//    if(!force.isNull() && force!=m_trapezoidalForce){
+//        disconnect(m_trapezoidalForce.data());
+//        m_trapezoidalForce=force.toWeakRef();
+//        connect(m_trapezoidalForce.data(),SIGNAL(destroyed(QObject*)),this,SLOT(deleteLater()));
+//        connect(m_trapezoidalForce.data(),SIGNAL(destroyed(QObject*)),m_component3D,SLOT(deleteLater()));
+//        connect(m_component3D,SIGNAL(killMe()),m_trapezoidalForce.data(),SIGNAL(killMe()));
+//    }
+//}
+
 
 
 void TrapezoidalForceVM::onForceChanged()
@@ -93,5 +140,5 @@ void TrapezoidalForceVM::initView(Qt3DCore::QEntity* parentEntity,QVariantHash p
     m_component3D->setParent(parentEntity);
     onForceChanged();
     onRelativePositionChanged();
-
+    append_3D_resources(m_component3D);
 }

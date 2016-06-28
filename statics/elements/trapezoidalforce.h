@@ -21,6 +21,8 @@ public:
     void setRelativePosition(QVector3D relativePosition, QVector2D extent);
     void relativePosition(QVector3D& relativePosition, QVector2D &extent);
     void positionOnBeam(QVector3D& begin, QVector3D& end);
+    void setBeam(BeamPtr beam);
+
 signals:
     void forceChanged();
     void relativePositionChanged();

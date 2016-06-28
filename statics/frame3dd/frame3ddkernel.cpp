@@ -52,12 +52,12 @@ QString readLine(QTextStream* inputStream){
 Frame3DDKernel::Frame3DDKernel(QObject* parent):
     AbstractStaticsModule(parent),
     m_gravity(0,-9800,0),
-    m_shear(1),
-    m_geom(1)
+    m_shear(0),
+    m_geom(0)
 {
     connect(&m_lazyupdateTimer, SIGNAL(timeout()), this, SLOT(solve()));
     m_lazyupdateTimer.setSingleShot(true);
-    m_lazyupdateTimer.setInterval(300);
+    m_lazyupdateTimer.setInterval(700);
     m_maxForce=0;
     m_minForce=0;
 }
@@ -301,66 +301,6 @@ bool Frame3DDKernel::readStructure(QString path){
         }
         JointPtr first=m_joints.at(joint_index_1);
         JointPtr second=m_joints.at(joint_index_2);
-        JointPtr tmp;
-        //Reordering
-        if(is2d){
-            if(first->position().x()>second->position().x()){
-                tmp=first;
-                first=second;
-                second=tmp;
-            }
-            else if(first->position().x()==second->position().x()){
-                if(first->position().y()>second->position().y()){
-                    tmp=first;
-                    first=second;
-                    second=tmp;
-                }
-                else if(first->position().y()==second->position().y()){
-                    if(first->position().z()>second->position().z()){
-                        tmp=first;
-                        first=second;
-                        second=tmp;
-                    }
-                }
-            }
-        }else{
-            if(first->position().x()>second->position().x()){
-                tmp=first;
-                first=second;
-                second=tmp;
-            }
-//            else if(first->position().x()==second->position().x()){
-//                if(first->position().z()<second->position().z()){//Check with th eflipped coordinates
-//                    tmp=first;
-//                    first=second;
-//                    second=tmp;
-//                }
-//                else if(first->position().z()==second->position().z()){
-//                    if(first->position().y()>second->position().y()){
-//                        tmp=first;
-//                        first=second;
-//                        second=tmp;
-//                    }
-//                }
-//            }
-            else if(first->position().x()==second->position().x()){
-                if(first->position().y()>second->position().y()){//Check with th eflipped coordinates
-                    tmp=first;
-                    first=second;
-                    second=tmp;
-                }
-                else if(first->position().y()==second->position().y()){
-                    if(first->position().z()<second->position().z()){
-                        tmp=first;
-                        first=second;
-                        second=tmp;
-                    }
-                }
-            }
-
-
-
-        }
         qreal area_x=line_parts[3].toDouble(&ok);
         if(!ok){
             qWarning("Fail to convert area x element");
@@ -896,7 +836,7 @@ void Frame3DDKernel::solve(){
                                 Ax, Asy, Asz, Jx, Iy, Iz, E, G, p,
                                 d, gX[lc], gY[lc], gZ[lc],
                                 nU[lc],U[lc],nW[lc],W[lc],nP[lc],P[lc],
-                                D, shear, error );
+                                D, shear, error ,active_beams);
 
         //        static_mesh ( IN_file, infcpath, meshpath, plotpath, title,
         //                    nN, nE, nL, lc, DoF,
@@ -937,7 +877,7 @@ void Frame3DDKernel::write_internal_forces (
         float *E, float *G, float *p,
         float *d, float gX, float gY, float gZ,
         int nU, float **U, int nW, float **W, int nP, float **P,
-        double *D, int shear, double error
+        double *D, int shear, double error,QVector<BeamPtr> active_beams
         ){
     double	t1, t2, t3, t4, t5, t6, t7, t8, t9, /* coord transformation */
             u1, u2, u3, u4, u5, u6, u7, u8, u9, u10, u11, u12; /* displ. */
@@ -1266,7 +1206,7 @@ void Frame3DDKernel::write_internal_forces (
             //            fprintf(fpif,"%14.6e\t%14.6e\t%14.6e\t%14.6e\n",
             //                        Dx[i], Dy[i], Dz[i], Rx[i] );
         }
-        m_beams[m-1]->setStressSegment(segments);
+        active_beams[m-1]->setStressSegment(segments);
         int type=0;
         if(maxNx>0 && minNx>0)
             type=1;
@@ -1275,7 +1215,7 @@ void Frame3DDKernel::write_internal_forces (
         else if( maxNx>0 && minNx<0){
             qWarning("Internal axial forces are not coherent");
         }
-        m_beams[m-1]->setForcesAndMoments(type,qMax(fabs(maxNx),fabs(minNx)),
+        active_beams[m-1]->setForcesAndMoments(type,qMax(fabs(maxNx),fabs(minNx)),
                                           qMax(fabs(maxVy),fabs(minVy)),
                                           qMax(fabs(maxVz),fabs(minVz)),
                                           qMax(fabs(maxTx),fabs(minTx)),
@@ -1283,7 +1223,7 @@ void Frame3DDKernel::write_internal_forces (
                                           qMax(fabs(maxMz),fabs(minMz)),
                                           3);
 
-        m_beams[m-1]->setPeakDisplacements(QVector4D(minDx,minDy,minDz,minRx),QVector4D(maxDx,maxDy,maxDz,maxRx));
+        active_beams[m-1]->setPeakDisplacements(QVector4D(minDx,minDy,minDz,minRx),QVector4D(maxDx,maxDy,maxDz,maxRx));
 
         // free memory
         free_dvector(x,0,nx);
@@ -1484,6 +1424,10 @@ void Frame3DDKernel::assemble_loads (
         TrapezoidalForcePtr trz_load=m_trapezoidal_loads[i-1];
         //n is the idnex of the beam the force is applied on
         n=active_beams.indexOf(trz_load->beam().toStrongRef())+1;
+        if(n<=0){
+            qDebug("UDLoad on disabled beam");
+            return ;
+        }
         QVector3D begin,end;
         trz_load->positionOnBeam(begin,end);
         QVector3D localForce=trz_load->forceLocal();
@@ -1894,7 +1838,7 @@ void Frame3DDKernel::update_statics(
     float maxF=0,minF=100000;
     for (n=1; n<= nE; n++) {
         BeamPtr beam=active_beams.at(n-1);
-
+        qDebug()<<beam->objectName()<<Q[n][1]<<" "<<Q[n][7];
         int axial_type;
         if (fabs(Q[n][1]) < 0.0001)
             axial_type=0;
@@ -1980,6 +1924,58 @@ BeamPtr Frame3DDKernel::createBeam(JointPtr extreme1,JointPtr extreme2,QSizeF si
 BeamPtr Frame3DDKernel::createBeam(JointPtr extreme1, JointPtr extreme2, QSizeF size, QString materialID, QString name)
 {
     if(!extreme1.isNull() && !extreme2.isNull() && extreme1!=extreme2){
+        /*Check for duplicates*/
+        WeakJointPtr _e1,_e2;
+        Q_FOREACH(WeakBeamPtr _b,extreme1->connectedBeams()){
+            _b.toStrongRef()->extremes(_e1,_e2);
+            if(_e1==extreme2 || _e2==extreme2)
+                return BeamPtr();
+        }
+
+        JointPtr tmp;
+        //Reordering
+        if(this->is2D()){
+            if(extreme1->position().x()>extreme2->position().x()){
+                tmp=extreme1;
+                extreme1=extreme2;
+                extreme2=tmp;
+            }
+            else if(extreme1->position().x()==extreme2->position().x()){
+                if(extreme1->position().y()>extreme2->position().y()){
+                    tmp=extreme1;
+                    extreme1=extreme2;
+                    extreme2=tmp;
+                }
+                else if(extreme1->position().y()==extreme2->position().y()){
+                    if(extreme1->position().z()>extreme2->position().z()){
+                        tmp=extreme1;
+                        extreme1=extreme2;
+                        extreme2=tmp;
+                    }
+                }
+            }
+        }else{
+            if(extreme1->position().x()>extreme2->position().x()){
+                tmp=extreme1;
+                extreme1=extreme2;
+                extreme2=tmp;
+            }
+            else if(extreme1->position().x()==extreme2->position().x()){
+                if(extreme1->position().y()>extreme2->position().y()){//Check with the flipped coordinates
+                    tmp=extreme1;
+                    extreme1=extreme2;
+                    extreme2=tmp;
+                }
+                else if(extreme1->position().y()==extreme2->position().y()){
+                    if(extreme1->position().z()<extreme2->position().z()){
+                        tmp=extreme1;
+                        extreme1=extreme2;
+                        extreme2=tmp;
+                    }
+                }
+            }
+        }
+
         BeamPtr beam(new Beam(extreme1,extreme2,m_materialsManager,name,this));
         extreme1->addConnectedBeam(beam);
         extreme2->addConnectedBeam(beam);
@@ -2156,6 +2152,7 @@ void Frame3DDKernel::onKillRequest(){
         if(!_ptr.isNull()){
             m_joints.removeAll(_ptr);
             update();
+            return;
         }
     }
     Beam* b=qobject_cast<Beam*>(sender);
@@ -2170,6 +2167,7 @@ void Frame3DDKernel::onKillRequest(){
         if(!_ptr.isNull()){
             m_beams.removeAll(_ptr);
             update();
+            return;
         }
     }
     NodeLoad* nl=qobject_cast<NodeLoad*>(sender);
@@ -2184,6 +2182,7 @@ void Frame3DDKernel::onKillRequest(){
         if(!_ptr.isNull()){
             m_node_loads.removeAll(_ptr);
             update();
+            return;
         }
     }
     UniformlyDistributedLoad* udl=qobject_cast<UniformlyDistributedLoad*>(sender);
@@ -2198,6 +2197,7 @@ void Frame3DDKernel::onKillRequest(){
         if(!_ptr.isNull()){
             m_uniformly_distributed_loads.removeAll(_ptr);
             update();
+            return;
         }
     }
     InteriorPointLoad* ipl=qobject_cast<InteriorPointLoad*>(sender);
@@ -2212,6 +2212,7 @@ void Frame3DDKernel::onKillRequest(){
         if(!_ptr.isNull()){
             m_interior_point_loads.removeAll(_ptr);
             update();
+            return;
         }
     }
     TrapezoidalForce* tpz=qobject_cast<TrapezoidalForce*>(sender);
@@ -2226,6 +2227,7 @@ void Frame3DDKernel::onKillRequest(){
         if(!_ptr.isNull()){
             m_trapezoidal_loads.removeAll(_ptr);
             update();
+            return;
         }
     }
 }

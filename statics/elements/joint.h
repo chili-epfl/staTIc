@@ -34,7 +34,7 @@ class Joint:public AbstractElement
     QVector3D displacement() {return m_displacement;}
     QVector3D displacementRot(){return m_displacement_rot;}
 
-    QList<WeakBeamPtr> connectedBeams(){return m_connected_beams;}
+    QList<WeakBeamPtr> connectedBeams();
     void addConnectedBeam(BeamPtr b);
 
 public slots:

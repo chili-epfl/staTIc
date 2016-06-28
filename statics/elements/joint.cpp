@@ -21,6 +21,7 @@ Joint::Joint(QVector3D position,QString name,QObject* parent):
 void Joint::addConnectedBeam(BeamPtr b){
     m_connected_beams.append(b.toWeakRef());
     connect(b.data(),SIGNAL(destroyed(QObject*)),this,SLOT(onBeamDestroyed()));
+    connect(b.data(),SIGNAL(enableChanged(bool)),this,SLOT(onBeamDestroyed()));
     emit connectedBeamsChanged();
 }
 
@@ -28,7 +29,7 @@ void Joint::onBeamDestroyed(){
     QList<WeakBeamPtr> newlist;
     Q_FOREACH(WeakBeamPtr b, m_connected_beams){
         if(!b.isNull()){
-            newlist.append(b);
+                newlist.append(b);
         }
     }
     m_connected_beams=newlist;
@@ -82,6 +83,20 @@ void Joint::setDisplacementRot(QVector3D displacement){
         m_displacement_rot=displacement;
         emit displacementRotChanged();
     }
+}
+
+QList<WeakBeamPtr> Joint::connectedBeams()
+{
+    QList<WeakBeamPtr> _list;
+    _list.reserve(m_connected_beams.size());
+    Q_FOREACH(WeakBeamPtr b,m_connected_beams){
+        if(b.toStrongRef()->enable()){
+            _list.append(b);
+        }
+    }
+    return _list;
+
+    //return m_connected_beams;
 }
 
 
