@@ -22,6 +22,19 @@ Frame3DDVMManager::Frame3DDVMManager(QObject* parent):
     m_player.setVolume(50);
 }
 
+Frame3DDVMManager::~Frame3DDVMManager()
+{
+    Q_FOREACH(QObject* o, m_dependent_objects){
+        delete o;
+    }
+
+    Q_FOREACH(PoolEntity e,m_entity_pool.values()){
+        delete e.entity;
+        delete e.component;
+        delete e.contex;
+    }
+}
+
 void Frame3DDVMManager::setStaticsModule(Frame3DDKernel *staticsModule){
     if(m_staticsModule!=staticsModule){
         m_staticsModule=staticsModule;
@@ -43,7 +56,15 @@ void Frame3DDVMManager::initViewModels(){
 
 BeamVM* Frame3DDVMManager::createBeamVM(BeamPtr b){
     if(!b.isNull()){
-        BeamVM* beamVm=new BeamVM(b,m_sceneRoot,this);
+        BeamVM* beamVm;
+        const QString classname=BeamVM::staticMetaObject.className();
+        if(m_entity_pool.contains(classname)){
+            PoolEntity _e=m_entity_pool.value(classname);
+            m_entity_pool.remove(classname,_e);
+            beamVm=new BeamVM(b,_e.entity,_e.component,_e.contex,m_sceneRoot,this);
+        }
+        else
+            beamVm=new BeamVM(b,m_sceneRoot,this);
         Q_FOREACH(Qt3DCore::QEntity* e,beamVm->getEntities()){
             m_Entity3D2ViewModel[e]=beamVm;
             m_entityID2Entity3D[e->id()]=e;
@@ -51,6 +72,7 @@ BeamVM* Frame3DDVMManager::createBeamVM(BeamPtr b){
         }
         connect(beamVm,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDestroyed(QObject*)));
         connect(beamVm,SIGNAL(resourcesUpdated()),this,SLOT(onResourcesUpdate()));
+        registerDependentObject(beamVm);
         return beamVm;
     }
     return Q_NULLPTR;
@@ -58,7 +80,16 @@ BeamVM* Frame3DDVMManager::createBeamVM(BeamPtr b){
 
 JointVM* Frame3DDVMManager::createJointVM(JointPtr j){
     if(!j.isNull()){
-        JointVM* jointVm=new JointVM(j,m_sceneRoot,this);
+        JointVM* jointVm;
+        const QString classname=JointVM::staticMetaObject.className();
+        if(m_entity_pool.contains(classname)){
+            PoolEntity _e=m_entity_pool.value(classname);
+            m_entity_pool.remove(classname,_e);
+            jointVm=new JointVM(j,_e.entity,_e.component,_e.contex,m_sceneRoot,this);
+        }
+        else
+            jointVm=new JointVM(j,m_sceneRoot,this);
+
         Q_FOREACH(Qt3DCore::QEntity* e,jointVm->getEntities()){
             m_Entity3D2ViewModel[e]=jointVm;
             m_entityID2Entity3D[e->id()]=e;
@@ -66,6 +97,7 @@ JointVM* Frame3DDVMManager::createJointVM(JointPtr j){
         }
         connect(jointVm,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDestroyed(QObject*)));
         connect(jointVm,SIGNAL(resourcesUpdated()),this,SLOT(onResourcesUpdate()));
+        registerDependentObject(jointVm);
         return jointVm;
     }
     return Q_NULLPTR;
@@ -88,6 +120,38 @@ void Frame3DDVMManager::produceTPZForce(Qt3DCore::QEntity *parentEntity,QVariant
     }
     connect(tpzForceVM,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDestroyed(QObject*)));
     connect(tpzForceVM,SIGNAL(resourcesUpdated()),this,SLOT(onResourcesUpdate()));
+    registerDependentObject(tpzForceVM);
+
+}
+
+
+void Frame3DDVMManager::registerDependentObject(QObject *o)
+{
+    m_dependent_objects.insert(o);
+}
+
+void Frame3DDVMManager::addPoolEntity(QString className, Qt3DCore::QEntity *e, QQmlContext *contex, QQmlComponent *component)
+{
+    PoolEntity poolEntity;
+    poolEntity.entity=e;
+    poolEntity.component=component;
+    poolEntity.contex=contex;
+    m_entity_pool.insert(className,poolEntity);
+}
+
+void Frame3DDVMManager::tryRetrivePoolEntity(QString className, Qt3DCore::QEntity *&e, QQmlContext *&contex, QQmlComponent *&component)
+{
+    if(m_entity_pool.contains(className)){
+        PoolEntity _e=m_entity_pool.value(className);
+        m_entity_pool.remove(className,_e);
+        e=_e.entity;
+        contex=_e.contex;
+        component=_e.component;
+    }else{
+        e=Q_NULLPTR;
+        contex=Q_NULLPTR;
+        component=Q_NULLPTR;
+    }
 }
 
 Qt3DCore::QEntity* Frame3DDVMManager::getEntity3D(Qt3DCore::QNodeId id){
@@ -107,6 +171,17 @@ AbstractElementViewModel* Frame3DDVMManager::getAssociatedVM(Qt3DCore::QEntity* 
     return m_Entity3D2ViewModel[e];
 }
 
+AbstractElementViewModel *Frame3DDVMManager::getAssociatedVM(AbstractElement *element)
+{
+    if(!element) return Q_NULLPTR;
+    Q_FOREACH(AbstractElementViewModel* _vm,m_Entity3D2ViewModel.values()){
+        if(_vm->element()==element){
+            return _vm;
+        }
+    }
+    return Q_NULLPTR;
+}
+
 Qt3DCore::QEntity *Frame3DDVMManager::getEntity3D(QString entity_name)
 {
     if(!entity_name.isEmpty() && m_entityNameMap.contains(entity_name))
@@ -118,12 +193,18 @@ Qt3DCore::QEntity *Frame3DDVMManager::getEntity3D(QString entity_name)
 
 
 void Frame3DDVMManager::onResourceDestroyed(QObject * o){
+    m_dependent_objects.remove(o);
     Q_FOREACH(Qt3DCore::QEntity* e, m_Entity3D2ViewModel.keys()){
-        if(m_Entity3D2ViewModel[e]==o){
+        if(m_Entity3D2ViewModel[e]==(AbstractElementViewModel*)o){
             m_Entity3D2ViewModel.remove(e);
-            m_entityID2Entity3D.remove(e->id());
-            if(!e->objectName().isEmpty())
-                m_entityNameMap.remove(e->objectName());
+            Q_FOREACH(Qt3DCore::QNodeId id ,m_entityID2Entity3D.keys()){
+                if(m_entityID2Entity3D[id]==e)
+                    m_entityID2Entity3D.remove(id);
+            }
+            Q_FOREACH(QString name ,m_entityNameMap.keys()){
+                if(m_entityNameMap[name]==e)
+                    m_entityNameMap.remove(name);
+            }
         }
     }
 }
