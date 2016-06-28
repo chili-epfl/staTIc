@@ -208,6 +208,7 @@ Entity{
    Entity{
         id:third_digit
         property Mesh mesh:Mesh{
+            source: "qrc:/UIMesh/3DObjects/0.obj"
         }
         property Transform offset:Transform{
             rotation:quaternion_helper.product(fromAxisAndAngle(1,0,0,90),fromAxisAndAngle(0,1,0,-90))
@@ -234,6 +235,7 @@ Entity{
    Entity{
         id:first_decimal_digit
         property Mesh mesh:Mesh{
+            source: "qrc:/UIMesh/3DObjects/0.obj"
 
         }
         property Transform offset:Transform{
