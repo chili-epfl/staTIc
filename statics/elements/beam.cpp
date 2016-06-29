@@ -50,7 +50,9 @@ Beam::Beam(JointPtr extreme1, JointPtr extreme2,MaterialsManager* mm,QString nam
     m_dirty=DirtyFlag::Clean;
     m_extreme1=extreme1;
     m_extreme2=extreme2;
-    m_length=extreme1->position().distanceToPoint(extreme2->position());
+    m_length=sqrt(pow(extreme1->position().x()-extreme2->position().x(),2)+
+                  pow(extreme1->position().y()-extreme2->position().y(),2)+
+                  pow(extreme1->position().z()-extreme2->position().z(),2));
     m_materialsManager=mm;
     m_tangibleSection=QSizeF(34,17);
     connect(m_extreme1.data(),SIGNAL(destroyed(QObject*)),this,SIGNAL(killMe()));
