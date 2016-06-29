@@ -4,7 +4,9 @@
 	http://www.nr.com/public-domain.html
 */
 
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "NRutil.h"
 
 #if defined(__STDC__) || defined(ANSI) || defined(NRANSI) /* ANSI */
@@ -1065,3 +1067,6 @@ void save_ut_dmatrix ( char filename[], double **A, int n, const char *mode )
 	fclose ( fp_m);
 	return;
 }
+#ifdef __cplusplus
+}
+#endif

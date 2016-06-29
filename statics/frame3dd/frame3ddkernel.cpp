@@ -10,18 +10,21 @@
 
 #include <QDebug>
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
+//#include <math.h>
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <string.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include "common.h"
 #include "eig.h"
 #include "HPGmatrix.h"
 #include "NRutil.h"
 #include "coordtrans.h"
-
-
+#ifdef __cplusplus
+}
+#endif
 const char separator=',';
 
 /*Utility function to skip comments and new lines in the config file*/
@@ -153,7 +156,7 @@ bool Frame3DDKernel::readStructure(QString path){
         }
         else{
             //createJoint(QVector3D(tmp_nodes[i].x(),tmp_nodes[i].z(),-tmp_nodes[i].y()),tmp_nodes_names[i]);
-            createJoint(QVector3D(tmp_nodes[i].x(),tmp_nodes[i].y(),-tmp_nodes[i].z()),tmp_nodes_names[i]);
+            createJoint(QVector3D(tmp_nodes[i].x(),tmp_nodes[i].y(),tmp_nodes[i].z()),tmp_nodes_names[i]);
 
         }
     }
@@ -534,18 +537,18 @@ void Frame3DDKernel::solve(){
     /*Set node data*/
     for(i=0; i<nN;i++){
         JointPtr joint=m_joints.at(i);
-        xyz[i+1].x=joint->position().x();
+        xyz[i+1].x=static_cast<double>(joint->position().x());
         if(m_is2D){
-            xyz[i+1].y=joint->position().y();
-            xyz[i+1].z=joint->position().z();
+            xyz[i+1].y=static_cast<double>(joint->position().y());
+            xyz[i+1].z=static_cast<double>(joint->position().z());
         }
         else{
 //            xyz[i+1].z=joint->position().y();
 //            xyz[i+1].y=-joint->position().z();
-            xyz[i+1].y=joint->position().y();
-            xyz[i+1].z=-joint->position().z();
+            xyz[i+1].y=static_cast<double>(joint->position().y());
+            xyz[i+1].z=static_cast<double>(joint->position().z());
         }
-        rj[i+1]=0;
+        rj[i+1]=0.0;
     }
 
     DoF = 6*nN;		/* total number of degrees of freedom	*/
@@ -562,28 +565,32 @@ void Frame3DDKernel::solve(){
         joint->support(X,Y,Z,XX,YY,ZZ);
         if(X || Y || Z || XX || YY || ZZ){
             nR++;
-            r[i*6+1]=X;
-            r[i*6+4]=XX;
-            if(m_is2D){
-                r[i*6+2]=Y;
-                r[i*6+3]=Z;
-                r[i*6+5]=YY;
-                r[i*6+6]=ZZ;
-            }else{
-//                r[i*6+2]=Z;
-//                r[i*6+3]=Y;
-//                r[i*6+5]=ZZ;
-//                r[i*6+6]=YY;
-                r[i*6+2]=Y;
-                r[i*6+3]=Z;
-                r[i*6+5]=YY;
-                r[i*6+6]=ZZ;
-            }
+            r[i*6+1]=static_cast<int>(X);
+            r[i*6+4]=static_cast<int>(XX);
+//            if(m_is2D){
+            r[i*6+2]=static_cast<int>(Y);
+            r[i*6+3]=static_cast<int>(Z);
+            r[i*6+5]=static_cast<int>(YY);
+            r[i*6+6]=static_cast<int>(ZZ);
+//            }else{
+////                r[i*6+2]=Z;
+////                r[i*6+3]=Y;
+////                r[i*6+5]=ZZ;
+////                r[i*6+6]=YY;
+//                r[i*6+2]=(int)Y;
+//                r[i*6+3]=(int)Z;
+//                r[i*6+5]=(int)YY;
+//                r[i*6+6]=(int)ZZ;
+//            }
 
         }
     }
     sumR=0;	for (i=1;i<=DoF;i++) sumR += r[i];
-    for (i=1; i<=DoF; i++)	if (r[i]) q[i] = 0;	else q[i] = 1;
+    for (i=1; i<=DoF; i++)
+        if (r[i])
+            q[i] = 0;
+        else
+            q[i] = 1;
 
     QVector<BeamPtr> active_beams;
     Q_FOREACH(BeamPtr beam,m_beams){
@@ -617,35 +624,25 @@ void Frame3DDKernel::solve(){
     /*Set beam data*/
     for(i=0;i<nE;i++){
         BeamPtr beam=active_beams.at(i);
-        L[i+1]=beam->length();
-        Le[i+1]=beam->length();
+        L[i+1]=static_cast<double>(beam->length());
+        Le[i+1]=static_cast<double>(beam->length());
         WeakJointPtr e1,e2;
         beam->extremes(e1,e2);
         N1[i+1]=m_joints.indexOf(e1.toStrongRef())+1;
         N2[i+1]=m_joints.indexOf(e2.toStrongRef())+1;
         qreal beam_Ax,beam_Asy,beam_Asz,beam_Jx,beam_Iy,beam_Iz,beam_E,beam_G,beam_p,beam_d;
         beam->parameters(beam_Ax,beam_Asy,beam_Asz,beam_Jx,beam_Iy,beam_Iz,beam_E,beam_G,beam_p,beam_d);
-        Ax[i+1]=beam_Ax;
-        Jx[i+1]=beam_Jx;
-        if(m_is2D){
-            Asy[i+1]=beam_Asy;
-            Asz[i+1]=beam_Asz;
-            Iy[i+1]=beam_Iy;
-            Iz[i+1]=beam_Iz;
-        }else{
-//            Asy[i+1]=beam_Asz;
-//            Asz[i+1]=beam_Asy;
-//            Iy[i+1]=beam_Iz;
-//            Iz[i+1]=beam_Iy;
-            Asy[i+1]=beam_Asy;
-            Asz[i+1]=beam_Asz;
-            Iy[i+1]=beam_Iy;
-            Iz[i+1]=beam_Iz;            
-        }
-        E[i+1]=beam_E;
-        G[i+1]=beam_G;
-        p[i+1]=beam_p;
-        d[i+1]=beam_d;
+        Ax[i+1]=static_cast<float>(beam_Ax);
+        Jx[i+1]=static_cast<float>(beam_Jx);
+        Asy[i+1]=static_cast<float>(beam_Asy);
+        Asz[i+1]=static_cast<float>(beam_Asz);
+        Iy[i+1]=static_cast<float>(beam_Iy);
+        Iz[i+1]=static_cast<float>(beam_Iz);
+
+        E[i+1]=static_cast<float>(beam_E);
+        G[i+1]=static_cast<float>(beam_G);
+        p[i+1]=static_cast<float>(beam_p);
+        d[i+1]=static_cast<float>(beam_d);
     }
 
 
@@ -784,7 +781,6 @@ void Frame3DDKernel::solve(){
 
         /*  check the equilibrium error	*/
         error = equilibrium_error ( dF, F, K, D, DoF, q,r );
-
         /* quasi Newton-Raphson iteration for geometric nonlinearity  */
         if (geom) { error = 1.0; ok = 0; iter = 0; } /* re-initialize */
         while ( geom && error > tol && iter < 500 && ok >= 0) {
@@ -1290,15 +1286,15 @@ void Frame3DDKernel::assemble_loads (
 
 
     /* gravity loads applied uniformly to all frame elements ------- */
-    gX[1]=m_gravity.x();
+    gX[1]=(float)m_gravity.x();
     if(m_is2D){
-        gY[1]=m_gravity.y();
-        gZ[1]=m_gravity.z();
+        gY[1]=(float)m_gravity.y();
+        gZ[1]=(float)m_gravity.z();
     }else{
 //        gY[1]=-m_gravity.z();
 //        gZ[1]=m_gravity.y();
-        gY[1]=m_gravity.y();
-        gZ[1]=-m_gravity.z();
+        gY[1]=(float)m_gravity.y();
+        gZ[1]=-(float)m_gravity.z();
     }
     for (n=1; n<=nE; n++) {
 
@@ -1967,7 +1963,7 @@ BeamPtr Frame3DDKernel::createBeam(JointPtr extreme1, JointPtr extreme2, QSizeF 
                     extreme2=tmp;
                 }
                 else if(extreme1->position().y()==extreme2->position().y()){
-                    if(extreme1->position().z()<extreme2->position().z()){
+                    if(extreme1->position().z()>extreme2->position().z()){
                         tmp=extreme1;
                         extreme1=extreme2;
                         extreme2=tmp;

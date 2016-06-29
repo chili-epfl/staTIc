@@ -28,7 +28,9 @@
  Duke University, Box 90287
  Durham, NC  27708--0287
 */
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -607,3 +609,6 @@ void check_non_negative( double x, int i)
 	}
 }
 
+#ifdef __cplusplus
+}
+#endif

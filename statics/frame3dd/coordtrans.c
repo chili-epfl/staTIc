@@ -20,7 +20,9 @@
     You should have received a copy of the GNU General Public License
     along with FRAME3DD.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <math.h>
 
 #include "coordtrans.h"
@@ -202,3 +204,6 @@ void atma(
 	free_dmatrix(ma,1,12,1,12);
 }
 
+#ifdef __cplusplus
+}
+#endif

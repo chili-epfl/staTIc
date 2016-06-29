@@ -22,7 +22,9 @@
 */
 
 /* NOTE main 'driver' routine is now moved to main.c */
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <math.h>
 #include <assert.h>
 
@@ -1188,4 +1190,6 @@ void deallocate(
 /* removed strcpy -- it's in <string.h> in the standard C library */
 
 /* dots moved to frame3dd_io.c */
-
+#ifdef __cplusplus
+}
+#endif

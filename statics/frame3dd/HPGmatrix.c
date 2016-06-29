@@ -32,13 +32,14 @@
     You should have received a copy of the GNU General Public License
     along with HPGmatrix.  If not, see <http://www.gnu.org/licenses/>.
 */
-
+#ifdef __cplusplus
+extern "C" {
+#endif
 #include <math.h>
 #include <stdio.h>
 
 #include "HPGmatrix.h"
 #include "NRutil.h"
-
 #define SWAP(a,b) {temp=(a);(a)=(b);(b)=temp;}
 
 /* 
@@ -393,18 +394,20 @@ void ldl_dcmp_pm (
 				if ( q[k] )
 					A[j][i] -= A[j][k]*A[i][k];
 		    }
-		}
-
+        }
 		d[j] = A[j][j];
-	    	for (i=m; i < j; i++) if ( q[i] ) d[j] -= A[j][i]*A[j][i]/d[i];
-	    	for (i=m; i < j; i++) if ( q[i] ) A[j][i] /= d[i];
+
+
+        for (i=m; i < j; i++) if ( q[i] ) d[j] -= A[j][i]*A[j][i]/d[i];
+        for (i=m; i < j; i++) if ( q[i] ) A[j][i] /= d[i];
 
 		if ( d[j] == 0.0 ) {
 		 fprintf(stderr," ldl_dcmp_pm(): zero found on diagonal ...\n");
 		 fprintf(stderr," d[%d] = %11.4e\n", j, d[j] );
 		 return;
 		}
-		if ( d[j] < 0.0 ) (*pd)--;
+        if ( d[j] < 0.0 )
+            (*pd)--;
 	      }
 	    }
 		
@@ -966,3 +969,6 @@ void Legendre( int order, float *t, int n, float **P, float **Pp, float **Ppp )
 	return;
 }
 
+#ifdef __cplusplus
+}
+#endif
