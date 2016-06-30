@@ -17,4 +17,6 @@ Item {
     property bool show_info_box:false
     /*Tools*/
     property bool enable_scaffold: true;
+    property var beam_dragging_ownership:0;
+    onBeam_dragging_ownershipChanged: console.log(beam_dragging_ownership)
 }

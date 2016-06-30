@@ -24,6 +24,7 @@ Rectangle{
                 target:settings
                 show_spatial_references: true
                 show_info_box: infobox.current_item!=0
+                load_is_selectable:false
             }
 
         },
@@ -38,6 +39,7 @@ Rectangle{
                 target: settings
                 show_spatial_references: false
                 show_info_box:true
+                load_is_selectable:true
             }
         }
     ]
