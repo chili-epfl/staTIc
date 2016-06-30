@@ -142,8 +142,9 @@ Item{
     }
     Component.onCompleted: if(Platform=="ANDROID")
                                camDevice.deviceId=QtMultimedia.availableCameras[0].deviceId
-                           else
+                           else {
                                camDevice.deviceId=QtMultimedia.availableCameras[1].deviceId
+                           }
 
     /*Loading animation*/
     Rectangle{
@@ -267,7 +268,10 @@ Item{
          source: camDevice
          filters:[aruco]
          fillMode:VideoOutput.PreserveAspectCrop
-
+         onContentRectChanged: if(camDevice.isRunning){
+                                    scene3D.view_finder_width=viewFinder.contentRect.width
+                                    scene3D.view_finder_height=viewFinder.contentRect.height
+                               }
          Rectangle{
              anchors.fill: parent
              color:"#00000000"
@@ -283,14 +287,13 @@ Item{
                  aspects: ["input","physics"]
 //                 aspects:["input"]
                  multisample:true
-
                  DefaultScriptScene3D {
-                     id:scene3D
-                     property int factor_h:  Math.round(stillImage.sourceSize.height/ scene3DContainer.height)
-                     cameraScaleX: stillImage.visible ?  stillImage.sourceSize.height/ (Math.round(stillImage.sourceSize.height/ scene3DContainer.height) * scene3DContainer.height) : viewFinder.contentRect.height/scene3DContainer.height
-                     cameraScaleY: stillImage.visible ?  stillImage.sourceSize.width/ (Math.round(stillImage.sourceSize.width/ scene3DContainer.width) * scene3DContainer.width) : viewFinder.contentRect.width/scene3DContainer.width
+                    id:scene3D
+                     property real view_finder_width;
+                     property real view_finder_height;
+                     cameraScaleX: view_finder_height/scene3DContainer.height
+                     cameraScaleY: view_finder_width/scene3DContainer.width
                  }
-
              }
 
              Rectangle{
