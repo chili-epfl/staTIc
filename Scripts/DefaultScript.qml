@@ -12,6 +12,7 @@ import Frame3DDKernel 1.0
 import Frame3DDVMManager 1.0
 
 import "qrc:/ui/UI/"
+import "qrc:/"
 import Warehouse3D 1.0
 Item{
     id: applicationRoot
@@ -28,11 +29,12 @@ Item{
     property url structure3DAsset;
     property url structureTagConfig;
 
-
     QuaternionHelper{
         id:quaternion_helper
     }
-
+    Settings{
+        id:settings
+    }
 //    property real text_color_alpha:0.0
 //    SequentialAnimation{
 //        id:text_animation
@@ -190,8 +192,8 @@ Item{
         }
         //onUpdated: text_animation.restart()
         onStartingUpdate:{
-            scene3D.blinking_displacement=false;
-            scene3D.blinking_stress=false;
+            settings.blink_stress=0;
+            settings.blink_displacement=0;
         }
         onStabilityChanged: {
             if(stability==Frame3DDKernel.UNSTABLE){
@@ -429,33 +431,33 @@ Item{
                     anchors.margins: 10
                     width: 100
                     height: 100
-                    source: scene3D.show_stress_ratio?
+                    source: settings.show_stress?
                                 "qrc:/icons/Icons/show_stress_on.png" :
                                 "qrc:/icons/Icons/show_stress_off.png"
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            scene3D.show_stress_ratio = !scene3D.show_stress_ratio
-                            if(scene3D.show_displacement && scene3D.show_stress_ratio)
-                                scene3D.show_displacement=false;
-                            scene3D.blinking_stress=false;
+                            settings.show_stress = !settings.show_stress
+                            if(settings.show_displacement && settings.show_stress)
+                                settings.show_displacement=false;
+                            settings.blink_stress=0;
                         }
                     }
                     Rectangle{
-                        visible: scene3D.blinking_stress>0
+                        visible: settings.blink_stress>0
                         width: parent.width
                         height: parent.height
                         radius: width/2
                         color: "transparent"
                         SequentialAnimation on color{
-                            running: scene3D.blinking_stress>0
+                            running: settings.blink_stress>0
                             loops: -1
                             ColorAnimation {
-                                to: scene3D.blinking_stress==1 ? Qt.rgba(1,0.64,0,0.8) : Qt.rgba(1,0,0,0.8)
+                                to: settings.blink_stress==1 ? Qt.rgba(1,0.64,0,0.8) : Qt.rgba(1,0,0,0.8)
                                 duration: 1000
                             }
                             ColorAnimation {
-                                to: scene3D.blinking_stress==1 ? Qt.rgba(1,0.64,0,0.2) : Qt.rgba(1,0,0,0.2)
+                                to: settings.blink_stress==1 ? Qt.rgba(1,0.64,0,0.2) : Qt.rgba(1,0,0,0.2)
                                 duration: 1000
                             }
                         }
@@ -468,33 +470,33 @@ Item{
                     anchors.margins: 10
                     width: 100
                     height: 100
-                    source: scene3D.show_displacement?
+                    source: settings.show_displacement?
                                 "qrc:/icons/Icons/show_displacement_on.png" :
                                 "qrc:/icons/Icons/show_displacement_off.png"
                     MouseArea{
                         anchors.fill: parent
                         onClicked: {
-                            scene3D.show_displacement = !scene3D.show_displacement
-                            if(scene3D.show_displacement && scene3D.show_stress_ratio)
-                                scene3D.show_stress_ratio=false
-                            scene3D.blinking_displacement=false;
+                            settings.show_displacement = !settings.show_displacement
+                            if(settings.show_displacement && settings.show_stress)
+                                settings.show_stress=false
+                            settings.blink_displacement=0;
                         }
                     }
                     Rectangle{
-                        visible: scene3D.blinking_displacement>0
+                        visible: settings.blink_displacement>0
                         width: parent.width
                         height: parent.height
                         radius: width/2
                         color: "transparent"
                         SequentialAnimation on color{
-                            running: scene3D.blinking_displacement>0
+                            running: settings.blink_displacement>0
                             loops: -1
                             ColorAnimation {
-                                to: scene3D.blinking_displacement==1 ? Qt.rgba(1,0.64,0,0.8) : Qt.rgba(1,0,0,0.8)
+                                to: settings.blink_displacement==1 ? Qt.rgba(1,0.64,0,0.8) : Qt.rgba(1,0,0,0.8)
                                 duration: 1000
                             }
                             ColorAnimation {
-                                to: scene3D.blinking_displacement==1 ? Qt.rgba(1,0.64,0,0.2) : Qt.rgba(1,0,0,0.2)
+                                to: settings.blink_displacement==1 ? Qt.rgba(1,0.64,0,0.2) : Qt.rgba(1,0,0,0.2)
                                 duration: 1000
                             }
                         }

@@ -18,28 +18,26 @@ Rectangle{
             PropertyChanges {
                 target: infobox
                 current_item: 0
-            }
-            PropertyChanges {
-                target: infobox
                 lateral_visibility: "Visible"
             }
-        },
-        State{
-            name:"JOINT"
             PropertyChanges {
-                target: infobox
-                current_item: 0
+                target:settings
+                show_spatial_references: true
+                show_info_box: infobox.current_item!=0
             }
+
         },
         State{
             name:"DESIGNER"
             PropertyChanges {
                 target: infobox
                 current_item: 0
+                lateral_visibility: "Visible"
             }
             PropertyChanges {
-                target: infobox
-                lateral_visibility: "Visible"
+                target: settings
+                show_spatial_references: false
+                show_info_box:true
             }
         }
     ]

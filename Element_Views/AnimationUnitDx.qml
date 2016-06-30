@@ -38,8 +38,6 @@ Entity{
                 return 0/360
         }
         diffuse:Qt.hsla(h,1,0.5)
-        //diffuse:"grey"
-        //specular:"black"
         shininess:0
     }
 

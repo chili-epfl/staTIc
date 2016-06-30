@@ -4,6 +4,7 @@
         <file>AR/board.yml</file>
         <file>AR/singleTags.yml</file>
         <file>load.yml</file>
+        <file>Settings.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file>Icons/ic_keyboard_arrow_up_black_36px.svg</file>

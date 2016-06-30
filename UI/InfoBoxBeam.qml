@@ -37,15 +37,6 @@ Rectangle {
 
     ColumnLayout{
         spacing: 10
-        //        LinearGradient {
-        //            anchors.fill: parent
-        //            start: Qt.point(0, parent.height)
-        //            end: Qt.point(parent.width, 0)
-        //            gradient: Gradient {
-        //                GradientStop { position: 0.0; color: "transparent" }
-        //                GradientStop { position: 0.3; color: "#80ffb90f" }
-        //            }
-        //        }
 
         Rectangle{
             color:"#2f3439"
@@ -164,72 +155,8 @@ Rectangle {
                             }
                         }
                     }
-                    //                    Text {
-                    //                        id: sizeInfo
-                    //                        property string val
-                    //                        color:"#F8F8F8"
-                    //                        text: qsTr("Size:")+val
-                    //                    }
-                    //                    Text {
-                    //                        id: weightInfo
-                    //                        property string val
-                    //                        color:"#F8F8F8"
-                    //                        text: qsTr("Weight:")+val
-                    //                    }
-                    //                    Text {
-                    //                        id: priceInfo
-                    //                        property string val
-                    //                        color:"#F8F8F8"
-                    //                        text: qsTr("Price:")+val
-                    //                    }
-                    //                    Text {
-                    //                        id: statusInfo
-                    //                        property string val
-                    //                        color:"#F8F8F8"
-                    //                        text: qsTr("Status:")+val
-                    //                    }
                 }
             }
-//            Image{
-//                id:animationIcon
-//                states: [
-//                    State {
-//                        name: "play"
-//                        PropertyChanges {
-//                            target: animationIcon
-//                            source: "qrc:/icons/Icons/pause.svg"
-//                        }
-//                        PropertyChanges {
-//                            target: infoboxscene3d
-//                            play: true
-//                        }
-//                    },
-//                    State {
-//                        name: "pause"
-//                        PropertyChanges {
-//                            target: animationIcon
-//                            source: "qrc:/icons/Icons/play.svg"
-//                        }
-//                        PropertyChanges {
-//                            target: infoboxscene3d
-//                            play: false
-//                        }
-//                    }
-//                ]
-
-//                state: "play"
-//                anchors.bottom: parent.bottom
-//                anchors.right: parent.right
-//                anchors.margins: 30
-//                source: "qrc:/icons/Icons/play.svg"
-//                width: 75
-//                height: 75
-//                MouseArea{
-//                    anchors.fill: parent
-//                    onClicked: parent.state=="play"? parent.state="pause" : parent.state="play"
-//                }
-//            }
-
 
             //----------Navigation UI-----------------
             Image {
@@ -309,7 +236,9 @@ Rectangle {
                 anchors.bottom: parent.bottom
                 anchors.horizontalCenter:  parent.horizontalCenter
                 height: 35
+                width:2*height
                 style: CustomSwitchStyle{
+
                 }
                 checked: true
                 onCheckedChanged: {

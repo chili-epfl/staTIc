@@ -45,7 +45,7 @@ Entity{
             from:  0
             to: distanceFromJoint
             loops: QQ2.Animation.Infinite
-            running: visible && reactionMagnitude > 0
+            running: visible && settings.show_joint && reactionMagnitude > 0
     }
 
     function computeTransform(){
@@ -78,7 +78,7 @@ Entity{
     SphereMesh{
         id:mesh
         radius: 2
-        enabled:  visible
+        enabled:  visible && settings.show_joint
     }
 
     Transform{
@@ -93,20 +93,9 @@ Entity{
     components: [mesh,transform]
 
     Entity{
-       SphereMesh{
-           enabled: false
-           id:objectPickerMesh
-           radius: 10
-       }
-
-
-       components: [objectPickerMesh]
-    }
-
-    Entity{
-
         Mesh{
             id:label_mesh
+            enabled: visible && settings.show_joint
             source: root.objectName.length>0 ? "qrc:/UIMesh/3DObjects/"+root.objectName+".obj" :"qrc:/UIMesh/3DObjects/1.obj"
         }
         Transform{
@@ -125,8 +114,7 @@ Entity{
             hoverEnabled: false
             onClicked: {
                 sceneRoot.mouseEventHasBeenAccepted=true;
-                if(applicationRoot.currentViewFilter!='DESIGNER'){
-                    applicationRoot.currentViewFilter='JOINT'
+                if(settings.joint_is_selectable){
                     infobox.current_item=root
                 }
 
@@ -140,7 +128,7 @@ Entity{
 
     Mesh{
         id:tiny_arrow
-        enabled: visible && reactionMagnitude>0
+        enabled: visible && settings.joint_is_selectable && reactionMagnitude>0
         source:"qrc:/element_views/Element_Views/tiny_arrow.obj"
     }
 

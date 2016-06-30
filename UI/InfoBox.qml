@@ -41,7 +41,7 @@ Rectangle {
                 state="beam";
                 lateral_visibility="Visible"
             }
-            else if(applicationRoot.currentViewFilter=='JOINT' && current_item.type==="joint"){
+            else if(applicationRoot.currentViewFilter=='BEAM' && current_item.type==="joint"){
                 state="joint"
                 lateral_visibility="Visible"
             }
@@ -53,8 +53,7 @@ Rectangle {
 
     color:"transparent"
     radius:5
-    visible:applicationRoot.currentViewFilter=='DESIGNER' ?
-                true : current_item != 0
+    visible: settings.show_info_box
 
     Rectangle{
         //close button
@@ -160,7 +159,6 @@ Rectangle {
         anchors.fill:parent
         asynchronous: false
         onLoaded: item.current_item=Qt.binding(function(){return current_item})
-
     }
 
 }
