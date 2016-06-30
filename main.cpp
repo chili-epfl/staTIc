@@ -97,11 +97,16 @@ int main(int argc, char *argv[])
     qmlRegisterType<DeformingBeamMesh>("DeformingBeamMesh", 1, 0, "DeformingBeamMesh");
 
 //    engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
-
+#ifdef ANDROID
+    view.rootContext()->setContextProperty("Platform","ANDROID");
+#else
+    view.rootContext()->setContextProperty("Platform","UNIX");
+#endif
     view.resize(2560, 1600);
     view.setResizeMode(QQuickView::SizeRootObjectToView);
     view.setSource(QUrl("qrc:/main.qml"));
     view.show();
+
 
     //Frame3DDKernel* k=new Frame3DDKernel();
     //k->setSource(QString(":/models/models/Model1/Model1.lol"));

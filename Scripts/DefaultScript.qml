@@ -140,7 +140,10 @@ Item{
         running: false;
         interval: 2000
     }
-    Component.onCompleted: camDevice.deviceId=QtMultimedia.availableCameras[1].deviceId
+    Component.onCompleted: if(Platform=="ANDROID")
+                               camDevice.deviceId=QtMultimedia.availableCameras[0].deviceId
+                           else
+                               camDevice.deviceId=QtMultimedia.availableCameras[1].deviceId
 
     /*Loading animation*/
     Rectangle{
