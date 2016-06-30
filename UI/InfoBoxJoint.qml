@@ -189,7 +189,7 @@ Rectangle {
                         anchors.right: parent.right
                         checked: true
                         width: height*2
-                        height: forceList_label.height*2
+                        height: forceList_label.height*1.5
                         style: CustomSwitchStyle{
                         }
                         property vector3d forceVectorDel: (beam) ? beam.globalForceExtreme1 : joint.reaction
