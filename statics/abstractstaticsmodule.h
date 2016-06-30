@@ -105,6 +105,7 @@ protected:
     virtual void update() =0;
 
 protected:
+    void setStability(Stability val);
     Status m_status;
     Stability m_stability;
     static qreal m_modelScale;

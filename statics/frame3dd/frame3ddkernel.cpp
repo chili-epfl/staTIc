@@ -1802,12 +1802,14 @@ void Frame3DDKernel::update_statics(
     int	i,j,n;
 
     if ( ok < 0 ) {
+        setStability(UNSTABLE);
         qDebug("  * The Stiffness Matrix is not positive-definite *\n");
         qDebug("    Check that all six rigid-body translations are restrained\n");
         qDebug("    If geometric stiffness is included, reduce the loads.\n");
-        /*	 return; */
+        emit updated();
+        return;
     }
-
+    setStability(DETERMINATE);
     /*Node Displacement.
     * j node index, starting from 1.
     * X-dsp       Y-dsp       Z-dsp X-rot       Y-rot       Z-rot*/

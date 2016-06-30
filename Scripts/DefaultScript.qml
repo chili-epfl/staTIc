@@ -189,6 +189,12 @@ Item{
             scene3D.blinking_displacement=false;
             scene3D.blinking_stress=false;
         }
+        onStabilityChanged: {
+            if(stability==Frame3DDKernel.UNSTABLE){
+                suggestion_box.text="The structure is unstable. Check the supports"
+                suggestion_box_container.state="Visible"
+            }
+        }
     }
 
     property alias materialsManager: staticsmodule.materialsManager
@@ -281,6 +287,7 @@ Item{
                      cameraScaleX: stillImage.visible ?  stillImage.sourceSize.height/ (Math.round(stillImage.sourceSize.height/ scene3DContainer.height) * scene3DContainer.height) : viewFinder.contentRect.height/scene3DContainer.height
                      cameraScaleY: stillImage.visible ?  stillImage.sourceSize.width/ (Math.round(stillImage.sourceSize.width/ scene3DContainer.width) * scene3DContainer.width) : viewFinder.contentRect.width/scene3DContainer.width
                  }
+
              }
 
              Rectangle{
@@ -591,6 +598,11 @@ Item{
 
                     }
                 }
+             }
+             Rectangle{
+                visible: staticsmodule.stability==Frame3DDKernel.UNSTABLE
+                anchors.fill: parent
+                color: Qt.rgba(1,0,0,0.3)
              }
          }
      }
