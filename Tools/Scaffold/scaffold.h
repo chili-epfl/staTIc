@@ -68,6 +68,7 @@ private:
     JointPtr splitBeam(BeamPtr b, qreal offset);
     //QHash<WeakBeamPtr, WeakBeamPtr> m_child2parent_beams;
     short stability_1,stability_2,stability_3;
+    QTime timer_1,timer_2;
 };
 
 #endif // SCAFFOLD_H

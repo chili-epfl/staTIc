@@ -14,7 +14,7 @@
 
 const int discrete_step = 30;
 const int max_distance=50;
-
+const int stability_threshold=1000;//milliseconds
 /*********************Support functions************************/
 QMatrix4x4 getTranformationMatrix(Qt3DCore::QEntity* entity,bool local){
     if(!entity) return  QMatrix4x4();
@@ -41,8 +41,6 @@ QMatrix4x4 getTranformationMatrix(Qt3DCore::QEntity* entity,bool local){
 /**********************************************************************/
 
 
-
-
 Scaffold::Scaffold(QObject* parent):
     QObject(parent)
 {
@@ -58,10 +56,6 @@ Scaffold::Scaffold(QObject* parent):
     m_refractory_timer->setSingleShot(true);
     //connect(m_refractory_timer,SIGNAL(timeout()),this,SLOT(reactivate()));
     m_active=true;
-    stability_1=0;
-    stability_2=0;
-    stability_3=0;
-
 }
 
 void Scaffold::setLocalExtreme1Pos(QVector3D v)
@@ -156,9 +150,6 @@ void Scaffold::reset(){
     m_anchor_1_offset=-1;
     m_anchor_2_offset=-1;
 
-    stability_1=0;
-    stability_2=0;
-    stability_3=0;
     //m_child2parent_beams.clear();
     m_active=true;
     if(m_extreme1!=Q_NULLPTR)
@@ -173,15 +164,12 @@ void Scaffold::reset(){
 void Scaffold::onCollisionExtreme1(Physics::PhysicsCollisionEventPtr e){
     if(!m_active) return;
     if(!m_VMManager) return;
-
     //Check stability
     if(!m_anchor_1.isNull()){
         if(m_reference_extreme_pos1.distanceToPoint(m_extreme_pos1)>max_distance){
             m_anchor_1.clear();
-            stability_1=0;
         }else{
-            if(++stability_1 > 15 ){
-                stability_1--;
+            if( timer_1.elapsed() > stability_threshold ){
                 onAnchorsChanged();
             }
             return;
@@ -198,6 +186,8 @@ void Scaffold::onCollisionExtreme1(Physics::PhysicsCollisionEventPtr e){
 
     Qt3DCore::QEntity* targetEntity=m_VMManager->getEntity3D(e->target());
     if(targetEntity!=Q_NULLPTR){
+        qDebug()<<targetEntity->id();
+        qDebug()<<e->target();
         AbstractElementViewModel* targetVM=m_VMManager->getAssociatedVM(targetEntity);
         if(targetVM!=Q_NULLPTR && targetVM->inherits("JointVM")) {
             JointVM* jointVM= static_cast<JointVM*>(targetVM);
@@ -206,7 +196,7 @@ void Scaffold::onCollisionExtreme1(Physics::PhysicsCollisionEventPtr e){
             m_anchor_1=joint;
             m_anchor_1_offset=-1;
             m_reference_extreme_pos1=m_extreme_pos1;
-            stability_1=0;
+            timer_1.start();
         }
         else if(targetVM!=Q_NULLPTR && targetVM->inherits("BeamVM")){
             BeamVM* beamVM=static_cast<BeamVM*>(targetVM);
@@ -235,7 +225,7 @@ void Scaffold::onCollisionExtreme1(Physics::PhysicsCollisionEventPtr e){
 
             }
             m_reference_extreme_pos1=m_extreme_pos1;
-            stability_1=0;
+            timer_1.start();
         }
     }
 }
@@ -245,14 +235,12 @@ void Scaffold::onCollisionExtreme2(Physics::PhysicsCollisionEventPtr e){
     if(!m_VMManager) return;
 
     //Check stability
-
     if(!m_anchor_2.isNull()){
         if(m_reference_extreme_pos2.distanceToPoint(m_extreme_pos2)>max_distance){
             m_anchor_2.clear();
-            stability_2=0;
+
         }else{
-            if(++stability_2 > 15 ){
-                stability_2--;
+            if(timer_2.elapsed() > stability_threshold ){
                 onAnchorsChanged();
             }
             return;
@@ -276,7 +264,7 @@ void Scaffold::onCollisionExtreme2(Physics::PhysicsCollisionEventPtr e){
             m_anchor_2=joint;
             m_anchor_2_offset=-1;
             m_reference_extreme_pos2=m_extreme_pos2;
-            stability_2=0;
+            timer_2.start();
         }
         else if(targetVM!=Q_NULLPTR && targetVM->inherits("BeamVM")){
             BeamVM* beamVM=static_cast<BeamVM*>(targetVM);
@@ -307,7 +295,7 @@ void Scaffold::onCollisionExtreme2(Physics::PhysicsCollisionEventPtr e){
                 //m_anchor_2_offset=(floor(contactDistance/beam_discrete_step)*beam_discrete_step)* beam.toStrongRef()->length()/beam.toStrongRef()->scaledLength();
             }
             m_reference_extreme_pos2=m_extreme_pos2;
-            stability_2=0;
+            timer_2.start();
         }
     }
 }
@@ -341,7 +329,6 @@ void Scaffold::onAnchorsChanged(){
                 m_VMManager->createJointVM(m_joint_2.toStrongRef());
 
             m_VMManager->createBeamVM(new_beam);
-
             connect(new_beam.data(),SIGNAL(destroyed(QObject*)),this,SLOT(reset()));
             /*Do not listen to the collition bodies anymore*/
             disconnect(m_extreme1);
@@ -364,7 +351,7 @@ void Scaffold::checkPositionExtremes()
     if(m_extreme_pos1.distanceToPoint(m_reference_extreme_pos1)>max_distance
             ||
             m_extreme_pos2.distanceToPoint(m_reference_extreme_pos2)>max_distance ){
-        if(++stability_3 > 15){
+        if(++stability_3 > 30){
             stability_3=0;
             disconnect(this,SIGNAL(localExtreme1PosChanged()),0,0);
             disconnect(this,SIGNAL(localExtreme2PosChanged()),0,0);
