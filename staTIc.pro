@@ -149,8 +149,8 @@ android {
         /home/chili/Downloads/bullet3-2.83.5/build-android/install/lib/libLinearMath.so \
         /home/chili/Downloads/bullet3-2.83.5/build-android/install/lib/libBulletCollision.so \
         /home/chili/Downloads/bullet3-2.83.5/build-android/install/lib/libBulletDynamics.so \
-        /home/chili/Downloads/bullet3-2.83.5/build-android/install/lib/libBulletSoftBody.so
-
+        /home/chili/Downloads/bullet3-2.83.5/build-android/install/lib/libBulletSoftBody.so \
+        $$[QT_INSTALL_PLUGINS]/physicsfactories/libbullet.so
 
     ANDROID_PERMISSIONS += \
         android.permission.CAMERA
