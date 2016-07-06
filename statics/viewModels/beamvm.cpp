@@ -59,11 +59,13 @@ BeamVM::BeamVM(BeamPtr beam, Qt3DCore::QEntity *entity, QQmlComponent *component
 
 }
 BeamVM::~BeamVM(){
-    m_component3D->setEnabled(false);
-    m_component3D->setProperty("extreme1",QVector3D(-10,0,400));
-    m_component3D->setProperty("extreme2",QVector3D(10,0,400));
-    Frame3DDVMManager* parent_vm_manager=static_cast<Frame3DDVMManager*>(parent());
-    parent_vm_manager->addPoolEntity(metaObject()->className(),m_component3D,m_qqmlcontext,m_qqmlcomponent);
+    if(m_component3D){
+        m_component3D->setEnabled(false);
+        m_component3D->setProperty("extreme1",QVector3D(-10,0,400));
+        m_component3D->setProperty("extreme2",QVector3D(10,0,400));
+        Frame3DDVMManager* parent_vm_manager=static_cast<Frame3DDVMManager*>(parent());
+        parent_vm_manager->addPoolEntity(metaObject()->className(),m_component3D,m_qqmlcontext,m_qqmlcomponent);
+    }
     m_qqmlcomponent=Q_NULLPTR;
     m_qqmlcontext=Q_NULLPTR;
     m_component3D=Q_NULLPTR;

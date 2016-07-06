@@ -35,21 +35,23 @@ JointVM::JointVM(JointPtr joint, Qt3DCore::QEntity *entity, QQmlComponent *compo
 }
 
 JointVM::~JointVM(){
-    m_component3D->setEnabled(false);
-    m_component3D->setProperty("position",QVector3D(0,0,400));
-    Frame3DDVMManager* parent_vm_manager=static_cast<Frame3DDVMManager*>(parent());
-    parent_vm_manager->addPoolEntity(metaObject()->className(),m_component3D,m_qqmlcontext,m_qqmlcomponent);
+    if(m_component3D){
+        m_component3D->setEnabled(false);
+        m_component3D->setProperty("position",QVector3D(0,0,400));
+        Frame3DDVMManager* parent_vm_manager=static_cast<Frame3DDVMManager*>(parent());
+        parent_vm_manager->addPoolEntity(metaObject()->className(),m_component3D,m_qqmlcontext,m_qqmlcomponent);
 
-    m_qqmlcomponent=Q_NULLPTR;
-    m_qqmlcontext=Q_NULLPTR;
-    m_component3D=Q_NULLPTR;
-    Q_FOREACH(Qt3DCore::QEntity* e,m_beamsMap.keys()){
+        Q_FOREACH(Qt3DCore::QEntity* e,m_beamsMap.keys()){
             auto extras=m_beams_entities_extras[e];
             parent_vm_manager->addPoolEntity(metaObject()->className()+classname4beamEntity,
                                              e,extras.second,extras.first);
             e->setEnabled(false);
             e->setProperty("parent_joint",QVariant());
+        }
     }
+    m_qqmlcomponent=Q_NULLPTR;
+    m_qqmlcontext=Q_NULLPTR;
+    m_component3D=Q_NULLPTR;
 }
 
 AbstractElement *JointVM::element()
