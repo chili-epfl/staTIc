@@ -39,6 +39,8 @@
         <file>Icons/apply_load_pressed.png</file>
         <file>Icons/show_displacement_off.png</file>
         <file>Icons/show_displacement_on.png</file>
+        <file>Icons/delete_load_pressed.png</file>
+        <file>Icons/delete_load.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>Images/mainbanner.png</file>
@@ -54,6 +56,7 @@
         <file>Images/compression.png</file>
         <file>Images/tension.png</file>
         <file>Images/support.png</file>
+        <file>Images/wood_beam2.png</file>
     </qresource>
     <qresource prefix="/element_views">
         <file>Element_Views/AnimationUnitDy.qml</file>
@@ -98,6 +101,7 @@
         <file>PercNumberEntity.qml</file>
         <file>UI/CustomSwitchStyle.qml</file>
         <file>NumberEntity.qml</file>
+        <file>UI/InfoBoxCableEx.qml</file>
     </qresource>
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>
