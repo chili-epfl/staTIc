@@ -426,6 +426,7 @@ Item{
                 }
                 Image {
                     id:show_stress_button
+                    visible: settings.show_stress_button
                     anchors.bottom: parent.bottom
                     anchors.left: ghostMode_button.right
                     anchors.margins: 10
@@ -465,6 +466,7 @@ Item{
 
                 }
                 Image {
+                    visible: settings.show_displacement_button
                     anchors.bottom: parent.bottom
                     anchors.left: show_stress_button.right
                     anchors.margins: 10
