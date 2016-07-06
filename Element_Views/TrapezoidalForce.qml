@@ -85,50 +85,38 @@ Entity{
         if(!isSelected)
             rootEntity.parent.drag_anchor_enabled=false
     }
-    components: [transform,customMesh,material]
 
-    Entity{
-
-        SphereMesh{
-            id:picker_mesh
-            radius: 10
-        }
-        PhongAlphaMaterial{
-            id:transparent_material
-            alpha:0.0
-        }
-        ObjectPicker {
-            id:valid_picker
-            hoverEnabled: false
-            onPressedChanged: if(pressed && settings.beam_dragging_ownership==0){
-                                  settings.beam_dragging_ownership=rootEntity
-                                  if(settings.load_is_selectable)
-                                      infobox.current_item=rootEntity
-                                  rootEntity.parent.drag_anchor_enabled=true;
-                                  rootEntity.parent.current_anchor_position=transform.translation.minus(offsetAugmentation)
-                                  resetTimer.restart()
-                              }
-                              else if(!pressed && settings.beam_dragging_ownership==rootEntity){
-                                  sceneRoot.mouseEventHasBeenAccepted=true;
-                                  rootEntity.parent.drag_anchor_enabled=false;
-                                  settings.beam_dragging_ownership=0;
-                                  transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
-                              }
-            onClicked: {
-                sceneRoot.mouseEventHasBeenAccepted=true;
-                if(settings.load_is_selectable)
-                        infobox.current_item=rootEntity
-                if(dragging){
-                    rootEntity.parent.drag_anchor_enabled=false;
-                    settings.beam_dragging_ownership=0
-                    transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
-                }
+    ObjectPicker {
+        id:valid_picker
+        hoverEnabled: false
+        onPressedChanged: if(pressed && settings.beam_dragging_ownership==0){
+                              settings.beam_dragging_ownership=rootEntity
+                              if(settings.load_is_selectable)
+                                  infobox.current_item=rootEntity
+                              rootEntity.parent.drag_anchor_enabled=true;
+                              rootEntity.parent.current_anchor_position=transform.translation.minus(offsetAugmentation)
+                              resetTimer.restart()
+                          }
+                          else if(!pressed && settings.beam_dragging_ownership==rootEntity){
+                              sceneRoot.mouseEventHasBeenAccepted=true;
+                              rootEntity.parent.drag_anchor_enabled=false;
+                              settings.beam_dragging_ownership=0;
+                              transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
+                          }
+        onClicked: {
+            sceneRoot.mouseEventHasBeenAccepted=true;
+            if(settings.load_is_selectable)
+                    infobox.current_item=rootEntity
+            if(dragging){
+                rootEntity.parent.drag_anchor_enabled=false;
+                settings.beam_dragging_ownership=0
+                transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
             }
         }
-
-        components: [transparent_material,valid_picker,picker_mesh]
-
     }
+
+
+    components: [transform,customMesh,material,valid_picker]
 
 
     QQ2.Timer{

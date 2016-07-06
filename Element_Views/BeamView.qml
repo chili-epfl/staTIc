@@ -297,6 +297,24 @@ Entity{
     components: [transform]
 
     Entity{
+        enabled: settings.show_beam_sphere
+        SphereMesh{
+            id:sphere_mesh
+            radius: 7.5
+        }
+        components: [
+            sphere_mesh
+            ,
+            main_mesh_material
+
+        ]
+
+
+    }
+
+
+
+    Entity{
         enabled: settings.show_beam_spring
         components: [Mesh{
             source:"qrc:/UIMesh/3DObjects/spring.obj"

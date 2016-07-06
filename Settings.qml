@@ -6,11 +6,15 @@ Item {
     property int blink_displacement:0
     property bool show_stress: true
     property bool show_displacement:false
+    property bool show_stress_button: true
+    property bool show_displacement_button:true
+
     property bool beam_is_selectable: true
     property bool joint_is_selectable: true
     property bool load_is_selectable: true
     property bool show_beam: true
     property bool show_beam_spring: true
+    property bool show_beam_sphere: false
     property bool show_joint: true
     property bool show_load: true
     property bool show_spatial_references: true
@@ -18,5 +22,4 @@ Item {
     /*Tools*/
     property bool enable_scaffold: true;
     property var beam_dragging_ownership:0;
-    onBeam_dragging_ownershipChanged: console.log(beam_dragging_ownership)
 }
