@@ -125,7 +125,7 @@ Rectangle {
                                 anchors.right: parent.horizontalCenter
                                 width: Math.min((parent.width-20)/2,parent.height)
                                 height: width
-                                source: object_delete_button.pressed ? "qrc:/icons/Icons/delete_pressed.png":"qrc:/icons/Icons/delete.png"
+                                source: object_delete_button.pressed ? "qrc:/icons/Icons/delete_load_pressed.png":"qrc:/icons/Icons/delete_load.png"
                                 MouseArea{
                                     id:object_delete_button
                                     anchors.fill: parent
@@ -136,7 +136,6 @@ Rectangle {
                                         }
                                         else{
                                             suggestion_box.text="You need to select a load first"
-                                            suggestion_box_container.state="Visible"
                                         }
                                     }
                                 }
@@ -164,7 +163,6 @@ Rectangle {
                                         }
                                         else{
                                             suggestion_box.text="You need to select a beam first"
-                                            suggestion_box_container.state="Visible"
                                         }
                                     }
                                 }

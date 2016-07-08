@@ -128,7 +128,7 @@ Entity{
 
     Mesh{
         id:tiny_arrow
-        enabled: visible && settings.joint_is_selectable && reactionMagnitude>0
+        enabled: visible && settings.show_beam_axial_loads && reactionMagnitude>0
         source:"qrc:/element_views/Element_Views/tiny_arrow.obj"
     }
 

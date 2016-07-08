@@ -167,7 +167,9 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: if(gridview.currentIndex !=-1){
-                                   scriptLoader.source="qrc:/scripts/Scripts/DefaultScript.qml"
+                                   scriptLoader.source="qrc:/scripts/Scripts/CableExercise.qml"
+//                                   scriptLoader.source="qrc:/scripts/Scripts/DefaultScript.qml"
+
                                }
                 }
             }

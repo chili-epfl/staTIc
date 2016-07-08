@@ -4,7 +4,7 @@ import Qt3D.Input 2.0
 
 import QtQuick 2.0 as QQ2
 import QtPhysics.unofficial 1.0
-import "qrc:/ui"
+import "qrc:/ui/UI"
 import "qrc:/opengl/Opengl"
 Entity{
     id:rootEntity
@@ -494,6 +494,8 @@ Entity{
            mass: 10
            friction: 500
            restitution: 0
+           mask: 2;
+           group: 1;
        }
        PhongAlphaMaterial{
            id:transparentMaterial

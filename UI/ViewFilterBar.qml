@@ -2,47 +2,14 @@ import QtQuick 2.0
 import QtQuick.Layouts 1.1
 
 Rectangle{
-    property alias selection:  root.state
-
+    property string selection:"DESIGNER"
     id:root
     width: icon_model.count*(74)
     height: 84
     radius:5
     color: "#606060"
     border.color: "#F0F0F0"
-    state:"DESIGNER"
-
-    states:[
-        State {
-            name: "BEAM"
-            PropertyChanges {
-                target: infobox
-                current_item: 0
-                lateral_visibility: "Visible"
-            }
-            PropertyChanges {
-                target:settings
-                show_spatial_references: true
-                show_info_box: infobox.current_item!=0
-                load_is_selectable:false
-            }
-
-        },
-        State{
-            name:"DESIGNER"
-            PropertyChanges {
-                target: infobox
-                current_item: 0
-                lateral_visibility: "Visible"
-            }
-            PropertyChanges {
-                target: settings
-                show_spatial_references: false
-                show_info_box:true
-                load_is_selectable:true
-            }
-        }
-    ]
+    visible: settings.show_filter_bar
 
     ListModel {
         id:icon_model
@@ -51,15 +18,9 @@ Rectangle{
             imageSource: "qrc:/images/Images/designer.png"
         }
         ListElement {
-            name: "BEAM"
+            name: "ANALYSIS"
             imageSource: "qrc:/images/Images/analysis_mode.png"
         }
-
-//        ListElement {
-//            name: "JOINT"
-//            imageSource: "qrc:/images/Images/wood_joint.png"
-//        }
-
     }
 
     Item{
@@ -88,7 +49,7 @@ Rectangle{
                 }
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: {layoutView.currentIndex = index;root.state=name;infobox.current_item=0}
+                    onClicked: {layoutView.currentIndex = index;root.selection=name}
                 }
             }
             highlight: Rectangle { color: "lightsteelblue"; radius: 5 ; border.color: "red"}

@@ -15,47 +15,38 @@ import "qrc:/ui/UI/"
 import "qrc:/"
 import Warehouse3D 1.0
 Item{
+
     id: applicationRoot
     anchors.fill: parent
     signal pageExit();
+
     property alias currentViewFilter: viewFilterBar.selection
+    property alias materialsManager: staticsmodule.materialsManager
 
     property alias maxForce : staticsmodule.maxForce
     property alias minForce : staticsmodule.minForce
-
-    property bool firstInit : true
 
     property url structureUrl;
     property url structure3DAsset;
     property url structureTagConfig;
 
+    property alias settings: settings
+    property alias infobox: infobox
+
+    property bool firstInit : true
+    property bool stateLock: false
     QuaternionHelper{
         id:quaternion_helper
     }
+
     Settings{
         id:settings
     }
-//    property real text_color_alpha:0.0
-//    SequentialAnimation{
-//        id:text_animation
-//        NumberAnimation{
-//            duration:200
-//            target: applicationRoot
-//            property:"text_color_alpha"
-//            from:0.0
-//            to:1
-//        }
-//        PauseAnimation { duration: 3000 }
-//        NumberAnimation{
-//            duration:5000
-//            target: applicationRoot
-//            property:"text_color_alpha"
-//            to:0
-//        }
-//    }
 
     state: "LoadingCamera"
+
     states: [
+        //....Init states....
         State {
             name: "LoadingCamera"
             when: firstInit && camDevice.cameraStatus!=Camera.ActiveStatus
@@ -129,8 +120,88 @@ Item{
                    closeLoadingAnimation.start()
                 }
             }
+        },//....end....//
+        State {
+            when:!firstInit && stateLock
+            name: "custom"
+        },
+        State{
+            name: ""
+            StateChangeScript{
+                script: settings.restore_defaults();
+            }
         }
     ]
+
+    Item{
+        states: [
+            State {
+                name: "beam"
+                when: !firstInit && settings.show_filter_bar && currentViewFilter=='ANALYSIS' &&
+                      infobox.current_item!=0 && infobox.current_item.type==="beam"
+                      && applicationRoot.state==""
+                PropertyChanges {
+                    target: infobox.loader
+                    source:"qrc:/ui/UI/InfoBoxBeam.qml"
+                    restoreEntryValues: false
+                }
+                PropertyChanges {
+                    target: infobox
+                    lateral_visibility:"Visible"
+                }
+                PropertyChanges {
+                    target:settings
+                    show_spatial_references: true
+                    show_info_box: true
+                    load_is_selectable:false
+                }
+            },
+            State {
+                name: "joint"
+                when: !firstInit &&  settings.show_filter_bar && currentViewFilter=='ANALYSIS' &&
+                      infobox.current_item!=0 && infobox.current_item.type==="joint"
+                      && applicationRoot.state==""
+                PropertyChanges {
+                    target: infobox.loader
+                    source:"qrc:/ui/UI/InfoBoxJoint.qml"
+                    restoreEntryValues: false
+                }
+                PropertyChanges {
+                    target: infobox
+                    lateral_visibility:"Visible"
+                }
+                PropertyChanges {
+                    target:settings
+                    show_spatial_references: true
+                    show_info_box: true
+                    load_is_selectable:false
+                }
+            },
+            State {
+                name: "designer"
+                when: !firstInit && settings.show_filter_bar && currentViewFilter=='DESIGNER'
+                      && applicationRoot.state==""
+                PropertyChanges {
+                    target: infobox.loader
+                    source:"qrc:/ui/UI/InfoBoxDesigner.qml"
+                    restoreEntryValues: false
+                }
+                PropertyChanges {
+                    target: infobox
+                    lateral_visibility:"Visible"
+                }
+                PropertyChanges {
+                    target: settings
+                    show_spatial_references: false
+                    show_info_box:true
+                    load_is_selectable:true
+                }
+            }
+        ]
+
+
+    }
+
 
     Timer{
         id:closeLoadingAnimation
@@ -142,6 +213,7 @@ Item{
         running: false;
         interval: 2000
     }
+
     Component.onCompleted: if(Platform=="ANDROID")
                                camDevice.deviceId=QtMultimedia.availableCameras[0].deviceId
                            else {
@@ -198,16 +270,15 @@ Item{
         onStabilityChanged: {
             if(stability==Frame3DDKernel.UNSTABLE){
                 suggestion_box.text="The structure is unstable. Check the supports"
-                suggestion_box_container.state="Visible"
             }
         }
     }
 
-    property alias materialsManager: staticsmodule.materialsManager
 
     Frame3DDVMManager{
             id:vmFrame3DDManager
     }
+
     Warehouse3D{
         id:warehouse3d
     }
@@ -222,15 +293,13 @@ Item{
              }
          }
 
-         //imageCapture.resolution: "1920x1440" //Android sets the viewfinder resolution as the capture one
          imageCapture.resolution: "640x480"
          viewfinder.resolution:"640x480"
-//         imageCapture.resolution: "800x448" //Android sets the viewfinder resolution as the capture one
-//         viewfinder.resolution:"800x448"
+
          focus {
-                     focusMode: Camera.FocusContinuous
-                     focusPointMode: Camera.FocusPointAuto
-                 }
+             focusMode: Camera.FocusContinuous
+             focusPointMode: Camera.FocusPointAuto
+         }
          imageProcessing {
                  whiteBalanceMode: CameraImageProcessing.WhiteBalanceAuto
          }
@@ -312,11 +381,12 @@ Item{
                 }
                 InfoBox{
                     id:infobox
-//                    width:Math.max(parent.width/3,pt2px(142))//5cm
-                      width: parent.width/3;
+                    width: parent.width/3;
                 }
+
                 Item{
                     id:legend_item
+                    visible: settings.show_legend
                     anchors.bottom: parent.top
                     width: parent.width
                     height: parent.parent.border.width
@@ -409,6 +479,7 @@ Item{
                         onClicked: camDevice.isRunning = !camDevice.isRunning
                     }
                 }
+
                 Image {
                     id:ghostMode_button
                     anchors.bottom: parent.bottom
@@ -424,6 +495,7 @@ Item{
                         onClicked: scene3D.ghostMode = !scene3D.ghostMode
                     }
                 }
+
                 Image {
                     id:show_stress_button
                     visible: settings.show_stress_button
@@ -465,6 +537,7 @@ Item{
                    }
 
                 }
+
                 Image {
                     visible: settings.show_displacement_button
                     anchors.bottom: parent.bottom
@@ -504,68 +577,9 @@ Item{
                         }
                    }
                 }
-                Rectangle{
-                    id:suggestion_box_container
-                    state:"Hidden"
-                    states: [
-                        State {
-                            name: "Hidden"
-                            AnchorChanges {
-                                target: suggestion_box_container
-                                anchors.top:parent.bottom
-                            }
-                            PropertyChanges {
-                                target: suggestion_box_container
-                                opacity:0
-                            }
-                        },
-                        State {
-                            name: "Visible"
-                            AnchorChanges {
-                                target: suggestion_box_container
-                                anchors.bottom: parent.bottom
-                            }
-                            PropertyChanges {
-                                target: suggestion_box_container
-                                opacity:1
-                            }
-                            StateChangeScript{
-                                script: {suggention_box_timer.restart()}
-                            }
-                        }
-                    ]
-                    transitions: Transition {
-                        AnchorAnimation { duration: 500 }
-                        NumberAnimation { property:"opacity" ; duration: 500 }
-                    }
-                    Timer{
-                        id:suggention_box_timer
-                        interval: 5000
-                        running: false
-                        onTriggered: suggestion_box_container.state="Hidden"
-                    }
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.margins: 10
-                    width: Math.min(suggestion_box.implicitWidth+20,parent.width/3)
-                    height: Math.max(suggestion_box.implicitHeight+20,ghostMode_button.height)
-                    radius: 5
-                    border.width: 5
-                    border.color: "#B4E1E4"
-                    color: "#81c7e1"
-                    Text{
-                        id: suggestion_box
-                        anchors.fill: parent
-                        color: "white"
-                        text:""
-                        font.pointSize: 14
-                        fontSizeMode: Text.Fit;
-                        minimumPointSize: 10
-                        wrapMode: Text.WordWrap
-                        horizontalAlignment: Text.AlignHCenter
-                        verticalAlignment: Text.AlignVCenter
-                    }
 
-
+                SuggestionBox{
+                    id:suggestion_box
                 }
 
                 Image {
@@ -580,6 +594,7 @@ Item{
                         onClicked:pageExit()
                     }
                 }
+
                 Slider{
                     id:clippingPlaneSlider
                     anchors.left: parent.left
@@ -593,6 +608,7 @@ Item{
                     tickmarksEnabled: true
 
                 }
+
                 Rectangle{
                     anchors.left: clippingPlaneSlider.right
                     anchors.leftMargin: 15
@@ -609,6 +625,7 @@ Item{
                     }
                 }
              }
+
              Rectangle{
                 visible: staticsmodule.stability==Frame3DDKernel.UNSTABLE
                 anchors.fill: parent

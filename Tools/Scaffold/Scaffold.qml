@@ -53,6 +53,8 @@ Entity {
                     id:extreme1Body
                     kinematic:true
                     inputTransform: extreme1Transform;
+                    mask: 1;
+                    group: 2;
                 }
                 components:[extreme1Body,material,extreme1Mesh,extreme1Transform]
             }
@@ -95,7 +97,8 @@ Entity {
                     id:extreme2Body
                     kinematic:true
                     inputTransform: extreme2Transform;
-
+                    mask: 1;
+                    group: 2;
                 }
                 components:[extreme2Body,material,extreme2Mesh,extreme2Transform]
             }

@@ -55,6 +55,7 @@ Entity {
         length: 20
         radius: 0.5
     }
+
     PhongMaterial{
         id:red
         ambient:"#980000"
@@ -62,6 +63,7 @@ Entity {
         specular:"black"
         shininess:0
     }
+
     PhongMaterial{
         id:blue
         ambient:"#001a98"
@@ -420,10 +422,7 @@ Entity {
                         }
                     }
                     components: [axis_mesh,transform,test_material]
-
                 }
-
-
     }
 
 

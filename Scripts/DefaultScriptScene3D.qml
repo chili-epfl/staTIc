@@ -198,16 +198,16 @@ Entity {
             }
         }
 
-        Scaffold{
-            extreme1_tag: ArucoObject{
-                objectId: "242"
-                QQ2.Component.onCompleted: aruco.registerObserver(this)
-            }
-            extreme2_tag: ArucoObject{
-                objectId: "243"
-                QQ2.Component.onCompleted: aruco.registerObserver(this)
-            }
-        }
+//        Scaffold{
+//            extreme1_tag: ArucoObject{
+//                objectId: "242"
+//                QQ2.Component.onCompleted: aruco.registerObserver(this)
+//            }
+//            extreme2_tag: ArucoObject{
+//                objectId: "243"
+//                QQ2.Component.onCompleted: aruco.registerObserver(this)
+//            }
+//        }
         /*Tools*/
 
 //        ConcentratedForce{

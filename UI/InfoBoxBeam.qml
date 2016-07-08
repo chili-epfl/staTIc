@@ -14,24 +14,6 @@ Rectangle {
             title.text="Beam "+ current_item.objectName;
             infoboxscene3d.extreme1_name=current_item.extreme1_name;
             infoboxscene3d.extreme2_name=current_item.extreme2_name;
-            //            materialInfo.val=Qt.binding(function(){return current_item.material;})
-            //            sizeInfo.val=Qt.binding(function(){return current_item.size;})
-            //            statusInfo.val=Qt.binding(function(){return current_item.status;})
-            //            weightInfo.val=Qt.binding(function(){return current_item.weight;})
-            //            priceInfo.val=Qt.binding(function(){return current_item.price;})
-//            infoboxscene3d.segments=Qt.binding(function(){
-//                if(current_item != null && current_item.segments)
-//                    return current_item.segments;
-//                else
-//                    return [];
-//            })
-//            infoboxscene3d.beamSize=Qt.binding(function(){
-//                if(current_item != null && current_item.segments)
-//                    return current_item.beamSize;})
-//            infoboxscene3d.beamLength=Qt.binding(function(){
-//                if(current_item != null && current_item.segments)
-//                    return current_item.length;
-//            })
         }
     }
 

@@ -6,50 +6,7 @@ Rectangle {
     id:root
     property var current_item:0;
     property alias lateral_visibility:hideButton.state
-
-    state: "designer"
-    states: [
-        State {
-            name: "beam"
-            PropertyChanges {                
-                target: loader
-                source:"qrc:/ui/UI/InfoBoxBeam.qml"
-            }
-        },
-        State {
-            name: "joint"
-            PropertyChanges {
-                target: loader
-                source:"qrc:/ui/UI/InfoBoxJoint.qml"
-            }
-        },
-        State {
-            name: "designer"
-            PropertyChanges {
-                target: loader
-                source:"qrc:/ui/UI/InfoBoxDesigner.qml"
-            }
-        }
-    ]
-
-    onCurrent_itemChanged: {
-        if(applicationRoot.currentViewFilter=='DESIGNER'){
-            state="designer"
-        }
-        else if(current_item != 0){
-            if(applicationRoot.currentViewFilter=='BEAM' && current_item.type==="beam"){
-                state="beam";
-                lateral_visibility="Visible"
-            }
-            else if(applicationRoot.currentViewFilter=='BEAM' && current_item.type==="joint"){
-                state="joint"
-                lateral_visibility="Visible"
-            }
-         }
-        else{
-
-        }
-    }
+    property alias loader: loader
 
     color:"transparent"
     radius:5
@@ -154,11 +111,13 @@ Rectangle {
             running: parent.visible
         }
     }
+
     Loader{
         id:loader
         anchors.fill:parent
         asynchronous: false
         onLoaded: item.current_item=Qt.binding(function(){return current_item})
+        onSourceChanged: console.log(source)
     }
 
 }

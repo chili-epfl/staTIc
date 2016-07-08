@@ -129,7 +129,7 @@ Entity{
 
     Mesh{
         id:tiny_arrow
-        enabled: visible && settings.show_joint
+        enabled: visible && settings.show_beam_axial_loads
         source:"qrc:/element_views/Element_Views/tiny_arrow.obj"
     }
 
