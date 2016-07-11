@@ -25,7 +25,7 @@ public:
     AbstractElementViewModel* getAssociatedVM(Qt3DCore::QEntity*);
     AbstractElementViewModel*getAssociatedVM(AbstractElement *);
     Q_INVOKABLE Qt3DCore::QEntity *getEntity3D(QString entity_name);
-
+    Q_INVOKABLE QVariantList beamEntities();
     /*Factory methods invoked by the QML side mainly*/
     Q_INVOKABLE void produceTPZForce(Qt3DCore::QEntity* parentEntity, QVariantHash properties=QVariantHash());
     void registerDependentObject(QObject* o);

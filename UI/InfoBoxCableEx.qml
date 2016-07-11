@@ -6,21 +6,28 @@ import QtQuick.Layouts 1.1
 import QtMultimedia 5.5
 import "qrc:/ui/UI"
 
-
-
 Rectangle {
     id:root
     property bool exerciseComplete:false;
+    property bool checking:false;
     SoundEffect {
         id: crashSound
         source: "qrc:/soundeffects/AR/SoundEffects/crash_wood_2.wav"
+        onPlayingChanged: if(!playing && checking){
+                              exerciseComplete=true
+                          }
     }
     SoundEffect {
         id: clappingSound
         source: "qrc:/soundeffects/AR/SoundEffects/clapping.wav"
+        onPlayingChanged: if(!playing && checking){
+                              exerciseComplete=true
+                          }
     }
     function checkSolution(){
         var valid=true;
+        var incomplete=false;
+        checking=true;
         for(var i=0; i<selected_beams.count;i++){
                 if(selected_beams.get(i).beam.axialForceType==-1){
                     valid=false
@@ -28,9 +35,28 @@ Rectangle {
                     break;
                 }
           }
+        if(valid){
+            for(i=0; i<vmFrame3DDManager.beamEntities().length;i++)
+                if(vmFrame3DDManager.beamEntities()[i].axialForceType==1){
+                    var part_incomplete=true;
+                    console.log("1",vmFrame3DDManager.beamEntities()[i])
+                    for(var j=0; j<selected_beams.count;j++){
+                        console.log("2",selected_beams.get(j).beam)
+                        if(selected_beams.get(j).beam==vmFrame3DDManager.beamEntities()[i]){
+                            part_incomplete=false;
+                            break;
+                        }
+                    }
+                    if(part_incomplete){
+                        incomplete=true;
+                        break;
+                    }
+                }
+        }
         if(valid)
             clappingSound.play()
-        exerciseComplete=true;
+        if(incomplete)
+            console.log("Incomplete")
     }
     property var current_item
     color: "transparent"

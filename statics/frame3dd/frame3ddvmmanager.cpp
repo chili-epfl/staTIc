@@ -193,6 +193,18 @@ Qt3DCore::QEntity *Frame3DDVMManager::getEntity3D(QString entity_name)
         return Q_NULLPTR;
 }
 
+QVariantList Frame3DDVMManager::beamEntities()
+{
+    QVariantList list;
+    Q_FOREACH(Qt3DCore::QNode* node,m_sceneRoot->childrenNodes()){
+        Qt3DCore::QEntity* entity=qobject_cast<Qt3DCore::QEntity*>(node);
+        if(entity!=Q_NULLPTR && entity->property("type")=="beam"){
+            list.append(QVariant::fromValue(entity));
+        }
+    }
+    return list;
+}
+
 
 
 void Frame3DDVMManager::onResourceDestroyed(QObject * o){
