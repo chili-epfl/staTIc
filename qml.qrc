@@ -41,6 +41,8 @@
         <file>Icons/show_displacement_on.png</file>
         <file>Icons/delete_load_pressed.png</file>
         <file>Icons/delete_load.png</file>
+        <file>Icons/next_pressed.png</file>
+        <file>Icons/next.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>Images/mainbanner.png</file>
@@ -57,6 +59,8 @@
         <file>Images/tension.png</file>
         <file>Images/support.png</file>
         <file>Images/wood_beam2.png</file>
+        <file>Images/boss.png</file>
+        <file>Images/steal_cable.jpg</file>
     </qresource>
     <qresource prefix="/element_views">
         <file>Element_Views/AnimationUnitDy.qml</file>

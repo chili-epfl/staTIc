@@ -583,6 +583,7 @@ Item{
                 }
 
                 Image {
+                    visible: settings.show_back_button
                     anchors.top: parent.top
                     anchors.left: parent.left
                     anchors.margins: 10

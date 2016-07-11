@@ -2,6 +2,7 @@ import QtQuick 2.0
 
 Item {
 
+    property bool show_back_button:true
     property int blink_stress:0
     property int blink_displacement:0
     property bool show_stress: true
