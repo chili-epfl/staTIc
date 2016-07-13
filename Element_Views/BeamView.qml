@@ -348,14 +348,15 @@ Entity{
 //    }
 
     Entity{
-
         property Transform transform: Transform{
-                translation:Qt.vector3d(0,0.5*mainMesh.length+15,0)
+                translation:length > (2*mainMesh.length + 30)?
+                                Qt.vector3d(0,0.5*mainMesh.length+15,0):
+                                Qt.vector3d(0,0,0)
         }
         components: [mainMesh,this.transform,main_mesh_material]
     }
     Entity{
-
+        enabled: length > (2*mainMesh.length + 30)
         property Transform transform: Transform{
                 translation:Qt.vector3d(0,-0.5*mainMesh.length-15,0)
         }
