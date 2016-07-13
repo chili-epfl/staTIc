@@ -56,17 +56,17 @@ Entity{
     property real relativeDisplacementY:0
     property real relativeDisplacementZ:0
 
-    onRelativeDisplacementYChanged:
-                if(relativeDisplacementY>=0.8)
-                    settings.blink_displacement=2;
-                else if(relativeDisplacementY>=0.5)
-                    settings.blink_displacement=1;
+//    onRelativeDisplacementYChanged:
+//                if(relativeDisplacementY>=0.8)
+//                    settings.blink_displacement=2;
+//                else if(relativeDisplacementY>=0.5)
+//                    settings.blink_displacement=1;
 
-    onRelativeDisplacementZChanged:
-            if(relativeDisplacementZ>=0.8)
-                settings.blink_displacement=2;
-            else if(relativeDisplacementZ>=0.5)
-                settings.blink_displacement=1;
+//    onRelativeDisplacementZChanged:
+//            if(relativeDisplacementZ>=0.8)
+//                settings.blink_displacement=2;
+//            else if(relativeDisplacementZ>=0.5)
+//                settings.blink_displacement=1;
 
     property matrix4x4 poseMatrix
     property quaternion quaternionTest;
@@ -96,7 +96,8 @@ Entity{
 
 
     Entity{
-        enabled: settings.show_displacement
+        //enabled: settings.show_displacement
+        enabled: false;
         //Y displacement
         NumberEntity{
             id:dispY_entity

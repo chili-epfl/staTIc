@@ -22,6 +22,7 @@ public slots:
     void onConnectedBeamChanged();
     void onConnectedBeamStressChanged();
     void visibilityChanged();
+    void onDisplacementChanged();
     /*---------*/
 signals:
 private:

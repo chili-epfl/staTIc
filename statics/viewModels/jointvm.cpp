@@ -20,6 +20,8 @@ JointVM::JointVM(JointPtr joint,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     connect(m_joint.data(),SIGNAL(reactionChanged()),this,SLOT(onReactionChanged()));
     connect(m_joint.data(),SIGNAL(destroyed(QObject*)),this,SLOT(deleteLater()));
     connect(m_joint.data(),SIGNAL(connectedBeamsChanged()),this,SLOT(onConnectedBeamChanged()));
+    connect(m_joint.data(),SIGNAL(displacementChanged()),this,SLOT(onDisplacementChanged()));
+
 }
 
 JointVM::JointVM(JointPtr joint, Qt3DCore::QEntity *entity, QQmlComponent *component, QQmlContext *context, Qt3DCore::QEntity *sceneRoot, QObject *parent)
@@ -32,6 +34,9 @@ JointVM::JointVM(JointPtr joint, Qt3DCore::QEntity *entity, QQmlComponent *compo
     initView();
     connect(m_joint.data(),SIGNAL(reactionChanged()),this,SLOT(onReactionChanged()));
     connect(m_joint.data(),SIGNAL(destroyed(QObject*)),this,SLOT(deleteLater()));
+    connect(m_joint.data(),SIGNAL(connectedBeamsChanged()),this,SLOT(onConnectedBeamChanged()));
+    connect(m_joint.data(),SIGNAL(displacementChanged()),this,SLOT(onDisplacementChanged()));
+
 }
 
 JointVM::~JointVM(){
@@ -68,6 +73,13 @@ void JointVM::onReactionChanged(){
     JointPtr joint_str_ref=m_joint.toStrongRef();
     if(m_component3D){
         m_component3D->setProperty("reaction",joint_str_ref->reaction());
+    }
+}
+
+void JointVM::onDisplacementChanged(){
+    JointPtr joint_str_ref=m_joint.toStrongRef();
+    if(m_component3D){
+        m_component3D->setProperty("displacement",joint_str_ref->displacement()*AbstractStaticsModule::modelScale());
     }
 }
 

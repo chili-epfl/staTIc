@@ -20,6 +20,24 @@ Entity{
 
     property vector3d position
     property vector3d reaction
+    property vector3d displacement
+    property real displacementLimit: position.y==0 ? 1 : position.y/500
+    property int displacementStatus: 0
+    onDisplacementChanged: {
+        if(displacement.x > displacementLimit ||
+                displacement.z > displacementLimit){
+            displacementStatus=2;
+            settings.blink_displacement=2;
+        }
+        else if((displacement.x > displacementLimit/2 ||
+                displacement.z > displacementLimit/2) && settings.blink_displacement<2){
+            displacementStatus=1;
+            settings.blink_displacement=1;
+        }
+        else
+            displacementStatus=0;
+        console.log(objectName,displacement)
+    }
 
     property real reactionMagnitude: reaction.length()
 
@@ -80,7 +98,10 @@ Entity{
         radius: 2
         enabled:  visible && settings.show_joint
     }
-
+    PhongAlphaMaterial{
+        id:material
+        alpha: settings.show_displacement? 0.5 : 1
+    }
     Transform{
         id:transform
         matrix: {
@@ -90,7 +111,7 @@ Entity{
         }
 
     }
-    components: [mesh,transform]
+    components: [mesh,transform,material]
 
     Entity{
         Mesh{
@@ -124,6 +145,27 @@ Entity{
 
     }
 
+    //Displacement entity
+    Entity{
+        enabled: visible && settings.show_joint && settings.show_displacement
+        SphereMesh{
+            id:displacement_mesh
+            radius: 2
+        }
+        Transform{
+            id:displacement_transform;
+            translation:displacement
+        }
+        PhongMaterial{
+            id:displacement_material
+            ambient: {
+                if(displacementStatus==2) return "red"
+                if(displacementStatus==1) return "yellow"
+                if(displacementStatus==0) return "green"
+            }
+        }
+        components: [displacement_mesh,displacement_transform,displacement_material]
+    }
 
 
     Mesh{
