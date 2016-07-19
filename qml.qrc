@@ -5,6 +5,7 @@
         <file>AR/singleTags.yml</file>
         <file>load.yml</file>
         <file>Settings.qml</file>
+        <file>Experiment-Mode.qml</file>
     </qresource>
     <qresource prefix="/icons">
         <file>Icons/ic_keyboard_arrow_up_black_36px.svg</file>
@@ -60,7 +61,6 @@
         <file>Images/support.png</file>
         <file>Images/wood_beam2.png</file>
         <file>Images/boss.png</file>
-        <file>Images/steal_cable.jpg</file>
     </qresource>
     <qresource prefix="/element_views">
         <file>Element_Views/AnimationUnitDy.qml</file>
@@ -86,6 +86,14 @@
         <file>Scripts/DefaultScript.qml</file>
         <file>Scripts/DefaultScriptScene3D.qml</file>
         <file>Scripts/CableExercise.qml</file>
+        <file>Scripts/SupportExercise.qml</file>
+        <file>Scripts/Stories.qml</file>
+        <file>Scripts/Story_1/chicken_shelter.png</file>
+        <file>Scripts/Story_1/Model.structure</file>
+        <file>Scripts/Story_1/boss_suggestion.png</file>
+        <file>Scripts/Story_1/suggestion.png</file>
+        <file>Scripts/Story_2/steal_cable.jpg</file>
+        <file>Scripts/Story_2/Model.structure</file>
     </qresource>
     <qresource prefix="/ui">
         <file>UI/ViewFilterBar.qml</file>
@@ -165,5 +173,12 @@
         <file>3DObjects/perc.obj</file>
         <file>3DObjects/mm.obj</file>
         <file>3DObjects/bar.obj</file>
+        <file>3DObjects/rolling support.obj</file>
+        <file>3DObjects/pin support.obj</file>
+    </qresource>
+    <qresource prefix="/resources">
+        <file>Resources/Assets3D/solar_pannel/Solar.png</file>
+        <file>Resources/Assets3D/solar_pannel/Solar.obj</file>
+        <file>Resources/Assets3D/solar_pannel/preview.png</file>
     </qresource>
 </RCC>
