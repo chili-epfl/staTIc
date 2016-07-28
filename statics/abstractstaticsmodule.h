@@ -54,7 +54,15 @@ public:
 
     AbstractStaticsModule(QObject *parent = 0);
     ~AbstractStaticsModule();
-    void setSourceUrl(QUrl sourceUrl){readStructure(sourceUrl.toLocalFile());}
+    void setSourceUrl(QUrl sourceUrl){
+        if(sourceUrl.scheme()=="file")
+            readStructure(sourceUrl.toLocalFile());
+        else if(sourceUrl.scheme()=="qrc"){
+            QString as_string=sourceUrl.toString();
+            as_string.remove(0,3);
+            readStructure(as_string);
+        }
+    }
     void setSource(QString source){readStructure(source);}
 
     Status status(){return m_status;}
