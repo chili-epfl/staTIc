@@ -57,6 +57,8 @@ Beam::Beam(JointPtr extreme1, JointPtr extreme2,MaterialsManager* mm,QString nam
     m_tangibleSection=QSizeF(34,17);
     connect(m_extreme1.data(),SIGNAL(destroyed(QObject*)),this,SIGNAL(killMe()));
     connect(m_extreme2.data(),SIGNAL(destroyed(QObject*)),this,SIGNAL(killMe()));
+    connect(m_extreme1.data(),SIGNAL(displacementChanged()),this,SIGNAL(extremeDisplacementsChanged()));
+    connect(m_extreme2.data(),SIGNAL(displacementChanged()),this,SIGNAL(extremeDisplacementsChanged()));
     m_lazy_signal_emitter.setInterval(200);
     connect(&m_lazy_signal_emitter,SIGNAL(timeout()),this,SLOT(lazy_update()));
 }
@@ -417,6 +419,18 @@ void Beam::peakDisplacements(QVector4D &min, QVector4D &max)
 {
     min=m_min_disp;
     max=m_max_disp;
+}
+
+void Beam::extremeDisplacements(QVector3D& ex1, QVector3D& ex2)
+{
+    if(!m_extreme1.isNull() && !m_extreme2.isNull()){
+        ex1=m_extreme1.toStrongRef()->displacement();
+        ex2=m_extreme2.toStrongRef()->displacement();
+    }
+    else{
+        ex1=QVector3D();
+        ex2=ex1;
+    }
 }
 
 void Beam::setSize(QSizeF size){

@@ -43,6 +43,7 @@ public:
     void setPeakDisplacements(QVector4D min, QVector4D max);
     void peakDisplacements(QVector4D& min, QVector4D& max);
 
+    void extremeDisplacements(QVector3D &ex1, QVector3D &ex2);
 
 
     void setSize(QSizeF size);
@@ -81,6 +82,17 @@ public:
     void setParentBeam(QSharedPointer<Beam> parent);
     QWeakPointer<Beam> parentBeam(){return m_parent_beam;}
 
+    /*THES ARE NOT SETTERS*/
+    qreal computeTorsionShearConstant(QSizeF size=QSizeF()); // C
+    qreal computeCrossSectionalArea(QSizeF size=QSizeF());// Ax
+    qreal computeShearAreaY(qreal Ax=-1);//Ay
+    qreal computeShearAreaZ(qreal Ax=-1);// Az
+    qreal computeTorsionalMomentInertia(QSizeF size=QSizeF());//Jx
+    qreal computeBendingMomentInertiaY(QSizeF size=QSizeF());//Iy
+    qreal computeBendingMomentInertiaZ(QSizeF size=QSizeF());//Iz
+    qreal computeSectionModulusY(QSizeF size=QSizeF());//Sy
+    qreal computeSectionModulusZ(QSizeF size=QSizeF());//Sz
+    /**/
 public slots:
     void lazy_update();
 
@@ -88,6 +100,7 @@ signals:
     void parametersChanged();
     void tangibleSectionChanged();
     void stressChanged();
+    void extremeDisplacementsChanged();
 
     void segmentsChanged();
     void materialChanged();
@@ -100,18 +113,6 @@ private:
 
     DirtyFlags m_dirty;
 
-
-
-    /*THES ARE NOT relativeAxialStressSETTERS*/
-    qreal computeTorsionShearConstant(QSizeF size=QSizeF()); // C
-    qreal computeCrossSectionalArea(QSizeF size=QSizeF());// Ax
-    qreal computeShearAreaY(qreal Ax=-1);//Ay
-    qreal computeShearAreaZ(qreal Ax=-1);// Az
-    qreal computeTorsionalMomentInertia(QSizeF size=QSizeF());//Jx
-    qreal computeBendingMomentInertiaY(QSizeF size=QSizeF());//Iy
-    qreal computeBendingMomentInertiaZ(QSizeF size=QSizeF());//Iz
-    qreal computeSectionModulusY(QSizeF size=QSizeF());//Sy
-    qreal computeSectionModulusZ(QSizeF size=QSizeF());//Sz
 
     bool m_enable;
 
