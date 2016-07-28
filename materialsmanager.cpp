@@ -12,8 +12,8 @@ MaterialsManager::MaterialsManager(QObject *parent):
                          20,0.350e-9,7000,440,8,16,14,0.4,2,3);
     default_material.uniqueID="default";
 
-    m_materials[default_material.uniqueID]=default_material;
-
+    m_materials[default_material.uniqueID]=default_material;  
+    /*....*/
     QString materialsDir=materialsPath;
     QDirIterator dirIt(materialsDir);
     while(dirIt.hasNext()){
