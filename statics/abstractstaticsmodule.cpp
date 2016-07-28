@@ -23,6 +23,7 @@ void AbstractStaticsModule::setStability(AbstractStaticsModule::Stability val)
 
 }
 
+/*From real world to tangible scale factor*/
 qreal AbstractStaticsModule::modelScale(){
     return m_modelScale;
 }
