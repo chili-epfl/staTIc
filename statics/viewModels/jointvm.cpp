@@ -21,7 +21,7 @@ JointVM::JointVM(JointPtr joint,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     connect(m_joint.data(),SIGNAL(destroyed(QObject*)),this,SLOT(deleteLater()));
     connect(m_joint.data(),SIGNAL(connectedBeamsChanged()),this,SLOT(onConnectedBeamChanged()));
     connect(m_joint.data(),SIGNAL(displacementChanged()),this,SLOT(onDisplacementChanged()));
-
+    connect(m_joint.data(),SIGNAL(supportChanged()),this,SLOT(onSupportChanged()));
 }
 
 JointVM::JointVM(JointPtr joint, Qt3DCore::QEntity *entity, QQmlComponent *component, QQmlContext *context, Qt3DCore::QEntity *sceneRoot, QObject *parent)
@@ -36,6 +36,7 @@ JointVM::JointVM(JointPtr joint, Qt3DCore::QEntity *entity, QQmlComponent *compo
     connect(m_joint.data(),SIGNAL(destroyed(QObject*)),this,SLOT(deleteLater()));
     connect(m_joint.data(),SIGNAL(connectedBeamsChanged()),this,SLOT(onConnectedBeamChanged()));
     connect(m_joint.data(),SIGNAL(displacementChanged()),this,SLOT(onDisplacementChanged()));
+    connect(m_joint.data(),SIGNAL(supportChanged()),this,SLOT(onSupportChanged()));
 
 }
 
@@ -113,7 +114,33 @@ void JointVM::onConnectedBeamChanged(){
 
 }
 
-
+void JointVM::onSupportChanged(){
+    JointPtr joint_str_ref=m_joint.toStrongRef();
+    QString supportType="special";
+    if(m_component3D){
+        bool  X,Y,Z,XX,YY,ZZ;
+        joint_str_ref->support(X,Y,Z,XX,YY,ZZ);
+        Frame3DDVMManager* parent_vm_manager=static_cast<Frame3DDVMManager*>(parent());
+        if(parent_vm_manager->staticsModule()->is2D()){
+            if(X && Y && Z && XX && YY && !ZZ)
+                supportType="Pinned";
+            else if(!X && Y && Z && XX && YY && !ZZ)
+                supportType="Rolling";
+            else if(!X && !Y && Z && XX && YY && ZZ)
+                supportType="none";
+        }
+        else
+            if(X && Y && Z && !XX && !YY && !ZZ)
+                supportType="Pinned";
+            else if(!X && Y && !Z && !XX && !YY && !ZZ)
+                supportType="Rolling";
+            else if(!X && !Y && !Z && !XX && !YY && !ZZ)
+                supportType="none";
+        if (X && Y && Z && XX && YY && ZZ)
+            supportType="Fixed";
+        m_component3D->setProperty("supportType",supportType);
+    }
+}
 void JointVM::initView(){
     JointPtr joint_str_ref=m_joint.toStrongRef();
     if(m_component3D==Q_NULLPTR){
@@ -130,9 +157,9 @@ void JointVM::initView(){
     m_component3D->setProperty("position",joint_str_ref->scaledPosition());
     onReactionChanged();
     onConnectedBeamChanged();
+    onSupportChanged();
     append_3D_resources(m_component3D);
     m_component3D->setEnabled(true);
-
 }
 
 void JointVM::createEntityForBeam(BeamPtr b){
