@@ -9,6 +9,16 @@ QSet<QString> Warehouse3D::m_image_extensions=QSet<QString>()<< "jpg"<<"jpeg"<<"
 
 Warehouse3D::Warehouse3D(QObject *parent): QAbstractListModel(parent)
 {
+    /*Default models*/
+    Object solar_pannel;
+    solar_pannel.decoration_img="qrc:/resources/Resources/Assets3D/solar_pannel/preview.png";
+    solar_pannel.properties["thumbnail"]=solar_pannel.decoration_img;
+    solar_pannel.properties["main_asset_url"]="qrc:/resources/Resources/Assets3D/solar_pannel/Solar.obj";
+    solar_pannel.properties["main_asset_diffuse_map_url"]="qrc:/resources/Resources/Assets3D/solar_pannel/Solar.png";
+    solar_pannel.properties["weight"]=25;
+    solar_pannel.properties["extent"]=QVector2D(-500,500);
+    m_objectsIndexes.append(solar_pannel);
+    /*.........*/
     QDirIterator it(assets3DPath);
     while(it.hasNext()){
         it.next();
