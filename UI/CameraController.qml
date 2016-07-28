@@ -11,7 +11,7 @@ Entity {
     property real orbitSpeed: panMode? -90.0 : 90
     property real lookSpeed: panMode? 90.0 :-45
     property bool firstPersonMode: false
-    property bool panMode: true
+    property bool panMode: false
     property int zoom: 0
     property bool resize : false
     property int totalTranslationZ:0

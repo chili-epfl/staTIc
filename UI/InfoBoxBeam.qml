@@ -14,6 +14,10 @@ Rectangle {
             title.text="Beam "+ current_item.objectName;
             infoboxscene3d.extreme1_name=current_item.extreme1_name;
             infoboxscene3d.extreme2_name=current_item.extreme2_name;
+            if(current_item.extreme1.y>current_item.extreme2.y)
+                infoboxscene3d.upsideDown=true
+            else
+                infoboxscene3d.upsideDown=false
         }
     }
 
@@ -74,8 +78,8 @@ Rectangle {
                 anchors.top: parent.top
                 anchors.left: parent.left
                 anchors.margins: 30
-                width: parent.width/2
-                height: 3*width/4
+                width: parent.width/4
+                height: 4*width/3
                 color:"#80000000"
                 border.color: "black"
                 radius: 3
@@ -84,15 +88,16 @@ Rectangle {
                     anchors.fill: parent
                     anchors.margins: 5
                     spacing:5
-                    Text {
-                        Layout.fillWidth: true
+                    Text{
+                        Layout.preferredWidth: material_info_box.width
+                        Layout.preferredHeight: 0.3*material_info_box.height
                         id: materialInfo
                         color:"#F8F8F8"
                         text: "<b>Material:</b> "+materialsManager.get(current_item.materialID,"name");
                         fontSizeMode: Text.Fit;
-                        minimumPixelSize: 10;
+                        wrapMode: Text.WordWrap
+                        minimumPixelSize: 8;
                         font.pixelSize: 20
-                        textFormat: Text.RichText
                     }
                     Item{
                         Layout.fillWidth: true
@@ -222,7 +227,7 @@ Rectangle {
                 style: CustomSwitchStyle{
 
                 }
-                checked: true
+                checked: false
                 onCheckedChanged: {
                     infoboxscene3d.panMode=checked;
                 }
