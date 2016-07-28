@@ -26,6 +26,7 @@ BeamVM::BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     connect(m_beam.data(),SIGNAL(segmentsChanged()),this,SLOT(onSegmentsChanged()));
     connect(m_beam.data(),SIGNAL(parametersChanged()),this,SLOT(onParametersChanged()));
     connect(m_beam.data(),SIGNAL(tangibleSectionChanged()),this,SLOT(onTangibleSectionChanged()));
+    connect(m_beam.data(),SIGNAL(extremeDisplacementsChanged()),this,SLOT(onExtremeDisplacementChanged()));
 
     /*Material*/
     connect(m_component3D,SIGNAL(materialIDChanged()),this,SLOT(onMaterialChangedVMSide()));
@@ -51,6 +52,7 @@ BeamVM::BeamVM(BeamPtr beam, Qt3DCore::QEntity *entity, QQmlComponent *component
     connect(m_beam.data(),SIGNAL(segmentsChanged()),this,SLOT(onSegmentsChanged()));
     connect(m_beam.data(),SIGNAL(parametersChanged()),this,SLOT(onParametersChanged()));
     connect(m_beam.data(),SIGNAL(tangibleSectionChanged()),this,SLOT(onTangibleSectionChanged()));
+    connect(m_beam.data(),SIGNAL(extremeDisplacementsChanged()),this,SLOT(onExtremeDisplacementChanged()));
 
     /*Material*/
     connect(m_component3D,SIGNAL(materialIDChanged()),this,SLOT(onMaterialChangedVMSide()));
@@ -102,6 +104,7 @@ void BeamVM::initView(){
         onBeamAxialStressChanged();
         onSegmentsChanged();
         onTangibleSectionChanged();
+        onExtremeDisplacementChanged();
         m_qqmlcomponent->completeCreate();
         m_component3D->setParent(m_sceneRoot);
 
@@ -119,6 +122,7 @@ void BeamVM::initView(){
         onBeamAxialStressChanged();
         onSegmentsChanged();
         onTangibleSectionChanged();
+        onExtremeDisplacementChanged();
         append_3D_resources(m_component3D,true);
         m_component3D->setEnabled(true);
     }
@@ -140,7 +144,16 @@ void BeamVM::onTangibleSectionChanged()
         m_component3D->setProperty("tangibleSection",beam_str_ref->tangibleSection());
     }
 }
-
+void BeamVM::onExtremeDisplacementChanged(){
+    BeamPtr beam_str_ref=m_beam.toStrongRef();
+    if(m_component3D){
+        QVector3D ex1Disp,ex2Disp;
+        beam_str_ref->extremeDisplacements(ex1Disp,ex2Disp);
+        qDebug()<<ex1Disp<<ex2Disp;
+        m_component3D->setProperty("extreme1Displacement",ex1Disp*AbstractStaticsModule::modelScale());
+        m_component3D->setProperty("extreme2Displacement",ex2Disp*AbstractStaticsModule::modelScale());
+    }
+}
 void BeamVM::onBeamAxialStressChanged(){
     BeamPtr beam_str_ref=m_beam.toStrongRef();
     if(m_component3D){

@@ -32,6 +32,7 @@ public slots:
     void onBeamSizeChangedVMSide();
     /*-----*/
 
+    void onExtremeDisplacementChanged();
 private:
     void initView();
     WeakBeamPtr m_beam;
