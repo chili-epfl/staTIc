@@ -27,6 +27,10 @@ extern "C" {
 #endif
 const char separator=',';
 
+#ifndef JOINT_MODELLING
+//#define JOINT_MODELLING
+#endif
+
 /*Utility function to skip comments and new lines in the config file*/
 QString readLine(QTextStream* inputStream){
     QString line;
@@ -56,7 +60,7 @@ Frame3DDKernel::Frame3DDKernel(QObject* parent):
     AbstractStaticsModule(parent),
     m_gravity(0,-9800,0),
     m_shear(0),
-    m_geom(0)
+    m_geom(1)
 {
     connect(&m_lazyupdateTimer, SIGNAL(timeout()), this, SLOT(solve()));
     m_lazyupdateTimer.setSingleShot(true);
@@ -520,8 +524,18 @@ void Frame3DDKernel::solve(){
         fprintf(stdout,"\n");
     }
 */
+    QVector<BeamPtr> active_beams;
+    Q_FOREACH(BeamPtr beam,m_beams){
+        if(beam->enable()){
+            active_beams.append(beam);
+        }
+    }
 
-    nN=m_joints.size();
+    nN=m_joints.size()
+        #ifdef JOINT_MODELLING
+            +2*active_beams.length()
+        #endif
+            ;
 
     //    sfrv=fscanf(fp, "%d", &nN );		/* number of nodes	*/
     //    if (sfrv != 1)	sferr("nN value for number of nodes");
@@ -535,7 +549,7 @@ void Frame3DDKernel::solve(){
     xyz = (vec3 *)malloc(sizeof(vec3)*(1+nN));	/* node coordinates */
 
     /*Set node data*/
-    for(i=0; i<nN;i++){
+    for(i=0; i<m_joints.size();i++){
         JointPtr joint=m_joints.at(i);
         xyz[i+1].x=static_cast<double>(joint->position().x());
         if(m_is2D){
@@ -550,6 +564,28 @@ void Frame3DDKernel::solve(){
         }
         rj[i+1]=0.0;
     }
+
+#ifdef JOINT_MODELLING
+    for(i=0;i<active_beams.length();i++){
+        BeamPtr beam=active_beams[i];
+        WeakJointPtr e1,e2;
+        beam->extremes(e1,e2);
+        JointPtr _e1=e1.toStrongRef();
+        JointPtr _e2=e2.toStrongRef();
+        QVector3D pos;
+        //Virtual extreme 1
+        pos=_e1->position()+100*(_e2->position()-_e1->position()).normalized();
+        xyz[i*2+1+m_joints.length()].x=static_cast<double>(pos.x());
+        xyz[i*2+1+m_joints.length()].y=static_cast<double>(pos.y());
+        xyz[i*2+1+m_joints.length()].z=static_cast<double>(pos.z());
+        //Virtual extreme 2
+        pos=_e2->position()+100*(_e1->position()-_e2->position()).normalized();
+        xyz[i*2+2+m_joints.length()].x=static_cast<double>(pos.x());
+        xyz[i*2+2+m_joints.length()].y=static_cast<double>(pos.y());
+        xyz[i*2+2+m_joints.length()].z=static_cast<double>(pos.z());
+    }
+#endif
+
 
     DoF = 6*nN;		/* total number of degrees of freedom	*/
 
@@ -582,9 +618,19 @@ void Frame3DDKernel::solve(){
 //                r[i*6+5]=(int)YY;
 //                r[i*6+6]=(int)ZZ;
 //            }
-
         }
     }
+#ifdef JOINT_MODELLING
+    for(i=m_joints.size();i<nN;i++){
+            r[i*6+1]=0;
+            r[i*6+2]=0;
+            r[i*6+3]=1;
+            r[i*6+4]=1;
+            r[i*6+5]=1;
+            r[i*6+6]=0;
+    }
+#endif
+
     sumR=0;	for (i=1;i<=DoF;i++) sumR += r[i];
     for (i=1; i<=DoF; i++)
         if (r[i])
@@ -592,16 +638,11 @@ void Frame3DDKernel::solve(){
         else
             q[i] = 1;
 
-    QVector<BeamPtr> active_beams;
-    Q_FOREACH(BeamPtr beam,m_beams){
-        if(beam->enable()){
-            active_beams.append(beam);
-        }
-    }
-
-
-    nE=active_beams.size();
-
+    nE=active_beams.size()
+#ifdef JOINT_MODELLING
+            *3
+#endif
+            ;
     /* allocate memory for frame elements ... */
     L   = dvector(1,nE);	/* length of each element		*/
     Le  = dvector(1,nE);	/* effective length of each element	*/
@@ -622,14 +663,29 @@ void Frame3DDKernel::solve(){
     d   =  vector(1,nE);	/* element mass density			*/
 
     /*Set beam data*/
-    for(i=0;i<nE;i++){
+    for(i=0;i<active_beams.length();i++){
         BeamPtr beam=active_beams.at(i);
-        L[i+1]=static_cast<double>(beam->length());
-        Le[i+1]=static_cast<double>(beam->length());
+        L[i+1]=static_cast<double>(beam->length())
+        #ifdef JOINT_MODELLING
+            -200
+        #endif
+                ;
+        Le[i+1]=static_cast<double>(beam->length())
+        #ifdef JOINT_MODELLING
+            -200
+        #endif
+                ;
         WeakJointPtr e1,e2;
         beam->extremes(e1,e2);
+#ifdef JOINT_MODELLING
+        N1[i+1]=m_joints.length()+2*i+1;
+        N2[i+1]=m_joints.length()+2*i+2;
+#else
+
         N1[i+1]=m_joints.indexOf(e1.toStrongRef())+1;
         N2[i+1]=m_joints.indexOf(e2.toStrongRef())+1;
+
+#endif
         qreal beam_Ax,beam_Asy,beam_Asz,beam_Jx,beam_Iy,beam_Iz,beam_E,beam_G,beam_p,beam_d;
         beam->parameters(beam_Ax,beam_Asy,beam_Asz,beam_Jx,beam_Iy,beam_Iz,beam_E,beam_G,beam_p,beam_d);
         Ax[i+1]=static_cast<float>(beam_Ax);
@@ -638,13 +694,50 @@ void Frame3DDKernel::solve(){
         Asz[i+1]=static_cast<float>(beam_Asz);
         Iy[i+1]=static_cast<float>(beam_Iy);
         Iz[i+1]=static_cast<float>(beam_Iz);
-
         E[i+1]=static_cast<float>(beam_E);
         G[i+1]=static_cast<float>(beam_G);
         p[i+1]=static_cast<float>(beam_p);
         d[i+1]=static_cast<float>(beam_d);
-    }
 
+#ifdef JOINT_MODELLING
+        //Virtual beam 1
+        L[2*i+1+active_beams.length()]=100.0;
+        Le[2*i+1+active_beams.length()]=100.0;
+
+        N1[2*i+1+active_beams.length()]=m_joints.indexOf(e1.toStrongRef())+1;
+        N2[2*i+1+active_beams.length()]=m_joints.length()+i*2+1;
+
+        Ax[2*i+1+active_beams.length()]=beam_Ax/3;
+        Jx[2*i+1+active_beams.length()]=beam_Jx/3;
+        Asy[2*i+1+active_beams.length()]=beam_Asy/3;
+        Asz[2*i+1+active_beams.length()]=beam_Asz/3;
+        Iy[2*i+1+active_beams.length()]=beam_Iy/3;
+        Iz[2*i+1+active_beams.length()]=beam_Iz/3;
+        E[2*i+1+active_beams.length()]=beam_E;
+        G[2*i+1+active_beams.length()]=beam_G;
+        p[2*i+1+active_beams.length()]=0;
+        d[2*i+1+active_beams.length()]=beam_d;
+
+        //Virtual beam 2
+        L[2*i+2+active_beams.length()]=100.0;
+        Le[2*i+2+active_beams.length()]=100.0;
+
+        N1[2*i+2+active_beams.length()]=m_joints.length()+i*2+2;
+        N2[2*i+2+active_beams.length()]=m_joints.indexOf(e2.toStrongRef())+1;
+
+        Ax[2*i+2+active_beams.length()]=Ax[2*i+1+active_beams.length()];
+        Jx[2*i+2+active_beams.length()]=Jx[2*i+1+active_beams.length()];
+        Asy[2*i+2+active_beams.length()]=Asy[2*i+1+active_beams.length()];
+        Asz[2*i+2+active_beams.length()]=Asz[2*i+1+active_beams.length()];
+        Iy[2*i+2+active_beams.length()]=Iy[2*i+1+active_beams.length()];
+        Iz[2*i+2+active_beams.length()]=Iz[2*i+1+active_beams.length()];
+        E[2*i+2+active_beams.length()]=E[2*i+1+active_beams.length()];
+        G[2*i+2+active_beams.length()]=G[2*i+1+active_beams.length()];
+        p[2*i+2+active_beams.length()]=0;
+        d[2*i+2+active_beams.length()]=d[2*i+1+active_beams.length()];
+#endif
+
+    }
 
     /*Set Run data*/
     shear=m_shear;
@@ -916,7 +1009,7 @@ void Frame3DDKernel::write_internal_forces (
     if (dx == -1.0)	return;	// skip calculation of internal forces and displ
 
     for ( m=1; m <= nE; m++ ) {	// loop over all frame elements
-
+        if(m>active_beams.length()) break;
         n1 = J1[m];	n2 = J2[m]; // node 1 and node 2 of elmnt m
 
         nx = floor(L[m]/dx);	// number of x-axis increments
@@ -1814,6 +1907,7 @@ void Frame3DDKernel::update_statics(
     * j node index, starting from 1.
     * X-dsp       Y-dsp       Z-dsp X-rot       Y-rot       Z-rot*/
     for (j=1; j<= nN; j++) {
+        if(j>m_joints.length()) break;
         disp = 0.0;
         for ( i=5; i>=0; i-- ) disp += fabs( D[6*j-i] );
         JointPtr joint=m_joints.at(j-1);
@@ -1835,6 +1929,7 @@ void Frame3DDKernel::update_statics(
     /*      Nx          Vy         Vz   Txx        Myy        Mzz*/;
     float maxF=0,minF=100000;
     for (n=1; n<= nE; n++) {
+        if(n>active_beams.length()) break;
         BeamPtr beam=active_beams.at(n-1);
         qDebug()<<beam->objectName()<<Q[n][1]<<" "<<Q[n][7];
         int axial_type;
@@ -1869,6 +1964,7 @@ void Frame3DDKernel::update_statics(
 
     /*Reactions Fx          Fy          Fz  Mxx         Myy         Mzz*/
     for (j=1; j<=nN; j++) {
+        if(j>m_joints.length()) break;
         JointPtr joint=m_joints.at(j-1);
         i = 6*(j-1);
         if ( r[i+1] || r[i+2] || r[i+3] ||
