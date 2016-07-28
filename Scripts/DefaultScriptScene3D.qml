@@ -30,7 +30,7 @@ Entity {
            structureLoaded=true;
        }
     }
-    property bool structureLoaded: false
+    property bool structureLoaded: true
     property alias structureEntity: structureEntity
 
     property bool ghostMode: false

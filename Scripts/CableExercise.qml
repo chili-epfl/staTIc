@@ -12,7 +12,7 @@ Item {
     property alias structureTagConfig:default_script.structureTagConfig;
 
     property string problem_description_text;
-    property url problem_image_url:"qrc:/images/Images/steal_cable.jpg";
+    property url problem_image_url;
 
     DefaultScript{
         id:default_script
@@ -46,7 +46,7 @@ Item {
                 visible:true
             }
             PropertyChanges{
-                target: settings
+                target: default_script.settings
                 show_back_button:false
                 restoreEntryValues: false
             }
@@ -199,6 +199,9 @@ Item {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.right: parent.right
                 anchors.left: parent.horizontalCenter
+                textFormat: Text.RichText
+                lineHeight: 1.5
+
             }
         }
         Item{
