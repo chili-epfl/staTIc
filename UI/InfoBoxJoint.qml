@@ -21,7 +21,7 @@ Rectangle {
         if(current_item != 0 && current_item.type=="joint"){
             title.text="Joint "+ current_item.objectName;
             for(var i=0;i<current_item.connected_beams.length;i++){
-                forceListModel.append({isAdded:true,
+                forceListModel.append({isAdded:false,
                                        beam:current_item.connected_beams[i],
                                       })
                 infoboxScene3D.beam_poses.push(current_item.connected_beams[i].poseMatrix)
@@ -30,7 +30,7 @@ Rectangle {
             //Important that this stays at the end!
             if(Math.abs(current_item.reaction.length())>0.0001){
                    hasReaction=true;
-                   forceListModel.append({isAdded:true,
+                   forceListModel.append({isAdded:false,
                                           joint:current_item,
                                           })
             }
@@ -187,7 +187,7 @@ Rectangle {
                     Switch{
                         id:forceList_switch
                         anchors.right: parent.right
-                        checked: true
+                        checked: false
                         width: height*2
                         height: forceList_label.height*1.5
                         style: CustomSwitchStyle{
