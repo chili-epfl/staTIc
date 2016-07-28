@@ -42,7 +42,8 @@ public:
 
     void setProjectionMatrix(QMatrix4x4 m);
     void setBoards(BoardMap boards);
-    void setSingleTagList(QList<SingleTag> list);
+    void setSingleTagList(QList<SingleTag> list);    
+
 public slots:
     void doWork();
 signals:
@@ -77,23 +78,35 @@ private:
     QStringList m_board_names;
     QHash<int,qreal> m_singleTagSizes;
     cv::Ptr< cv::aruco::Dictionary> m_dictionary;
-    std::vector< int > m_markerIds,m_markerIds_prev;
-    std::vector< std::vector<cv::Point2f> > m_markerCorners;
+    std::vector< int > m_markerIds,m_markerIds_prev,m_markerIds_no_aging;
+    std::vector< std::vector<cv::Point2f> > m_markerCorners,m_markerCorners_no_aging;
     std::vector<cv::Point2f> m_markerCorners_prev,m_tracked_corners;
     cv::Mat m_distCoeff;
     cv::Mat m_cv_projectionMatrix;
     int test=0;
     cv::Ptr<cv::aruco::DetectorParameters> m_detector_params;
-    bool m_use_filter=true;
+    bool m_use_filter=
+        #ifdef ANDROID
+            false
+        #else
+            true
+        #endif
+            ;
     QHash<QString,LinearKalmanFilter*> m_LKFilters;
     QQuaternion m_rotationOpencvToOpenGL=QQuaternion::fromAxisAndAngle(1,0,0,180);
+
+    int m_tag_aging_threshold=5;
     QHash<int,int> m_tag_ages;
     QHash<int, std::vector<cv::Point2f>  > m_tags_corners_history;
 
+    QElapsedTimer m_calibration_timer;
     std::vector< std::vector<cv::Point2f> > m_calibration_2d_points;
     std::vector< std::vector<cv::Point3f> > m_calibration_3d_points;
     QSet<QVector3D> m_camera_poses;
+    bool m_need_calibration;
 
+    bool saveCameraParams(const std::string &filename, cv::Size imageSize, const cv::Mat &cameraMatrix, const cv::Mat &distCoeffs, double totalAvgErr);
+    bool loadCameraParams(const std::string &filename);
 };
 
 

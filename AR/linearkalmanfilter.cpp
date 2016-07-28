@@ -13,11 +13,11 @@ LinearKalmanFilter::LinearKalmanFilter():
 void LinearKalmanFilter::init()
 {
     KF.init(nStates, nMeasurements, nInputs, CV_64F);                 // init Kalman Filter
-    cv::setIdentity(KF.processNoiseCov, cv::Scalar::all(1e-6));       // set process noise
+    cv::setIdentity(KF.processNoiseCov, cv::Scalar::all(1e-3));       // set process noise
     cv::setIdentity(KF.measurementNoiseCov, cv::Scalar::all(1e-6));   // set measurement noise
-    KF.measurementNoiseCov.at<double>(3,3)=1e-6;
-    KF.measurementNoiseCov.at<double>(4,4)=1e-6;
-    KF.measurementNoiseCov.at<double>(5,5)=1e-6;
+    KF.measurementNoiseCov.at<double>(3,3)=1e-3;
+    KF.measurementNoiseCov.at<double>(4,4)=1e-3;
+    KF.measurementNoiseCov.at<double>(5,5)=1e-3;
 
     cv::setIdentity(KF.errorCovPost, cv::Scalar::all(1));             // error covariance
 

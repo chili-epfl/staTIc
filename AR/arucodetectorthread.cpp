@@ -7,6 +7,13 @@
 #include <QMatrix4x4>
 #include <iostream>
 #include <algorithm>
+
+uint qHash(const QVector3D &v)
+{
+    return qHash( QString( "%1x%2x%3" ).arg(v.x()).arg(v.y()).arg(v.z()) ) ;
+}
+
+
 ArucoDetectorThread::ArucoDetectorThread(ArucoDetector* detector,QObject *parent):
     QObject(parent),
     gl(nullptr)
@@ -234,6 +241,7 @@ void ArucoDetectorThread::setPause(bool val)
 DetectionTask::DetectionTask(QMatrix4x4 projectionMatrix):
     m_cameraResolution(640,480)
 {
+    m_need_calibration=true;
     m_distCoeff=cv::Mat();
 //    m_distCoeff=(cv::Mat_<float>(1,5) <<
 //                 4.1105624753282284e-02, 7.9058604507765057e-02,
@@ -245,18 +253,22 @@ DetectionTask::DetectionTask(QMatrix4x4 projectionMatrix):
     m_distCoeff=(cv::Mat_<float>(1,5) <<1.1224532617510330e-01, -2.2484405532605575e-01,
                  3.1964984777861946e-03, -8.4539818221493670e-03,
                  -6.8592421730318237e-02);
+    m_distCoeff=(cv::Mat_<float>(1,5) <<0, 0,
+                 0, 0,
+                 0);
 #else
     m_distCoeff=(cv::Mat_<float>(1,5) <<1.0634465971291887e-01, -2.5039862307498616e-02,
                  1.5413114762228067e-03, -8.6609040453171499e-03,
                  -1.0291179278991518e+00 );
 #endif
     setProjectionMatrix(projectionMatrix);
+
     m_dictionary= cv::aruco::getPredefinedDictionary(cv::aruco::DICT_6X6_1000);
     m_detector_params=cv::aruco::DetectorParameters::create();
     //m_detector_params->polygonalApproxAccuracyRate=0.04;
     m_detector_params->doCornerRefinement=false;
-    m_detector_params->adaptiveThreshWinSizeMax=13;
-    m_detector_params->adaptiveThreshWinSizeMin=3;
+    m_detector_params->adaptiveThreshWinSizeMax=17;
+    m_detector_params->adaptiveThreshWinSizeMin=7;
     //m_detector_params->minMarkerPerimeterRate=0.05;
 }
 
@@ -304,6 +316,7 @@ void DetectionTask::setProjectionMatrix(QMatrix4x4 m)
                            m.operator ()(0,0),m.operator ()(0,1),m.operator ()(0,2),
                            m.operator ()(1,0),m.operator ()(1,1),m.operator ()(1,2),
                            m.operator ()(2,0),m.operator ()(2,1),m.operator ()(2,2));
+    emit projectionMatrixChanged(m);
 }
 
 void DetectionTask::setBoards(BoardMap boards)
@@ -342,8 +355,7 @@ void DetectionTask::doWork()
     frameLock.lock();
     cv::Mat rvec(3, 1, CV_64F);
     cv::Mat tvec(3, 1, CV_64F);
-    cv::Mat rmat,lap,lap_ROI;
-    cv::Mat prev_Image;
+    cv::Mat lap,lap_ROI;
     cv::Mat ROI_image;
     cv::Rect roi;
     bool init=false;
@@ -352,13 +364,14 @@ void DetectionTask::doWork()
     float roll,pitch,yaw;
     QQuaternion measur_quad;
     PoseMap poseMap;
-    int min_x,min_y,max_x,max_y;
-    std::vector<uchar> status;
-    std::vector<float> err;
+    int min_x,min_y,max_x,max_y;    
     QHash<int,QList<double> > sharpness_tags;
     QList<double> sort_list;
     double focusMeasure;
     bool points_are_cooplanar;
+    m_calibration_timer.start();
+
+
     while(running){
 
         //Process frame if possible
@@ -375,25 +388,22 @@ void DetectionTask::doWork()
 //            cv::imwrite(tets_name.toStdString(),nextFrame.clone());
 
             if(m_cameraResolution!=QSizeF(nextFrame.cols,nextFrame.rows)){
-                m_cameraResolution=QSizeF(nextFrame.cols,nextFrame.rows);
                 setProjectionMatrix(QMatrix4x4(
-                                        700, 0., nextFrame.cols/2.0 ,0,
-                                        0., 700, nextFrame.rows/2.0,0,
+                                        600, 0., nextFrame.cols/2.0 ,0,
+                                        0., 600, nextFrame.rows/2.0,0,
                                         0,              0,              1,  0,
                                         0,              0,              0,  1
                                         ));
-
-                emit projectionMatrixChanged(QMatrix4x4(
-                                                 700, 0., nextFrame.cols/2.0 ,0,
-                                                 0., 700, nextFrame.rows/2.0,0,
-                                                 0,              0,              1,  0,
-                                                 0,              0,              0,  1
-                                                 ));
+                m_need_calibration=true;
+                m_cameraResolution=QSizeF(nextFrame.cols,nextFrame.rows);
                 emit cameraResolutionChanged(m_cameraResolution);
             }
             if(!init){
-                roi=cv::Rect(nextFrame.cols-0.75*nextFrame.cols,nextFrame.rows-0.75*nextFrame.rows,
-                             0.75*nextFrame.cols,0.75*nextFrame.rows);
+                if(!loadCameraParams("camera_calibration.xml"))
+                    qDebug()<<"Can't read camera calibration";
+
+                roi=cv::Rect((nextFrame.cols-0.85*nextFrame.cols)/2,(nextFrame.rows-0.65*nextFrame.rows)/1.5,
+                             0.85*nextFrame.cols,0.65*nextFrame.rows);
                 init=true;
             }
             m_markerCorners.clear();
@@ -402,8 +412,7 @@ void DetectionTask::doWork()
                 ROI_image=nextFrame(roi);
                 cv::aruco::detectMarkers(ROI_image,m_dictionary,m_markerCorners,m_markerIds,m_detector_params);
             }
-
-            //            bool skip=false;
+//            bool skip=false;
 //            for(int i=0;i<m_markerIds_prev.size();i++){
 //                if(status[i*4]==0 || status[i*4+1]==0
 //                   || status[i*4+2]==0 || status[i*4+2]==0  ) continue;
@@ -478,15 +487,13 @@ void DetectionTask::doWork()
                 }
             }
 
-
-
             for(unsigned int  i=0;i<m_markerIds.size();i++){
                 m_tag_ages[m_markerIds.at(i)]=0;
                 m_tags_corners_history[m_markerIds.at(i)]=m_markerCorners.at(i);
             }
 
             Q_FOREACH(int id, m_tag_ages.keys()){
-                if(m_tag_ages[id]<-5){
+                if(m_tag_ages[id]<m_tag_aging_threshold){
                     m_tag_ages.remove(id);
                     m_tags_corners_history.remove(id);
                 }
@@ -553,12 +560,12 @@ void DetectionTask::doWork()
 
             for(unsigned int  i=0;i<m_boards.size();i++){
 
-                /*Check for cooplanarity. Assuming that z is the sam efor all the 4 points of a tag*/
+                /*Check for cooplanarity. Assuming that z is the same for all the 4 points of a tag*/
                 points_are_cooplanar=true;
+                float marker_z;
+                bool marker_z_init=false;
                 for(unsigned int j = 0; j < m_markerIds.size(); j++) {
                     int currentId = m_markerIds[j];
-                    float marker_z;
-                    bool marker_z_init=false;
                     if(!marker_z_init)
                         for(unsigned int z = 0; z < m_boards[i]->ids.size(); z++) {
                             if(currentId == m_boards[i]->ids[z]) {
@@ -576,10 +583,10 @@ void DetectionTask::doWork()
                                 }
                             }
                         }
-                    if(points_are_cooplanar)
+                    if(!points_are_cooplanar)
                         break;
                 }
-
+                points_are_cooplanar=false;
                 bool useGuess=false;
 
                 if(m_use_filter && points_are_cooplanar && m_LKFilters.contains(m_board_names[i]) && m_LKFilters[m_board_names[i]]->isLastEstimationBasedOnMeasurement()){
@@ -599,7 +606,7 @@ void DetectionTask::doWork()
                     solvepnp_flag=cv::SOLVEPNP_ITERATIVE;
 
                 if(cv::aruco::estimatePoseBoard(m_markerCorners,m_markerIds,m_boards[i],m_cv_projectionMatrix,
-                                                m_distCoeff,rvec,tvec,useGuess,solvepnp_flag)){
+                                                m_distCoeff,rvec,tvec,useGuess,solvepnp_flag)>2){
                     norm=cv::norm(rvec);
                     measur_quad=QQuaternion::fromAxisAndAngle((rvec.at<double>(0)/norm),(rvec.at<double>(1)/norm),(rvec.at<double>(2)/norm),180.0*norm/CV_PI);
                     if(!m_use_filter){
@@ -627,6 +634,59 @@ void DetectionTask::doWork()
                         QVector3D t((qreal)tvec.at<double>(0),-(qreal)tvec.at<double>(1),-(qreal)tvec.at<double>(2));
                         poseMap[m_board_names[i]]= Pose(t,m_rotationOpencvToOpenGL*measur_quad.fromEulerAngles(rvec.at <double>(0),rvec.at <double>(1),rvec.at <double>(2)));
                     }
+
+                    /*Calibration*/
+                    if(m_need_calibration && m_board_names[i]=="Default"){
+
+                        m_markerIds_no_aging.clear();
+                        m_markerCorners_no_aging.clear();
+                        m_markerIds_no_aging.reserve(m_markerIds.size());
+                        m_markerCorners_no_aging.reserve(m_markerIds.size());
+                        for(unsigned int l=0;l<m_markerIds.size();l++){
+                            if(m_tag_ages[m_markerIds[l]]==0){
+                                int currentId = m_markerIds[l];
+                                for(unsigned int j = 0; j < m_boards[i]->ids.size(); j++) {
+                                    if(currentId == m_boards[i]->ids[j]){
+                                        m_markerIds_no_aging.push_back(currentId);
+                                        m_markerCorners_no_aging.push_back(m_markerCorners[l]);
+                                    }
+                                }
+                            }
+                        }
+
+
+                        if(!points_are_cooplanar && m_markerIds_no_aging.size()>5 && m_calibration_timer.elapsed()>3000){
+                            QVector3D angles=poseMap[m_board_names[i]].second.toEulerAngles();
+                            angles.setX((round(angles.x()/20)));
+                            angles.setY((round(angles.y()/20)));
+                            angles.setZ((round(angles.z()/20)));
+                            if(!m_camera_poses.contains(angles)){
+                                m_camera_poses.insert(angles);
+                                std::vector<cv::Point2f> tmp_img_point;
+                                tmp_img_point.reserve(m_markerIds_no_aging.size()*4);
+                                std::vector<cv::Point3f> tmp_obj_point;
+                                tmp_obj_point.reserve(m_markerIds_no_aging.size()*4);
+                                for(unsigned int l = 0; l < m_markerIds_no_aging.size(); l++) {
+                                    int currentId = m_markerIds_no_aging[l];
+                                    for(unsigned int j = 0; j < m_boards[i]->ids.size(); j++) {
+                                        if(currentId == m_boards[i]->ids[j]) {
+                                            for(int p = 0; p < 4; p++) {
+                                                tmp_obj_point.push_back(m_boards[i]->objPoints[j][p]);
+                                                tmp_img_point.push_back(m_markerCorners_no_aging[l][p]);
+                                            }
+                                        }
+                                    }
+                                }
+                                m_calibration_2d_points.push_back(tmp_img_point);
+                                m_calibration_3d_points.push_back(tmp_obj_point);
+                                qDebug()<<m_calibration_2d_points.size();
+                                m_calibration_timer.restart();
+                                if(m_calibration_2d_points.size()>14)
+                                    calibrateCamera();
+                            }
+                        }
+                    }
+
                     //qDebug()<< poseMap[m_board_names[i]];
 //                    cv::Mat debug=nextFrame.clone();
 //                    cv::cvtColor(debug,debug,CV_GRAY2RGB);
@@ -634,9 +694,9 @@ void DetectionTask::doWork()
 //                    cv::imwrite("/storage/emulated/legacy/staTIc/Resources/lol.png",nextFrame.clone());
                 }
                 else{
-                    if(m_LKFilters.contains(m_board_names[i])){
-                        m_LKFilters[m_board_names[i]]->updateKalmanFilter(tvec,rvec);
-                    }
+//                    if(m_LKFilters.contains(m_board_names[i])){
+//                        m_LKFilters[m_board_names[i]]->updateKalmanFilter(tvec,rvec);
+//                    }
                 }
             }
 //            prev_Image=nextFrame;
@@ -656,14 +716,13 @@ void DetectionTask::doWork()
         //frameLock.unlock() is performed by wait below
         nextFrameCond.wait(&frameLock);
         //frameLock.lock() is performed by wait above
-
 #ifdef QT_DEBUG
         millis = (long)timer.restart();
         millisElapsed += millis;
         if(millis>0){
             fps = FPS_RATE*fps + (1.0f - FPS_RATE)*(1000.0f/millis);
             if(millisElapsed >= FPS_PRINT_PERIOD){
-                qDebug("Aruco is running at %f FPS",fps);
+                //qDebug("Aruco is running at %f FPS",fps);
                 millisElapsed = 0;
             }
         }
@@ -672,3 +731,77 @@ void DetectionTask::doWork()
     state = NONE;
     frameLock.unlock();
 }
+
+void DetectionTask::calibrateCamera()
+{
+    cv::Mat camMatrix=m_cv_projectionMatrix.clone();
+    cv::Mat dist_coeff=cv::Mat::zeros(1, 5, CV_64F);
+    double err=cv::calibrateCamera(m_calibration_3d_points,m_calibration_2d_points,cv::Size(m_cameraResolution.width(),m_cameraResolution.height()),camMatrix,dist_coeff,cv::noArray(),cv::noArray(),CV_CALIB_USE_INTRINSIC_GUESS| CV_CALIB_FIX_PRINCIPAL_POINT
+
+//                        |CV_CALIB_ZERO_TANGENT_DIST | CV_CALIB_FIX_K1 |CV_CALIB_FIX_K2 |CV_CALIB_FIX_K3
+                                    );
+    if(err < 2){
+        m_need_calibration=false;
+        setProjectionMatrix(QMatrix4x4(
+                                camMatrix.at<double>(0,0), 0., nextFrame.cols/2.0 ,0,
+                                0., camMatrix.at<double>(1,1), nextFrame.rows/2.0,0,
+                                0,              0,              1,  0,
+                                0,              0,              0,  1
+                                ));
+        m_distCoeff=dist_coeff;
+        if(!saveCameraParams("camera_calibration.xml",cv::Size(m_cameraResolution.width(),m_cameraResolution.height()),
+                         camMatrix,dist_coeff,err))
+            qDebug()<<"Can't save camera calibration";
+    }
+
+    m_calibration_2d_points.clear();
+    m_calibration_3d_points.clear();
+
+    qDebug()<<err;
+    qDebug()<<camMatrix.at<double>(0,0)<<camMatrix.at<double>(0,1)<<camMatrix.at<double>(0,2);
+    qDebug()<<camMatrix.at<double>(1,0)<<camMatrix.at<double>(1,1)<<camMatrix.at<double>(1,2);
+    qDebug()<<camMatrix.at<double>(2,0)<<camMatrix.at<double>(2,1)<<camMatrix.at<double>(2,2);
+
+}
+
+bool DetectionTask::saveCameraParams(const std::string &filename, cv::Size imageSize,
+                             const cv::Mat &cameraMatrix, const cv::Mat &distCoeffs, double totalAvgErr) {
+
+    cv::FileStorage fs(filename, cv::FileStorage::WRITE);
+    if(!fs.isOpened())
+        return false;
+
+    fs << "image_width" << imageSize.width;
+    fs << "image_height" << imageSize.height;
+
+    fs << "camera_matrix" << cameraMatrix;
+    fs << "distortion_coefficients" << distCoeffs;
+
+    fs << "avg_reprojection_error" << totalAvgErr;
+
+    return true;
+}
+bool DetectionTask::loadCameraParams(const std::string &filename){
+    cv::FileStorage fs(filename, cv::FileStorage::READ);
+    if(!fs.isOpened())
+        return false;
+    float w,h;
+    fs["image_width"] >> w;
+    fs["image_height"] >> h;
+    m_cameraResolution.setWidth(w);
+    m_cameraResolution.setHeight(h);
+    emit cameraResolutionChanged(m_cameraResolution);
+    cv::Mat camMatrix;
+    fs["camera_matrix"]>> camMatrix;
+    setProjectionMatrix(QMatrix4x4(
+                            camMatrix.at<double>(0,0),camMatrix.at<double>(0,1),camMatrix.at<double>(0,2), 0,
+                            camMatrix.at<double>(1,0),camMatrix.at<double>(1,1),camMatrix.at<double>(1,2), 0,
+                            camMatrix.at<double>(2,0),camMatrix.at<double>(2,1),camMatrix.at<double>(2,2), 0,
+                            0,              0,              0,  1
+                           ));
+
+    fs["distortion_coefficients"]>> m_distCoeff;
+    m_need_calibration=false;
+    return true;
+}
+
