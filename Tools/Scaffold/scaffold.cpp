@@ -12,7 +12,7 @@
 #include <QQmlEngine>
 #include <QQmlContext>
 
-const int discrete_step = 30;
+const int discrete_step = 40;
 const int max_distance=50;
 const int stability_threshold=1000;//milliseconds
 /*********************Support functions************************/
@@ -56,6 +56,9 @@ Scaffold::Scaffold(QObject* parent):
     m_refractory_timer->setSingleShot(true);
     //connect(m_refractory_timer,SIGNAL(timeout()),this,SLOT(reactivate()));
     m_active=true;
+    m_newSupport_possible=0;
+    connect(this,SIGNAL(localExtreme1PosChanged()),this,SLOT(checkPosition4NewSupport()));
+    connect(this,SIGNAL(localExtreme2PosChanged()),this,SLOT(checkPosition4NewSupport()));
 }
 
 void Scaffold::setLocalExtreme1Pos(QVector3D v)
@@ -156,7 +159,9 @@ void Scaffold::reset(){
         connect(m_extreme1,SIGNAL(collided(Physics::PhysicsCollisionEventPtr)),this,SLOT(onCollisionExtreme1(Physics::PhysicsCollisionEventPtr)));
     if(m_extreme2!=Q_NULLPTR)
         connect(m_extreme2,SIGNAL(collided(Physics::PhysicsCollisionEventPtr)),this,SLOT(onCollisionExtreme2(Physics::PhysicsCollisionEventPtr)));
-
+    m_newSupport_possible=0;
+    connect(this,SIGNAL(localExtreme1PosChanged()),this,SLOT(checkPosition4NewSupport()));
+    connect(this,SIGNAL(localExtreme2PosChanged()),this,SLOT(checkPosition4NewSupport()));
 }
 
 
@@ -164,6 +169,8 @@ void Scaffold::reset(){
 void Scaffold::onCollisionExtreme1(Physics::PhysicsCollisionEventPtr e){
     if(!m_active) return;
     if(!m_VMManager) return;
+    if(!m_VMManager->staticsModule()) return;
+    //if(m_newSupport_possible==1) return;
     //Check stability
     if(!m_anchor_1.isNull()){
         if(m_reference_extreme_pos1.distanceToPoint(m_extreme_pos1)>max_distance){
@@ -186,8 +193,6 @@ void Scaffold::onCollisionExtreme1(Physics::PhysicsCollisionEventPtr e){
 
     Qt3DCore::QEntity* targetEntity=m_VMManager->getEntity3D(e->target());
     if(targetEntity!=Q_NULLPTR){
-        qDebug()<<targetEntity->id();
-        qDebug()<<e->target();
         AbstractElementViewModel* targetVM=m_VMManager->getAssociatedVM(targetEntity);
         if(targetVM!=Q_NULLPTR && targetVM->inherits("JointVM")) {
             JointVM* jointVM= static_cast<JointVM*>(targetVM);
@@ -233,6 +238,8 @@ void Scaffold::onCollisionExtreme1(Physics::PhysicsCollisionEventPtr e){
 void Scaffold::onCollisionExtreme2(Physics::PhysicsCollisionEventPtr e){
     if(!m_active) return;
     if(!m_VMManager) return;
+    if(!m_VMManager->staticsModule()) return;
+    //if(m_newSupport_possible==2) return;
 
     //Check stability
     if(!m_anchor_2.isNull()){
@@ -301,26 +308,42 @@ void Scaffold::onCollisionExtreme2(Physics::PhysicsCollisionEventPtr e){
 }
 
 void Scaffold::onAnchorsChanged(){
-    if(!m_anchor_1.isNull() && !m_anchor_2.isNull() && m_anchor_1!=m_anchor_2){
+    if( (!m_anchor_1.isNull() || m_newSupport_possible==1 ) &&
+            (!m_anchor_2.isNull() || m_newSupport_possible==2 )
+            && m_anchor_1!=m_anchor_2){
         //Need to clear everything first....
         JointPtr e1,e2;
-        if(m_anchor_1_offset<=0){
-            e1=m_anchor_1.toStrongRef().dynamicCast<Joint>();
-        }else{
-            BeamPtr b=m_anchor_1.toStrongRef().dynamicCast<Beam>();            
-            e1=splitBeam(b,m_anchor_1_offset);
+        if(!m_anchor_1.isNull()){
+            if(m_anchor_1_offset<=0){
+                e1=m_anchor_1.toStrongRef().dynamicCast<Joint>();
+            }else{
+                BeamPtr b=m_anchor_1.toStrongRef().dynamicCast<Beam>();
+                e1=splitBeam(b,m_anchor_1_offset);
+                m_joint_1=e1.toWeakRef();//Ownership
+                m_beam_1=b.toWeakRef();
+            }
+        }
+        else if(m_newSupport_possible==1){
+            e1=vmManager()->staticsModule()->createJoint(m_newSupport_position,"P",1,1,1,1,1,1);
             m_joint_1=e1.toWeakRef();//Ownership
-            m_beam_1=b.toWeakRef();
         }
-        if(m_anchor_2_offset<=0){
-            e2=m_anchor_2.toStrongRef().dynamicCast<Joint>();
-        }else{
-            BeamPtr b=m_anchor_2.toStrongRef().dynamicCast<Beam>();
-            e2=splitBeam(b,m_anchor_2_offset);
+        if(!m_anchor_2.isNull()){
+            if(m_anchor_2_offset<=0){
+                e2=m_anchor_2.toStrongRef().dynamicCast<Joint>();
+            }else{
+                BeamPtr b=m_anchor_2.toStrongRef().dynamicCast<Beam>();
+                e2=splitBeam(b,m_anchor_2_offset);
+                m_joint_2=e2.toWeakRef();//Ownership
+                m_beam_2=b.toWeakRef();
+            }
+        }
+        else if(m_newSupport_possible==2){
+            e2=vmManager()->staticsModule()->createJoint(m_newSupport_position,"P",1,1,1,1,1,1);
             m_joint_2=e2.toWeakRef();//Ownership
-            m_beam_2=b.toWeakRef();
         }
+
         BeamPtr new_beam=m_VMManager->staticsModule()->createBeam(e1,e2,QSizeF(120,220),"Default","Scaffold");
+
         m_beam=new_beam.toWeakRef();
         if(!new_beam.isNull()){
             if(!m_joint_1.isNull())
@@ -333,6 +356,8 @@ void Scaffold::onAnchorsChanged(){
             /*Do not listen to the collition bodies anymore*/
             disconnect(m_extreme1);
             disconnect(m_extreme2);
+            disconnect(this,SIGNAL(localExtreme1PosChanged()),this,SLOT(checkPosition4NewSupport()));
+            disconnect(this,SIGNAL(localExtreme2PosChanged()),this,SLOT(checkPosition4NewSupport()));
             m_active=false;
             stability_3=0;
             connect(this,SIGNAL(localExtreme1PosChanged()),this,SLOT(checkPositionExtremes()));
@@ -353,14 +378,80 @@ void Scaffold::checkPositionExtremes()
             m_extreme_pos2.distanceToPoint(m_reference_extreme_pos2)>max_distance ){
         if(++stability_3 > 30){
             stability_3=0;
-            disconnect(this,SIGNAL(localExtreme1PosChanged()),0,0);
-            disconnect(this,SIGNAL(localExtreme2PosChanged()),0,0);
+            disconnect(this,SIGNAL(localExtreme1PosChanged()),this,SLOT(checkPositionExtremes()));
+            disconnect(this,SIGNAL(localExtreme2PosChanged()),this,SLOT(checkPositionExtremes()));
             reset();
         }
     }
     else{
         stability_3=0;
     }
+}
+
+void Scaffold::checkPosition4NewSupport(){
+    if(!m_active) return;
+    if(!m_VMManager) return;
+    if(!m_VMManager->staticsModule()) return;
+
+    if(m_newSupport_possible>0) {
+        if((m_newSupport_possible==1 && m_reference_extreme_pos1.distanceToPoint(m_extreme_pos1)>
+                max_distance) ||
+                (m_newSupport_possible==2 && m_reference_extreme_pos2.distanceToPoint(m_extreme_pos2)>
+                max_distance)){
+            m_newSupport_possible=0;
+        }
+        else{
+            if(stability_4>30){
+                onAnchorsChanged();
+            }
+            else{
+                stability_4++;
+            }
+            return;
+        }
+    }
+    if(m_anchor_1.isNull() && m_extreme_pos1.y()<discrete_step){
+        if(m_VMManager->staticsModule()->is2D()){
+            if(fabs(m_extreme_pos1.z())>20) return;
+            m_newSupport_position=QVector3D(m_extreme_pos1.x(),0,0)/m_VMManager->staticsModule()->modelScale();
+        }
+        else
+            m_newSupport_position=QVector3D(m_extreme_pos1.x(),0,m_extreme_pos1.z())/m_VMManager->staticsModule()->modelScale();
+        m_reference_extreme_pos1=m_extreme_pos1;
+        m_newSupport_possible=1;
+        stability_4=0;
+    }
+    else if(m_anchor_2.isNull() && m_extreme_pos2.y()<discrete_step){
+        if(m_VMManager->staticsModule()->is2D()){
+            if(fabs(m_extreme_pos2.z())>20) return;
+            m_newSupport_position=QVector3D(m_extreme_pos2.x(),0,0)/m_VMManager->staticsModule()->modelScale();
+        }
+        else
+            m_newSupport_position=QVector3D(m_extreme_pos2.x(),0,m_extreme_pos2.z())/m_VMManager->staticsModule()->modelScale();
+        m_reference_extreme_pos2=m_extreme_pos2;
+        m_newSupport_possible=2;
+        stability_4=0;
+    }
+    if(m_newSupport_possible>0){
+        Q_FOREACH(JointPtr j,m_VMManager->staticsModule()->joints()){
+            if(j->scaledPosition().distanceToPoint(m_newSupport_position*m_VMManager->staticsModule()->modelScale())<max_distance){
+                if(m_newSupport_possible==1){
+                    m_anchor_1=j.toWeakRef();
+                    m_anchor_1_offset=-1;
+                    timer_1.start();
+                }
+                else
+                {
+                    m_anchor_2=j.toWeakRef();
+                    m_anchor_2_offset=-1;
+                    timer_2.start();
+                }
+                m_newSupport_possible=0;
+                break;
+            }
+        }
+    }
+
 }
 
 JointPtr Scaffold::splitBeam(BeamPtr b, qreal offset){

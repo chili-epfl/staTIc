@@ -31,6 +31,8 @@ public:
     AbstractVMManager* vmManager(){return m_VMManager;}
     void setVMManager(AbstractVMManager*);
 
+public slots:
+    void checkPosition4NewSupport();
 private slots:
     void onCollisionExtreme1(Physics::PhysicsCollisionEventPtr e);
     void onCollisionExtreme2(Physics::PhysicsCollisionEventPtr e);
@@ -54,6 +56,10 @@ private:
     QVector3D m_extreme_pos1,m_extreme_pos2;
     QVector3D m_reference_extreme_pos1,m_reference_extreme_pos2;
 
+    /*Variables for creating a new support*/
+    QVector3D m_newSupport_position;
+    short m_newSupport_possible;
+
     /*Joints created during the split*/
     WeakJointPtr m_joint_1,m_joint_2;
     /*Beam added to the structure*/
@@ -67,7 +73,7 @@ private:
 
     JointPtr splitBeam(BeamPtr b, qreal offset);
     //QHash<WeakBeamPtr, WeakBeamPtr> m_child2parent_beams;
-    short stability_1,stability_2,stability_3;
+    short stability_1,stability_2,stability_3,stability_4;
     QTime timer_1,timer_2;
 };
 
