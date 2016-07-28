@@ -5,6 +5,7 @@ import QtQuick 2.3 as QQ2
 Entity{
     id:root
     readonly property string type: "joint"
+    property string supportType:"none"
     onEnabledChanged: {
         if(infobox.current_item == root)
             infobox.current_item=0;
@@ -21,22 +22,22 @@ Entity{
     property vector3d position
     property vector3d reaction
     property vector3d displacement
+
     property real displacementLimit: position.y==0 ? 1 : position.y/500
     property int displacementStatus: 0
     onDisplacementChanged: {
-        if(displacement.x > displacementLimit ||
-                displacement.z > displacementLimit){
+        if(Math.abs(displacement.x) > displacementLimit ||
+                Math.abs(displacement.z) > displacementLimit){
             displacementStatus=2;
             settings.blink_displacement=2;
         }
-        else if((displacement.x > displacementLimit/2 ||
-                displacement.z > displacementLimit/2) && settings.blink_displacement<2){
+        else if((Math.abs(displacement.x) > displacementLimit/2 ||
+                Math.abs(displacement.z) > displacementLimit/2) && settings.blink_displacement<2){
             displacementStatus=1;
             settings.blink_displacement=1;
         }
         else
             displacementStatus=0;
-        console.log(objectName,displacement)
     }
 
     property real reactionMagnitude: reaction.length()
@@ -55,7 +56,7 @@ Entity{
     property int animationValue: 0
     property int step: 10
 
-    property int distanceFromJoint: 50
+    property int distanceFromJoint: 25
 
     QQ2.NumberAnimation on animationValue{
             id:animation
@@ -154,14 +155,17 @@ Entity{
         }
         Transform{
             id:displacement_transform;
-            translation:displacement
+            translation:displacement.times(settings.exagerate_displacement_factor)
         }
         PhongMaterial{
             id:displacement_material
             ambient: {
-                if(displacementStatus==2) return "red"
-                if(displacementStatus==1) return "yellow"
-                if(displacementStatus==0) return "green"
+                var disp=displacement.times(settings.exagerate_displacement_factor)
+                if(Math.abs(disp.x) > displacementLimit ||
+                        Math.abs(disp.z) > displacementLimit) return "red"
+                if(Math.abs(disp.x) > displacementLimit*0.5 ||
+                        Math.abs(disp.z) > displacementLimit*0.5) return "yellow"
+                else return "green"
             }
         }
         components: [displacement_mesh,displacement_transform,displacement_material]
@@ -170,7 +174,7 @@ Entity{
 
     Mesh{
         id:tiny_arrow
-        enabled: visible && settings.show_beam_axial_loads && reactionMagnitude>0
+        enabled: visible && settings.show_beam_axial_loads && reactionMagnitude>0 && !settings.show_displacement
         source:"qrc:/element_views/Element_Views/tiny_arrow.obj"
     }
 
@@ -199,41 +203,41 @@ Entity{
             isReaction: true
 
         }
-        AnimationUnitDx{
-            unitId: 2
-            unitMesh: tiny_arrow
-            step: root.step
-            animationValue: root.animationValue
-            module: distanceFromJoint
-            direction: 1
-            scaleFactor: root.scaleFactor
-            rotate: false
-            isReaction: true
+//        AnimationUnitDx{
+//            unitId: 2
+//            unitMesh: tiny_arrow
+//            step: root.step
+//            animationValue: root.animationValue
+//            module: distanceFromJoint
+//            direction: 1
+//            scaleFactor: root.scaleFactor
+//            rotate: false
+//            isReaction: true
 
-        }
-        AnimationUnitDx{
-            unitId: 3
-            unitMesh: tiny_arrow
-            step: root.step
-            animationValue: root.animationValue
-            module: distanceFromJoint
-            direction: 1
-            scaleFactor: root.scaleFactor
-            rotate: false
-            isReaction: true
+//        }
+//        AnimationUnitDx{
+//            unitId: 3
+//            unitMesh: tiny_arrow
+//            step: root.step
+//            animationValue: root.animationValue
+//            module: distanceFromJoint
+//            direction: 1
+//            scaleFactor: root.scaleFactor
+//            rotate: false
+//            isReaction: true
 
-        }
-        AnimationUnitDx{
-            unitId: 4
-            unitMesh: tiny_arrow
-            step: root.step
-            animationValue: root.animationValue
-            module: distanceFromJoint
-            direction: 1
-            scaleFactor: root.scaleFactor
-            rotate: false
-            isReaction: true
-        }
+//        }
+//        AnimationUnitDx{
+//            unitId: 4
+//            unitMesh: tiny_arrow
+//            step: root.step
+//            animationValue: root.animationValue
+//            module: distanceFromJoint
+//            direction: 1
+//            scaleFactor: root.scaleFactor
+//            rotate: false
+//            isReaction: true
+//        }
 
 
 
@@ -241,6 +245,25 @@ Entity{
             Transform{
                 matrix: poseMatrix
             }]
+    }
+    Entity{
+        enabled: supportType=="Pinned" || supportType=="Rolling"
+        Mesh{
+            id:support_mesh
+            source: if(supportType=="Pinned") return "qrc:/UIMesh/3DObjects/pin support.obj"
+                    else if(supportType=="Rolling") return "qrc:/UIMesh/3DObjects/rolling support.obj"
+                    else return ""
+        }
+        Transform{
+            id:support_transform
+            translation:Qt.vector3d(0,-25,0)
+            scale:5
+        }
+        PhongMaterial{
+            id:support_material
+        }
+        components: [support_mesh,support_transform,support_material]
+
     }
 
 

@@ -56,6 +56,12 @@ Entity{
     property real relativeDisplacementY:0
     property real relativeDisplacementZ:0
 
+    property vector3d extreme1Displacement;
+    property vector3d extreme2Displacement;
+
+    onExtreme1DisplacementChanged: computeTransform4Displacement();
+    onExtreme2DisplacementChanged: computeTransform4Displacement();
+
 //    onRelativeDisplacementYChanged:
 //                if(relativeDisplacementY>=0.8)
 //                    settings.blink_displacement=2;
@@ -266,9 +272,9 @@ Entity{
 
     CylinderMesh{
         id:mainMesh
-        radius: 5
-        length: 25
-        enabled:  settings.show_beam
+        radius: 2.5
+        length: settings.show_beam_axial_loads ? rootEntity.length/2-80 : rootEntity.length/2-25
+        enabled:  settings.show_beam && !settings.show_displacement
     }
 
     QQ2.NumberAnimation{
@@ -316,14 +322,14 @@ Entity{
 
 
     Entity{
-        enabled: settings.show_beam_spring
+        enabled: settings.show_beam_spring && !settings.show_displacement
         components: [Mesh{
             source:"qrc:/UIMesh/3DObjects/spring.obj"
         },
             Transform{
                 //z:width,x:height,y:lenght
                 //scale3D:Qt.vector3d(17/9,1,35/9)
-                scale3D: axialForceType > 0 ? Qt.vector3d(1,1 + Math.min(relativeAxialStress,1),1) : Qt.vector3d(1,1 -0.8* Math.min(relativeAxialStress,1),1)
+                scale3D: axialForceType > 0 ? Qt.vector3d(0.75,0.75 + Math.min(relativeAxialStress,1),0.75) : Qt.vector3d(0.75,0.75 -0.55* Math.min(relativeAxialStress,1),0.75)
                 QQ2.Behavior on scale3D{
                     QQ2.Vector3dAnimation{
                         duration: 500
@@ -362,7 +368,6 @@ Entity{
         }
         components: [mainMesh,this.transform,main_mesh_material]
     }
-
 
 
     /*Overview related part*/
@@ -574,6 +579,69 @@ Entity{
             components: drag_anchor_enabled ? [drag_mesh,drag_material,transform,objectPicker] : []
 
         }
+    }
+
+
+    /*Displacement entity*/
+    property quaternion displacementQuaternion;
+    property vector3d displacementTranslation;
+    property real displacementMeshLenght;
+
+    QQ2.Connections{
+        target: settings
+        onExagerate_displacement_factorChanged:computeTransform4Displacement()
+    }
+
+    function computeTransform4Displacement(){
+        var e1=extreme1.plus(extreme1Displacement.times(settings.exagerate_displacement_factor))
+        var e2=extreme2.plus(extreme2Displacement.times(settings.exagerate_displacement_factor))
+        displacementMeshLenght=e2.minus(e1).length();
+        var b=e2.minus(e1).normalized();
+        displacementQuaternion=displacement_transform.fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+        if(b.x!=1 && b.x!=-1){
+            var axis=Qt.vector3d(1,0,0).crossProduct(b).normalized();
+            var angle=Math.acos(Qt.vector3d(1,0,0).dotProduct(b));
+            displacementQuaternion=quaternion_helper.product(displacement_transform.fromAxisAndAngle(axis, angle*180.0/Math.PI),displacementQuaternion)
+        }
+        var center=e2.plus(e1).times(0.5);
+        displacementTranslation.x=center.x;
+        displacementTranslation.y=center.y;
+        displacementTranslation.z=center.z;
+    }
+
+    Entity{
+        enabled: settings.show_displacement
+        components: [Transform{
+                rotation:quaternion_helper.invert(quaternionTest)
+                }
+        ]
+
+        Entity{
+            components: [Transform{
+                translation:translationTest.times(-1)
+            }]
+            Entity{
+
+                Transform{
+                    id:displacement_transform
+                    rotation:displacementQuaternion
+                    translation:displacementTranslation
+                }
+                CylinderMesh{
+                    id:displacement_mesh
+                    radius: mainMesh.radius
+                    length: displacementMeshLenght-50
+                }
+                PhongAlphaMaterial{
+                    id:displacement_material
+                    ambient:"green"
+                    alpha:0.7
+                }
+                components: [displacement_transform,displacement_mesh,displacement_material]
+            }
+        }
+
+
     }
 
 

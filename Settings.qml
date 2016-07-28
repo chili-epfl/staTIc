@@ -5,7 +5,7 @@ Item {
     property bool show_back_button:true
     property int blink_stress:0
     property int blink_displacement:0
-    property bool show_stress: true
+    property bool show_stress: false
     property bool show_displacement:false
     property bool show_stress_button: true
     property bool show_displacement_button:true
@@ -24,6 +24,7 @@ Item {
     property bool show_filter_bar: true
     property bool show_legend: true
 
+    property int exagerate_displacement_factor:1
     /*Tools*/
     property bool enable_scaffold: true;
     property var beam_dragging_ownership:0;
@@ -32,7 +33,7 @@ Item {
 
     function restore_defaults(){
 
-        show_stress= true
+        show_stress= false
         show_displacement=false
         show_stress_button= true
         show_displacement_button=true
@@ -40,9 +41,11 @@ Item {
         beam_is_selectable= true
         joint_is_selectable= true
         load_is_selectable= true
+
         show_beam= true
         show_beam_spring= true
         show_beam_sphere= false
+
         show_joint= true
         show_beam_axial_loads= true
         show_load= true

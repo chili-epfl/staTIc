@@ -22,6 +22,8 @@ Item{
 
     property alias currentViewFilter: viewFilterBar.selection
     property alias materialsManager: staticsmodule.materialsManager
+    property alias vmManager: vmFrame3DDManager
+    property alias warehouse: warehouse3d
 
     property alias maxForce : staticsmodule.maxForce
     property alias minForce : staticsmodule.minForce
@@ -35,6 +37,7 @@ Item{
 
     property bool firstInit : true
     property bool stateLock: false
+
     QuaternionHelper{
         id:quaternion_helper
     }
@@ -514,6 +517,8 @@ Item{
                             if(settings.show_displacement && settings.show_stress)
                                 settings.show_displacement=false;
                             settings.blink_stress=0;
+
+
                         }
                     }
                     Rectangle{
@@ -549,13 +554,22 @@ Item{
                                 "qrc:/icons/Icons/show_displacement_on.png" :
                                 "qrc:/icons/Icons/show_displacement_off.png"
                     MouseArea{
+                        id:show_disp_button
                         anchors.fill: parent
                         onClicked: {
                             settings.show_displacement = !settings.show_displacement
                             if(settings.show_displacement && settings.show_stress)
                                 settings.show_stress=false
                             settings.blink_displacement=0;
+                            if(settings.show_displacement)
+                                exagerate_disp_slider.visible=true
+                            else
+                                exagerate_disp_slider.visible=false
+
                         }
+                        hoverEnabled: true
+                        onHoveredChanged:if(settings.show_displacement)
+                                             exagerate_disp_slider.visible=true
                     }
                     Rectangle{
                         visible: settings.blink_displacement>0
@@ -576,6 +590,41 @@ Item{
                             }
                         }
                    }
+                    Slider{
+                        id:exagerate_disp_slider
+                        visible:false
+                        Timer{
+                            running:!show_disp_button.pressed && !exagerate_disp_slider.hovered && exagerate_disp_slider.visible
+                            onTriggered: exagerate_disp_slider.visible=false
+                            interval: 5000
+                        }
+                        width: parent.width
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.bottom: parent.top
+                        anchors.margins: 10
+                        stepSize: 1
+                        minimumValue: 0
+                        maximumValue: 4
+                        value: 0
+                        Binding{
+                            target:settings
+                            property: "exagerate_displacement_factor"
+                            value: Math.pow(10,exagerate_disp_slider.value)
+                        }
+                        Text{
+                            text:"Exagerate"
+                            fontSizeMode: Text.Fit
+                            horizontalAlignment: Text.AlignHCenter
+                            color: "#F8F8F8"
+                            font.pointSize: 14
+                            width: parent.width
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            anchors.bottom: parent.top
+                            visible: !parent.hovered
+                        }
+
+                    }
+
                 }
 
                 SuggestionBox{
@@ -607,7 +656,6 @@ Item{
                     minimumValue: 100
                     maximumValue: 3000
                     tickmarksEnabled: true
-
                 }
 
                 Rectangle{
@@ -636,7 +684,6 @@ Item{
      }
      ArucoDetector{
         id:aruco
-
         //pause: backgroundsubtraction.entropy<200
      }
      ArucoObject{

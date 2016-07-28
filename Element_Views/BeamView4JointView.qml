@@ -70,8 +70,6 @@ Entity{
             }
 
             globalForceExtreme1=ab.plus(shearY).plus(shearZ);
-
-
     }
 
     property real scaleFactor: Math.min(2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 1,3)
@@ -129,7 +127,7 @@ Entity{
 
     Mesh{
         id:tiny_arrow
-        enabled: visible && settings.show_beam_axial_loads
+        enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement
         source:"qrc:/element_views/Element_Views/tiny_arrow.obj"
     }
 
