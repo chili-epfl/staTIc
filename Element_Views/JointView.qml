@@ -53,19 +53,10 @@ Entity{
 
     property matrix4x4 poseMatrix
 
-    property int animationValue: 0
+    property int animationValue: globalNumericAnimation
     property int step: 10
 
-    property int distanceFromJoint: 25
-
-    QQ2.NumberAnimation on animationValue{
-            id:animation
-            duration: 10000
-            from:  0
-            to: distanceFromJoint
-            loops: QQ2.Animation.Infinite
-            running: visible && settings.show_joint && reactionMagnitude > 0
-    }
+    property int distanceFromJoint: 10
 
     function computeTransform(){
         var a=Qt.vector3d(1,0,0);

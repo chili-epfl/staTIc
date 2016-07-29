@@ -11,7 +11,7 @@ Entity{
     property bool rotate: false
     property real scaleFactor: 1
     property bool isReaction: false
-    property int offset: isReaction ? -10:10
+    property int offset: isReaction ? -2:2
     Transform{
         id:transform
         matrix: {
