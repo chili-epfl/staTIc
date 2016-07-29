@@ -3,8 +3,6 @@
 #include <QApplication>
 #include <QQuickView>
 
-#include "AR/backgroundsubtraction.h"
-
 #include "scenariolistmodel.h"
 #include "materialsmanager.h"
 #include "warehouse3d.h"
@@ -20,13 +18,12 @@
 
 #include "AR/deformingbeammesh.h"
 
-#include <opencv2/core.hpp>
 #include "resourcesfetcher.h"
 #include "static_global.h"
-#include "AR/arucodetector.h"
-#include "AR/arucoobject.h"
+
 #include "AR/quaternionhelper.h"
 #include "logger.h"
+
 int main(int argc, char *argv[])
 {
 //    QApplication app(argc, argv);
@@ -61,11 +58,7 @@ int main(int argc, char *argv[])
 
     QQuickView view;
 
-    qRegisterMetaType<cv::Mat>("cv::Mat");
-
     qmlRegisterType<Logger>("Logger", 1, 0, "Logger");
-
-    qmlRegisterType<BackgroundSubtraction>("BackgroundSubtraction", 1, 0, "BackgroundSubtraction");
 
     qmlRegisterType<ScenarioListModel>("ScenarioListModel", 1, 0, "ScenarioListModel");
     qmlRegisterType<MaterialsManager>("MaterialsManager", 1, 0, "MaterialsManager");
@@ -73,18 +66,10 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<ResourcesFetcher>("ResourcesFetcher", 1, 0, "ResourcesFetcher");
 
-    //qmlRegisterType<TwoDimensionalStaticsModule>("StaticsModule2D", 1, 0, "StaticsModule2D");
-    //qmlRegisterType<TwoDimentionalEventHandler>("EventHandler2D", 1, 0, "EventHandler2D");
     qmlRegisterType<Frame3DDKernel>("Frame3DDKernel",1,0,"Frame3DDKernel");
     qmlRegisterType<Frame3DDVMManager>("Frame3DDVMManager",1,0,"Frame3DDVMManager");
 
-    qmlRegisterType<ArucoDetector>("ArucoDetector",1,0,"ArucoDetector");
-    qmlRegisterType<ArucoObject>("ArucoObject",1,0,"ArucoObject");
-
     qmlRegisterType<QuaternionHelper>("QuaternionHelper",1,0,"QuaternionHelper");
-
-    //qmlRegisterType<MaterialSetter>("MaterialSetter", 1, 0, "MaterialSetter");
-    //qmlRegisterType<PhysicsSetter>("PhysicsSetter", 1, 0, "PhysicsSetter");
 
     /*Tools*/
     qmlRegisterType<ConcentratedForce>("QuickConcentratedForce", 1, 0, "QuickConcentratedForce");
@@ -96,7 +81,6 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<DeformingBeamMesh>("DeformingBeamMesh", 1, 0, "DeformingBeamMesh");
 
-//    engine.load(QUrl(QStringLiteral("qrc:///main.qml")));
 #ifdef ANDROID
     view.rootContext()->setContextProperty("Platform","ANDROID");
 #else
@@ -105,11 +89,7 @@ int main(int argc, char *argv[])
     view.resize(2560, 1600);
     view.setResizeMode(QQuickView::SizeRootObjectToView);
     view.setSource(QUrl("qrc:/main.qml"));
-//    view.setSource(QUrl("qrc:/Experiment-Mode.qml"));
     view.show();
 
-
-    //Frame3DDKernel* k=new Frame3DDKernel();
-    //k->setSource(QString(":/models/models/Model1/Model1.lol"));
    return app.exec();
 }

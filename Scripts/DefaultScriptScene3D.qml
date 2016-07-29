@@ -4,7 +4,7 @@ import Qt3D.Input 2.0
 
 import QtQuick 2.3 as QQ2
 import QtPhysics.unofficial 1.0
-import ArucoObject 1.0
+import ARToolkit 1.0
 import "qrc:/"
 
 import "qrc:/tools/Tools/ConcentratedForce"
@@ -45,7 +45,7 @@ Entity {
         duration: 10000
         from:0
         to:50
-        running: true
+        running: false
         loops: QQ2.Animation.Infinite
     }
 
@@ -57,14 +57,14 @@ Entity {
         nearPlane : 0.1
         farPlane : clippingPlaneSlider.value
 
-        top: 0.1*(aruco.projectionMatrix.m23/(cameraScaleX*aruco.projectionMatrix.m11))
-        bottom: -0.1*(aruco.projectionMatrix.m23/(cameraScaleX*aruco.projectionMatrix.m11))
-        left: -0.1*(aruco.projectionMatrix.m13/(cameraScaleY*aruco.projectionMatrix.m22))
-        right: 0.1*(aruco.projectionMatrix.m13/(cameraScaleY*aruco.projectionMatrix.m22))
+        top: 0.1*(marker_detector.projectionMatrix.m23/(cameraScaleX*marker_detector.projectionMatrix.m11))
+        bottom: -0.1*(marker_detector.projectionMatrix.m23/(cameraScaleX*marker_detector.projectionMatrix.m11))
+        left: -0.1*(marker_detector.projectionMatrix.m13/(cameraScaleY*marker_detector.projectionMatrix.m22))
+        right: 0.1*(marker_detector.projectionMatrix.m13/(cameraScaleY*marker_detector.projectionMatrix.m22))
 
-        position: Qt.vector3d( 0.0, 0.0, 0 )
+        position: Qt.vector3d( 0.0, 0.0, 1 )
         upVector: Qt.vector3d( 0.0, 1.0, 0.0 )
-        viewCenter: Qt.vector3d( 0.0, 0.0, -1.0 )
+        viewCenter: Qt.vector3d( 0.0, 0.0, 0.0 )
     }
 
 //    Configuration  {
@@ -188,13 +188,13 @@ Entity {
         }
 
         Scaffold{
-            extreme1_tag: ArucoObject{
+            extreme1_tag: ARToolkitObject{
                 objectId: "240"
-                QQ2.Component.onCompleted: aruco.registerObserver(this)
+                QQ2.Component.onCompleted: marker_detector.registerObserver(this)
             }
-            extreme2_tag: ArucoObject{
+            extreme2_tag: ARToolkitObject{
                 objectId: "241"
-                QQ2.Component.onCompleted: aruco.registerObserver(this)
+                QQ2.Component.onCompleted: marker_detector.registerObserver(this)
             }
         }
 

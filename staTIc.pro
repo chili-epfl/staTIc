@@ -4,21 +4,13 @@ QT += qml quick widgets 3dcore 3drender 3dinput multimedia network
 DEFINES += VIDEOFORMAT=43
 CONFIG += c++11
 SOURCES += main.cpp \
-    #statics/two_dimentions/twodimensionalstaticsmodule.cpp \
     statics/elements/joint.cpp \
-    #statics/elements/force.cpp \
     statics/abstractstaticsmodule.cpp \
     statics/elements/abstractelement.cpp \
     statics/elements/beam.cpp \
-    #materialsetter.cpp \
-    #statics/two_dimentions/twodimentionaleventhandler.cpp \
     statics/viewModels/abstractelementviewmodel.cpp \
     statics/viewModels/beamvm.cpp \
-    #statics/viewModels/forcevm.cpp \
     statics/viewModels/jointvm.cpp \
-    #staticshelper.cpp \
-    #statics/viewModels/jointvmitemmodel.cpp \
-    #physicssetter.cpp \
     Tools/ConcentratedForce/concentratedforce.cpp \
     statics/frame3dd/coordtrans.c \
     statics/frame3dd/eig.c \
@@ -30,25 +22,17 @@ SOURCES += main.cpp \
     statics/elements/uniformlydistributedload.cpp \
     statics/abstractvmmanager.cpp \
     statics/frame3dd/frame3ddvmmanager.cpp \
-    #qmlenginefactory.cpp \
     statics/elements/interiorpointload.cpp \
     Tools/Scaffold/scaffold.cpp \
     Tools/BeamRemover/beamremover.cpp \
     scenariolistmodel.cpp \
-    #statics/elements/force.cpp \
-    AR/backgroundsubtraction.cpp \
-    AR/backgroundsubtractionfilter.cpp \
     AR/deformingbeammesh.cpp \
     materialsmanager.cpp \
     statics/elements/trapezoidalforce.cpp \
     statics/viewModels/trapezoidalforcevm.cpp \
     warehouse3d.cpp \
     resourcesfetcher.cpp \
-    AR/arucodetector.cpp \
-    AR/arucodetectorthread.cpp \
-    AR/arucoobject.cpp \
     Tools/TangibleTrapzLoad/tangibletrapzload.cpp \
-    AR/linearkalmanfilter.cpp \
     AR/quaternionhelper.cpp \
     Tools/Snow/snow.cpp \
     logger.cpp
@@ -89,8 +73,6 @@ HEADERS += \
     Tools/Scaffold/scaffold.h \
     Tools/BeamRemover/beamremover.h \
     scenariolistmodel.h \
-    AR/backgroundsubtraction.h \
-    AR/backgroundsubtractionfilter.h \
     AR/deformingbeammesh.h \
     materialsmanager.h \
     statics/elements/trapezoidalforce.h \
@@ -98,11 +80,7 @@ HEADERS += \
     warehouse3d.h \
     resourcesfetcher.h \
     static_global.h \
-    AR/arucodetector.h \
-    AR/arucodetectorthread.h \
-    AR/arucoobject.h \
     Tools/TangibleTrapzLoad/tangibletrapzload.h \
-    AR/linearkalmanfilter.h \
     AR/quaternionhelper.h \
     Tools/Snow/snow.h \
     logger.h
@@ -118,7 +96,7 @@ QML_IMPORT_PATH =
 # Default rules for deployment.
 include(deployment.pri)
 
-LIBS += -lopencv_core -lopencv_video -lopencv_imgproc -lquazip -lz -lopencv_aruco -lopencv_calib3d -lopencv_highgui -lopencv_imgcodecs
+LIBS += -lquazip -lz
 #-lopencv_highgui -lopencv_imgproc
 #-lopencv_video -lopencv_calib3d
 LIBS += -lLinearMath -lBulletDynamics -lBulletCollision -lBulletSoftBody
@@ -131,25 +109,16 @@ android {
     INCLUDEPATH += /home/chili/Downloads/bullet3-2.83.5/build-android/install/include
     INCLUDEPATH += /home/chili/Downloads/bullet3-2.83.5/build-android/install/include/bullet
 
-    LIBS += -L/home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a
+    LIBS += -L/home/chili/artoolkit5/android/libs/armeabi-v7a/
     LIBS += -L/home/chili/Downloads/bullet3-2.83.5/build-android/install/lib
 
     ANDROID_EXTRA_LIBS = \
-        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_core.so \
-        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_imgproc.so \
-        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_imgcodecs.so \
-        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_flann.so \
-        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_ml.so \
-        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_features2d.so \
-        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_calib3d.so \
-        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_video.so \
-        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_videoio.so \
-        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_highgui.so \
-        /home/chili/opencv/android-build/install/sdk/native/libs/armeabi-v7a/libopencv_aruco.so \
         /home/chili/Downloads/bullet3-2.83.5/build-android/install/lib/libLinearMath.so \
         /home/chili/Downloads/bullet3-2.83.5/build-android/install/lib/libBulletCollision.so \
         /home/chili/Downloads/bullet3-2.83.5/build-android/install/lib/libBulletDynamics.so \
         /home/chili/Downloads/bullet3-2.83.5/build-android/install/lib/libBulletSoftBody.so \
+        /home/chili/artoolkit5/android/libs/armeabi-v7a/libc++_shared.so\
+        /home/chili/artoolkit5/android/libs/armeabi-v7a/libARWrapper.so\
         $$[QT_INSTALL_PLUGINS]/physicsfactories/libbullet.so
 
     ANDROID_PERMISSIONS += \
@@ -159,9 +128,9 @@ android {
         android.hardware.camera
 }
 !android{
-    INCLUDEPATH += /home/chili/opencv/build-linux/install/include
     LIBS += -L/home/chili/opencv/build-linux/install/lib
     LIBS += -L/home/chili/Downloads/bullet3-2.83.5/build-linux/install/lib
+    LIBS += -L/home/chili/artoolkit5/lib -L/home/chili/artoolkit5/lib/linux-x86_64
 }
 
 DISTFILES += \

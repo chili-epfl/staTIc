@@ -3,11 +3,11 @@ import Qt3D.Render 2.0
 import QtPhysics.unofficial 1.0
 import QuickScaffold 1.0
 import QtQuick 2.3 as QQ2
-import ArucoObject 1.0
+import ARToolkit 1.0
 
 Entity {
-    property ArucoObject extreme1_tag;
-    property ArucoObject extreme2_tag;
+    property ARToolkitObject extreme1_tag;
+    property ARToolkitObject extreme2_tag;
     enabled: settings.enable_scaffold
 
     property bool extreme1_is_enable:false
@@ -41,7 +41,7 @@ Entity {
             Transform{
                 id:inv_rotation1
                 QQ2.Binding on rotation{
-                    when:extreme1_tag.isVisible
+                    when:extreme1_tag.objectIsVisible
                     value:quaternion_helper.invert(structureLoaderTransform.rotation)
 
                 }
@@ -52,7 +52,7 @@ Entity {
                 Transform{
                     id:inv_transform1
                     QQ2.Binding on translation{
-                        when:extreme1_tag.isVisible
+                        when:extreme1_tag.objectIsVisible
                         value:structureLoaderTransform.translation.times(-1)
 
                     }
@@ -86,7 +86,7 @@ Entity {
             Transform{
                 id:inv_rotation2
                 QQ2.Binding on rotation{
-                    when:extreme2_tag.isVisible
+                    when:extreme2_tag.objectIsVisible
                     value:quaternion_helper.invert(structureLoaderTransform.rotation)
 
                 }
@@ -97,7 +97,7 @@ Entity {
                 Transform{
                     id:inv_transform2
                     QQ2.Binding on translation{
-                        when:extreme2_tag.isVisible
+                        when:extreme2_tag.objectIsVisible
                         value:structureLoaderTransform.translation.times(-1)
 
                     }

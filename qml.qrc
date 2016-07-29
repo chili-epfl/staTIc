@@ -6,6 +6,7 @@
         <file>load.yml</file>
         <file>Settings.qml</file>
         <file>Experiment-Mode.qml</file>
+        <file>AR/board_configuration.dat</file>
     </qresource>
     <qresource prefix="/icons">
         <file>Icons/ic_keyboard_arrow_up_black_36px.svg</file>

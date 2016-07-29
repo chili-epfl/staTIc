@@ -3,10 +3,8 @@ import QtQuick.Controls 1.3
 import QtMultimedia 5.5
 import QtQuick.Layouts 1.1
 import QtQuick.Scene3D 2.0
-import ArucoDetector 1.0
-import ArucoObject 1.0
+import ARToolkit 1.0
 import QuaternionHelper 1.0
-import BackgroundSubtraction 1.0
 
 import Frame3DDKernel 1.0
 import Frame3DDVMManager 1.0
@@ -340,7 +338,7 @@ Item{
          anchors.centerIn: parent
          anchors.fill: parent
          source: camDevice
-         filters:[aruco]
+         filters:[marker_detector]
          fillMode:VideoOutput.PreserveAspectCrop
          onContentRectChanged: if(camDevice.isRunning){
                                     scene3D.view_finder_width=viewFinder.contentRect.width
@@ -682,22 +680,20 @@ Item{
              }
          }
      }
-     ArucoDetector{
-        id:aruco
-        //pause: backgroundsubtraction.entropy<200
-     }
-     ArucoObject{
-        id:structure_tag
-        objectId: "Default"
+     ARToolkit{
+        id:marker_detector
+        defaultMarkerSize: 50
         Component.onCompleted: {
-            aruco.registerObserver(structure_tag)
+            loadMultiMarkersConfigFile("default","qrc:/AR/board_configuration.dat")
+        }
+     }
+     ARToolkitObject{
+        id:structure_tag
+        objectId: "default"
+        Component.onCompleted: {
+            marker_detector.registerObserver(structure_tag)
         }
      }
 
-
-     BackgroundSubtraction{
-        id:backgroundsubtraction
-        //onEntropyChanged: console.log(entropy)
-     }
 
 }
