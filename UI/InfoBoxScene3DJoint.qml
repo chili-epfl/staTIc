@@ -31,6 +31,7 @@ Entity {
 
     CameraController{
         camera: camera
+        panMode: true
     }
 
     function resetCamera(){
