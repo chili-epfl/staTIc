@@ -682,6 +682,7 @@ Item{
      }
      ARToolkit{
         id:marker_detector
+        matrixCode: ARToolkit.MATRIX_CODE_4x4_BCH_13_9_3
         defaultMarkerSize: 50
         Component.onCompleted: {
             loadMultiMarkersConfigFile("default","qrc:/AR/board_configuration.dat")
