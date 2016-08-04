@@ -72,6 +72,11 @@
         <file>Element_Views/tiny_arrow.obj</file>
         <file>Element_Views/AnimationUnitDx.qml</file>
         <file>Element_Views/TrapezoidalForce.qml</file>
+        <file>Element_Views/AnimationUnitDxCommons.qml</file>
+        <file>Element_Views/BeamView_Commons.qml</file>
+        <file>Element_Views/JointView_Commons.qml</file>
+        <file>Element_Views/Runtime_Meshes.qml</file>
+        <file>Element_Views/TrapezoidalForce_Commons.qml</file>
     </qresource>
     <qresource prefix="/opengl">
         <file>Opengl/phongalpha.frag</file>
@@ -117,6 +122,7 @@
         <file>UI/NumberEntity.qml</file>
         <file>UI/InfoBoxCableEx.qml</file>
         <file>UI/SuggestionBox.qml</file>
+        <file>UI/Char_Meshes.qml</file>
     </qresource>
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>

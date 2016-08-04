@@ -5,7 +5,7 @@ import QtQuick.Layouts 1.1
 import QtQuick.Scene3D 2.0
 import ARToolkit 1.0
 import QuaternionHelper 1.0
-
+import Qt3D.Core 2.0 as Q3D
 import Frame3DDKernel 1.0
 import Frame3DDVMManager 1.0
 
@@ -215,8 +215,14 @@ Item{
         interval: 2000
     }
 
-    Component.onCompleted: if(Platform=="ANDROID")
+    Component.onCompleted: if(Platform=="ANDROID"){
                                camDevice.deviceId=QtMultimedia.availableCameras[0].deviceId
+                               marker_detector.projectionMatrix=Qt.matrix4x4(
+                                           1.4272479930179818e+03 ,0 ,6.4750000000000000e+02,0,
+                                           0, 1.4272479930179818e+03 , 4.8550000000000000e+02,0,
+                                           0,0,1,0,
+                                           0,0,0,1)
+                           }
                            else {
                                camDevice.deviceId=QtMultimedia.availableCameras[1].deviceId
                            }
@@ -287,27 +293,19 @@ Item{
      /*3D Rendering*/
      Camera{
          id:camDevice
+         viewfinder.resolution: "640x480"
          onCameraStatusChanged: {
              if(firstInit && camDevice.cameraStatus==Camera.ActiveStatus ){
                  loadingAnimation_text.text="Loading 3D structure";
                  staticsmodule.sourceUrl=structureUrl;
              }
          }
-
-         imageCapture.resolution: "640x480"
-         viewfinder.resolution:"640x480"
-
-         focus {
-             focusMode: Camera.FocusContinuous
-             focusPointMode: Camera.FocusPointAuto
-         }
-         imageProcessing {
-                 whiteBalanceMode: CameraImageProcessing.WhiteBalanceAuto
-         }
-         exposure.exposureMode: Camera.ExposureAction
-         exposure.manualAperture: -1
-         exposure.manualShutterSpeed: -1
-
+         imageProcessing.whiteBalanceMode: CameraImageProcessing.WhiteBalanceAuto
+         focus.focusMode: CameraFocus.FocusContinuous
+         focus.focusPointMode: CameraFocus.FocusPointAuto
+         captureMode: Camera.CaptureViewfinder
+         exposure.exposureMode: CameraExposure.ExposureSports
+         //exposure.exposureCompensation:-0.5
          imageCapture {
              onImageCaptured: {
                  stillImage.source = preview
@@ -324,7 +322,12 @@ Item{
             }
          }
      }
-
+     Timer{
+         running: true
+         interval: 10000
+         onTriggered: {camDevice.unlock();camDevice.searchAndLock()}
+         repeat: true
+     }
      Image {
          id: stillImage
          visible: camDevice.isRunning && camDevice.cameraStatus==Camera.ActiveStatus ? false:true
@@ -357,7 +360,7 @@ Item{
                  anchors.fill: parent
                  focus: true
                  aspects: ["input","physics"]
-//                 aspects:["input"]
+                // aspects:["input"]
                  multisample:true
                  DefaultScriptScene3D {
                     id:scene3D
@@ -625,6 +628,19 @@ Item{
 
                 }
 
+                Slider{
+                    id:labeling_threshold_slider
+                    anchors.top:parent.bottom
+                    anchors.left: parent.left
+                    anchors.margins: 10
+                    width: 200
+                    value: 100
+                    minimumValue: 30
+                    maximumValue: 220
+                    stepSize: 5
+
+                }
+
                 SuggestionBox{
                     id:suggestion_box
                 }
@@ -682,7 +698,9 @@ Item{
      }
      ARToolkit{
         id:marker_detector
+        labelingThreshold: labeling_threshold_slider.value
         matrixCode: ARToolkit.MATRIX_CODE_4x4_BCH_13_9_3
+        onProjectionMatrixChanged: console.log(projectionMatrix)
         defaultMarkerSize: 50
         Component.onCompleted: {
             loadMultiMarkersConfigFile("default","qrc:/AR/board_configuration.dat")
@@ -691,6 +709,10 @@ Item{
      ARToolkitObject{
         id:structure_tag
         objectId: "default"
+        Q3D.QuaternionAnimation on rotation{
+            type: Q3D.QuaternionAnimation.Nlerp
+
+        }
         Component.onCompleted: {
             marker_detector.registerObserver(structure_tag)
         }

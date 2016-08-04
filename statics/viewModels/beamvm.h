@@ -10,7 +10,7 @@ class BeamVM : public AbstractElementViewModel
 
 public:
     explicit BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent=0);
-    explicit BeamVM(BeamPtr beam,Qt3DCore::QEntity* entity,QQmlComponent* component,QQmlContext* context,Qt3DCore::QEntity* sceneRoot, QObject* parent=0);
+    explicit BeamVM(BeamPtr beam,Qt3DCore::QEntity* entity,QQmlContext* context,Qt3DCore::QEntity* sceneRoot, QObject* parent=0);
     ~BeamVM();
 
     WeakBeamPtr beam(){return m_beam;}
@@ -37,7 +37,7 @@ private:
     void initView();
     WeakBeamPtr m_beam;
     Qt3DCore::QEntity* m_component3D;
-    QQmlComponent* m_qqmlcomponent;
+    static QSharedPointer<QQmlComponent> m_qqmlcomponent;
     QQmlContext* m_qqmlcontext;
 };
 

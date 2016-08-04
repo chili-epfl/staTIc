@@ -12,12 +12,7 @@ Entity{
     }
     property var connected_beams: []
 
-    property bool visible:  true/*backgroundsubtraction.entropy < .10
-                            && (
-                               (applicationRoot.currentViewFilter=='JOINT'
-                                   && (infobox.current_item == null || infobox.current_item == root))
-                                || applicationRoot.currentViewFilter=='DESIGNER')
-                            ? true : false*/
+    property bool visible:  true
 
     property vector3d position
     property vector3d reaction
@@ -85,15 +80,9 @@ Entity{
                                 0   ,   0, 0, 1)
         return matrix;
     }
-    SphereMesh{
-        id:mesh
-        radius: 2
-        enabled:  visible && settings.show_joint
-    }
-    PhongAlphaMaterial{
-        id:material
-        alpha: settings.show_displacement? 0.5 : 1
-    }
+
+    property Material material: settings.show_displacement? joint_commons.phon_alpha_05 : joint_commons.phon_alpha_1
+
     Transform{
         id:transform
         matrix: {
@@ -103,24 +92,17 @@ Entity{
         }
 
     }
-    components: [mesh,transform,material]
+
+    components: visible && settings.show_joint ? [joint_commons.sphere_mesh,transform,material] : [transform,material]
 
     Entity{
-        Mesh{
-            id:label_mesh
-            enabled: visible && settings.show_joint
-            source: root.objectName.length>0 ? "qrc:/UIMesh/3DObjects/"+root.objectName+".obj" :"qrc:/UIMesh/3DObjects/1.obj"
-        }
+        enabled: visible && settings.show_joint
+        property Mesh label_mesh: char_meshes.getMesh(root.objectName)
         Transform{
             id:label_transform
             translation:Qt.vector3d(0,10,5)
             rotation:fromEulerAngles(0,-90,-90)/*quaternion_helper.invert(structure_tag.rotationQuaternion)*/
             scale: 2
-        }
-        PhongMaterial{
-            id:label_material
-            ambient:"#2C3539"
-
         }
         ObjectPicker {
             id:label_picker
@@ -133,46 +115,32 @@ Entity{
 
             }
         }
-        components: [label_mesh,label_transform,label_material,label_picker]
-
+        components: [label_mesh,label_transform,joint_commons.label_material,label_picker]
     }
 
     //Displacement entity
     Entity{
         enabled: visible && settings.show_joint && settings.show_displacement
-        SphereMesh{
-            id:displacement_mesh
-            radius: 2
-        }
         Transform{
             id:displacement_transform;
             translation:displacement.times(settings.exagerate_displacement_factor)
         }
-        PhongMaterial{
-            id:displacement_material
-            ambient: {
-                var disp=displacement.times(settings.exagerate_displacement_factor)
-                if(Math.abs(disp.x) > displacementLimit ||
-                        Math.abs(disp.z) > displacementLimit) return "red"
-                if(Math.abs(disp.x) > displacementLimit*0.5 ||
-                        Math.abs(disp.z) > displacementLimit*0.5) return "yellow"
-                else return "green"
-            }
+        property Material displacement_material: {
+            var disp=displacement.times(settings.exagerate_displacement_factor)
+            if(Math.abs(disp.x) > displacementLimit ||
+                    Math.abs(disp.z) > displacementLimit) return joint_commons.phong_material_red
+            if(Math.abs(disp.x) > displacementLimit*0.5 ||
+                    Math.abs(disp.z) > displacementLimit*0.5) return joint_commons.phong_material_yellow
+            else return joint_commons.phong_material_green
         }
-        components: [displacement_mesh,displacement_transform,displacement_material]
+        components: [joint_commons.sphere_mesh,displacement_transform,displacement_material]
     }
 
-
-    Mesh{
-        id:tiny_arrow
-        enabled: visible && settings.show_beam_axial_loads && reactionMagnitude>0 && !settings.show_displacement
-        source:"qrc:/element_views/Element_Views/tiny_arrow.obj"
-    }
 
     Entity{
         AnimationUnitDx{
             unitId: 0
-            unitMesh: tiny_arrow
+            unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
             animationValue: root.animationValue
             module: distanceFromJoint
@@ -184,7 +152,7 @@ Entity{
 
         AnimationUnitDx{
             unitId: 1
-            unitMesh: tiny_arrow
+            unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
             animationValue: root.animationValue
             module: distanceFromJoint
@@ -194,43 +162,6 @@ Entity{
             isReaction: true
 
         }
-//        AnimationUnitDx{
-//            unitId: 2
-//            unitMesh: tiny_arrow
-//            step: root.step
-//            animationValue: root.animationValue
-//            module: distanceFromJoint
-//            direction: 1
-//            scaleFactor: root.scaleFactor
-//            rotate: false
-//            isReaction: true
-
-//        }
-//        AnimationUnitDx{
-//            unitId: 3
-//            unitMesh: tiny_arrow
-//            step: root.step
-//            animationValue: root.animationValue
-//            module: distanceFromJoint
-//            direction: 1
-//            scaleFactor: root.scaleFactor
-//            rotate: false
-//            isReaction: true
-
-//        }
-//        AnimationUnitDx{
-//            unitId: 4
-//            unitMesh: tiny_arrow
-//            step: root.step
-//            animationValue: root.animationValue
-//            module: distanceFromJoint
-//            direction: 1
-//            scaleFactor: root.scaleFactor
-//            rotate: false
-//            isReaction: true
-//        }
-
-
 
         components: [
             Transform{
@@ -239,25 +170,18 @@ Entity{
     }
     Entity{
         enabled: supportType=="Pinned" || supportType=="Rolling"
-        Mesh{
-            id:support_mesh
-            source: if(supportType=="Pinned") return "qrc:/UIMesh/3DObjects/pin support.obj"
-                    else if(supportType=="Rolling") return "qrc:/UIMesh/3DObjects/rolling support.obj"
-                    else return ""
+        property Mesh support_mesh: {
+            if(supportType=="Pinned") return joint_commons.pinned_support_mesh
+            else if(supportType=="Rolling") return joint_commons.rolling_support_mesh
+            else return joint_commons.empty_mesh
         }
         Transform{
             id:support_transform
             translation:Qt.vector3d(0,-25,0)
             scale:5
         }
-        PhongMaterial{
-            id:support_material
-        }
-        components: [support_mesh,support_transform,support_material]
-
+        components: [support_mesh,support_transform,joint_commons.phon_alpha_1]
     }
-
-
 }
 
 

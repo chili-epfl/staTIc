@@ -32,7 +32,6 @@ Frame3DDVMManager::~Frame3DDVMManager()
 
     Q_FOREACH(PoolEntity e,m_entity_pool.values()){
         delete e.entity;
-        delete e.component;
         delete e.contex;
     }
 }
@@ -77,7 +76,7 @@ BeamVM* Frame3DDVMManager::createBeamVM(BeamPtr b){
         if(m_entity_pool.contains(classname)){
             PoolEntity _e=m_entity_pool.value(classname);
             m_entity_pool.remove(classname,_e);
-            beamVm=new BeamVM(b,_e.entity,_e.component,_e.contex,m_sceneRoot,this);
+            beamVm=new BeamVM(b,_e.entity,_e.contex,m_sceneRoot,this);
         }
         else
             beamVm=new BeamVM(b,m_sceneRoot,this);
@@ -103,7 +102,7 @@ JointVM* Frame3DDVMManager::createJointVM(JointPtr j){
         if(m_entity_pool.contains(classname)){
             PoolEntity _e=m_entity_pool.value(classname);
             m_entity_pool.remove(classname,_e);
-            jointVm=new JointVM(j,_e.entity,_e.component,_e.contex,m_sceneRoot,this);
+            jointVm=new JointVM(j,_e.entity,_e.contex,m_sceneRoot,this);
         }
         else
             jointVm=new JointVM(j,m_sceneRoot,this);
@@ -149,28 +148,25 @@ void Frame3DDVMManager::registerDependentObject(QObject *o)
     m_dependent_objects.insert(o);
 }
 
-void Frame3DDVMManager::addPoolEntity(QString className, Qt3DCore::QEntity *e, QQmlContext *contex, QQmlComponent *component)
+void Frame3DDVMManager::addPoolEntity(QString className, Qt3DCore::QEntity *e, QQmlContext *contex)
 {
     if(m_dying) return;
     PoolEntity poolEntity;
     poolEntity.entity=e;
-    poolEntity.component=component;
     poolEntity.contex=contex;
     m_entity_pool.insert(className,poolEntity);
 }
 
-void Frame3DDVMManager::tryRetrivePoolEntity(QString className, Qt3DCore::QEntity *&e, QQmlContext *&contex, QQmlComponent *&component)
+void Frame3DDVMManager::tryRetrivePoolEntity(QString className, Qt3DCore::QEntity *&e, QQmlContext *&contex)
 {
     if(m_entity_pool.contains(className)){
         PoolEntity _e=m_entity_pool.value(className);
         m_entity_pool.remove(className,_e);
         e=_e.entity;
         contex=_e.contex;
-        component=_e.component;
     }else{
         e=Q_NULLPTR;
         contex=Q_NULLPTR;
-        component=Q_NULLPTR;
     }
 }
 

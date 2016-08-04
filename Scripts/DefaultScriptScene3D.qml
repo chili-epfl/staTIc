@@ -14,9 +14,32 @@ import "qrc:/tools/Tools/Snow"
 
 import "qrc:/ui/UI/"
 import "qrc:/ui"
-
+import "qrc:/element_views/Element_Views/"
 Entity {
     id: sceneRoot
+
+
+    /*Commons*/
+    AnimationUnitDxCommons{
+        id:audx_commons
+    }
+    BeamView_Commons{
+        id:beam_commons
+    }
+    JointView_Commons{
+        id:joint_commons
+    }
+    Char_Meshes{
+        id:char_meshes
+    }
+    Runtime_Meshes{
+        id:runtime_meshes
+    }
+    TrapezoidalForce_Commons{
+        id:trapz_force_commons
+    }
+    /*.....*/
+
     property alias mouseEventHasBeenAccepted: deselection_guard.eventHasBeenAccepted
     property url structureLoaderURL
     onStructureLoaderURLChanged: {

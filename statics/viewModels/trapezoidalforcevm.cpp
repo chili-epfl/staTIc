@@ -4,10 +4,12 @@
 #include <QQmlEngine>
 #include <Qt3DRender>
 
+QSharedPointer<QQmlComponent> TrapezoidalForceVM::m_qqmlcomponent=QSharedPointer<QQmlComponent>();
+
+
 TrapezoidalForceVM::TrapezoidalForceVM(TrapezoidalForcePtr force, Qt3DCore::QEntity *sceneRoot, Qt3DCore::QEntity* parentEntity, QVariantHash properties, QObject *parent)
     :AbstractElementViewModel(sceneRoot,parent)
 {
-    m_qqmlcomponent=Q_NULLPTR;
     m_qqmlcontext=Q_NULLPTR;
     m_component3D=Q_NULLPTR;
     m_asset_tmp_copy=QString();
@@ -27,11 +29,8 @@ TrapezoidalForceVM::~TrapezoidalForceVM()
        m_component3D->setParent(Q_NODE_NULLPTR);
        delete m_component3D;
    }
-   if(m_qqmlcomponent)
-       delete m_qqmlcomponent;
    if(m_qqmlcontext)
        delete m_qqmlcontext;
-   m_qqmlcomponent=Q_NULLPTR;
    m_qqmlcontext=Q_NULLPTR;
    m_component3D=Q_NULLPTR;
 
@@ -70,11 +69,8 @@ void TrapezoidalForceVM::setParentEntity(Qt3DCore::QEntity *parentEntity)
             m_component3D->setParent(Q_NODE_NULLPTR);
             delete m_component3D;
         }
-        if(m_qqmlcomponent)
-            delete m_qqmlcomponent;
         if(m_qqmlcontext)
             delete m_qqmlcontext;
-        m_qqmlcomponent=Q_NULLPTR;
         m_qqmlcontext=Q_NULLPTR;
         m_component3D=Q_NULLPTR;
         initView(parentEntity,properties);
@@ -125,8 +121,10 @@ void TrapezoidalForceVM::onRelativePositionChanged()
 
 void TrapezoidalForceVM::initView(Qt3DCore::QEntity* parentEntity,QVariantHash properties)
 {
-    m_qqmlcomponent=new QQmlComponent(qmlEngine(parentEntity),parentEntity);
-    m_qqmlcomponent->loadUrl(QUrl("qrc:/element_views/Element_Views/TrapezoidalForce.qml"));
+    if(m_qqmlcomponent.isNull()){
+        m_qqmlcomponent=QSharedPointer<QQmlComponent>(new QQmlComponent(qmlEngine(parentEntity),parentEntity));
+        m_qqmlcomponent->loadUrl(QUrl("qrc:/element_views/Element_Views/TrapezoidalForce.qml"));
+    }
     m_qqmlcontext=new QQmlContext(qmlContext(parentEntity));
     Qt3DCore::QEntity* forceView= qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent->beginCreate(m_qqmlcontext));
     m_qqmlcontext->setContextObject(forceView);

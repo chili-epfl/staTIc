@@ -18,6 +18,7 @@ Entity{
     property real axialForce_extreme1
     property real shearYForce_extreme1
     property real shearZForce_extreme1
+
     onAxialForce_extreme1Changed: lazyUpdate.start()
     onShearYForce_extreme1Changed: lazyUpdate.start()
     onShearZForce_extreme1Changed: lazyUpdate.start()
@@ -125,17 +126,12 @@ Entity{
 
 
 
-    Mesh{
-        id:tiny_arrow
-        enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement
-        source:"qrc:/element_views/Element_Views/tiny_arrow.obj"
-    }
-
     Entity{
         enabled: root.axialForceType!==0
         AnimationUnitDx{
+            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement
             unitId: 0
-            unitMesh: tiny_arrow
+            unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
             animationValue: root.animationValue
             module: 50
@@ -145,8 +141,9 @@ Entity{
         }
 
         AnimationUnitDx{
+            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement
             unitId: 1
-            unitMesh: tiny_arrow
+            unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
             animationValue: root.animationValue
             module: 50
@@ -155,8 +152,9 @@ Entity{
             rotate: root.axialForceType < 0
         }
         AnimationUnitDx{
+            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement
             unitId: 2
-            unitMesh: tiny_arrow
+            unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
             animationValue: root.animationValue
             module: 50
@@ -165,8 +163,9 @@ Entity{
             rotate: root.axialForceType < 0
         }
         AnimationUnitDx{
+            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement
             unitId: 3
-            unitMesh: tiny_arrow
+            unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
             animationValue: root.animationValue
             module: 50
@@ -175,8 +174,9 @@ Entity{
             rotate: root.axialForceType < 0
         }
         AnimationUnitDx{
+            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement
             unitId: 4
-            unitMesh: tiny_arrow
+            unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
             animationValue: root.animationValue
             module: 50

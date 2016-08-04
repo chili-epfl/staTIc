@@ -30,8 +30,8 @@ public:
     Q_INVOKABLE void produceTPZForce(Qt3DCore::QEntity* parentEntity, QVariantHash properties=QVariantHash());
     void registerDependentObject(QObject* o);
 
-    void addPoolEntity(QString className,Qt3DCore::QEntity* e, QQmlContext* contex, QQmlComponent* component);
-    void tryRetrivePoolEntity(QString className,Qt3DCore::QEntity* &e, QQmlContext* &contex, QQmlComponent* &component);
+    void addPoolEntity(QString className, Qt3DCore::QEntity* e, QQmlContext* contex);
+    void tryRetrivePoolEntity(QString className, Qt3DCore::QEntity* &e, QQmlContext* &contex);
 protected slots:
     void initViewModels();
 signals:
@@ -64,10 +64,9 @@ private:
 struct PoolEntity{
     Qt3DCore::QEntity* entity;
     QQmlContext* contex;
-    QQmlComponent* component;
     bool operator==(const PoolEntity& a) const
     {
-        return (this->component==a.component && this->entity==a.entity && this->contex==a.contex);
+        return (this->entity==a.entity && this->contex==a.contex);
     }
 };
 

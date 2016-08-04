@@ -8,12 +8,13 @@
 #include <QQmlComponent>
 #include <QQmlEngine>
 
+//QQmlComponent* BeamVM::m_qqmlcomponent=NULL;
+QSharedPointer<QQmlComponent> BeamVM::m_qqmlcomponent=QSharedPointer<QQmlComponent>();
 
 BeamVM::BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     AbstractElementViewModel(sceneRoot,parent),
     m_component3D(Q_NULLPTR)
 {
-    m_qqmlcomponent=Q_NULLPTR;
     m_qqmlcontext=Q_NULLPTR;
     m_beam=beam.toWeakRef();
     connect(m_beam.data(),SIGNAL(destroyed(QObject*)),this,SLOT(deleteLater()));
@@ -34,10 +35,9 @@ BeamVM::BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     connect(m_component3D,SIGNAL(realBeamSizeChanged()),this,SLOT(onBeamSizeChangedVMSide()));
 }
 
-BeamVM::BeamVM(BeamPtr beam, Qt3DCore::QEntity *entity, QQmlComponent *component, QQmlContext *context,Qt3DCore::QEntity* sceneRoot,  QObject *parent)
+BeamVM::BeamVM(BeamPtr beam, Qt3DCore::QEntity *entity, QQmlContext *context, Qt3DCore::QEntity* sceneRoot,  QObject *parent)
     :AbstractElementViewModel(sceneRoot,parent)
 {
-    m_qqmlcomponent=component;
     m_qqmlcontext=context;
     m_component3D=entity;
     m_beam=beam.toWeakRef();
@@ -66,9 +66,9 @@ BeamVM::~BeamVM(){
         m_component3D->setProperty("extreme1",QVector3D(-10,0,400));
         m_component3D->setProperty("extreme2",QVector3D(10,0,400));
         Frame3DDVMManager* parent_vm_manager=static_cast<Frame3DDVMManager*>(parent());
-        parent_vm_manager->addPoolEntity(metaObject()->className(),m_component3D,m_qqmlcontext,m_qqmlcomponent);
+        parent_vm_manager->addPoolEntity(metaObject()->className(),m_component3D,m_qqmlcontext);
     }
-    m_qqmlcomponent=Q_NULLPTR;
+    //m_qqmlcomponent=Q_NULLPTR;
     m_qqmlcontext=Q_NULLPTR;
     m_component3D=Q_NULLPTR;
 }
@@ -86,8 +86,10 @@ void BeamVM::initView(){
     BeamPtr beam_str_ref=m_beam.toStrongRef();
     if(!beam_str_ref->enable()) return;
     if(m_component3D==Q_NULLPTR){
-        m_qqmlcomponent=new QQmlComponent(qmlEngine(m_sceneRoot),m_sceneRoot);
-        m_qqmlcomponent->loadUrl(QUrl("qrc:/element_views/Element_Views/BeamView.qml"));
+        if(m_qqmlcomponent.isNull()){
+            m_qqmlcomponent=QSharedPointer<QQmlComponent>(new QQmlComponent(qmlEngine(m_sceneRoot),m_sceneRoot));
+            m_qqmlcomponent->loadUrl(QUrl("qrc:/element_views/Element_Views/BeamView.qml"));
+        }
         m_qqmlcontext=new QQmlContext(qmlContext(m_sceneRoot));
         Qt3DCore::QEntity* beamView= qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent->beginCreate(m_qqmlcontext));
         //QQmlEngine::setObjectOwnership(beamView,QQmlEngine::JavaScriptOwnership);
@@ -182,8 +184,8 @@ void BeamVM::onEnableChanged(){
         m_component3D->setProperty("extreme1",QVector3D(-10,0,400));
         m_component3D->setProperty("extreme2",QVector3D(10,0,400));
         Frame3DDVMManager* parent_vm_manager=static_cast<Frame3DDVMManager*>(parent());
-        parent_vm_manager->addPoolEntity(metaObject()->className(),m_component3D,m_qqmlcontext,m_qqmlcomponent);
-        m_qqmlcomponent=Q_NULLPTR;
+        parent_vm_manager->addPoolEntity(metaObject()->className(),m_component3D,m_qqmlcontext);
+        //m_qqmlcomponent=Q_NULLPTR;
         m_qqmlcontext=Q_NULLPTR;
         m_component3D=Q_NULLPTR;
     }

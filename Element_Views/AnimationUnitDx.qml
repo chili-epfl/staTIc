@@ -1,14 +1,25 @@
 import Qt3D.Core 2.0
 import Qt3D.Render 2.0
+import QtQuick 2.0 as QQ2
 
 Entity{
     property Mesh unitMesh
+    property PhongMaterial material:{
+        if(isReaction)
+            return audx_commons.material_reaction;
+        else if(rotate){
+            return audx_commons.material_240_360;
+        }
+        else if(!rotate)
+            return audx_commons.material_0_360;
+    }
+
     property int unitId: 0
     property int step: 0
     property int animationValue: 0
     property int module: 1
     property int direction:1
-    property bool rotate: false
+    property bool rotate:false
     property real scaleFactor: 1
     property bool isReaction: false
     property int offset: isReaction ? -2:2
@@ -26,20 +37,6 @@ Entity{
 
             return m;
         }
-    }
-
-    PhongMaterial{
-        id:material
-        property real h: {
-            if(isReaction)
-                return 120/360;
-            else if(rotate)
-                return 240/360
-            else if(!rotate)
-                return 0/360
-        }
-        diffuse:Qt.hsla(h,1,0.5)
-        shininess:0
     }
 
     components: [

@@ -61,24 +61,12 @@ Entity{
         }
     }
 
-    Mesh{
-        id:customMesh
-        source: asset3DMeshURL
-    }
-    DiffuseMapMaterial {
-        id:material_diffuse
-        ambient: Qt.rgba( 0.2, 0.2, 0.2, 1.0 )
-        diffuse:  asset3DTextureURL
-        shininess: 2.0
-    }
-    PhongAlphaMaterial{
-        id:material_selection
-        ambient:  "yellow"
-        diffuse:"grey"
-        specular:"black"
-        alpha:0.80
-    }
-    property Material material: isSelected || dragging ? material_selection:material_diffuse
+
+    property Mesh customMesh: runtime_meshes.getMesh(asset3DMeshURL)
+    property DiffuseMapMaterial material_diffuse: runtime_meshes.getTexture(asset3DTextureURL)
+
+    property Material material: isSelected || dragging ? trapz_force_commons.material_for_selection :material_diffuse
+
     property bool isSelected: infobox.current_item==rootEntity
 
     onIsSelectedChanged: {
