@@ -136,6 +136,13 @@ Item{
 
     Item{
         states: [
+            State{
+                name:""
+                PropertyChanges{
+                    target:settings
+                    show_info_box: false
+                }
+            },
             State {
                 name: "beam"
                 when: !firstInit && settings.show_filter_bar && currentViewFilter=='ANALYSIS' &&
