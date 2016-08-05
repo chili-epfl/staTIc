@@ -102,6 +102,7 @@ Item {
             show_legend:false
             show_filter_bar:false
             restoreEntryValues: false
+            visible_loader:"CUSTOM"
         }
         PropertyChanges{
             target: info_container
@@ -124,8 +125,11 @@ Item {
                 visible:true
             }
             StateChangeScript{
-                script: {default_script.stateLock=false
-                    checkSolution()}
+                script: {
+                    default_script.stateLock=false
+                    checkSolution()
+                    default_script.infobox.custom_loader.source=""
+                }
             }
             PropertyChanges{
                 target: story_box

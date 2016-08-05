@@ -20,7 +20,7 @@ Item {
     property bool show_beam_axial_loads: true
     property bool show_load: true
     property bool show_spatial_references: true
-    property bool show_info_box:false
+    property bool show_info_box:true
     property bool show_filter_bar: true
     property bool show_legend: true
 
@@ -40,6 +40,7 @@ Item {
         show_displacement=false
         show_stress_button= true
         show_displacement_button=true
+        show_info_box=true
 
         beam_is_selectable= true
         joint_is_selectable= true
@@ -53,13 +54,12 @@ Item {
         show_beam_axial_loads= true
         show_load= true
         show_spatial_references= true
-        show_info_box=false
         show_filter_bar= true
         show_legend= true
 
         enable_scaffold= true;
 
-
+        visible_loader="DESIGNER";
 
 
     }

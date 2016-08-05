@@ -96,7 +96,10 @@ Item {
                 visible:true
             }
             StateChangeScript{
-                script: default_script.stateLock=false
+                script: {
+                    default_script.stateLock=false
+                    default_script.infobox.custom_loader.source=""
+                }
             }
             PropertyChanges{
                 target: story_box

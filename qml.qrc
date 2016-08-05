@@ -9,9 +9,6 @@
         <file>AR/board_configuration.dat</file>
     </qresource>
     <qresource prefix="/icons">
-        <file>Icons/ic_keyboard_arrow_up_black_36px.svg</file>
-        <file>Icons/pause.svg</file>
-        <file>Icons/play.svg</file>
         <file>Icons/minus.png</file>
         <file>Icons/move.png</file>
         <file>Icons/pan.png</file>
