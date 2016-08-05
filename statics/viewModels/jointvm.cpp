@@ -173,7 +173,7 @@ void JointVM::createEntityForBeam(BeamPtr b){
     Frame3DDVMManager* parent_vm_manager=static_cast<Frame3DDVMManager*>(parent());
     if(m_qqmlcomponent_beam_view==NULL){
         m_qqmlcomponent_beam_view=new QQmlComponent(qmlEngine(m_sceneRoot),m_sceneRoot);
-        connect(m_qqmlcomponent_beam_view,&QQmlComponent::destroyed,[=]() {
+        connect(m_qqmlcomponent_beam_view,&QQmlComponent::destroyed,[]() {
             JointVM::m_qqmlcomponent_beam_view=NULL;
           });
         m_qqmlcomponent_beam_view->loadUrl(QUrl("qrc:/element_views/Element_Views/BeamView4JointView.qml"));
