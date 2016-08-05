@@ -35,7 +35,7 @@ Entity {
     property alias panMode: cameraController.panMode
 
     onResizeChanged: {
-        camera.position=Qt.vector3d( 0.0, 0.0, (0.9*(deformingMesh.length))/Math.tan(camera.fieldOfView/2) )
+        camera.position=Qt.vector3d( 0.0, 0.0, (1.1*(deformingMesh.length))/Math.tan(camera.fieldOfView/2) )
         camera.upVector= Qt.vector3d( 0.0, 1.0, 0.0 )
         camera.viewCenter= Qt.vector3d( 0.0, 0.0, 0.0 )
         resize=false;
@@ -57,7 +57,7 @@ Entity {
         fieldOfView: 45
         nearPlane : 0.1
         farPlane : 10000
-        position: Qt.vector3d( 0.0, 0.0, (0.9*(deformingMesh.length))/Math.tan(fieldOfView/2) )
+        position: Qt.vector3d( 0.0, 0.0, (1.1*(deformingMesh.length))/Math.tan(fieldOfView/2) )
         upVector: Qt.vector3d( 0.0, 1.0, 0.0 )
         viewCenter: Qt.vector3d( 0.0, 0.0, 0.0 )
     }
