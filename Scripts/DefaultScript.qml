@@ -141,20 +141,23 @@ Item{
                 when: !firstInit && settings.show_filter_bar && currentViewFilter=='ANALYSIS' &&
                       infobox.current_item!=0 && infobox.current_item.type==="beam"
                       && applicationRoot.state==""
-                PropertyChanges {
-                    target: infobox.loader
-                    source:"qrc:/ui/UI/InfoBoxBeam.qml"
-                    restoreEntryValues: false
-                }
+//                PropertyChanges {
+//                    target: infobox.loader
+//                    source:"qrc:/ui/UI/InfoBoxBeam.qml"
+//                    restoreEntryValues: false
+//                }
                 PropertyChanges {
                     target: infobox
                     lateral_visibility:"Visible"
+
                 }
                 PropertyChanges {
                     target:settings
                     show_spatial_references: true
                     show_info_box: true
                     load_is_selectable:false
+                    visible_loader:"BEAM"
+
                 }
             },
             State {
@@ -162,11 +165,11 @@ Item{
                 when: !firstInit &&  settings.show_filter_bar && currentViewFilter=='ANALYSIS' &&
                       infobox.current_item!=0 && infobox.current_item.type==="joint"
                       && applicationRoot.state==""
-                PropertyChanges {
-                    target: infobox.loader
-                    source:"qrc:/ui/UI/InfoBoxJoint.qml"
-                    restoreEntryValues: false
-                }
+//                PropertyChanges {
+//                    target: infobox.loader
+//                    source:"qrc:/ui/UI/InfoBoxJoint.qml"
+//                    restoreEntryValues: false
+//                }
                 PropertyChanges {
                     target: infobox
                     lateral_visibility:"Visible"
@@ -176,17 +179,19 @@ Item{
                     show_spatial_references: true
                     show_info_box: true
                     load_is_selectable:false
+                    visible_loader:"JOINT"
+
                 }
             },
             State {
                 name: "designer"
                 when: !firstInit && settings.show_filter_bar && currentViewFilter=='DESIGNER'
                       && applicationRoot.state==""
-                PropertyChanges {
-                    target: infobox.loader
-                    source:"qrc:/ui/UI/InfoBoxDesigner.qml"
-                    restoreEntryValues: false
-                }
+//                PropertyChanges {
+//                    target: infobox.loader
+//                    source:"qrc:/ui/UI/InfoBoxDesigner.qml"
+//                    restoreEntryValues: false
+//                }
                 PropertyChanges {
                     target: infobox
                     lateral_visibility:"Visible"
@@ -196,6 +201,8 @@ Item{
                     show_spatial_references: false
                     show_info_box:true
                     load_is_selectable:true
+                    visible_loader:"DESIGNER"
+
                 }
             }
         ]

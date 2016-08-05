@@ -20,7 +20,7 @@ Item {
         stateLock: true
         onFirstInitChanged:
             if(!firstInit){
-                default_script.infobox.loader.source="qrc:/ui/UI/InfoBoxCableEx.qml"
+                default_script.infobox.custom_loader.source="qrc:/ui/UI/InfoBoxCableEx.qml"
             }
     }
     state: "PRESENTING"
@@ -74,6 +74,7 @@ Item {
             show_legend:false
             show_filter_bar:false
             restoreEntryValues: false
+            visible_loader:"CUSTOM"
         }
         PropertyChanges {
             target: default_script.infobox
@@ -132,13 +133,13 @@ Item {
      }
 
     Connections{
-        target: default_script.infobox.loader.item
+        target: default_script.infobox.custom_loader.item
         ignoreUnknownSignals: true
         onExerciseCompleteChanged: {
-            correct_text.text=default_script.infobox.loader.item.correct;
-            wrong_text.text=default_script.infobox.loader.item.wrong;
-            missing_text.text=default_script.infobox.loader.item.missing;
-            if(default_script.infobox.loader.item.wrong>0)
+            correct_text.text=default_script.infobox.custom_loader.item.correct;
+            wrong_text.text=default_script.infobox.custom_loader.item.wrong;
+            missing_text.text=default_script.infobox.custom_loader.item.missing;
+            if(default_script.infobox.custom_loader.item.wrong>0)
                 crashSound.play()
             else
                 clappingSound.play()

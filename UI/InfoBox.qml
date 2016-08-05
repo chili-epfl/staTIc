@@ -6,7 +6,12 @@ Rectangle {
     id:root
     property var current_item:0;
     property alias lateral_visibility:hideButton.state
-    property alias loader: loader
+
+    property alias custom_loader: custom_loader
+    property alias loader_beam: loader_beam
+    property alias loader_designer: loader_designer
+    property alias loader_joint: loader_joint
+
 
     color:"transparent"
     radius:5
@@ -98,26 +103,53 @@ Rectangle {
     }
 
 
-    Rectangle{
-        anchors.centerIn: parent
-        width: busyIndicator.width*1.2
-        height: width
-        radius: width/2
-        color: "#F8F8F8"
-        visible: loader.status!=Loader.Ready
-        BusyIndicator {
-            id:busyIndicator
-            anchors.centerIn: parent
-            running: parent.visible
-        }
-    }
+//    Rectangle{
+//        anchors.centerIn: parent
+//        width: busyIndicator.width*1.2
+//        height: width
+//        radius: width/2
+//        color: "#F8F8F8"
+//        visible: loader.status!=Loader.Ready
+//        BusyIndicator {
+//            id:busyIndicator
+//            anchors.centerIn: parent
+//            running: parent.visible
+//        }
+//    }
 
     Loader{
-        id:loader
+        id:custom_loader
         anchors.fill:parent
         asynchronous: false
         onLoaded: item.current_item=Qt.binding(function(){return current_item})
         onSourceChanged: console.log(source)
+        visible:settings.visible_loader=="CUSTOM"
+    }
+    Loader{
+        id:loader_designer
+        anchors.fill:parent
+        visible: settings.visible_loader=="DESIGNER"
+        asynchronous: true
+        onLoaded: item.current_item=Qt.binding(function(){return current_item})
+        source:"qrc:/ui/UI/InfoBoxDesigner.qml"
+    }
+    Loader{
+        id:loader_beam
+        anchors.fill:parent
+        visible: settings.visible_loader=="BEAM"
+        asynchronous: true
+        source:"qrc:/ui/UI/InfoBoxBeam.qml"
+        onLoaded: item.current_item=Qt.binding(function(){return current_item})
+
+    }
+    Loader{
+        id:loader_joint
+        visible: settings.visible_loader=="JOINT"
+        anchors.fill:parent
+        asynchronous: true
+        onLoaded: item.current_item=Qt.binding(function(){return current_item})
+        source:"qrc:/ui/UI/InfoBoxJoint.qml"
+
     }
 
 }

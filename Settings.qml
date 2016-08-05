@@ -25,6 +25,9 @@ Item {
     property bool show_legend: true
 
     property int exagerate_displacement_factor:1
+
+    property string visible_loader:"DESIGNER"; //BEAM,JOINT,DESIGNER,CUSTOM
+
     /*Tools*/
     property bool enable_scaffold: true;
     property var beam_dragging_ownership:0;
@@ -55,6 +58,7 @@ Item {
         show_legend= true
 
         enable_scaffold= true;
+
 
 
 
