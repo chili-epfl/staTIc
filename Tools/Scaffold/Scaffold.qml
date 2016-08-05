@@ -12,6 +12,7 @@ Entity {
 
     property bool extreme1_is_enable:false
     property bool extreme2_is_enable:false
+
     QQ2.Connections{
         id:c1
         ignoreUnknownSignals: true
@@ -128,8 +129,14 @@ Entity {
 
     QuickScaffold{
         vmManager:vmFrame3DDManager
-        extreme1: extreme1Body
-        extreme2: extreme2Body
+        QQ2.Binding on extreme1 {
+            when:extreme1_is_enable
+            value:extreme1Body
+        }
+        QQ2.Binding on extreme2 {
+            when:extreme2_is_enable
+            value:extreme2Body
+        }
         localExtreme1Pos:quaternion_helper.rotateVector(inv_rotation1.rotation,extreme1_tag.translation.plus(inv_transform1.translation))
         localExtreme2Pos:quaternion_helper.rotateVector(inv_rotation2.rotation,extreme2_tag.translation.plus(inv_transform2.translation))
     }

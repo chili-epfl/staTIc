@@ -75,6 +75,8 @@ private:
     //QHash<WeakBeamPtr, WeakBeamPtr> m_child2parent_beams;
     short stability_1,stability_2,stability_3,stability_4;
     QTime timer_1,timer_2;
+
+    bool m_name_s1_is_available;
 };
 
 #endif // SCAFFOLD_H

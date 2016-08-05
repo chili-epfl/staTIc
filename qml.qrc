@@ -177,6 +177,8 @@
         <file>3DObjects/bar.obj</file>
         <file>3DObjects/rolling support.obj</file>
         <file>3DObjects/pin support.obj</file>
+        <file>3DObjects/S2.obj</file>
+        <file>3DObjects/S1.obj</file>
     </qresource>
     <qresource prefix="/resources">
         <file>Resources/Assets3D/solar_pannel/Solar.png</file>

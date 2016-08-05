@@ -54,6 +54,10 @@ Entity{
             return char_8
         if(character==='9')
             return char_9
+        if(character==='s1')
+            return s1
+        if(character==='s2')
+            return s2
         return dot;
     }
 
@@ -160,5 +164,13 @@ Entity{
     property Mesh dot:
         Mesh{
         source:"qrc:/UIMesh/3DObjects/dot.obj"
+    }
+    property Mesh s1:
+        Mesh{
+        source:"qrc:/UIMesh/3DObjects/S1.obj"
+    }
+    property Mesh s2:
+        Mesh{
+        source:"qrc:/UIMesh/3DObjects/S2.obj"
     }
 }

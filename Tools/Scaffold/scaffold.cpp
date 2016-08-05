@@ -59,6 +59,8 @@ Scaffold::Scaffold(QObject* parent):
     m_newSupport_possible=0;
     connect(this,SIGNAL(localExtreme1PosChanged()),this,SLOT(checkPosition4NewSupport()));
     connect(this,SIGNAL(localExtreme2PosChanged()),this,SLOT(checkPosition4NewSupport()));
+
+    m_name_s1_is_available=true;
 }
 
 void Scaffold::setLocalExtreme1Pos(QVector3D v)
@@ -108,6 +110,8 @@ void Scaffold::setVMManager(AbstractVMManager * vmManager){
 
 
 void Scaffold::reset(){
+    m_name_s1_is_available=true;
+
     if(!m_beam_1.isNull())
         m_beam_1.toStrongRef()->setEnable(true);
 
@@ -324,7 +328,13 @@ void Scaffold::onAnchorsChanged(){
             }
         }
         else if(m_newSupport_possible==1){
-            e1=vmManager()->staticsModule()->createJoint(m_newSupport_position,"P",1,1,1,1,1,1);
+            if(m_name_s1_is_available){
+                e1=vmManager()->staticsModule()->createJoint(m_newSupport_position,"S1",1,1,1,1,1,1);
+                m_name_s1_is_available=false;
+            }
+            else
+                e1=vmManager()->staticsModule()->createJoint(m_newSupport_position,"S2",1,1,1,1,1,1);
+
             m_joint_1=e1.toWeakRef();//Ownership
         }
         if(!m_anchor_2.isNull()){
@@ -338,11 +348,16 @@ void Scaffold::onAnchorsChanged(){
             }
         }
         else if(m_newSupport_possible==2){
-            e2=vmManager()->staticsModule()->createJoint(m_newSupport_position,"P",1,1,1,1,1,1);
+            if(m_name_s1_is_available){
+                e2=vmManager()->staticsModule()->createJoint(m_newSupport_position,"S1",1,1,1,1,1,1);
+                m_name_s1_is_available=false;
+            }else
+                e2=vmManager()->staticsModule()->createJoint(m_newSupport_position,"S2",1,1,1,1,1,1);
+
             m_joint_2=e2.toWeakRef();//Ownership
         }
 
-        BeamPtr new_beam=m_VMManager->staticsModule()->createBeam(e1,e2,QSizeF(120,220),"Default","Scaffold");
+        BeamPtr new_beam=m_VMManager->staticsModule()->createBeam(e1,e2,QSizeF(120,220),"Default",e1->objectName()+e2->objectName());
 
         m_beam=new_beam.toWeakRef();
         if(!new_beam.isNull()){
@@ -392,6 +407,7 @@ void Scaffold::checkPosition4NewSupport(){
     if(!m_active) return;
     if(!m_VMManager) return;
     if(!m_VMManager->staticsModule()) return;
+    if(m_extreme1==Q_NULLPTR || m_extreme2==Q_NULLPTR) return;
 
     if(m_newSupport_possible>0) {
         if((m_newSupport_possible==1 && m_reference_extreme_pos1.distanceToPoint(m_extreme_pos1)>
@@ -466,16 +482,24 @@ JointPtr Scaffold::splitBeam(BeamPtr b, qreal offset){
     new_joint_position.setY(round(new_joint_position.y()/10)*10);
     new_joint_position.setZ(round(new_joint_position.z()/10)*10);
 
-    qDebug()<<"New joint"<<new_joint_position;
-    qDebug()<<offset;
-    qDebug()<<direction;
     JointPtr new_joint;
     if(m_VMManager->staticsModule()->is2D())
-        new_joint=m_VMManager->staticsModule()->createJoint(new_joint_position,"",0,0,1,1,1,0);
+        if(m_name_s1_is_available){
+            new_joint=m_VMManager->staticsModule()->createJoint(new_joint_position,"S1",0,0,1,1,1,0);
+            m_name_s1_is_available=false;
+        }
+        else
+            new_joint=m_VMManager->staticsModule()->createJoint(new_joint_position,"S2",0,0,1,1,1,0);
     else
-        new_joint=m_VMManager->staticsModule()->createJoint(new_joint_position);
-    BeamPtr segment1=m_VMManager->staticsModule()->createBeam(extreme1,new_joint,b->size(),b->materialID(),b->objectName()+"_1");
-    BeamPtr segment2=m_VMManager->staticsModule()->createBeam(new_joint,extreme2,b->size(),b->materialID(),b->objectName()+"_2");
+        if(m_name_s1_is_available){
+            new_joint=m_VMManager->staticsModule()->createJoint(new_joint_position,"S1");
+            m_name_s1_is_available=false;
+        }
+        else
+            new_joint=m_VMManager->staticsModule()->createJoint(new_joint_position,"S2");
+
+    BeamPtr segment1=m_VMManager->staticsModule()->createBeam(extreme1,new_joint,b->size(),b->materialID(),extreme1->objectName()+new_joint->objectName());
+    BeamPtr segment2=m_VMManager->staticsModule()->createBeam(new_joint,extreme2,b->size(),b->materialID(),new_joint->objectName()+extreme2->objectName());
 
     BeamVM* segment1_vm=m_VMManager->createBeamVM(segment1);
     BeamVM* segment2_vm=m_VMManager->createBeamVM(segment2);
