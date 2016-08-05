@@ -179,6 +179,7 @@ Entity {
 //            QuaternionAnimation on rotation{
 //            }
             translation:structure_tag.translation
+
             QQ2.Component.onCompleted:
                 //structure_tag.appendQuaternion(fromAxisAndAngle(1,1,1,120))
                 structure_tag.appendQuaternion(fromAxisAndAngle(1,0,0,90))
@@ -212,11 +213,11 @@ Entity {
 
         Scaffold{
             extreme1_tag: ARToolkitObject{
-                objectId: "240"
+                objectId: "Mat_240"
                 QQ2.Component.onCompleted: marker_detector.registerObserver(this)
             }
             extreme2_tag: ARToolkitObject{
-                objectId: "241"
+                objectId: "Mat_241"
                 QQ2.Component.onCompleted: marker_detector.registerObserver(this)
             }
         }
@@ -244,6 +245,8 @@ Entity {
 //        }
 
     }
+
+
 
 //    TangibleTrapzLoad{
 

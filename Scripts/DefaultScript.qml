@@ -710,6 +710,7 @@ Item{
         onProjectionMatrixChanged: console.log(projectionMatrix)
         defaultMarkerSize: 50
         Component.onCompleted: {
+            loadSingleMarkersConfigFile("qrc:/AR/single_markers.json")
             loadMultiMarkersConfigFile("default","qrc:/AR/board_configuration.dat")
         }
      }

@@ -191,7 +191,6 @@ DISTFILES += \
     Resources/Materials/D30/lorenzo.lucignano@epfl.ch-8316125742.material \
     Resources/Materials/D50/lorenzo.lucignano@epfl.ch-8316125742.material \
     Resources/Materials/D70/lorenzo.lucignano@epfl.ch-8316125742.material \
-    load.yml \
     android/AndroidManifest.xml \
     android/gradle/wrapper/gradle-wrapper.jar \
     android/gradlew \

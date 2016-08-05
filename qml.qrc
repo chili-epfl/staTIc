@@ -1,12 +1,10 @@
 <RCC>
     <qresource prefix="/">
         <file>main.qml</file>
-        <file>AR/board.yml</file>
-        <file>AR/singleTags.yml</file>
-        <file>load.yml</file>
         <file>Settings.qml</file>
         <file>Experiment-Mode.qml</file>
         <file>AR/board_configuration.dat</file>
+        <file>AR/single_markers.json</file>
     </qresource>
     <qresource prefix="/icons">
         <file>Icons/minus.png</file>

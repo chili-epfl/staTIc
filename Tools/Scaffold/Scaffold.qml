@@ -12,12 +12,11 @@ Entity {
 
     property bool extreme1_is_enable:false
     property bool extreme2_is_enable:false
-    onExtreme1_is_enableChanged: console.log("test")
     QQ2.Connections{
         id:c1
         ignoreUnknownSignals: true
         target: extreme1_tag
-        onIsVisibleChanged: if(!extreme1_is_enable && extreme1_tag.isVisible){
+        onObjectIsVisibleChanged: if(!extreme1_is_enable && extreme1_tag.objectIsVisible){
                                 extreme1_is_enable=true;
                                 c1.target=null
                             }
@@ -26,7 +25,7 @@ Entity {
         id:c2
         ignoreUnknownSignals: true
         target: extreme2_tag
-        onIsVisibleChanged: if(!extreme2_is_enable && extreme2_tag.isVisible){
+        onObjectIsVisibleChanged: if(!extreme2_is_enable && extreme2_tag.objectIsVisible){
                                 extreme2_is_enable=true;
                                 c2.target=null
                             }
