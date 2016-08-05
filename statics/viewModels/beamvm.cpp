@@ -8,8 +8,7 @@
 #include <QQmlComponent>
 #include <QQmlEngine>
 
-//QQmlComponent* BeamVM::m_qqmlcomponent=NULL;
-QSharedPointer<QQmlComponent> BeamVM::m_qqmlcomponent=QSharedPointer<QQmlComponent>();
+QQmlComponent* BeamVM::m_qqmlcomponent=NULL;
 
 BeamVM::BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     AbstractElementViewModel(sceneRoot,parent),
@@ -86,9 +85,12 @@ void BeamVM::initView(){
     BeamPtr beam_str_ref=m_beam.toStrongRef();
     if(!beam_str_ref->enable()) return;
     if(m_component3D==Q_NULLPTR){
-        if(m_qqmlcomponent.isNull()){
-            m_qqmlcomponent=QSharedPointer<QQmlComponent>(new QQmlComponent(qmlEngine(m_sceneRoot),m_sceneRoot));
+        if(m_qqmlcomponent==NULL){
+            m_qqmlcomponent=new QQmlComponent(qmlEngine(m_sceneRoot),m_sceneRoot);
             m_qqmlcomponent->loadUrl(QUrl("qrc:/element_views/Element_Views/BeamView.qml"));
+            connect(m_qqmlcomponent,&QQmlComponent::destroyed,[]() {
+                BeamVM::m_qqmlcomponent=NULL;
+              });
         }
         m_qqmlcontext=new QQmlContext(qmlContext(m_sceneRoot));
         Qt3DCore::QEntity* beamView= qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent->beginCreate(m_qqmlcontext));

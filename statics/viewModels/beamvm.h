@@ -37,7 +37,7 @@ private:
     void initView();
     WeakBeamPtr m_beam;
     Qt3DCore::QEntity* m_component3D;
-    static QSharedPointer<QQmlComponent> m_qqmlcomponent;
+    static QQmlComponent* m_qqmlcomponent;
     QQmlContext* m_qqmlcontext;
 };
 

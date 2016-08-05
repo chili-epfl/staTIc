@@ -36,8 +36,9 @@ private:
     QHash<Qt3DCore::QEntity*,QQmlContext*> m_beams_entities_extras;
 
     WeakJointPtr m_joint;
-    static QSharedPointer<QQmlComponent> m_qqmlcomponent;
-    static QSharedPointer<QQmlComponent> m_qqmlcomponent_beam_view;
+
+    static QQmlComponent* m_qqmlcomponent;
+    static QQmlComponent* m_qqmlcomponent_beam_view;
 
     QQmlContext* m_qqmlcontext;
 };

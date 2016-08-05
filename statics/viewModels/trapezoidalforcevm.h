@@ -30,7 +30,7 @@ private:
     WeakTrapezoidalForcePtr m_trapezoidalForce;
     Qt3DCore::QEntity* m_component3D;
     QUrl m_asset_tmp_copy;
-    static QSharedPointer<QQmlComponent> m_qqmlcomponent;
+    static QQmlComponent* m_qqmlcomponent;
     QQmlContext* m_qqmlcontext;
 };
 

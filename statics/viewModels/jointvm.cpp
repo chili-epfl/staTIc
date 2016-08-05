@@ -8,8 +8,8 @@
 #include <QQmlEngine>
 
 const QString classname4beamEntity="Beam4Joint";
-QSharedPointer<QQmlComponent> JointVM::m_qqmlcomponent=QSharedPointer<QQmlComponent>();
-QSharedPointer<QQmlComponent> JointVM::m_qqmlcomponent_beam_view=QSharedPointer<QQmlComponent>();
+QQmlComponent* JointVM::m_qqmlcomponent=NULL;
+QQmlComponent* JointVM::m_qqmlcomponent_beam_view=NULL;
 
 JointVM::JointVM(JointPtr joint,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     AbstractElementViewModel(sceneRoot,parent),
@@ -140,11 +140,16 @@ void JointVM::onSupportChanged(){
         m_component3D->setProperty("supportType",supportType);
     }
 }
+
+
 void JointVM::initView(){
     JointPtr joint_str_ref=m_joint.toStrongRef();
     if(m_component3D==Q_NULLPTR){
-        if(m_qqmlcomponent.isNull()){
-            m_qqmlcomponent=QSharedPointer<QQmlComponent>(new QQmlComponent(qmlEngine(m_sceneRoot),m_sceneRoot));
+        if(m_qqmlcomponent==NULL){
+            m_qqmlcomponent=new QQmlComponent(qmlEngine(m_sceneRoot),m_sceneRoot);
+            connect(m_qqmlcomponent,&QQmlComponent::destroyed,[]() {
+                JointVM::m_qqmlcomponent=NULL;
+              });
             m_qqmlcomponent->loadUrl(QUrl("qrc:/element_views/Element_Views/JointView.qml"));
         }
         m_qqmlcontext=new QQmlContext(qmlContext(m_sceneRoot));
@@ -166,8 +171,11 @@ void JointVM::initView(){
 void JointVM::createEntityForBeam(BeamPtr b){
     JointPtr joint_str_ref=m_joint.toStrongRef();
     Frame3DDVMManager* parent_vm_manager=static_cast<Frame3DDVMManager*>(parent());
-    if(m_qqmlcomponent_beam_view.isNull()){
-        m_qqmlcomponent_beam_view=QSharedPointer<QQmlComponent>(new QQmlComponent(qmlEngine(m_sceneRoot),m_sceneRoot));
+    if(m_qqmlcomponent_beam_view==NULL){
+        m_qqmlcomponent_beam_view=new QQmlComponent(qmlEngine(m_sceneRoot),m_sceneRoot);
+        connect(m_qqmlcomponent_beam_view,&QQmlComponent::destroyed,[=]() {
+            JointVM::m_qqmlcomponent_beam_view=NULL;
+          });
         m_qqmlcomponent_beam_view->loadUrl(QUrl("qrc:/element_views/Element_Views/BeamView4JointView.qml"));
 
     }

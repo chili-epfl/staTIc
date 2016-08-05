@@ -4,7 +4,7 @@
 #include <QQmlEngine>
 #include <Qt3DRender>
 
-QSharedPointer<QQmlComponent> TrapezoidalForceVM::m_qqmlcomponent=QSharedPointer<QQmlComponent>();
+QQmlComponent* TrapezoidalForceVM::m_qqmlcomponent=NULL;
 
 
 TrapezoidalForceVM::TrapezoidalForceVM(TrapezoidalForcePtr force, Qt3DCore::QEntity *sceneRoot, Qt3DCore::QEntity* parentEntity, QVariantHash properties, QObject *parent)
@@ -121,9 +121,12 @@ void TrapezoidalForceVM::onRelativePositionChanged()
 
 void TrapezoidalForceVM::initView(Qt3DCore::QEntity* parentEntity,QVariantHash properties)
 {
-    if(m_qqmlcomponent.isNull()){
-        m_qqmlcomponent=QSharedPointer<QQmlComponent>(new QQmlComponent(qmlEngine(parentEntity),parentEntity));
+    if(m_qqmlcomponent==NULL){
+        m_qqmlcomponent=new QQmlComponent(qmlEngine(parentEntity),parentEntity);
         m_qqmlcomponent->loadUrl(QUrl("qrc:/element_views/Element_Views/TrapezoidalForce.qml"));
+        connect(m_qqmlcomponent,&QQmlComponent::destroyed,[]() {
+            TrapezoidalForceVM::m_qqmlcomponent=NULL;
+          });
     }
     m_qqmlcontext=new QQmlContext(qmlContext(parentEntity));
     Qt3DCore::QEntity* forceView= qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent->beginCreate(m_qqmlcontext));
