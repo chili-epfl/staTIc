@@ -1,0 +1,491 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<!-- shadow-map-qml.qdoc -->
+  <title>Qt3D: Shadow Map QML Example | Qt3D Module 5.5</title>
+  <link rel="stylesheet" type="text/css" href="/style/online.css" />
+  <link rel="shortcut icon" href="//d3hp9ud7yvwzy0.cloudfront.net/wp-content/themes/oneqt/images/favicon.ico.gzip" />
+  <script type="text/javascript"> wpThemeFolder = 'http://qt.io/wp-content/themes/oneqt'; </script>
+  <script type="text/javascript" src="//d3hp9ud7yvwzy0.cloudfront.net/wp-content/themes/oneqt/js/combo.js.gzip"></script>
+  <script type="text/javascript" src="/scripts/main.js"></script>
+  <script type="text/javascript" src="/scripts/extras.js"></script>
+  <script type="text/javascript">
+  $(function(){
+     $("#footer").load("/style/qt-footer.html");
+     $("#sidebar-content").load("style/qt5-sidebar.html");
+  });
+  </script>
+  <script type="text/javascript">
+    (function (i, s, o, g, r, a, m) {
+      i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+        (i[r].q = i[r].q || []).push(arguments)
+        }, i[r].l = 1 * new Date(); a = s.createElement(o),
+        m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+    ga('create', 'UA-54043535-2', 'qt.io');
+    ga('set', 'forceSSL', true);
+    ga('send', 'pageview');
+  </script>
+</head>
+<body>
+<div class="header" id="header">
+<header id="navbar" class="">
+        <div class="cookies_yum">
+            <div>
+                <img src="//d3hp9ud7yvwzy0.cloudfront.net/wp-content/themes/oneqt/assets/images/cookie_small.png" align="left">
+                <p class="close_button">
+                    We bake cookies in your browser for a better experience.  Using this site means that you consent. <a href="//qt.io/terms-conditions/">Read More</a>
+                </p>
+                <a class="close"></a>
+            </div>
+        </div>
+        <div class="container">
+                <div class="navbar-header clearfix">
+                    <a href="#" class="navbar-toggle">
+                        <figure>
+                            <span class="line"></span>
+                        </figure>
+                        <span>Menu</span>
+                    </a>
+                    <ul id="menuextras">
+                        <li>
+                            <a href="//qt.io/partners/" data-icon="">
+                                <span>Partners</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a target="_blank" href="http://blog.qt.io/" data-icon="">
+                                <span>Blog</span>
+                            </a>
+                        </li>
+                        <li class="sign-in">
+                             <a data-icon="" class="signin" href="https://account.qt.io/login"><span>Sign in</span></a>
+                        </li>
+                    </ul>
+                    <a href="http://qt.io/" class="navbar-oneQt retina" data-icon="">
+                    </a>
+                    <nav class="navbar-menu clearfix" role="navigation">
+                        <ul id="mainmenu" class="menu"><li id="menu-item-18" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-18"><a href="http://qt.io/download/">Download</a></li>
+<li id="menu-item-12207" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-12207"><a href="http://www.qt.io/qt-for-device-creation/">Device Creation</a></li>
+<li id="menu-item-12208" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-12208"><a href="http://www.qt.io/application-development/">Application Development</a></li>
+<li id="menu-item-1381" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1381"><a href="http://www.qt.io/services/">Services</a></li>
+<li id="menu-item-20" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-20"><a href="http://www.qt.io/developers/">Developers</a></li>
+</ul>                        <ul class="menuextraslanguages">
+                            <li class="active dark"><a class="dark" href="http://qt.io/support/">EN</a></li><li class="dark"><a class="dark" href="http://qt.io/ru/">RU</a></li><li class="dark"><a class="dark" href="http://qt.io/zh-hans/">ZH</a></li></ul>
+                    </nav>
+                </div>
+            </div>
+<div class="big_bar account" style="">
+    <div class="container">
+        <h1><!-- mclude oneqt_no_cache_bMrsJxAh /wp-content/themes/oneqt/php_login_info_bottom_header.php --><!-- /mclude oneqt_no_cache_bMrsJxAh -->
+            <div class="col-1 right big_bar_button account" style="margin-top:5px !important;"></div>
+        </h1>
+    </div>
+</div>
+</header>
+</div>
+<div class="main">
+<div class="main-rounded">
+<div class="navigationbar">
+    <ul class="sub-navigation">
+        <li><a href="http://wiki.qt.io/">Wiki</a></li>
+        <li><a href="http://doc.qt.io/" class="active">Documentation</a></li>
+        <li><a href="http://forum.qt.io/">Forum</a></li>
+        <li><a href="https://bugreports.qt.io/">Bug Reports</a></li>
+        <li><a href="https://codereview.qt-project.org/">Code Review</a></li>
+    </ul>
+    <div id="main_title_bar">
+        <h1>Qt Documentation</h1>
+        <div class="search_bar">
+        <script>
+            (function() {
+                var cx = '003672281345882769388:1y4pftuq8so';
+                var gcse = document.createElement('script');
+                gcse.type = 'text/javascript';
+                gcse.async = true;
+                gcse.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//www.google.com/cse/cse.js?cx=' + cx;
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(gcse, s);
+            })();
+        </script>
+        <gcse:searchbox-only resultsUrl="search-results.html"></gcse:searchbox-only>
+    </div></div>
+    <ul>
+<li><a href="index.html">Qt 5.5</a></li>
+<li><a href="qt3d-index.html">Qt3D Module</a></li>
+<li>Qt3D: Shadow Map QML Example</li>
+    </ul>
+</div>
+<div class="content">
+    <div class="line">
+        <div class="content mainContent">
+<div class="sidebar">
+<div class="toc">
+<h3><a name="toc">Contents</a></h3>
+<ul>
+<li class="level1"><a href="#running-the-example">Running the Example</a></li>
+<li class="level1"><a href="#setting-up-the-scene">Setting Up the Scene</a></li>
+<li class="level1"><a href="#specifying-the-light">Specifying the Light</a></li>
+<li class="level1"><a href="#configuring-the-framegraph">Configuring the Framegraph</a></li>
+<li class="level1"><a href="#generating-the-shadow-map">Generating the Shadow Map</a></li>
+<li class="level1"><a href="#using-effects">Using Effects</a></li>
+<li class="level1"><a href="#rendering-using-phong-shading">Rendering Using Phong Shading</a></li>
+</ul>
+</div>
+<div class="sidebar-content" id="sidebar-content"></div></div>
+<div class="context">
+<h1 class="title">Qt3D: Shadow Map QML Example</h1>
+<span class="subtitle"></span>
+<!-- $$$shadow-map-qml-description -->
+<div class="descr"> <a name="details"></a>
+<p class="centerAlign"><img src="images/shadowmapping-qt3d.png" alt="" /></p><p><i>Qt3D Shadow Map</i> illustrates how to configure the renderer in order to accommodate custom rendering techniques. The example application displays a self-shadowed plane and trefoil knot.</p>
+<p>We implement <a href="qt3d-overview.html#shadow-mapping">shadow mapping</a> using a two pass rendering. In the first pass, we generate the shadow information. In the second pass, we generate the scene using the forward rendering technique with Phong shading, while at the same time using the information gathered in the first pass to draw the shadows.</p>
+<p>The entire rendering is configured using QML, but it is possible to use C++ to achieve the very same result.</p>
+<a name="running-the-example"></a>
+<h2 id="running-the-example">Running the Example</h2>
+<p>To run the example from <a href="http://doc.qt.io/qtcreator/index.html">Qt Creator</a>, open the <b>Welcome</b> mode and select the example from <b>Examples</b>. For more information, visit <a href="http://doc.qt.io/qtcreator/creator-build-example-application.html">Building and Running an Example</a>.</p>
+<a name="setting-up-the-scene"></a>
+<h2 id="setting-up-the-scene">Setting Up the Scene</h2>
+<p>We set up the entire scene in the <i>main.qml</i> file.</p>
+<p>To be able to use the types in the Q3D and Q3D Renderer modules, we must import the modules:</p>
+<pre class="qml">import Qt3D 2.0
+import Qt3D.Renderer 2.0</pre>
+<p>The first entities we create are a <a href="qml-qt3d-camera.html">Camera</a>, which represents the camera used for the final rendering, and a <a href="qml-qt3d-configuration.html">Configuration</a>, which allows us to control this camera using the keyboard or the mouse:</p>
+<pre class="qml"><span class="type"><a href="qml-qt3d-entity.html">Entity</a></span> {
+    <span class="name">id</span>: <span class="name">sceneRoot</span>
+
+    <span class="type"><a href="qml-qt3d-camera.html">Camera</a></span> {
+        <span class="name">id</span>: <span class="name">camera</span>
+        <span class="name">projectionType</span>: <span class="name">CameraLens</span>.<span class="name">PerspectiveProjection</span>
+        <span class="name">fieldOfView</span>: <span class="number">45</span>
+        <span class="name">aspectRatio</span>: <span class="name">_window</span>.<span class="name">width</span> <span class="operator">/</span> <span class="name">_window</span>.<span class="name">height</span>
+        <span class="name">nearPlane</span>: <span class="number">0.1</span>
+        <span class="name">farPlane</span>: <span class="number">1000.0</span>
+        <span class="name">position</span>: <span class="name">Qt</span>.<span class="name">vector3d</span>(<span class="number">0.0</span>, <span class="number">10.0</span>, <span class="number">20.0</span>)
+        <span class="name">viewCenter</span>: <span class="name">Qt</span>.<span class="name">vector3d</span>(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>)
+        <span class="name">upVector</span>: <span class="name">Qt</span>.<span class="name">vector3d</span>(<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>)
+    }
+
+    <span class="type"><a href="qml-qt3d-configuration.html">Configuration</a></span>  {
+        <span class="name">controlledCamera</span>: <span class="name">camera</span>
+    }</pre>
+<p>We then create a Light custom entity, which represents our light. It is a directional spotlight, placed somewhere above the plane and looking down at the scene’s origin:</p>
+<pre class="qml">    <span class="type">Light</span> {
+        <span class="name">id</span>: <span class="name">light</span>
+    }</pre>
+<p>This light entity is used by our custom framegraph, ShadowMapFrameGraph, and our rendering effect, AdsEffect, whose instances are created just after the light:</p>
+<pre class="qml">    <span class="name">components</span>: [
+        <span class="type">ShadowMapFrameGraph</span> {
+            <span class="name">id</span>: <span class="name">framegraph</span>
+            <span class="name">viewCamera</span>: <span class="name">camera</span>
+            <span class="name">lightCamera</span>: <span class="name">light</span>.<span class="name">lightCamera</span>
+        }
+    ]
+
+    <span class="type">AdsEffect</span> {
+        <span class="name">id</span>: <span class="name">shadowMapEffect</span>
+
+        <span class="name">shadowTexture</span>: <span class="name">framegraph</span>.<span class="name">shadowTexture</span>
+        <span class="name">light</span>: <span class="name">light</span>
+    }</pre>
+<p>Last, we create three entities for the meshes in the scene: a trefoil knot, a toy plane, and a ground plane. They aggregate a mesh, a transformation, and a material that uses the AdsEffect. The toy plane and the trefoil knot transformations are animated:</p>
+<pre class="qml">    <span class="comment">// Trefoil knot entity</span>
+    <span class="type">Trefoil</span> {
+        <span class="name">material</span>: <span class="name">AdsMaterial</span> {
+            <span class="name">effect</span>: <span class="name">shadowMapEffect</span>
+            <span class="name">specularColor</span>: <span class="name">Qt</span>.<span class="name">rgba</span>(<span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">0.5</span>, <span class="number">1.0</span>)
+        }
+    }
+
+    <span class="comment">// Toyplane entity</span>
+    <span class="type">Toyplane</span> {
+        <span class="name">material</span>: <span class="name">AdsMaterial</span> {
+            <span class="name">effect</span>: <span class="name">shadowMapEffect</span>
+            <span class="name">diffuseColor</span>: <span class="name">Qt</span>.<span class="name">rgba</span>(<span class="number">0.9</span>, <span class="number">0.5</span>, <span class="number">0.3</span>, <span class="number">1.0</span>)
+            <span class="name">shininess</span>: <span class="number">75</span>
+        }
+    }
+
+    <span class="comment">// Plane entity</span>
+    <span class="type">GroundPlane</span> {
+        <span class="name">material</span>: <span class="name">AdsMaterial</span> {
+            <span class="name">effect</span>: <span class="name">shadowMapEffect</span>
+            <span class="name">diffuseColor</span>: <span class="name">Qt</span>.<span class="name">rgba</span>(<span class="number">0.2</span>, <span class="number">0.5</span>, <span class="number">0.3</span>, <span class="number">1.0</span>)
+            <span class="name">specularColor</span>: <span class="name">Qt</span>.<span class="name">rgba</span>(<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>, <span class="number">1.0</span>)
+        }
+    }
+}</pre>
+<a name="specifying-the-light"></a>
+<h2 id="specifying-the-light">Specifying the Light</h2>
+<p>We specify the Light custom entity in <i>Light.qml</i>.</p>
+<p>Again, we import the necessary modules:</p>
+<pre class="qml">import Qt3D 2.0
+import Qt3D.Renderer 2.0</pre>
+<p>We then use an <a href="qml-qt3d-entity.html">Entity</a> type as the root element of the custom QML type. The light is a directional spotlight that exposes as properties a position, intensity, and a 4×4 transformation matrix:</p>
+<pre class="qml"><span class="type"><a href="qml-qt3d-entity.html">Entity</a></span> {
+    <span class="name">id</span>: <span class="name">root</span>
+
+    property <span class="type">vector3d</span> <span class="name">lightPosition</span>: <span class="name">Qt</span>.<span class="name">vector3d</span>(<span class="number">30.0</span>, <span class="number">30.0</span>, <span class="number">0.0</span>)
+    property <span class="type">vector3d</span> <span class="name">lightIntensity</span>: <span class="name">Qt</span>.<span class="name">vector3d</span>(<span class="number">1.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>)
+
+    readonly property <span class="type"><a href="qml-qt3d-camera.html">Camera</a></span> <span class="name">lightCamera</span>: <span class="name">lightCamera</span>
+    readonly property <span class="type">matrix4x4</span> <span class="name">lightViewProjection</span>: <span class="name">lightCamera</span>.<span class="name">projectionMatrix</span>.<span class="name">times</span>(<span class="name">lightCamera</span>.<span class="name">matrix</span>)</pre>
+<p>In the first rendering pass, we use the light as a camera, and therefore we use a <a href="qml-qt3d-camera.html">Camera</a> entity within the light and expose it as a property:</p>
+<pre class="qml">    <span class="type"><a href="qml-qt3d-camera.html">Camera</a></span> {
+        <span class="name">id</span>: <span class="name">lightCamera</span>
+        <span class="name">objectName</span>: <span class="string">&quot;lightCameraLens&quot;</span>
+        <span class="name">projectionType</span>: <span class="name">CameraLens</span>.<span class="name">PerspectiveProjection</span>
+        <span class="name">fieldOfView</span>: <span class="number">45</span>
+        <span class="name">aspectRatio</span>: <span class="number">1</span>
+        <span class="name">nearPlane</span> : <span class="number">0.1</span>
+        <span class="name">farPlane</span> : <span class="number">200.0</span>
+        <span class="name">position</span>: <span class="name">root</span>.<span class="name">lightPosition</span>
+        <span class="name">viewCenter</span>: <span class="name">Qt</span>.<span class="name">vector3d</span>(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">0.0</span>)
+        <span class="name">upVector</span>: <span class="name">Qt</span>.<span class="name">vector3d</span>(<span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">0.0</span>)
+    }
+}</pre>
+<a name="configuring-the-framegraph"></a>
+<h2 id="configuring-the-framegraph">Configuring the Framegraph</h2>
+<p>In Qt3D, the framegraph is the data-driven configuration for the rendering. We implement the framegraph in the <i>ShadowMapFrameGraph.qml</i> file.</p>
+<p>In addition to the Qt3D and Qt3D Renderer modules, we also import the Qt Quick module:</p>
+<pre class="qml">import Qt3D 2.0
+import Qt3D.Renderer 2.0
+import QtQuick 2.2 as QQ2</pre>
+<p>The code defines a <a href="qml-qt3d-renderer-framegraph.html">FrameGraph</a> entity that has a tree of entities as the active framegraph:</p>
+<pre class="qml"><span class="type"><a href="qml-qt3d-renderer-framegraph.html">FrameGraph</a></span> {
+    <span class="name">id</span>: <span class="name">root</span>
+
+    property <span class="type">alias</span> <span class="name">viewCamera</span>: <span class="name">viewCameraSelector</span>.<span class="name">camera</span>
+    property <span class="type">alias</span> <span class="name">lightCamera</span>: <span class="name">lightCameraSelector</span>.<span class="name">camera</span>
+    readonly property <span class="type">Texture2D</span> <span class="name">shadowTexture</span>: <span class="name">depthTexture</span>
+
+    <span class="name">activeFrameGraph</span>: <span class="name">Viewport</span> {
+        <span class="name">rect</span>: <span class="name">Qt</span>.<span class="name">rect</span>(<span class="number">0.0</span>, <span class="number">0.0</span>, <span class="number">1.0</span>, <span class="number">1.0</span>)
+        <span class="name">clearColor</span>: <span class="name">Qt</span>.<span class="name">rgba</span>(<span class="number">0.0</span>, <span class="number">0.4</span>, <span class="number">0.7</span>, <span class="number">1.0</span>)</pre>
+<p>Any path from the leaves of this tree to the root is a viable framegraph configuration. Filter entities can enable or disable such paths, and selector entities can alter the configuration.</p>
+<p>In our case, the tree looks like this:</p>
+<pre class="cpp">Viewport
+    RenderPassFilter
+        RenderTargetSelector
+            ClearBuffer
+                CameraSelector
+    RenderPassFilter
+        ClearBuffer
+            CameraSelector</pre>
+<p>So we have two paths from the topmost Viewport entity. Each path corresponds to a pass of the shadow map technique. The paths are enabled and disabled using a RenderPassFilter, an entity that can filter depending on arbitrary values defined in a given render pass. In this example, it is a string:</p>
+<pre class="qml">        <span class="type">RenderPassFilter</span> {
+            <span class="name">includes</span>: [ <span class="type"><a href="qml-qt3d-renderer-annotation.html">Annotation</a></span> { <span class="name">name</span>: <span class="string">&quot;pass&quot;</span>; <span class="name">value</span>: <span class="string">&quot;shadowmap&quot;</span> } ]</pre>
+<p>The actual passes are not defined here. The framegraph simply modifies its configuration when a given pass is rendered.</p>
+<a name="generating-the-shadow-map"></a>
+<h2 id="generating-the-shadow-map">Generating the Shadow Map</h2>
+<p>In the shadow map generation pass, we must render to an offscreen surface (Framebuffer Object) which has a depth texture attachment. In Qt3D, it is represented by the RenderTarget entity, which has a number of attachments.</p>
+<p>In this example, we need only a depth attachment. We define it as a RenderAttachment entity using the RenderAttachment.DepthAttachment <code>type</code> that stores the depth and a Texture2D entity that actually configures the exture storage used to store the depth information:</p>
+<pre class="qml">            <span class="type">RenderTargetSelector</span> {
+                <span class="name">target</span>: <span class="name">RenderTarget</span> {
+                    <span class="name">attachments</span>: [
+                        <span class="type">RenderAttachment</span> {
+                            <span class="name">name</span>: <span class="string">&quot;depth&quot;</span>
+                            <span class="name">type</span>: <span class="name">RenderAttachment</span>.<span class="name">DepthAttachment</span>
+                            <span class="name">texture</span>: <span class="name">Texture2D</span> {
+                                <span class="name">id</span>: <span class="name">depthTexture</span>
+                                <span class="name">width</span>: <span class="number">1024</span>
+                                <span class="name">height</span>: <span class="number">1024</span>
+                                <span class="name">format</span>: <span class="name">Texture</span>.<span class="name">DepthFormat</span>
+                                <span class="name">generateMipMaps</span>: <span class="number">false</span>
+                                <span class="name">magnificationFilter</span>: <span class="name">Texture</span>.<span class="name">Linear</span>
+                                <span class="name">minificationFilter</span>: <span class="name">Texture</span>.<span class="name">Linear</span>
+                                <span class="type">wrapMode</span> {
+                                    <span class="name">x</span>: <span class="name">WrapMode</span>.<span class="name">ClampToEdge</span>
+                                    <span class="name">y</span>: <span class="name">WrapMode</span>.<span class="name">ClampToEdge</span>
+                                }
+                                <span class="name">comparisonFunction</span>: <span class="name">Texture</span>.<span class="name">CompareLessEqual</span>
+                                <span class="name">comparisonMode</span>: <span class="name">Texture</span>.<span class="name">CompareRefToTexture</span>
+                            }
+                        }
+                    ]
+                }</pre>
+<p>Moreover, in this first pass, we must render using the light’s camera. Therefore, we have a CameraSelector entity that sets the camera to the one exported by the Light:</p>
+<pre class="qml">                    <span class="type">CameraSelector</span> {
+                        <span class="name">id</span>: <span class="name">lightCameraSelector</span>
+                    }</pre>
+<p>The second pass is more straightforward, because we simply render to the screen using the main camera.</p>
+<a name="using-effects"></a>
+<h2 id="using-effects">Using Effects</h2>
+<p>The bulk of the magic happens in the <i>AdsEffect.qml</i> file, where our main Effect entity is defined. It implements the Ambient, Diffuse and Specular (ADS) Lightning Model Phong shading with the addition of shadow mapped generated shadows.</p>
+<p>An effect contains the implementation of a particular rendering strategy. In this example, shadow mapping using two passes:</p>
+<pre class="qml"><span class="type">Effect</span> {
+    <span class="name">id</span>: <span class="name">root</span>
+
+    property <span class="type">Texture2D</span> <span class="name">shadowTexture</span>
+    property <span class="type">Light</span> <span class="name">light</span></pre>
+<p>The <code>parameters</code> list defines some default values for the effect. The values will get mapped to OpenGL shader program uniforms, so that in the shaders we can access them. In this example, we expose some information from the Light entity (position, intensity, view or projection matrix defined by the internal camera) and the shadow map texture exposed by the framegraph:</p>
+<pre class="qml">    <span class="name">parameters</span>: [
+        <span class="type">Parameter</span> { <span class="name">name</span>: <span class="string">&quot;lightViewProjection&quot;</span>; <span class="name">value</span>: <span class="name">root</span>.<span class="name">light</span>.<span class="name">lightViewProjection</span> },
+        <span class="type">Parameter</span> { <span class="name">name</span>: <span class="string">&quot;lightPosition&quot;</span>;  <span class="name">value</span>: <span class="name">root</span>.<span class="name">light</span>.<span class="name">lightPosition</span> },
+        <span class="type">Parameter</span> { <span class="name">name</span>: <span class="string">&quot;lightIntensity&quot;</span>; <span class="name">value</span>: <span class="name">root</span>.<span class="name">light</span>.<span class="name">lightIntensity</span> },
+
+        <span class="type">Parameter</span> { <span class="name">name</span>: <span class="string">&quot;shadowMapTexture&quot;</span>; <span class="name">value</span>: <span class="name">root</span>.<span class="name">shadowTexture</span> }
+    ]</pre>
+<p>It is possible to put such parameters all the way down, from a Material, to its Effect, to one of the effect’s Techniques. This allows a Material instance to override defaults in an Effect or Technique. The bindings array provides the same thing, except that it also allows us to rename some parameters. In this example, it renames the <code>ambient</code>, <code>diffuse</code>, and <code>specular</code> values defined in the material to the actual uniform names used by the shader programs:</p>
+<pre class="qml">                    <span class="name">bindings</span>: [
+                        <span class="comment">// Uniforms (those provided by the user)</span>
+                        <span class="type"><a href="qml-qt3d-renderer-parametermapping.html">ParameterMapping</a></span> { <span class="name">parameterName</span>: <span class="string">&quot;ambient&quot;</span>;  <span class="name">shaderVariableName</span>: <span class="string">&quot;ka&quot;</span>; <span class="name">bindingType</span>: <span class="name">ParameterMapping</span>.<span class="name">Uniform</span> },
+                        <span class="type"><a href="qml-qt3d-renderer-parametermapping.html">ParameterMapping</a></span> { <span class="name">parameterName</span>: <span class="string">&quot;diffuse&quot;</span>;  <span class="name">shaderVariableName</span>: <span class="string">&quot;kd&quot;</span>; <span class="name">bindingType</span>: <span class="name">ParameterMapping</span>.<span class="name">Uniform</span> },
+                        <span class="type"><a href="qml-qt3d-renderer-parametermapping.html">ParameterMapping</a></span> { <span class="name">parameterName</span>: <span class="string">&quot;specular&quot;</span>; <span class="name">shaderVariableName</span>: <span class="string">&quot;ks&quot;</span>; <span class="name">bindingType</span>: <span class="name">ParameterMapping</span>.<span class="name">Uniform</span> }
+                    ]</pre>
+<p>To adapt the implementation to different hardware or OpenGL versions, we could use one or more Technique elements. In this example, only one technique is provided, targeting OpenGL 3.2 Core, or later:</p>
+<pre class="qml">    <span class="name">techniques</span>: [
+        <span class="type">Technique</span> {
+            <span class="type">openGLFilter</span> {
+                <span class="name">api</span>: <span class="name">OpenGLFilter</span>.<span class="name">Desktop</span>
+                <span class="name">profile</span>: <span class="name">OpenGLFilter</span>.<span class="name">Core</span>
+                <span class="name">majorVersion</span>: <span class="number">3</span>
+                <span class="name">minorVersion</span>: <span class="number">2</span>
+            }</pre>
+<p>Inside the technique, we finally have the definition of our two rendering passes. We <i>tag</i> each pass with an <a href="qml-qt3d-renderer-annotation.html">Annotation</a> entity, matching the ones we specified in the framegraph configuration, so that each pass will have different rendering settings:</p>
+<pre class="qml">            <span class="name">renderPasses</span>: [
+                <span class="type">RenderPass</span> {
+                    <span class="name">annotations</span>: [ <span class="type"><a href="qml-qt3d-renderer-annotation.html">Annotation</a></span> { <span class="name">name</span>: <span class="string">&quot;pass&quot;</span>; <span class="name">value</span>: <span class="string">&quot;shadowmap&quot;</span> } ]</pre>
+<p>The first pass is the shadow map generation. We load a suitable set of GLSL shaders, which are actually extremely simple. They do only MVP (Model, View, Projection) to bring meshes from their model space into clip space (and, remember, in this first pass, the light is the camera). The fragment shader is totally empty, because there is no color to be generated, and the depth will be automatically captured for us by OpenGL:</p>
+<pre class="qml">                    <span class="name">shaderProgram</span>: <span class="name">ShaderProgram</span> {
+                        <span class="name">vertexShaderCode</span>:   <span class="name">loadSource</span>(<span class="string">&quot;qrc:/shaders/shadowmap.vert&quot;</span>)
+                        <span class="name">fragmentShaderCode</span>: <span class="name">loadSource</span>(<span class="string">&quot;qrc:/shaders/shadowmap.frag&quot;</span>)
+                    }</pre>
+<p>In this first pass, we also set some custom OpenGL state in the form of a polygon offset and depth testing mode:</p>
+<pre class="qml">                    <span class="name">renderStates</span>: [
+                        <span class="type">PolygonOffset</span> { <span class="name">factor</span>: <span class="number">4</span>; <span class="name">units</span>: <span class="number">4</span> },
+                        <span class="type">DepthTest</span> { <span class="name">func</span>: <span class="name">DepthTest</span>.<span class="name">Less</span> }
+                    ]</pre>
+<a name="rendering-using-phong-shading"></a>
+<h2 id="rendering-using-phong-shading">Rendering Using Phong Shading</h2>
+<p>The second pass is a normal forward rendering using Phong shading. The code in the effect entity is extremely simple. We simply configure some parameters and load a pair of shaders which will be used when drawing.</p>
+<p>The first part of the shadow mapping happens in the vertex shader defined in <i>ads.vert</i> file, where we output towards the fragment shader the coordinates of each vertex in light space:</p>
+<pre class="qml">    positionInLightSpace = shadowMatrix * lightViewProjection * modelMatrix * vec4(vertexPosition, 1.0);</pre>
+<p>Actually, the coordinates get adjusted a little to allow us to easily sample the shadow map texture.</p>
+<p>The second part happens in the fragment shader defined in the <i>ads.frag</i> file, where we sample the shadow map. If the currently processed fragment is behind the one closest to the light, then the current fragment is in shadow (and only gets ambient contribution). Otherwise, it gets full Phong shading:</p>
+<pre class="qml">void main()
+{
+    float shadowMapSample = textureProj(shadowMapTexture, positionInLightSpace);
+
+    vec3 ambient = lightIntensity * ka;
+
+    vec3 result = ambient;
+    if (shadowMapSample &gt; 0)
+        result += dsModel(position, normalize(normal));
+
+    fragColor = vec4(result, 1.0);
+}</pre>
+<p>Files:</p>
+<ul>
+<li><a href="qt3drenderer-shadow-map-qml-adseffect-qml.html">shadow-map-qml/AdsEffect.qml</a></li>
+<li><a href="qt3drenderer-shadow-map-qml-adsmaterial-qml.html">shadow-map-qml/AdsMaterial.qml</a></li>
+<li><a href="qt3drenderer-shadow-map-qml-groundplane-qml.html">shadow-map-qml/GroundPlane.qml</a></li>
+<li><a href="qt3drenderer-shadow-map-qml-light-qml.html">shadow-map-qml/Light.qml</a></li>
+<li><a href="qt3drenderer-shadow-map-qml-shadowmapframegraph-qml.html">shadow-map-qml/ShadowMapFrameGraph.qml</a></li>
+<li><a href="qt3drenderer-shadow-map-qml-toyplane-qml.html">shadow-map-qml/Toyplane.qml</a></li>
+<li><a href="qt3drenderer-shadow-map-qml-trefoil-qml.html">shadow-map-qml/Trefoil.qml</a></li>
+<li><a href="qt3drenderer-shadow-map-qml-main-qml.html">shadow-map-qml/main.qml</a></li>
+<li><a href="qt3drenderer-shadow-map-qml-shaders-ads-vert.html">shadow-map-qml/shaders/ads.vert</a></li>
+<li><a href="qt3drenderer-shadow-map-qml-shaders-shadowmap-vert.html">shadow-map-qml/shaders/shadowmap.vert</a></li>
+<li><a href="qt3drenderer-shadow-map-qml-shaders-es3-ads-vert.html">shadow-map-qml/shaders/es3/ads.vert</a></li>
+<li><a href="qt3drenderer-shadow-map-qml-shaders-es3-shadowmap-vert.html">shadow-map-qml/shaders/es3/shadowmap.vert</a></li>
+<li><a href="qt3drenderer-shadow-map-qml-main-cpp.html">shadow-map-qml/main.cpp</a></li>
+<li><a href="qt3drenderer-shadow-map-qml-shadow-map-qml-pro.html">shadow-map-qml/shadow-map-qml.pro</a></li>
+<li><a href="qt3drenderer-shadow-map-qml-shadow-map-qml-qrc.html">shadow-map-qml/shadow-map-qml.qrc</a></li>
+</ul>
+</div>
+<!-- @@@shadow-map-qml -->
+   </div>
+   <p class="copy-notice">
+   <acronym title="Copyright">&copy;</acronym> 2015 The Qt Company Ltd.
+   Documentation contributions included herein are the copyrights of
+   their respective owners.     The documentation provided herein is licensed under the terms of the    <a href="http://www.gnu.org/licenses/fdl.html">GNU Free Documentation    License version 1.3</a> as published by the Free Software Foundation.     Qt and respective logos are trademarks of The Qt Company Ltd.     in Finland and/or other countries worldwide. All other trademarks are property
+   of their respective owners. </p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="footer">
+<footer id="footerbar">
+    <div class="footer-main">
+            <div class="container clearfix">
+                <nav class="footer-nav clearfix">
+                    <div class="menu-footer-menu-container"><ul id="menu-footer-menu" class="menu"><li id="menu-item-1403" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-1403"><a href="http://qt.io/download/">Download</a>
+<ul class="sub-menu">
+    <li id="menu-item-11677" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-11677"><a href="http://qt.io/download/">Start for Free</a></li>
+    <li id="menu-item-15840" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15840"><a href="http://qt.io/download-eval-for-applications-step-2/">Qt for Application Development</a></li>
+    <li id="menu-item-15841" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15841"><a href="http://qt.io/request-eval-for-devices-step-2/">Qt for Device Creation</a></li>
+    <li id="menu-item-15838" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15838"><a href="http://qt.io/download-open-source/">Qt Open Source</a></li>
+    <li id="menu-item-1415" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1415"><a href="http://qt.io/terms-conditions/">Terms &amp; Conditions</a></li>
+    <li id="menu-item-14184" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-14184"><a href="http://qt.io/FAQ/">Licensing FAQ</a></li>
+</ul>
+</li>
+<li id="menu-item-1355" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-1355"><a href="http://qt.io/product/">Product</a>
+<ul class="sub-menu">
+    <li id="menu-item-12576" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-12576"><a href="http://qt.io/product/">Qt in Use</a></li>
+    <li id="menu-item-15848" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15848"><a href="http://qt.io/application-development/">Qt for Application Development</a></li>
+    <li id="menu-item-1357" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1357"><a href="http://qt.io/qt-for-device-creation/">Qt for Device Creation</a></li>
+    <li id="menu-item-1356" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1356"><a href="http://qt.io/qt-features/">Commercial Features</a></li>
+    <li id="menu-item-15850" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15850"><a href="http://qt.io/ide/">Qt Creator IDE</a></li>
+    <li id="menu-item-1359" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1359"><a href="http://qt.io/qt-quick/">Qt Quick</a></li>
+</ul>
+</li>
+<li id="menu-item-1347" class="menu-item menu-item-type-post_type menu-item-object-page current-menu-ancestor current-menu-parent current_page_parent current_page_ancestor menu-item-has-children menu-item-1347"><a href="http://qt.io/services/">Services</a>
+<ul class="sub-menu">
+    <li id="menu-item-4028" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4028"><a href="http://qt.io/services-technology-evaluation/">Technology Evaluation</a></li>
+    <li id="menu-item-4027" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4027"><a href="http://qt.io/services-proof-of-concept/">Proof of Concept</a></li>
+    <li id="menu-item-4026" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4026"><a href="http://qt.io/services-design-implementation/">Design &amp; Implementation</a></li>
+    <li id="menu-item-4025" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-4025"><a href="http://qt.io/services-productization/">Productization</a></li>
+    <li id="menu-item-15863" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15863"><a href="http://qt.io/qt-training/">Qt Training</a></li>
+    <li id="menu-item-4779" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4779"><a href="https://qt.io/partners/">Partner Network</a></li>
+</ul>
+</li>
+<li id="menu-item-33" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-33"><a href="http://qt.io/developers/">Developers</a>
+<ul class="sub-menu">
+    <li id="menu-item-1365" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1365"><a href="http://doc.qt.io/">Documentation</a></li>
+    <li id="menu-item-1364" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1364"><a href="http://doc.qt.io/qt-5/qtexamplesandtutorials.html">Examples &amp; Tutorials</a></li>
+    <li id="menu-item-1363" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1363"><a href="http://doc.qt.io/qt-5/topics-app-development.html">Development Tools</a></li>
+    <li id="menu-item-1361" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1361"><a href="http://wiki.qt.io/">Wiki</a></li>
+    <li id="menu-item-1360" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1360"><a href="http://forum.qt.io/">Forums</a></li>
+    <li id="menu-item-15922" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-15922"><a href="http://wiki.qt.io/contribute">Contribute to Qt</a></li>
+</ul>
+</li>
+<li id="menu-item-1350" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-has-children menu-item-1350"><a href="http://qt.io/about-us/">About us</a>
+<ul class="sub-menu">
+    <li id="menu-item-1353" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1353"><a href="http://qt.io/events/">Training &amp; Events</a></li>
+    <li id="menu-item-1354" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1354"><a href="http://qt.io/resource-center/">Resource Center</a></li>
+    <li id="menu-item-12285" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-12285"><a href="http://qt.io/news/">News</a></li>
+    <li id="menu-item-1349" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1349"><a href="http://qt.io/careers/">Careers</a></li>
+    <li id="menu-item-11676" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-11676"><a href="http://qt.io/locations/">Locations</a></li>
+    <li id="menu-item-15911" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-15911"><a href="http://qt.io/contact-us">Contact Us</a></li>
+</ul>
+</li>
+</ul></div></nav>
+<a href="http://qt.io/about-us/" target="_blank" class="theqtcompany"></a>
+    <div class="footer-social clearfix">
+        <div class="facebook">
+            <iframe scrolling="no" frameborder="0" allowTransparency="true" src="http://www.facebook.com/plugins/like.php?href=https%3A%2F%2Fwww.facebook.com%2Fqt&amp;width&amp;layout=button_count&amp;action=like&amp;show_faces=true&amp;share=false&amp;height=21" style="border:none;overflow:hidden;height:21px;"></iframe>
+        </div>
+        <div class="twitter">
+            <iframe id="twitter-widget-0" scrolling="no" frameborder="0" allowtransparency="true" src="http://platform.twitter.com/widgets/follow_button.33b190ea0cba008796487b65df7f6d8e.en.html#_=1414403615717&amp;id=twitter-widget-0&amp;lang=en&amp;screen_name=qtproject&amp;show_count=true&amp;show_screen_name=false&amp;size=m" class="twitter-follow-button twitter-follow-button" title="Twitter Follow Button" data-twttr-rendered="true" style="width: 160px; height: 20px;"></iframe>
+        </div>
+    </div>
+</div>
+</div>
+<div class="disclaimer">
+<div class="container clearfix no_discs">
+    <ul id="menu-footer-submenu" class="right clearfix"><li id="menu-item-1795" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-1795"><a title="Sign into your account." href="https://account.qt.io/login">Sign In</a></li>
+      <li id="menu-item-10375" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-10375"><a href="mailto:feedback@theqtcompany.com?Subject=Feedback%20about%20doc.qt.io%20site">Feedback</a></li>
+      <li id="menu-item-1494" class="menu-item menu-item-type-post_type menu-item-object-page menu-item-1494"><a href="http://qt.io/contact-us/">Contact us</a></li>
+      <li id="menu-item-4472" class="menu-item menu-item-type-custom menu-item-object-custom menu-item-4472"><a href="http://qt.io/about-us/">© 2015 The Qt Company</a></li>
+    </ul>
+</div>
+</div>
+</footer>
+</div>
+</body>
+</html>
