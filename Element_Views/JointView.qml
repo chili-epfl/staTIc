@@ -138,6 +138,7 @@ Entity{
 
 
     Entity{
+        enabled: reactionMagnitude > 0.01
         AnimationUnitDx{
             unitId: 0
             unitMesh: joint_commons.tiny_arrow_mesh
