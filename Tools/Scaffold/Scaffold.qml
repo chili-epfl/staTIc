@@ -42,7 +42,7 @@ Entity {
                 id:inv_rotation1
                 QQ2.Binding on rotation{
                     when:extreme1_tag.objectIsVisible
-                    value:quaternion_helper.invert(structureLoaderTransform.rotation)
+                    value:structureLoaderTransform.inv_rotation
 
                 }
             }
@@ -87,7 +87,7 @@ Entity {
                 id:inv_rotation2
                 QQ2.Binding on rotation{
                     when:extreme2_tag.objectIsVisible
-                    value:quaternion_helper.invert(structureLoaderTransform.rotation)
+                    value:structureLoaderTransform.inv_rotation
 
                 }
             }
