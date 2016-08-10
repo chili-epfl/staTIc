@@ -8,7 +8,6 @@ import QuaternionHelper 1.0
 import Qt3D.Core 2.0 as Q3D
 import Frame3DDKernel 1.0
 import Frame3DDVMManager 1.0
-
 import "qrc:/ui/UI/"
 import "qrc:/"
 import Warehouse3D 1.0
@@ -17,6 +16,10 @@ Item{
     id: applicationRoot
     anchors.fill: parent
     signal pageExit();
+    onPageExit: {
+        logger.log("exit_default_script");
+        logger.close_logger();
+    }
 
     property alias currentViewFilter: viewFilterBar.selection
     property alias materialsManager: staticsmodule.materialsManager
@@ -35,6 +38,7 @@ Item{
 
     property bool firstInit : true
     property bool stateLock: false
+
 
     QuaternionHelper{
         id:quaternion_helper
@@ -187,7 +191,6 @@ Item{
                     show_info_box: true
                     load_is_selectable:false
                     visible_loader:"JOINT"
-
                 }
             },
             State {
@@ -224,6 +227,7 @@ Item{
             loadingAnimation.visible=false;
             loadingAnimation.enabled=false;
             firstInit=false;
+            logger.log("Start_default_script",{"structureUrl":structureUrl})
         }
         running: false;
         interval: 2000
@@ -293,8 +297,11 @@ Item{
                 suggestion_box.text="The structure is unstable. Check the supports"
             }
         }
-    }
+        onUpdated: {
+            logger.log("Static_module_update",{"stability":stability})
+        }
 
+    }
 
     Frame3DDVMManager{
             id:vmFrame3DDManager
@@ -316,9 +323,12 @@ Item{
          }
          imageProcessing.whiteBalanceMode: CameraImageProcessing.WhiteBalanceAuto
          focus.focusMode: CameraFocus.FocusContinuous
-         focus.focusPointMode: CameraFocus.FocusPointAuto
          captureMode: Camera.CaptureViewfinder
-         exposure.exposureMode: CameraExposure.ExposureSports
+         exposure.exposureMode: CameraExposure.ExposureModeVendor
+         exposure.meteringMode: CameraExposure.MeteringMatrix
+         imageProcessing.colorFilter: CameraImageProcessing.ColorFilterVendor
+         imageProcessing.denoisingLevel: 1
+         imageProcessing.sharpeningLevel: 1
          //exposure.exposureCompensation:-0.5
          imageCapture {
              onImageCaptured: {
@@ -336,12 +346,19 @@ Item{
             }
          }
      }
-     Timer{
-         running: true
-         interval: 10000
-         onTriggered: {camDevice.unlock();camDevice.searchAndLock()}
-         repeat: true
-     }
+
+//     Timer{
+//         running: true
+//         interval: 1000
+//         onTriggered: {
+//             if( gyro.reading.x>1.0){
+//                 console.log("di")
+//                 camDevice.unlock();
+//                 camDevice.searchAndLock()
+//             }
+//         }
+//         repeat: true
+//     }
      Image {
          id: stillImage
          visible: camDevice.isRunning && camDevice.cameraStatus==Camera.ActiveStatus ? false:true
@@ -494,7 +511,10 @@ Item{
                             "qrc:/icons/Icons/AR_OFF.png"
                     MouseArea{
                         anchors.fill: parent
-                        onClicked: camDevice.isRunning = !camDevice.isRunning
+                        onClicked: {
+                            camDevice.isRunning = !camDevice.isRunning
+                            logger.log("AR_Button_Click",{"running":camDevice.isRunning})
+                        }
                     }
                 }
 
@@ -532,8 +552,7 @@ Item{
                             if(settings.show_displacement && settings.show_stress)
                                 settings.show_displacement=false;
                             settings.blink_stress=0;
-
-
+                            logger.log("Show_Stress_Click",{"visible":settings.show_stress})
                         }
                     }
                     Rectangle{
@@ -580,7 +599,7 @@ Item{
                                 exagerate_disp_slider.visible=true
                             else
                                 exagerate_disp_slider.visible=false
-
+                            logger.log("Show_Displacement_Click",{"visible":settings.show_displacement,"exagerate":exagerate_disp_slider.value})
                         }
                         hoverEnabled: true
                         onHoveredChanged:if(settings.show_displacement)
@@ -621,6 +640,9 @@ Item{
                         minimumValue: 0
                         maximumValue: 4
                         value: 0
+                        onValueChanged: {
+                            logger.log("Show_Displacement_Click",{"visible":settings.show_displacement,"exagerate":exagerate_disp_slider.value})
+                        }
                         Binding{
                             target:settings
                             property: "exagerate_displacement_factor"
@@ -684,6 +706,9 @@ Item{
                     minimumValue: 100
                     maximumValue: 3000
                     tickmarksEnabled: true
+                    onValueChanged: {
+                        logger.log("Change_Clipping_Plane",{"value":clippingPlaneSlider.value})
+                    }
                 }
 
                 Rectangle{
@@ -710,11 +735,11 @@ Item{
              }
          }
      }
+
      ARToolkit{
         id:marker_detector
         labelingThreshold: labeling_threshold_slider.value
         matrixCode: ARToolkit.MATRIX_CODE_4x4_BCH_13_9_3
-        onProjectionMatrixChanged: console.log(projectionMatrix)
         defaultMarkerSize: 50
         Component.onCompleted: {
             loadSingleMarkersConfigFile("qrc:/AR/single_markers.json")
@@ -726,11 +751,12 @@ Item{
         objectId: "default"
         Q3D.QuaternionAnimation on rotation{
             type: Q3D.QuaternionAnimation.Nlerp
+        }       
 
-        }
         Component.onCompleted: {
             marker_detector.registerObserver(structure_tag)
         }
+
      }
 
 

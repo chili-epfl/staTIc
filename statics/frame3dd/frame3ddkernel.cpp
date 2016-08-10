@@ -9,7 +9,7 @@
 #include "../elements/trapezoidalforce.h"
 
 #include <QDebug>
-
+#include <QtConcurrent>
 //#include <math.h>
 //#include <stdio.h>
 //#include <stdlib.h>
@@ -1900,6 +1900,7 @@ void Frame3DDKernel::update_statics(
         qDebug("    Check that all six rigid-body translations are restrained\n");
         qDebug("    If geometric stiffness is included, reduce the loads.\n");
         emit updated();
+        QtConcurrent::run(this,&Frame3DDKernel::log);
         return;
     }
     setStability(DETERMINATE);
@@ -1993,6 +1994,7 @@ void Frame3DDKernel::update_statics(
     emit minForceChanged();
     m_relative_equilibrium_error=err;
     emit updated();
+    QtConcurrent::run(this,&Frame3DDKernel::log);
     return;
 }
 
@@ -2212,6 +2214,14 @@ bool Frame3DDKernel::unifyBeam(BeamPtr beam){
     return false;
 }
 
+void Frame3DDKernel::setGravity(QVector3D v)
+{
+    if(v!=m_gravity){
+        m_gravity=v;
+        emit gravityChanged();
+    }
+}
+
 void Frame3DDKernel::unifyBeam_recursive_step(BeamPtr beam){
     if(!beam.isNull()){
         WeakJointPtr e1,e2,e_mid;
@@ -2361,6 +2371,79 @@ void Frame3DDKernel::removeUDLoad(UniformlyDistributedLoadPtr item){
     update();
 }
 
+void Frame3DDKernel::log(){
+    QVariantMap logger_map;
+    logger_map["status"]=m_stability;
+    logger_map["gravity"]="("+QString::number(m_gravity.x())+","+QString::number(m_gravity.y())+
+            ","+QString::number(m_gravity.z())+")";
+    logger_map["n_joints"]=m_joints.size();
+    logger_map["n_beams"]=m_beams.size();
+    logger_map["n_loads"]=m_trapezoidal_loads.size();
 
+    QVariantList element_list;
+    QVariantMap element;
+    Q_FOREACH (JointPtr j,m_joints){
+        element.clear();
+        element["Name"]=j->objectName();
+        element["Position"]="("+QString::number(j->position().x())+","+QString::number(j->position().y())+
+                ","+QString::number(j->position().z())+")";
+        bool X,Y,Z,XX,YY,ZZ;
+        j->support(X,Y,Z,XX,YY,ZZ);
+        element["Support"]="("+QString::number(X)+","+QString::number(Y)+","+QString::number(Z)
+                +","+QString::number(XX)+","+QString::number(YY)+","+QString::number(ZZ)+")";
+        element["Displacement"]="("+QString::number(j->displacement().x())+","+QString::number(j->displacement().y())+
+                ","+QString::number(j->displacement().z())+")";
+        element_list.append(element);
+    }
+    logger_map["joints"]=element_list;
+
+    element_list.clear();
+    Q_FOREACH(BeamPtr b, m_beams){
+        element.clear();
+        element["Name"]=b->objectName();
+        element["Enabled"]=b->enable();
+        WeakJointPtr e1,e2;
+        b->extremes(e1,e2);
+        element["Extreme_1"]=e1.toStrongRef()->objectName();
+        element["Extreme_2"]=e2.toStrongRef()->objectName();
+        element["MaterialID"]=b->materialID();
+        element["Size"]="("+QString::number(b->size().width())+","+QString::number(b->size().height())+")";
+        int force_type;
+        qreal dummy;
+        b->ForcesAndMoments(force_type,dummy,dummy,dummy,
+                            dummy,dummy,dummy,1);
+        element["Axial_force_type_extreme_1"]=QString::number(force_type);
+        b->ForcesAndMoments(force_type,dummy,dummy,dummy,
+                            dummy,dummy,dummy,2);
+        element["Axial_force_type_extreme_2"]=QString::number(force_type);
+
+        qreal stress_axial,stress_shear;
+        b->stressRatio(stress_axial,stress_shear,3);
+        element["Stress_ratio_axial"]=QString::number(stress_axial);
+        element["Stress_ratio_shear"]=QString::number(stress_shear);
+        element_list.append(element);
+
+    }
+    logger_map["beams"]=element_list;
+
+    element_list.clear();
+    Q_FOREACH(TrapezoidalForcePtr l, m_trapezoidal_loads){
+        element.clear();
+        element["Beam"]=l->beam().toStrongRef()->objectName();
+        QVector3D pos;
+        QVector2D ext;
+        l->relativePosition(pos,ext);
+        element["Relative_position"]="("+QString::number(pos.x())+","+QString::number(pos.y())+
+                ","+QString::number(pos.z())+")";
+        element["Extent"]="("+QString::number(ext.x())+","+QString::number(ext.y())+")";
+        element["Force"]="("+QString::number(l->force().x())+","+QString::number(l->force().y())+
+                ","+QString::number(l->force().z())+")";
+        element_list.append(element);
+    }
+    logger_map["loads"]=element_list;
+
+    m_logger.log_static_configuration(logger_map);
+
+}
 
 

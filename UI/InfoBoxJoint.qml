@@ -35,18 +35,24 @@ Rectangle {
                                           })
             }
             updateSumOfForces()
+            logger.log("infobox_joint_item_changed",{"item":current_item.objectName})
         }
     }
     function updateSumOfForces(){
         var sum=Qt.vector3d(0,0,0)
         var max=computeMaxForce(0);
+        var logging_fields={};
         for(var i=0;i<current_item.connected_beams.length;i++){
             sum=sum.plus(forceListModel.get(i).beam.globalForceExtreme1.times(forceListModel.get(i).isAdded))
+            logging_fields[forceListModel.get(i).beam.objectName]=forceListModel.get(i).isAdded;
         };
         if(hasReaction){
             sum=sum.plus(forceListModel.get(current_item.connected_beams.length).joint.reaction.times(forceListModel.get(current_item.connected_beams.length).isAdded));
             max=max.length() > max.plus(forceListModel.get(current_item.connected_beams.length).joint.reaction).length() ?
                         max:max.plus(forceListModel.get(current_item.connected_beams.length).joint.reaction)
+
+            logging_fields[forceListModel.get(current_item.connected_beams.length).joint.objectName]=forceListModel.get(current_item.connected_beams.length).isAdded;
+
         }
         infoboxScene3D.currentForce=sum
         infoboxScene3D.maxForce=max;
@@ -122,37 +128,12 @@ Rectangle {
                 MouseArea{
                     id:mouseArea
                     anchors.fill: parent
-                    onPressed: infoboxScene3D.resetCamera()
+                    onPressed: {
+                        infoboxScene3D.resetCamera()
+                        logger.log("infobox_joint_reset_camera")
+                    }
                 }
             }
-
-            /*Switch {
-                id:controlSwitch
-                anchors.margins: 30
-                anchors.bottom: parent.bottom
-                anchors.horizontalCenter:  parent.horizontalCenter
-                height: 35
-            }
-            Image {
-                id: moveIcon
-                source: "qrc:/icons/Icons/move.png"
-                width: 35
-                height: 35
-                anchors.rightMargin:  10
-                anchors.margins: 30
-                anchors.bottom: parent.bottom
-                anchors.right: controlSwitch.left
-            }
-            Image {
-                id: panIcon
-                source: "qrc:/icons/Icons/pan.png"
-                width: 35
-                height: 35
-                anchors.margins: 30
-                anchors.leftMargin: 10
-                anchors.bottom: parent.bottom
-                anchors.left: controlSwitch.right
-            }*/
         }
 
 
@@ -196,8 +177,17 @@ Rectangle {
                         onForceVectorDelChanged: updateSumOfForces()
                         onCheckedChanged:
                         {
-                           forceListModel.setProperty(index, "isAdded", checked)
-                           updateSumOfForces()
+                            forceListModel.setProperty(index, "isAdded", checked)
+                            updateSumOfForces()
+                            var logging_fields={};
+                            for(var i=0;i<current_item.connected_beams.length;i++){
+                                logging_fields[forceListModel.get(i).beam.objectName]=forceListModel.get(i).isAdded;
+                            };
+                            if(hasReaction){
+                                logging_fields[forceListModel.get(current_item.connected_beams.length).joint.objectName]=forceListModel.get(current_item.connected_beams.length).isAdded;
+                            }
+                           logger.log("infobox_joint_change_force_list",logging_fields);
+
                         }
                     }
                 }

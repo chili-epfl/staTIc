@@ -6,7 +6,7 @@ Rectangle {
     id:root
     property var current_item:0;
     property alias lateral_visibility:hideButton.state
-
+    onLateral_visibilityChanged: logger.log("infobox_change_lateral_visibility",{"visibility":lateral_visibility})
     property alias custom_loader: custom_loader
     property alias loader_beam: loader_beam
     property alias loader_designer: loader_designer
@@ -16,6 +16,9 @@ Rectangle {
     color:"transparent"
     radius:5
     visible: settings.show_info_box
+    onVisibleChanged: {
+            logger.log("infobox_change_visibility",{"visible":visible,"visible_loader":settings.visible_loader})
+    }
 
     Rectangle{
         //close button
@@ -63,6 +66,7 @@ Rectangle {
                     target:root
                     anchors.leftMargin: hideLabel.height*2
                 }
+
             },
             State {
                 name: "Visible"
@@ -80,6 +84,7 @@ Rectangle {
                     target:root
                     anchors.margins: 10
                 }
+
             }
         ]
         transitions: Transition {
@@ -102,28 +107,15 @@ Rectangle {
         }
     }
 
-
-//    Rectangle{
-//        anchors.centerIn: parent
-//        width: busyIndicator.width*1.2
-//        height: width
-//        radius: width/2
-//        color: "#F8F8F8"
-//        visible: loader.status!=Loader.Ready
-//        BusyIndicator {
-//            id:busyIndicator
-//            anchors.centerIn: parent
-//            running: parent.visible
-//        }
-//    }
-
     Loader{
         id:custom_loader
         anchors.fill:parent
         asynchronous: false
         onLoaded: item.current_item=Qt.binding(function(){return current_item})
-        onSourceChanged: console.log(source)
         visible:settings.visible_loader=="CUSTOM"
+        onVisibleChanged: {
+                logger.log("infobox_custom_loader_visibility",{"visible":visible,"item": item.current_item})
+        }
     }
     Loader{
         id:loader_designer
@@ -132,6 +124,9 @@ Rectangle {
         asynchronous: true
         onLoaded: item.current_item=Qt.binding(function(){return current_item})
         source:"qrc:/ui/UI/InfoBoxDesigner.qml"
+        onVisibleChanged: {
+                logger.log("infobox_designer_loader_visibility",{"visible":visible,"item": item.current_item})
+        }
     }
     Loader{
         id:loader_beam
@@ -140,7 +135,9 @@ Rectangle {
         asynchronous: true
         source:"qrc:/ui/UI/InfoBoxBeam.qml"
         onLoaded: item.current_item=Qt.binding(function(){return current_item})
-
+        onVisibleChanged: {
+                logger.log("infobox_beam_loader_visibility",{"visible":visible,"item": item.current_item})
+        }
     }
     Loader{
         id:loader_joint
@@ -149,6 +146,9 @@ Rectangle {
         asynchronous: true
         onLoaded: item.current_item=Qt.binding(function(){return current_item})
         source:"qrc:/ui/UI/InfoBoxJoint.qml"
+        onVisibleChanged: {
+                logger.log("infobox_joint_loader_visibility",{"visible":visible,"item": item.current_item})
+        }
 
     }
 

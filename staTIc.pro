@@ -2,7 +2,7 @@ TEMPLATE = app
 
 QT += qml quick widgets 3dcore 3drender 3dinput multimedia network
 DEFINES += VIDEOFORMAT=43
-CONFIG += c++11
+CONFIG += c++11 concurrent
 SOURCES += main.cpp \
     statics/elements/joint.cpp \
     statics/abstractstaticsmodule.cpp \

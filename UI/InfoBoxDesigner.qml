@@ -131,6 +131,7 @@ Rectangle {
                                     anchors.fill: parent
                                     onClicked:{
                                         if(current_item.type==="trapezoidalForce"){
+                                            logger.log("infobox_designer_remove_load",{"beam":current_item.parent.objectName,"load":current_item.objectName})
                                             current_item.killMe();
                                             infobox.current_item=0;
                                         }
@@ -152,6 +153,7 @@ Rectangle {
                                     anchors.fill: parent
                                     onClicked:{
                                         if(current_item.type=="beam"){
+                                            logger.log("infobox_designer_add_load",{"beam":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight")})
                                             vmFrame3DDManager.produceTPZForce(current_item,warehouse3d.get(catalog_grid.currentIndex,"properties"))
                                             //current_item=instantiator.createEntity(current_item,"qrc:/element_views/Element_Views/TrapezoidalForce.qml")
                                         }
@@ -289,6 +291,7 @@ Rectangle {
                                                     if(current_item!=0 && current_item.type=="beam"){
                                                             feedback_animation_material.start();
                                                             current_item.materialID=materialsManager.get(index,"UniqueID")
+                                                            logger.log("infobox_designer_change_material",{"beam":current_item.objectName,"materialID":current_item.materialID})
                                                     }
                                                 }
                                             }
@@ -400,6 +403,7 @@ Rectangle {
                                         if(current_item!=0 && current_item.type=="beam"){
                                             feedback_animation_size.start();
                                             current_item.realBeamSize=Qt.size(w.text,h.text);
+                                            logger.log("infobox_designer_change_section",{"beam":current_item.objectName,"section": current_item.realBeamSize})
                                         }
                                     }
                                 }

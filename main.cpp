@@ -81,11 +81,14 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<DeformingBeamMesh>("DeformingBeamMesh", 1, 0, "DeformingBeamMesh");
 
+    Logger logger(&view);
 #ifdef ANDROID
     view.rootContext()->setContextProperty("Platform","ANDROID");
 #else
     view.rootContext()->setContextProperty("Platform","UNIX");
 #endif
+    view.rootContext()->setContextProperty("logger",&logger);
+
     view.resize(2560, 1600);
     view.setResizeMode(QQuickView::SizeRootObjectToView);
     view.setSource(QUrl("qrc:/main.qml"));

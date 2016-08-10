@@ -9,10 +9,11 @@
 #include "../elements/uniformlydistributedload.h"
 #include "../elements/interiorpointload.h"
 #include "frame3dd.h"
-
+#include "logger.h"
 class Frame3DDKernel : public AbstractStaticsModule
 {
     Q_OBJECT
+    Q_PROPERTY(QVector3D gravity READ gravity WRITE setGravity NOTIFY gravityChanged)
 public:
     Frame3DDKernel(QObject* parent=0);
     ~Frame3DDKernel();
@@ -46,6 +47,11 @@ public:
     QVector<JointPtr> joints(){return m_joints;}
     QVector<BeamPtr> beams(){return m_beams;}
     QVector<TrapezoidalForcePtr> TPLoads(){return m_trapezoidal_loads;}
+
+    QVector3D gravity(){return m_gravity;}
+    void setGravity(QVector3D v);
+signals:
+    void gravityChanged();
 protected slots:
     virtual bool readStructure(QString path) ;
     virtual void update();
@@ -53,6 +59,7 @@ private slots:
     void onKillRequest();
     void solve();
 private:
+    void log();
     void unifyBeam_recursive_step(BeamPtr beam);
     void setStatus(Status status);
     void assemble_loads(int nN, int nE, int nL, int DoF,
@@ -102,7 +109,7 @@ private:
 
     qreal m_relative_equilibrium_error;
     QTimer m_lazyupdateTimer;
-
+    Logger m_logger;
 };
 
 #endif // FRAME3DDKERNEL_H

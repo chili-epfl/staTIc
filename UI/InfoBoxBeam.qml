@@ -18,6 +18,7 @@ Rectangle {
                 infoboxscene3d.upsideDown=true
             else
                 infoboxscene3d.upsideDown=false
+            logger.log("infobox_beam_item_changed",{"item":current_item.objectName})
         }
     }
 
@@ -165,7 +166,10 @@ Rectangle {
                 MouseArea{
                     id:mouseArea_plus
                     anchors.fill: parent
-                    onPressed: infoboxscene3d.zoom=1
+                    onPressed: {
+                        infoboxscene3d.zoom=1
+                        logger.log("infobox_beam_zoom",{"direction":"In"})
+                    }
                     onReleased: infoboxscene3d.zoom=0
                     onCanceled: infoboxscene3d.zoom=0
                 }
@@ -189,7 +193,10 @@ Rectangle {
                 MouseArea{
                     id:mouseArea_minus
                     anchors.fill: parent
-                    onPressed: infoboxscene3d.zoom=-1
+                    onPressed: {
+                        infoboxscene3d.zoom=-1
+                        logger.log("infobox_beam_zoom",{"direction":"Out"})
+                    }
                     onReleased: infoboxscene3d.zoom=0
                     onCanceled: infoboxscene3d.zoom=0
                 }
@@ -213,7 +220,10 @@ Rectangle {
                 MouseArea{
                     id:mouseArea_resize
                     anchors.fill: parent
-                    onClicked: infoboxscene3d.resize=true
+                    onClicked: {
+                        infoboxscene3d.resize=true
+                        logger.log("infobox_beam_zoom",{"direction":"resize"})
+                    }
                 }
             }
 
@@ -230,6 +240,7 @@ Rectangle {
                 checked: false
                 onCheckedChanged: {
                     infoboxscene3d.panMode=checked;
+                    logger.log("infobox_beam_navigation",{"pan_mode":checked})
                 }
 
             }
@@ -274,7 +285,8 @@ Rectangle {
                     value:1
                     minimumValue: 1
                     maximumValue: 400
-
+                    onValueChanged:
+                        logger.log("infobox_beam_exagerate",{"value":value})
                 }
             }
 

@@ -122,7 +122,6 @@
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>
         <file>Tools/Scaffold/Scaffold.qml</file>
-        <file>Tools/Scaffold/Anchor.qml</file>
         <file>Tools/BeamRemover/BeamRemover.qml</file>
         <file>Tools/TangibleTrapzLoad/TangibleTrapzLoad.qml</file>
         <file>Tools/TangibleTrapzLoad/TangibleTrapzLoad_InjectedEntity.qml</file>

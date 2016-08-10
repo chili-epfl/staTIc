@@ -8,13 +8,12 @@
 #include "statics/viewModels/beamvm.h"
 #include "statics/viewModels/trapezoidalforcevm.h"
 
-#include <QQmlComponent>
-#include <QQmlEngine>
-#include <QQmlContext>
+#include "logger.h"
 
 const int discrete_step = 40;
 const int max_distance=50;
 const int stability_threshold=1000;//milliseconds
+
 /*********************Support functions************************/
 QMatrix4x4 getTranformationMatrix(Qt3DCore::QEntity* entity,bool local){
     if(!entity) return  QMatrix4x4();
@@ -111,12 +110,21 @@ void Scaffold::setVMManager(AbstractVMManager * vmManager){
 
 void Scaffold::reset(){
     m_name_s1_is_available=true;
+    m_logger_map.clear();
 
-    if(!m_beam_1.isNull())
+    QVariantList removed_beams;
+    QVariantList removed_joints;
+    QVariantList enabled_beams;
+
+    if(!m_beam_1.isNull()){
         m_beam_1.toStrongRef()->setEnable(true);
+        enabled_beams.append(m_beam_1.toStrongRef()->objectName());
+    }
 
-    if(!m_beam_2.isNull())
+    if(!m_beam_2.isNull()){
         m_beam_2.toStrongRef()->setEnable(true);
+        enabled_beams.append(m_beam_2.toStrongRef()->objectName());
+    }
 
     /*Reset loads*/
 //    if(m_child2parent_beams.size()>0){
@@ -137,12 +145,27 @@ void Scaffold::reset(){
 //    }
 
     /**/
-    if(!m_beam.isNull())
+    if(!m_beam.isNull()){
+        removed_beams.append(m_beam.toStrongRef()->objectName());
         m_VMManager->staticsModule()->removeBeam(m_beam.toStrongRef());
-    if(!m_joint_1.isNull())
+    }
+    if(!m_joint_1.isNull()){
+         removed_joints.append(m_joint_1.toStrongRef()->objectName());
         m_VMManager->staticsModule()->removeJoint(m_joint_1.toStrongRef());
-    if(!m_joint_2.isNull())
+    }
+    if(!m_joint_2.isNull()){
+        removed_joints.append(m_joint_2.toStrongRef()->objectName());
         m_VMManager->staticsModule()->removeJoint(m_joint_2.toStrongRef());
+    }
+
+    if(removed_beams.size()>0)
+        m_logger_map["Removed_beams"]=removed_beams;
+    if(removed_joints.size()>0)
+        m_logger_map["Removed_joints"]=removed_joints;
+    if(enabled_beams.size()>0)
+        m_logger_map["Enabled_beams"]=enabled_beams;
+
+    m_logger.log("Scaffold_cleanup",m_logger_map);
 
     m_beam.clear();
     m_joint_1.clear();
@@ -317,6 +340,8 @@ void Scaffold::onAnchorsChanged(){
             && m_anchor_1!=m_anchor_2){
         //Need to clear everything first....
         JointPtr e1,e2;
+        m_logger_map.clear();
+        QVariantList logger_tmp;
         if(!m_anchor_1.isNull()){
             if(m_anchor_1_offset<=0){
                 e1=m_anchor_1.toStrongRef().dynamicCast<Joint>();
@@ -335,6 +360,12 @@ void Scaffold::onAnchorsChanged(){
             else
                 e1=vmManager()->staticsModule()->createJoint(m_newSupport_position,"S2",1,1,1,1,1,1);
 
+            logger_tmp.clear();
+            if(m_logger_map.contains("created_joints")){
+                logger_tmp=m_logger_map["created_joints"].toList();
+            }
+            logger_tmp.append(e1->objectName());
+            m_logger_map["created_joints"]=logger_tmp;
             m_joint_1=e1.toWeakRef();//Ownership
         }
         if(!m_anchor_2.isNull()){
@@ -354,6 +385,13 @@ void Scaffold::onAnchorsChanged(){
             }else
                 e2=vmManager()->staticsModule()->createJoint(m_newSupport_position,"S2",1,1,1,1,1,1);
 
+            logger_tmp.clear();
+            if(m_logger_map.contains("created_joints")){
+                logger_tmp=m_logger_map["created_joints"].toList();
+            }
+            logger_tmp.append(e2->objectName());
+            m_logger_map["created_joints"]=logger_tmp;
+
             m_joint_2=e2.toWeakRef();//Ownership
         }
 
@@ -367,7 +405,7 @@ void Scaffold::onAnchorsChanged(){
                 m_VMManager->createJointVM(m_joint_2.toStrongRef());
 
             m_VMManager->createBeamVM(new_beam);
-            connect(new_beam.data(),SIGNAL(destroyed(QObject*)),this,SLOT(reset()));
+            //connect(new_beam.data(),SIGNAL(destroyed(QObject*)),this,SLOT(reset()));
             /*Do not listen to the collition bodies anymore*/
             disconnect(m_extreme1);
             disconnect(m_extreme2);
@@ -378,6 +416,14 @@ void Scaffold::onAnchorsChanged(){
             connect(this,SIGNAL(localExtreme1PosChanged()),this,SLOT(checkPositionExtremes()));
             connect(this,SIGNAL(localExtreme2PosChanged()),this,SLOT(checkPositionExtremes()));
 
+            logger_tmp.clear();
+            if(m_logger_map.contains("created_beams")){
+                logger_tmp=m_logger_map["created_beams"].toList();
+            }
+            logger_tmp.append(new_beam->objectName());
+            m_logger_map["created_beams"]=logger_tmp;
+
+            m_logger.log("Scaffold_create",m_logger_map);
         }
         else{
             reset();
@@ -482,6 +528,8 @@ JointPtr Scaffold::splitBeam(BeamPtr b, qreal offset){
     new_joint_position.setY(round(new_joint_position.y()/10)*10);
     new_joint_position.setZ(round(new_joint_position.z()/10)*10);
 
+    QVariantList logger_tmp;
+
     JointPtr new_joint;
     if(m_VMManager->staticsModule()->is2D())
         if(m_name_s1_is_available){
@@ -522,6 +570,28 @@ JointPtr Scaffold::splitBeam(BeamPtr b, qreal offset){
         }
     }
     b->setEnable(false);
+
+    logger_tmp.clear();
+    if(m_logger_map.contains("split_beams")){
+        logger_tmp=m_logger_map["split_beams"].toList();
+    }
+    logger_tmp.append(b->objectName());
+    m_logger_map["split_beams"]=logger_tmp;
+
+    logger_tmp.clear();
+    if(m_logger_map.contains("created_joints")){
+        logger_tmp=m_logger_map["created_joints"].toList();
+    }
+    logger_tmp.append(new_joint->objectName());
+    m_logger_map["created_joints"]=logger_tmp;
+
+    logger_tmp.clear();
+    if(m_logger_map.contains("created_beams")){
+        logger_tmp=m_logger_map["created_beams"].toList();
+    }
+    logger_tmp.append(segment1->objectName());
+    logger_tmp.append(segment2->objectName());
+    m_logger_map["created_beams"]=logger_tmp;
 
     return new_joint;
 }

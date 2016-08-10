@@ -13,6 +13,7 @@ Entity{
 
     signal killMe();
 
+
 //    property vector3d localForce: globalToLocalMat.times(globalForce);
 //    onLocalForceChanged: console.log(localForce);
 //    property matrix4x4 globalToLocalMat;
@@ -33,10 +34,14 @@ Entity{
 //        }
 //        return result.inverted();
 //    }
+
     /*Force is acting in the y direction*/
     property vector3d relativeLocalPosition:rootEntity.parent?
                                                 Qt.vector3d(-transform.translation.y/rootEntity.parent.length + 0.5,-transform.translation.y/rootEntity.parent.length + 0.5,-transform.translation.y/rootEntity.parent.length + 0.5):
-                                                Qt.vector3d(0,0,0)
+                                                Qt.vector3d(0,0,0);
+    onRelativeLocalPositionChanged: {
+        logger.log("Trapezoidal_force_move", {"realtive_position":relativeLocalPosition,"beam":parent.objectName})
+    }
 
     property bool dragging: settings.beam_dragging_ownership==rootEntity;
     property vector3d offsetAugmentation: rootEntity.parent? Qt.vector3d(rootEntity.parent.tangibleSection.height/2,0,
@@ -51,6 +56,7 @@ Entity{
         else
             transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
     }
+
     /*Visual aspect*/
     Transform{
         id:transform

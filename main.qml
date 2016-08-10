@@ -6,14 +6,18 @@ import ScenarioListModel 1.0
 import ResourcesFetcher 1.0
 import QtQuick.Dialogs 1.2
 import "qrc:/ui"
-Item {
+//import QtSensors 5.3
 
+Item {
     function pt2px(pt){return pt*0.3759*Screen.pixelDensity}
     id: applicationWindow
     visible: true
     //width: 2560
     //height: 1600
-
+//    Gyroscope{
+//        id:gyro
+//        active: true
+//    }
     Image{
         anchors.fill: parent
         fillMode: Image.Tile
@@ -170,7 +174,7 @@ Item {
 //                                   scriptLoader.source="qrc:/scripts/Scripts/CableExercise.qml"
                                      scriptLoader.source="qrc:/scripts/Scripts/DefaultScript.qml"
 //                                   scriptLoader.source="qrc:/scripts/Scripts/SupportExercise.qml"
-
+                                     logger.restart_logger();
                                }
                 }
             }

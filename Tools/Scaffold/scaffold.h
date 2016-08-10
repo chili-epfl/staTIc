@@ -6,6 +6,7 @@
 #include <QtPhysicsUnofficial/frontend/physicsbodyinfo.h>
 #include "statics/abstractvmmanager.h"
 #include "statics/elements/joint.h"
+#include "logger.h"
 class Scaffold : public QObject
 {
     Q_OBJECT
@@ -77,6 +78,9 @@ private:
     QTime timer_1,timer_2;
 
     bool m_name_s1_is_available;
+
+    QVariantMap m_logger_map;
+    Logger m_logger;
 };
 
 #endif // SCAFFOLD_H

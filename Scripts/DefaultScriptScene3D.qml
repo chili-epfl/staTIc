@@ -129,8 +129,8 @@ Entity {
                             SortMethod {
                                 criteria: [
                                     SortCriterion { sort: SortCriterion.StateChangeCost },
-                                    SortCriterion { sort: SortCriterion.Material },
-                                    SortCriterion { sort: SortCriterion.BackToFront }
+                                    SortCriterion { sort: SortCriterion.Material }
+//                                    SortCriterion { sort: SortCriterion.BackToFront }
                                 ]
                             }
                         }
@@ -176,6 +176,13 @@ Entity {
             id: structureLoaderTransform
 //            translation:Qt.vector3d(0,-100,-1000)
             rotation:structure_tag.rotationQuaternion
+            property quaternion inv_rotation: quaternion_helper.invert(rotation)
+            QQ2.Timer{
+                running: true
+                repeat: true
+                interval: 3000
+                onTriggered: logger.log_position("Structure",structure_tag.translation,structureLoaderTransform.rotationX,structureLoaderTransform.rotationY,structureLoaderTransform.rotationZ)
+            }
 //            QuaternionAnimation on rotation{
 //            }
             translation:structure_tag.translation
