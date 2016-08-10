@@ -147,7 +147,7 @@ Entity{
         enabled: settings.show_beam && !settings.show_displacement
         property Transform transform: Transform{
                 scale3D:  Qt.vector3d(1,main_mesh_lenght/beam_commons.main_mesh_cylinder.length,1)
-                translation:length > (2* main_mesh_lenght + 30)?
+                translation:length > (2* main_mesh_lenght + 30) ?
                                 Qt.vector3d(0,0.5*main_mesh_lenght+15,0):
                                 Qt.vector3d(0,0,0)
         }
@@ -185,7 +185,7 @@ Entity{
                 }
             }
         }
-        components: [beam_commons.spring_mesh, this.trasform, beam_commons.phong_grey]
+        components: [beam_commons.spring_mesh, this.transform, beam_commons.phong_grey]
     }
 
     Entity{
