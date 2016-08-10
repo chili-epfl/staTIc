@@ -16,6 +16,9 @@ Rectangle {
     color: "transparent"
     TabView{
         id:tab_view
+        onCurrentIndexChanged: if(current_item.type==="beam" && currentIndex===1){
+                                   tab_view.getTab(1).item.currentIndex=materialsManager.get(current_item.materialID ,"Index");
+                               }
         anchors.fill: parent
         style:TabViewStyle {
             tabOverlap: 0
