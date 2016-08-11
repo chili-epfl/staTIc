@@ -95,7 +95,7 @@ Rectangle {
             color:"#2f3439"
             radius: 1
             Layout.preferredWidth: root.width
-            Layout.preferredHeight: 0.70*root.height
+            Layout.preferredHeight: 0.60*root.height
             Scene3D {
                 anchors.fill: parent
                 anchors.margins: 10
