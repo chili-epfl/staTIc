@@ -95,6 +95,7 @@
         <file>Scripts/Story_1/suggestion.png</file>
         <file>Scripts/Story_2/steal_cable.jpg</file>
         <file>Scripts/Story_2/Model.structure</file>
+        <file>Scripts/FindAxialForceExercise.qml</file>
     </qresource>
     <qresource prefix="/ui">
         <file>UI/ViewFilterBar.qml</file>
@@ -118,6 +119,7 @@
         <file>UI/InfoBoxCableEx.qml</file>
         <file>UI/SuggestionBox.qml</file>
         <file>UI/Char_Meshes.qml</file>
+        <file>UI/InfoBoxFindAxialForce.qml</file>
     </qresource>
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>

@@ -30,5 +30,19 @@ Item{
              <p>Which beams could be replaced without affecting the structural safety?</p>",
             "structure_url":"qrc:/scripts/Scripts/Story_2/Model.structure",
         }
+        ,
+        {
+            "story_type":"FindAxialEx",
+            "story_picture":"qrc:/scripts/Scripts/Story_2/steal_cable.jpg",
+            "story_description":"
+             <p>Tobia has bought a old building in Renens and wants open a gym there.</p>
+             <p>The ceiling is made of triangular timber trusses which look too massive, so
+             Tobia wants you help to remove some of the truss elements and replace them with tie-beams.</p>
+             <p>Which beams could be replaced without affecting the structural safety?</p>",
+             "structure_url":"qrc:/scripts/Scripts/Story_2/Model.structure",
+             "question_beams":["AB","BC"],
+             "loadsOnBeams":[{"beamName":"BC", "warehouseIndex":0}, {"beamName":"CD", "warehouseIndex":0}]
+
+        }
     ]
 }
