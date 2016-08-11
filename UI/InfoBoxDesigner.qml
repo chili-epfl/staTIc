@@ -183,7 +183,7 @@ Rectangle {
         }
         Tab{
             title:"Beam Materials"
-            Rectangle{
+            Rectangle{                
                 id:materialItem
                 property alias currentIndex: materials_list.currentIndex
                 anchors.fill:parent
@@ -344,11 +344,12 @@ Rectangle {
                             TextField{
                                 id:w
                                 focus:false
+                                activeFocusOnTab: false
                                 anchors.verticalCenter: x.verticalCenter
                                 anchors.right: x.left
                                 anchors.rightMargin: 25
                                 text: current_item!=0 &&
-                                      current_item.type=="beam"?current_item.realBeamSize.width:100
+                                      current_item.type =="beam" ? current_item.realBeamSize.width:100
                                 maximumLength: 5
                                 validator: DoubleValidator {bottom: 1; top: 50000;}
                                 width: parent.width/2-50
@@ -366,6 +367,7 @@ Rectangle {
                             TextField{
                                 id:h
                                 focus:false
+                                activeFocusOnTab: false
                                 maximumLength: 5
                                 anchors.verticalCenter: x.verticalCenter
                                 anchors.left: x.right
