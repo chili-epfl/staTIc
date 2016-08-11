@@ -11,6 +11,7 @@ class Frame3DDVMManager: public AbstractVMManager
 {
     Q_OBJECT
     Q_PROPERTY(Frame3DDKernel* staticsModule READ staticsModule WRITE setStaticsModule NOTIFY staticsModuleChanged)
+    Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)
 public:
     Frame3DDVMManager(QObject* parent=0);
     ~Frame3DDVMManager();
@@ -32,11 +33,14 @@ public:
 
     void addPoolEntity(QString className, Qt3DCore::QEntity* e, QQmlContext* contex);
     void tryRetrivePoolEntity(QString className, Qt3DCore::QEntity* &e, QQmlContext* &contex);
+
+    bool ready(){return m_ready;}
 protected slots:
     void initViewModels();
 signals:
     void staticsModuleChanged();
     void scaleFactorsUpdated();
+    void readyChanged();
 private slots:
     void onResourceDestroyed(QObject*);
     void onResourcesUpdate();
@@ -59,6 +63,7 @@ private:
 
     QMultiHash<QString,PoolEntity> m_entity_pool;
     QSet<QObject*> m_dependent_objects;
+    bool m_ready;
 };
 
 struct PoolEntity{

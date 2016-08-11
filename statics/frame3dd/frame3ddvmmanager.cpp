@@ -7,6 +7,7 @@ Frame3DDVMManager::Frame3DDVMManager(QObject* parent):
     m_staticsModule(Q_NULLPTR),
     m_player(this)
 {
+    m_ready=false;
     m_dying=false;
     m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_1.ogg"));
     m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_2.ogg"));
@@ -54,19 +55,20 @@ void Frame3DDVMManager::initViewModels(){
         createBeamVM(beam);
     }
 #ifdef ANDROID
-    /*Create some resources in the pool*/
-    QList<AbstractElementViewModel*> victims;
-    if(m_staticsModule->joints().length()>1)
-        for(int i=0; i<10;i++)
-           victims.append(createJointVM(m_staticsModule->joints().at(0)));
-    if(m_staticsModule->beams().length()>1)
-        for(int i=0; i<10;i++)
-           victims.append(createBeamVM(m_staticsModule->beams().at(0)));
-    Q_FOREACH(AbstractElementViewModel* victim,victims){
-        victim->deleteLater();
-    }
-
+//    /*Create some resources in the pool*/
+//    QList<AbstractElementViewModel*> victims;
+//    if(m_staticsModule->joints().length()>1)
+//        for(int i=0; i<10;i++)
+//           victims.append(createJointVM(m_staticsModule->joints().at(0)));
+//    if(m_staticsModule->beams().length()>1)
+//        for(int i=0; i<10;i++)
+//           victims.append(createBeamVM(m_staticsModule->beams().at(0)));
+//    Q_FOREACH(AbstractElementViewModel* victim,victims){
+//        victim->deleteLater();
+//    }
 #endif
+    m_ready=true;
+    emit readyChanged();
 }
 
 BeamVM* Frame3DDVMManager::createBeamVM(BeamPtr b){
@@ -200,6 +202,8 @@ AbstractElementViewModel *Frame3DDVMManager::getAssociatedVM(AbstractElement *el
 
 Qt3DCore::QEntity *Frame3DDVMManager::getEntity3D(QString entity_name)
 {
+    qDebug()<<entity_name;
+    qDebug()<<m_entityNameMap.keys();
     if(!entity_name.isEmpty() && m_entityNameMap.contains(entity_name))
         return m_entityNameMap[entity_name];
     else

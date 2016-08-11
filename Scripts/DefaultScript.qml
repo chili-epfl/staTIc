@@ -18,7 +18,6 @@ Item{
     signal pageExit();
     onPageExit: {
         logger.log("exit_default_script");
-        logger.close_logger();
     }
 
     property alias currentViewFilter: viewFilterBar.selection
@@ -63,7 +62,7 @@ Item{
             PropertyChanges {
                 restoreEntryValues:false
                 target: loadingAnimation_progressbar
-                value:0.25
+                value:0.10
             }
         },
         State {
@@ -78,7 +77,7 @@ Item{
             PropertyChanges {
                 restoreEntryValues:false
                 target: loadingAnimation_progressbar
-                value:0.5
+                value:0.30
             }
         },
         State {
@@ -93,17 +92,17 @@ Item{
             PropertyChanges {
                 restoreEntryValues:false
                 target: loadingAnimation_progressbar
-                value:0.75
+                value:0.50
             }
 
         },
         State {
             name: "LoadingVMManager"
-            when: firstInit && scene3D.structureLoaded
+            when: firstInit && scene3D.structureLoaded && !vmFrame3DDManager.ready
             PropertyChanges {
                 restoreEntryValues:false
                 target: loadingAnimation_text
-                text:"Enjoy :)"
+                text:"Loading 3D Entities"
             }
             PropertyChanges {
                 restoreEntryValues:false
@@ -118,14 +117,11 @@ Item{
             PropertyChanges {
                 restoreEntryValues:false
                 target: loadingAnimation_progressbar
-                value:1
+                value:0.75
             }
-            StateChangeScript {
-                script: {
-                   closeLoadingAnimation.start()
-                }
-            }
-        },//....end....//
+        },
+
+        //....end....//
         State {
             when:!firstInit && stateLock
             name: "custom"
@@ -277,6 +273,7 @@ Item{
 
     Frame3DDKernel{
         id:staticsmodule
+        gravity:Qt.vector3d(0,0,0)
         onStatusChanged: {
             if(firstInit && status==Frame3DDKernel.LOADED){
                 loadingAnimation_text.text="Loading Scenario";
@@ -304,7 +301,12 @@ Item{
     }
 
     Frame3DDVMManager{
-            id:vmFrame3DDManager
+        id:vmFrame3DDManager
+        onReadyChanged: if(ready){
+                            loadingAnimation_text.text="Enjoy :)"
+                            loadingAnimation_progressbar.value=1
+                            closeLoadingAnimation.start()
+                        }
     }
 
     Warehouse3D{
