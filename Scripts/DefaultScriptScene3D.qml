@@ -128,9 +128,9 @@ Entity {
                             buffers : ClearBuffer.ColorDepthBuffer
                             SortMethod {
                                 criteria: [
+                                    SortCriterion { sort: SortCriterion.BackToFront },
                                     SortCriterion { sort: SortCriterion.StateChangeCost },
                                     SortCriterion { sort: SortCriterion.Material }
-//                                    SortCriterion { sort: SortCriterion.BackToFront }
                                 ]
                             }
                         }
