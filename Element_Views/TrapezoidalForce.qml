@@ -84,12 +84,14 @@ Entity{
         id:valid_picker
         hoverEnabled: false
         onPressedChanged: if(pressed && settings.beam_dragging_ownership==0){
-                              settings.beam_dragging_ownership=rootEntity
                               if(settings.load_is_selectable)
                                   infobox.current_item=rootEntity
-                              rootEntity.parent.drag_anchor_enabled=true;
-                              rootEntity.parent.current_anchor_position=transform.translation.minus(offsetAugmentation)
-                              resetTimer.restart()
+                              if(settings.load_is_draggable){
+                                  settings.beam_dragging_ownership=rootEntity
+                                  rootEntity.parent.drag_anchor_enabled=true;
+                                  rootEntity.parent.current_anchor_position=transform.translation.minus(offsetAugmentation)
+                                  resetTimer.restart()
+                              }
                           }
                           else if(!pressed && settings.beam_dragging_ownership==rootEntity){
                               sceneRoot.mouseEventHasBeenAccepted=true;

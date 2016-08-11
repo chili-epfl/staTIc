@@ -13,6 +13,8 @@ Item {
     property bool beam_is_selectable: true
     property bool joint_is_selectable: true
     property bool load_is_selectable: true
+    property bool load_is_draggable: true
+
     property bool show_beam: true
     property bool show_beam_spring: true
     property bool show_beam_sphere: false
@@ -45,6 +47,7 @@ Item {
         beam_is_selectable= true
         joint_is_selectable= true
         load_is_selectable= true
+        load_is_draggable=true
 
         show_beam= true
         show_beam_spring= true
