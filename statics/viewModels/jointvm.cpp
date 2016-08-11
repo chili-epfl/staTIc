@@ -200,11 +200,13 @@ void JointVM::createEntityForBeam(BeamPtr b){
         beamView->setProperty("flip_extremes",true);
         extreme_of_joint=2;
         extreme_not_on_joint=1;
+        beamView->setProperty("extreme2_name",e1.toStrongRef()->objectName());
         beamView->setProperty("extreme2",e1.toStrongRef()->scaledPosition());
     }else{
         beamView->setProperty("flip_extremes",false);
         extreme_of_joint=1;
         extreme_not_on_joint=2;
+        beamView->setProperty("extreme2_name",e2.toStrongRef()->objectName());
         beamView->setProperty("extreme2",e2.toStrongRef()->scaledPosition());
     }
 

@@ -7,9 +7,11 @@ Entity{
     property bool visible:  true
     property vector3d position;
 
+    property bool non_default_visibility: true
+
     property vector3d extreme1 //Always the joint extreme
     property vector3d extreme2
-
+    property string extreme2_name;
     /*Coarse representation */
     property int axialForceType: 0 //-1 compression,0 nul, 1 tension
     property real axialForce : 0
@@ -124,12 +126,10 @@ Entity{
         return matrix;
     }
 
-
-
     Entity{
         enabled: root.axialForceType!==0
         AnimationUnitDx{
-            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement
+            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement && non_default_visibility
             unitId: 0
             unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
@@ -141,7 +141,7 @@ Entity{
         }
 
         AnimationUnitDx{
-            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement
+            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement && non_default_visibility
             unitId: 1
             unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
@@ -152,7 +152,7 @@ Entity{
             rotate: root.axialForceType < 0
         }
         AnimationUnitDx{
-            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement
+            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement && non_default_visibility
             unitId: 2
             unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
@@ -163,7 +163,7 @@ Entity{
             rotate: root.axialForceType < 0
         }
         AnimationUnitDx{
-            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement
+            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement && non_default_visibility
             unitId: 3
             unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
@@ -174,7 +174,7 @@ Entity{
             rotate: root.axialForceType < 0
         }
         AnimationUnitDx{
-            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement
+            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement && non_default_visibility
             unitId: 4
             unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
