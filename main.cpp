@@ -91,7 +91,8 @@ int main(int argc, char *argv[])
 
     view.resize(2560, 1600);
     view.setResizeMode(QQuickView::SizeRootObjectToView);
-    view.setSource(QUrl("qrc:/main.qml"));
+    //view.setSource(QUrl("qrc:/main.qml"));
+    view.setSource(QUrl("qrc:/Experiment-Mode.qml"));
     view.show();
 
    return app.exec();

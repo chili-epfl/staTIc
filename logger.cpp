@@ -189,7 +189,7 @@ public:
     }
 
     void restart_logger(){
-        close_logger();
+        close_logger();       
         QDir localDir;
         bool directoryAvailable=localDir.exists(logFilesPath);
         if(!directoryAvailable){
@@ -261,7 +261,7 @@ public:
 
 private:
     LoggerPrivate(){
-        restart_logger();
+        //restart_logger();
     }
 
 

@@ -57,7 +57,12 @@ Item {
     Connections {
         ignoreUnknownSignals: true
         target: scriptLoader.valid ? scriptLoader.item : null
-        onPageExit: { intromenu.visible=true;intromenu.enabled=true;scriptLoader.source=""}
+        onPageExit: {
+            intromenu.visible=true;
+            intromenu.enabled=true;
+            scriptLoader.source=""
+            logger.close_logger();
+        }
     }
 
     /*Item conteining all the item for the intro menu.*/

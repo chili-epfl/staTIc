@@ -46,13 +46,20 @@ Item {
                 item.loadsOnBeams=stories.list[gridview.currentIndex].loadsOnBeams;
                 item.proposed_solution_url=stories.list[gridview.currentIndex].story_suggestion_picture
             }
+            if(stories.list[gridview.currentIndex].story_type=="FindAxialEx"){
+                item.loadsOnBeams=stories.list[gridview.currentIndex].loadsOnBeams;
+                item.question_beams=stories.list[gridview.currentIndex].question_beams
+            }
         }
     }
 
     Connections {
         ignoreUnknownSignals: true
         target: scriptLoader.valid ? scriptLoader.item : null
-        onPageExit: { intromenu.visible=true;intromenu.enabled=true;scriptLoader.source=""}
+        onPageExit: {
+            intromenu.visible=true;intromenu.enabled=true;scriptLoader.source=""
+            logger.close_logger();
+        }
     }
 
     /*Item conteining all the item for the intro menu.*/
@@ -148,11 +155,19 @@ Item {
                 MouseArea{
                     anchors.fill: parent
                     onClicked: if(gridview.currentIndex !=-1){
+                                   logger.restart_logger();
                                     if(stories.list[gridview.currentIndex].story_type=="SupportEx"){
                                         scriptLoader.source="qrc:/scripts/Scripts/SupportExercise.qml";
+                                        logger.log("Exercise_SupportEx_Start",{"Story":gridview.currentIndex})
                                     }
                                     else if(stories.list[gridview.currentIndex].story_type=="CableEx"){
                                         scriptLoader.source="qrc:/scripts/Scripts/CableExercise.qml";
+                                        logger.log("Exercise_CableEx_Start",{"Story":gridview.currentIndex})
+                                    }
+                                    else if(stories.list[gridview.currentIndex].story_type=="FindAxialEx"){
+                                        scriptLoader.source="qrc:/scripts/Scripts/FindAxialForceExercise.qml";
+                                        logger.log("Exercise_FindAxialForce_Start",{"Story":gridview.currentIndex})
+
                                     }
                                }
                 }
