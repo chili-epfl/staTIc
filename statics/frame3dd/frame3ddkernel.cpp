@@ -718,6 +718,20 @@ void Frame3DDKernel::solve(){
         p[2*i+1+active_beams.length()]=0;
         d[2*i+1+active_beams.length()]=beam_d;
 
+        Ax[2*i+1+active_beams.length()]=650;
+        Jx[2*i+1+active_beams.length()]=41623;
+        Asy[2*i+1+active_beams.length()]=65;
+        Asz[2*i+1+active_beams.length()]=65;
+        Iy[2*i+1+active_beams.length()]=416;
+        Iz[2*i+1+active_beams.length()]=416;
+
+
+        E[2*i+1+active_beams.length()]=beam_E;
+        G[2*i+1+active_beams.length()]=beam_G;
+        p[2*i+1+active_beams.length()]=0;
+        d[2*i+1+active_beams.length()]=beam_d;
+
+
         //Virtual beam 2
         L[2*i+2+active_beams.length()]=100.0;
         Le[2*i+2+active_beams.length()]=100.0;
