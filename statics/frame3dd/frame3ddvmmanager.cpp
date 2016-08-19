@@ -202,8 +202,6 @@ AbstractElementViewModel *Frame3DDVMManager::getAssociatedVM(AbstractElement *el
 
 Qt3DCore::QEntity *Frame3DDVMManager::getEntity3D(QString entity_name)
 {
-    qDebug()<<entity_name;
-    qDebug()<<m_entityNameMap.keys();
     if(!entity_name.isEmpty() && m_entityNameMap.contains(entity_name))
         return m_entityNameMap[entity_name];
     else

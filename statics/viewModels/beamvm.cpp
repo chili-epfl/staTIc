@@ -153,7 +153,7 @@ void BeamVM::onExtremeDisplacementChanged(){
     if(m_component3D){
         QVector3D ex1Disp,ex2Disp;
         beam_str_ref->extremeDisplacements(ex1Disp,ex2Disp);
-        qDebug()<<ex1Disp<<ex2Disp;
+//        qDebug()<<ex1Disp<<ex2Disp;
         m_component3D->setProperty("extreme1Displacement",ex1Disp*AbstractStaticsModule::modelScale());
         m_component3D->setProperty("extreme2Displacement",ex2Disp*AbstractStaticsModule::modelScale());
     }

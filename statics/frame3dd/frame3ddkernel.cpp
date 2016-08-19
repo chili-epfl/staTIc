@@ -1946,7 +1946,7 @@ void Frame3DDKernel::update_statics(
     for (n=1; n<= nE; n++) {
         if(n>active_beams.length()) break;
         BeamPtr beam=active_beams.at(n-1);
-        qDebug()<<beam->objectName()<<Q[n][1]<<" "<<Q[n][7];
+        //qDebug()<<beam->objectName()<<Q[n][1]<<" "<<Q[n][7];
         int axial_type;
         if (fabs(Q[n][1]) < 0.0001)
             axial_type=0;
