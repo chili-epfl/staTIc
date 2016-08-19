@@ -9,14 +9,15 @@ Item {
 
     property alias structureUrl:default_script.structureUrl;
     property alias structure3DAsset:default_script.structure3DAsset;
-    property alias structureTagConfig:default_script.structureTagConfig;
 
-    property string problem_description_text;
+    property string problem_description_text:"";
     property url problem_image_url;
     property url proposed_solution_url;
 
     property var question_beams;
     property var loadsOnBeams;
+
+    property var hidden_beams;
 
     property var elements_to_restore:[];
 
@@ -40,7 +41,7 @@ Item {
                         question_beams_model.append({"beam":beam, "answer":0})
                     }
                     else{
-                       console.log("Problem with getting the beam")
+                       console.log("Problem with getting the beam:",beam_name)
                     }
                     var e1=vmManager.getEntity3D(beam_name[0])
                     var e2=vmManager.getEntity3D(beam_name[1])
@@ -61,6 +62,34 @@ Item {
                             }
                         }}
                 }
+
+                for( i=0;i<hidden_beams.length;i++){
+                    beam_name=hidden_beams[i];
+                    beam=vmManager.getEntity3D(beam_name);
+                    if(!beam)
+                        console.log("Problem with getting the beam:",beam_name)
+
+                    e1=vmManager.getEntity3D(beam_name[0])
+                    e2=vmManager.getEntity3D(beam_name[1])
+                    if(e1){
+                        for(j=0;j<e1.connected_beams.length;j++){
+                            b=e1.connected_beams[j]
+                            if(b.extreme2_name==e2.objectName){
+                                b.non_default_visibility=false;
+                                elements_to_restore.push(b);
+                            }
+                        }}
+                    if(e2){
+                        for(j=0;j<e2.connected_beams.length;j++){
+                            b=e2.connected_beams[j]
+                            if(b.extreme2_name==e1.objectName){
+                                b.non_default_visibility=false;
+                                elements_to_restore.push(b);
+                            }
+                        }}
+                }
+
+
                 for(i=0;i<loadsOnBeams.length;i++){
                     var load=loadsOnBeams[i];
                     beam=default_script.vmManager.getEntity3D(load.beamName);
@@ -145,6 +174,9 @@ Item {
             target: next_button
             visible:false
         }
+        StateChangeScript{
+            script: logger.log("FindAxialLoad_Exercise_Solving")
+        }
     },
         State {
             name: "SOLVED"
@@ -187,6 +219,9 @@ Item {
                 target: next_button
                 anchors.bottom: exercise.bottom
                 anchors.right: exercise.right
+            }
+            StateChangeScript{
+                script: logger.log("FindAxialLoad_Exercise_Exploring")
             }
         }
 
@@ -265,7 +300,18 @@ Item {
                 anchors.left: parent.horizontalCenter
                 textFormat: Text.RichText
                 lineHeight: 1.5
-
+            }
+            Rectangle{
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: 100
+                height: 100
+                anchors.bottom: parent.bottom
+                Image {
+                    source: "qrc:/ui/UI/Eye_tracking_tags/011.png"
+                    anchors.centerIn: parent
+                    width: parent.width*0.75
+                    height: parent.height*0.75
+                }
             }
         }
         Item{
