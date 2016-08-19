@@ -9,7 +9,6 @@ Item {
 
     property alias structureUrl:default_script.structureUrl;
     property alias structure3DAsset:default_script.structure3DAsset;
-    property alias structureTagConfig:default_script.structureTagConfig;
 
     property string problem_description_text;
     property url problem_image_url;
