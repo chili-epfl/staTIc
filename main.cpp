@@ -84,6 +84,7 @@ int main(int argc, char *argv[])
     Logger logger(&view);
 #ifdef ANDROID
     view.rootContext()->setContextProperty("Platform","ANDROID");
+    view.rootContext()->setContextProperty("custom_board_url",QString("file://")+QString(getenv("EXTERNAL_STORAGE"))+QString("/staTIc/board_configuration.data"));
 #else
     view.rootContext()->setContextProperty("Platform","UNIX");
 #endif
@@ -91,7 +92,7 @@ int main(int argc, char *argv[])
 
     view.resize(2560, 1600);
     view.setResizeMode(QQuickView::SizeRootObjectToView);
-    //view.setSource(QUrl("qrc:/main.qml"));
+//    view.setSource(QUrl("qrc:/main.qml"));
     view.setSource(QUrl("qrc:/Experiment-Mode.qml"));
     view.show();
 

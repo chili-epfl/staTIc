@@ -13,6 +13,8 @@ Item {
     id: applicationWindow
     visible: true
 
+    property bool use_custom_board:false
+
     Image{
         anchors.fill: parent
         fillMode: Image.Tile
@@ -40,14 +42,17 @@ Item {
             intromenu.visible=false;
             intromenu.enabled=false;
             item.structureUrl=stories.list[gridview.currentIndex].structure_url;
-            item.problem_description_text=stories.list[gridview.currentIndex].story_description;
-            item.problem_image_url=stories.list[gridview.currentIndex].story_picture;
+            if(item.hasOwnProperty('problem_description_text'))
+                item.problem_description_text=stories.list[gridview.currentIndex].story_description;
+            if(item.hasOwnProperty('problem_image_url'))
+                item.problem_image_url=stories.list[gridview.currentIndex].story_picture;
             if(stories.list[gridview.currentIndex].story_type=="SupportEx"){
                 item.loadsOnBeams=stories.list[gridview.currentIndex].loadsOnBeams;
                 item.proposed_solution_url=stories.list[gridview.currentIndex].story_suggestion_picture
             }
             if(stories.list[gridview.currentIndex].story_type=="FindAxialEx"){
                 item.loadsOnBeams=stories.list[gridview.currentIndex].loadsOnBeams;
+                item.hidden_beams=stories.list[gridview.currentIndex].hidden_beams;
                 item.question_beams=stories.list[gridview.currentIndex].question_beams
             }
         }
@@ -133,26 +138,46 @@ Item {
             Layout.preferredHeight: parent.height*0.1
 
             Image{
+                id:synch_img
                 width: 100
                 height: 100
                 source: synch_mouse_area.pressed ? "qrc:/icons/Icons/synch_pressed.png" : "qrc:/icons/Icons/synch_ON.png"
                 anchors.bottom:  parent.bottom
                 anchors.rightMargin: 10
+
                 MouseArea{
                     id:synch_mouse_area
                     anchors.fill: parent
                     onClicked: synch_dialog_box.visible=true
                 }
             }
-
+            Rectangle{
+                anchors.left: synch_img.right
+                anchors.bottom:  parent.bottom
+                id:custom_board_enable_rect
+                width: 100
+                height: 100
+                color: use_custom_board ? "green" : "red"
+                Text {
+                    anchors.fill: parent
+                    fontSizeMode: Text.Fit
+                    wrapMode: Text.Wrap
+                    text: "Use Custom Board"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: use_custom_board=!use_custom_board
+                }
+            }
             Image{
                 width: 100
                 height: 100
-                source: "qrc:/icons/Icons/material_design.png"
+                source: start_button.pressed? "qrc:/icons/Icons/next_pressed.png" :"qrc:/icons/Icons/next.png"
                 anchors.right: parent.right
                 anchors.bottom:  parent.bottom
                 anchors.rightMargin: 10
                 MouseArea{
+                    id:start_button
                     anchors.fill: parent
                     onClicked: if(gridview.currentIndex !=-1){
                                    logger.restart_logger();
@@ -167,9 +192,25 @@ Item {
                                     else if(stories.list[gridview.currentIndex].story_type=="FindAxialEx"){
                                         scriptLoader.source="qrc:/scripts/Scripts/FindAxialForceExercise.qml";
                                         logger.log("Exercise_FindAxialForce_Start",{"Story":gridview.currentIndex})
-
+                                    }
+                                    else if(stories.list[gridview.currentIndex].story_type=="Default"){
+                                        scriptLoader.source="qrc:/scripts/Scripts/DefaultScript.qml";
+                                        logger.log("Exercise_Default_Start",{"Story":gridview.currentIndex})
                                     }
                                }
+                }
+            }
+            Rectangle{
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: 100
+                height: 100
+                anchors.bottom: parent.bottom
+                Image {
+                    id: stop_marker
+                    source: "qrc:/ui/UI/Eye_tracking_tags/010.png"
+                    anchors.centerIn: parent
+                    width: parent.width*0.75
+                    height: parent.height*0.75
                 }
             }
         }
@@ -181,6 +222,31 @@ Item {
     MaterialDesigner{
         id:materialDesigner
     }
+
+    Rectangle{
+        width: 100
+        height: 100
+        Image {
+            source: "qrc:/ui/UI/Eye_tracking_tags/012.png"
+            anchors.centerIn: parent
+            width: parent.width*0.75
+            height: parent.height*0.75
+        }
+    }
+
+    Rectangle{
+        width: 100
+        height: 100
+        anchors.top: parent.top
+        anchors.right: parent.right
+        Image {
+            source: "qrc:/ui/UI/Eye_tracking_tags/013.png"
+            anchors.centerIn: parent
+            width: parent.width*0.75
+            height: parent.height*0.75
+        }
+    }
+
 
 
 }

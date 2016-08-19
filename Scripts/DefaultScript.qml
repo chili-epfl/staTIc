@@ -30,7 +30,6 @@ Item{
 
     property url structureUrl;
     property url structure3DAsset;
-    property url structureTagConfig;
 
     property alias settings: settings
     property alias infobox: infobox
@@ -48,7 +47,6 @@ Item{
     }
 
     state: "LoadingCamera"
-
     states: [
         //....Init states....
         State {
@@ -98,11 +96,16 @@ Item{
         },
         State {
             name: "LoadingVMManager"
-            when: firstInit && scene3D.structureLoaded && !vmFrame3DDManager.ready
+            when: firstInit && scene3D.structureLoaded
             PropertyChanges {
                 restoreEntryValues:false
                 target: loadingAnimation_text
                 text:"Loading 3D Entities"
+            }
+            PropertyChanges {
+                restoreEntryValues:false
+                target: loadingAnimation_progressbar
+                value:0.75
             }
             PropertyChanges {
                 restoreEntryValues:false
@@ -113,11 +116,6 @@ Item{
                 restoreEntryValues:false
                 target: vmFrame3DDManager
                 sceneRoot:scene3D.structureEntity
-            }
-            PropertyChanges {
-                restoreEntryValues:false
-                target: loadingAnimation_progressbar
-                value:0.75
             }
         },
 
@@ -223,6 +221,7 @@ Item{
             loadingAnimation.visible=false;
             loadingAnimation.enabled=false;
             firstInit=false;
+            applicationRoot.state=""
             logger.log("Start_default_script",{"structureUrl":structureUrl})
         }
         running: false;
@@ -501,13 +500,15 @@ Item{
                         }
                 }
 
-                Image {
-                    id:ar_button
+                RowLayout{
                     anchors.bottom: parent.bottom
                     anchors.left: parent.left
                     anchors.margins: 10
-                    width: 100
-                    height: 100
+                    spacing: 10
+                Image {
+                    id:ar_button
+                    Layout.preferredWidth:  100
+                    Layout.preferredHeight: 100
                     source: camDevice.isRunning ?
                             "qrc:/icons/Icons/AR_ON.png" :
                             "qrc:/icons/Icons/AR_OFF.png"
@@ -522,11 +523,9 @@ Item{
 
                 Image {
                     id:ghostMode_button
-                    anchors.bottom: parent.bottom
-                    anchors.left: ar_button.right
-                    anchors.margins: 10
-                    width: 100
-                    height: 100
+                    visible: false
+                    Layout.preferredWidth:  100
+                    Layout.preferredHeight: 100
                     source: scene3D.ghostMode?
                             "qrc:/icons/Icons/ghost_Mode_on.png" :
                             "qrc:/icons/Icons/ghost_Mode_OFF.png"
@@ -539,11 +538,8 @@ Item{
                 Image {
                     id:show_stress_button
                     visible: settings.show_stress_button
-                    anchors.bottom: parent.bottom
-                    anchors.left: ghostMode_button.right
-                    anchors.margins: 10
-                    width: 100
-                    height: 100
+                    Layout.preferredWidth:  100
+                    Layout.preferredHeight: 100
                     source: settings.show_stress?
                                 "qrc:/icons/Icons/show_stress_on.png" :
                                 "qrc:/icons/Icons/show_stress_off.png"
@@ -581,11 +577,8 @@ Item{
 
                 Image {
                     visible: settings.show_displacement_button
-                    anchors.bottom: parent.bottom
-                    anchors.left: show_stress_button.right
-                    anchors.margins: 10
-                    width: 100
-                    height: 100
+                    Layout.preferredWidth:  100
+                    Layout.preferredHeight: 100
                     source: settings.show_displacement?
                                 "qrc:/icons/Icons/show_displacement_on.png" :
                                 "qrc:/icons/Icons/show_displacement_off.png"
@@ -665,6 +658,8 @@ Item{
                     }
 
                 }
+                }
+
 
                 Slider{
                     id:labeling_threshold_slider
@@ -745,7 +740,10 @@ Item{
         defaultMarkerSize: 50
         Component.onCompleted: {
             loadSingleMarkersConfigFile("qrc:/AR/single_markers.json")
-            loadMultiMarkersConfigFile("default","qrc:/AR/board_configuration.dat")
+            if(!use_custom_board)
+                loadMultiMarkersConfigFile("default","qrc:/AR/board_configuration.dat")
+            else
+                loadMultiMarkersConfigFile("default",custom_board_url)
         }
      }
      ARToolkitObject{

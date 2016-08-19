@@ -18,6 +18,8 @@ Item {
 //        id:gyro
 //        active: true
 //    }
+    property bool use_custom_board:false
+
     Image{
         anchors.fill: parent
         fillMode: Image.Tile
@@ -50,7 +52,6 @@ Item {
             intromenu.enabled=false;
             item.structureUrl=gridview.model.get(gridview.currentIndex,"ScenarioStructure");
             item.structure3DAsset=gridview.model.get(gridview.currentIndex,"Scenario3DAsset");
-            item.structureTagConfig=gridview.model.get(gridview.currentIndex,"ScenarioTagConfiguration");
         }
     }
 
@@ -153,16 +154,39 @@ Item {
             Layout.preferredWidth: parent.width
             Layout.preferredHeight: parent.height*0.1
 
+            Layout.preferredWidth: parent.width
+            Layout.preferredHeight: parent.height*0.1
+
             Image{
+                id:synch_img
                 width: 100
                 height: 100
                 source: synch_mouse_area.pressed ? "qrc:/icons/Icons/synch_pressed.png" : "qrc:/icons/Icons/synch_ON.png"
                 anchors.bottom:  parent.bottom
                 anchors.rightMargin: 10
+
                 MouseArea{
                     id:synch_mouse_area
                     anchors.fill: parent
                     onClicked: synch_dialog_box.visible=true
+                }
+            }
+            Rectangle{
+                anchors.left: synch_img.right
+                anchors.bottom:  parent.bottom
+                id:custom_board_enable_rect
+                width: 100
+                height: 100
+                color: use_custom_board ? "green" : "red"
+                Text {
+                    anchors.fill: parent
+                    fontSizeMode: Text.Fit
+                    wrapMode: Text.Wrap
+                    text: "Use Custom Board"
+                }
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: use_custom_board=!use_custom_board
                 }
             }
 
