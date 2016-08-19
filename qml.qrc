@@ -96,6 +96,17 @@
         <file>Scripts/Story_2/steal_cable.jpg</file>
         <file>Scripts/Story_2/Model.structure</file>
         <file>Scripts/FindAxialForceExercise.qml</file>
+        <file>Scripts/tens_comp.jpeg</file>
+        <file>Scripts/default.jpg</file>
+        <file>Scripts/Full_Roof/Full_roof.structure</file>
+        <file>Scripts/Vault/Vault.structure</file>
+        <file>Scripts/Howe/Howe.structure</file>
+        <file>Scripts/Gazebo/Gazebo.structure</file>
+        <file>Scripts/Full_Roof/full-roof.jpg</file>
+        <file>Scripts/Vault/vault.png</file>
+        <file>Scripts/Gazebo/gazebo.jpg</file>
+        <file>Scripts/Howe/howe.jpg</file>
+        <file>Scripts/Demo.structure</file>
     </qresource>
     <qresource prefix="/ui">
         <file>UI/ViewFilterBar.qml</file>
@@ -120,6 +131,10 @@
         <file>UI/SuggestionBox.qml</file>
         <file>UI/Char_Meshes.qml</file>
         <file>UI/InfoBoxFindAxialForce.qml</file>
+        <file>UI/Eye_tracking_tags/010.png</file>
+        <file>UI/Eye_tracking_tags/011.png</file>
+        <file>UI/Eye_tracking_tags/012.png</file>
+        <file>UI/Eye_tracking_tags/013.png</file>
     </qresource>
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>

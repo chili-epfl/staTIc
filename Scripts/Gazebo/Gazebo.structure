@@ -22,33 +22,39 @@ N,3600,1600,0,0
 O,1800,2600,0,0
 
 #Number of reaction
-12
+6
 
 #Node Id,x,y,z,Mx,My,Mz
+0,1,1,1,0,0,0
+1,1,1,1,0,0,0
+2,1,1,1,0,0,0
+3,1,1,1,0,0,0
+4,1,1,1,0,0,0
+5,1,1,1,0,0,0
 
 
 #Number of beams
 18
 
 #Beam name,node 1,node 2,width,height,MaterialID,tangibleWidth,tangibleHeight
-AG,0,6,25,50,default,0,0
-BH,1,7,25,50,default,0,0
-CI,2,8,25,50,default,0,0
-DL,3,9,25,50,default,0,0
-EM,4,10,25,50,default,0,0
-FN,5,11,25,50,default,0,0
+AG,0,6,40,60,default,0,13
+BH,1,7,40,60,default,0,13
+CI,2,8,40,60,default,0,13
+DL,3,9,40,60,default,0,13
+EM,4,10,40,60,default,0,13
+FN,5,11,40,60,default,0,13
 
-GH,6,7,25,50,default,0,0
-GI,6,8,25,50,default,0,0
-GO,6,12,25,50,default,0,0
-HL,7,9,25,50,default,0,0
-HO,7,12,25,50,default,0,0
-IM,8,10,25,50,default,0,0
-IO,8,12,25,50,default,0,0
-LN,9,11,25,50,default,0,0
-OL,12,9,25,50,default,0,0
-MN,10,11,25,50,default,0,0
-OM,12,10,25,50,default,0,0
-ON,12,11,25,50,default,0,0
+GH,6,7,40,60,default,0,13
+GI,6,8,40,60,default,0,13
+GO,6,12,40,60,default,0,13
+HL,7,9,40,60,default,0,13
+HO,7,12,40,60,default,0,13
+IM,8,10,40,60,default,0,13
+IO,8,12,40,60,default,0,13
+LN,9,11,40,60,default,0,13
+OL,12,9,40,60,default,0,13
+MN,10,11,40,60,default,0,13
+OM,12,10,40,60,default,0,13
+ON,12,11,40,60,default,0,13
 
 
