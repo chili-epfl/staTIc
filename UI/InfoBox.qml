@@ -111,10 +111,13 @@ Rectangle {
         id:custom_loader
         anchors.fill:parent
         asynchronous: false
-        onLoaded: item.current_item=Qt.binding(function(){return current_item})
+        onLoaded: if(item.hasOwnProperty('current_item')) item.current_item=Qt.binding(function(){return current_item})
         visible:settings.visible_loader=="CUSTOM"
         onVisibleChanged: {
-                logger.log("infobox_custom_loader_visibility",{"visible":visible,"item": item.current_item})
+            if(item && item.current_item)
+                logger.log("infobox_custom_loader_visibility",{"visible":visible,"item": item.current_item.objectName})
+            else
+                logger.log("infobox_custom_loader_visibility",{"visible":visible,"item": ""})
         }
     }
     Loader{
@@ -125,7 +128,10 @@ Rectangle {
         onLoaded: item.current_item=Qt.binding(function(){return current_item})
         source:"qrc:/ui/UI/InfoBoxDesigner.qml"
         onVisibleChanged: {
-                logger.log("infobox_designer_loader_visibility",{"visible":visible,"item": item.current_item})
+            if(item && item.current_item)
+                logger.log("infobox_designer_loader_visibility",{"visible":visible,"item": item.current_item.objectName})
+            else
+                logger.log("infobox_custom_loader_visibility",{"visible":visible,"item": ""})
         }
     }
     Loader{
@@ -136,7 +142,10 @@ Rectangle {
         source:"qrc:/ui/UI/InfoBoxBeam.qml"
         onLoaded: item.current_item=Qt.binding(function(){return current_item})
         onVisibleChanged: {
-                logger.log("infobox_beam_loader_visibility",{"visible":visible,"item": item.current_item})
+            if(item && item.current_item)
+                logger.log("infobox_beam_loader_visibility",{"visible":visible,"item": item.current_item.objectName})
+            else
+                logger.log("infobox_custom_loader_visibility",{"visible":visible,"item": ""})
         }
     }
     Loader{
@@ -147,7 +156,10 @@ Rectangle {
         onLoaded: item.current_item=Qt.binding(function(){return current_item})
         source:"qrc:/ui/UI/InfoBoxJoint.qml"
         onVisibleChanged: {
-                logger.log("infobox_joint_loader_visibility",{"visible":visible,"item": item.current_item})
+            if(item && item.current_item)
+                logger.log("infobox_joint_loader_visibility",{"visible":visible,"item": item.current_item.objectName})
+            else
+                logger.log("infobox_custom_loader_visibility",{"visible":visible,"item": ""})
         }
 
     }

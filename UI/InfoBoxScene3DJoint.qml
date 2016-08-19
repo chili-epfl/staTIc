@@ -409,17 +409,21 @@ Entity {
                     Transform{
                         id:transform
                         matrix:{
-                            var m=Qt.matrix4x4(beam_poses[index].m11,beam_poses[index].m12,
-                                               beam_poses[index].m13,0,
-                                               beam_poses[index].m21,beam_poses[index].m22,
-                                               beam_poses[index].m23,0,
-                                               beam_poses[index].m31,beam_poses[index].m32,
-                                               beam_poses[index].m33,0,
-                                               beam_poses[index].m41,beam_poses[index].m42,
-                                               beam_poses[index].m43,1);
-                            m.rotate(-90, Qt.vector3d(0, 0, 1))
-                            m.translate(Qt.vector3d(0,0.5*axis_mesh.length,0));
-                            return m
+                            if(beam_poses[index]){
+                                var m=Qt.matrix4x4(beam_poses[index].m11,beam_poses[index].m12,
+                                                   beam_poses[index].m13,0,
+                                                   beam_poses[index].m21,beam_poses[index].m22,
+                                                   beam_poses[index].m23,0,
+                                                   beam_poses[index].m31,beam_poses[index].m32,
+                                                   beam_poses[index].m33,0,
+                                                   beam_poses[index].m41,beam_poses[index].m42,
+                                                   beam_poses[index].m43,1);
+                                m.rotate(-90, Qt.vector3d(0, 0, 1))
+                                m.translate(Qt.vector3d(0,0.5*axis_mesh.length,0));
+                                return m
+                            }else{
+                                return Qt.matrix4x4()
+                            }
                         }
                     }
                     components: [axis_mesh,transform,test_material]
