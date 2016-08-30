@@ -20,6 +20,14 @@ Item {
 //    }
     property bool use_custom_board:false
 
+    focus:true
+    Keys.onReleased: {
+        console.log(event.key)
+        if (event.key === Qt.Key_Back) {
+            event.accepted = true
+        }
+    }
+
     Image{
         anchors.fill: parent
         fillMode: Image.Tile
