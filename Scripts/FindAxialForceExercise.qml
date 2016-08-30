@@ -33,7 +33,6 @@ Item {
         onFirstInitChanged:
             if(!firstInit){
                 default_script.infobox.custom_loader.source="qrc:/ui/UI/InfoBoxFindAxialForce.qml"
-
                 for(var i=0;i<question_beams.length;i++){
                     var beam_name=question_beams[i];
                     var beam=vmManager.getEntity3D(beam_name);

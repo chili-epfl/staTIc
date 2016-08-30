@@ -59,10 +59,10 @@ Item {
         ignoreUnknownSignals: true
         target: scriptLoader.valid ? scriptLoader.item : null
         onPageExit: {
+            logger.close_logger();
             intromenu.visible=true;
             intromenu.enabled=true;
             scriptLoader.source=""
-            logger.close_logger();
         }
     }
 

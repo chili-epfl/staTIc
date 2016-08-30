@@ -289,7 +289,6 @@ Rectangle {
                         logger.log("infobox_beam_exagerate",{"value":value})
                 }
             }
-
         }
     }
 }

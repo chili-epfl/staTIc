@@ -40,7 +40,8 @@ Entity{
                                                 Qt.vector3d(-transform.translation.y/rootEntity.parent.length + 0.5,-transform.translation.y/rootEntity.parent.length + 0.5,-transform.translation.y/rootEntity.parent.length + 0.5):
                                                 Qt.vector3d(0,0,0);
     onRelativeLocalPositionChanged: {
-        logger.log("Trapezoidal_force_move", {"realtive_position":relativeLocalPosition,"beam":parent.objectName})
+        if(dragging)
+            logger.log("Trapezoidal_force_move", {"realtive_position":relativeLocalPosition,"beam":parent.objectName})
     }
 
     property bool dragging: settings.beam_dragging_ownership==rootEntity;
