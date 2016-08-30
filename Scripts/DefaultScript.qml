@@ -47,6 +47,7 @@ Item{
     }
 
     state: "LoadingCamera"
+    onStateChanged: console.log("State:"+state)
     states: [
         //....Init states....
         State {
@@ -221,7 +222,6 @@ Item{
             loadingAnimation.visible=false;
             loadingAnimation.enabled=false;
             firstInit=false;
-            applicationRoot.state=""
             logger.log("Start_default_script",{"structureUrl":structureUrl})
         }
         running: false;
