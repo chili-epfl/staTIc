@@ -37,7 +37,7 @@ Item {
                     var beam_name=question_beams[i];
                     var beam=vmManager.getEntity3D(beam_name);
                     if(beam){
-                        question_beams_model.append({"beam":beam, "answer":0})
+                        question_beams_model.append({"beam":beam, "answer":0,"correctness":0})
                     }
                     else{
                        console.log("Problem with getting the beam:",beam_name)
@@ -181,12 +181,11 @@ Item {
             name: "SOLVED"
             PropertyChanges{
                 target: info_container
-                visible:true
+                visible:false
+                restoreEntryValues: false
             }
             StateChangeScript{
                 script: {
-                    default_script.stateLock=false
-                    default_script.infobox.custom_loader.source=""
                     for(var i=0;i<elements_to_restore.length;i++)
                         elements_to_restore[i].non_default_visibility=true;
                 }
@@ -198,29 +197,41 @@ Item {
             }
             PropertyChanges{
                 target: score_box
-                visible:true
+                visible:false
                 restoreEntryValues: false
             }
             PropertyChanges{
                 target: next_button
                 visible:true
                 restoreEntryValues: false
-            }
-
-        },
-        State {
-            name: "EXPLORING"
-            PropertyChanges{
-                target: info_container
-                visible:false
             }
             AnchorChanges{
                 target: next_button
                 anchors.bottom: exercise.bottom
                 anchors.right: exercise.right
             }
+
+        },
+        State {
+            name: "EXPLORING"
+            StateChangeScript{
+                script: {
+                    default_script.stateLock=false
+                    default_script.infobox.custom_loader.source=""
+                }
+            }
+            PropertyChanges{
+                target: info_container
+                visible:false
+            }
+
             StateChangeScript{
                 script: logger.log("FindAxialLoad_Exercise_Exploring")
+            }
+            AnchorChanges{
+                target: next_button
+                anchors.bottom: exercise.bottom
+                anchors.right: exercise.right
             }
         }
 

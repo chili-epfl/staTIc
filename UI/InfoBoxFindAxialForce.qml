@@ -18,13 +18,17 @@ Rectangle {
         var logger_map={}
         for(var i=0; i<question_beams.count;i++){
             logger_map[question_beams.get(i).beam.objectName]=question_beams.get(i).answer;
-            if(question_beams.get(i).answer==0)
+            if(question_beams.get(i).answer==0){
                 missing++;
+                question_beams.get(i).correctness=0;
+            }
             else if(question_beams.get(i).beam.axialForceType!=question_beams.get(i).answer){
                 wrong++
+                question_beams.get(i).correctness=-1;
             }
             else {
                 correct++
+                question_beams.get(i).correctness=1;
             }
         }
         logger_map["Correct"]=correct;
@@ -91,6 +95,21 @@ Rectangle {
                         Item{
                             Layout.preferredHeight: parent.height
                             Layout.preferredWidth: parent.width/2
+                            Rectangle{
+                                visible:root.exerciseComplete
+                                anchors.right: beam_label.left
+                                anchors.rightMargin: 10
+                                anchors.verticalCenter: parent.verticalCenter
+                                width: beam_label.height
+                                height: width
+                                radius: width/2
+                                onVisibleChanged:
+                                    if(question_beams.get(index).correctness==0)
+                                        color = "yellow"
+                                    else if(question_beams.get(index).correctness>0)
+                                        color = "green"
+                                    else color = "red"
+                            }
                             Text{
                                 anchors.centerIn: parent
                                 color:"#F0F0F0"
@@ -147,6 +166,7 @@ Rectangle {
             }
         }
         Item{
+            id:check_button
             Layout.preferredWidth: root.width
             Layout.preferredHeight: 0.10*root.height
             Rectangle{
@@ -173,6 +193,7 @@ Rectangle {
                         anchors.fill: parent
                         onClicked: {
                               checkSolution();
+                              check_button.visible=false
                         }
                     }
                 }
