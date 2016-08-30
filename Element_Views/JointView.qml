@@ -18,7 +18,7 @@ Entity{
     property vector3d reaction
     property vector3d displacement
 
-    property real displacementLimit: position.y==0 ? 1 : position.y/500
+    property real displacementLimit: Math.max( 1 , position.y/500)
     property int displacementStatus: 0
     onDisplacementChanged: {
         if(Math.abs(displacement.x) > displacementLimit ||
