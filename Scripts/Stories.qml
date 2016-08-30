@@ -56,7 +56,7 @@ Item{
              <p>For each beams you can choose either <b><i>Compression</i></b> or <b><i>Tension</i></b>. If you don't know just do not check any box</p>
              <p>Are you ready?</p>",
             "structure_url":"qrc:/scripts/Scripts/Vault/Vault.structure",
-             "question_beams":["CG","BC"],
+             "question_beams":["AC","CG","BC"],
              "hidden_beams":["CD","CE","AC"],
              "loadsOnBeams":[{"beamName":"AB", "warehouseIndex":0}, {"beamName":"DE", "warehouseIndex":0}
                 , {"beamName":"EF", "warehouseIndex":0}, {"beamName":"FH", "warehouseIndex":0}]
