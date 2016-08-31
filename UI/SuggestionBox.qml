@@ -1,8 +1,11 @@
 import QtQuick 2.0
 
 Rectangle{
-    property alias text:suggestion_box.text
-    onTextChanged: suggestion_box_container.state="Visible"
+
+    function show_message(text){
+        suggestion_box.text=text;
+        suggestion_box_container.state="Visible"
+    }
     id:suggestion_box_container
     state:"Hidden"
     states: [
@@ -40,19 +43,21 @@ Rectangle{
         id:suggention_box_timer
         interval: 5000
         running: false
-        onTriggered: suggestion_box_container.state="Hidden"
+        onTriggered: {
+            suggestion_box_container.state="Hidden"
+        }
     }
     anchors.horizontalCenter: parent.horizontalCenter
     anchors.margins: 10
-    width: Math.min(suggestion_box.implicitWidth+20,parent.width/3)
-    height: Math.max(suggestion_box.implicitHeight+20,ghostMode_button.height)
+    width: Math.min(suggestion_box.implicitWidth+50,parent.width/3)
+    height: Math.min(suggestion_box.implicitHeight+20,50)
     radius: 5
     border.width: 5
     border.color: "#B4E1E4"
     color: "#81c7e1"
     Text{
         id: suggestion_box
-        anchors.fill: parent
+        anchors.centerIn: parent
         color: "white"
         text:""
         font.pointSize: 14

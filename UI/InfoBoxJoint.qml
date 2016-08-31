@@ -71,7 +71,7 @@ Rectangle {
     color:"transparent"
 
     ColumnLayout{
-          spacing: 10
+        spacing: 10
 
         Rectangle{
             color:"#2f3439"
@@ -141,7 +141,7 @@ Rectangle {
             color:"#2f3439"
             radius: 1
             Layout.preferredWidth: root.width
-            Layout.preferredHeight: 0.20*root.height
+            Layout.preferredHeight: 0.30*root.height
 
             ListModel{
                 id:forceListModel

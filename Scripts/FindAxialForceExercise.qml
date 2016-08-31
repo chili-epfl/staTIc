@@ -421,14 +421,26 @@ Item {
         MouseArea{
             id:next_button_area
             anchors.fill: parent
+            property bool firstClick:true;
             onClicked: {
                 if(exercise.state=="PRESENTING")
                     exercise.state="SOLVING"
                 else if(exercise.state=="SOLVED"){
                     exercise.state="EXPLORING"
                 }
-                else if(exercise.state=="EXPLORING")
-                    pageExit()
+                else if(exercise.state=="EXPLORING" && !firstClick)
+                    default_script.pageExit()
+                else if(exercise.state=="EXPLORING" && firstClick){
+                    default_script.suggestion_box.show_message("Click again to exit")
+                    firstClick=false
+                    timer_reset_firstClick.start()
+                }
+            }
+            Timer{
+                id:timer_reset_firstClick
+                interval: 5000
+                running: false
+                onTriggered: next_button_area.firstClick=true
             }
         }
 

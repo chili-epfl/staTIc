@@ -41,7 +41,6 @@ Entity {
 
 
     property vector3d currentForce: Qt.vector3d(0,0,0)
-    onCurrentForceChanged: console.log(currentForce)
 
     property vector3d maxForce: Qt.vector3d(0.0001,0,0)
 

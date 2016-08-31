@@ -15,8 +15,8 @@ public:
     }
     void log(QDateTime date,QString action, QVariantMap fields)
     {
+        m_mutex.lock();
         if(m_file.isOpen()){
-            m_mutex.lock();
             //        m_file.open(QFile::WriteOnly | QFile::Append);
             //        m_textstream.setDevice(&m_file);
             if(init_file){
@@ -54,12 +54,13 @@ public:
             m_textstream<<"\t]\n";
             m_textstream<<"}\n";
             m_textstream.flush();
-            m_mutex.unlock();
         }
+        m_mutex.unlock();
+
     }
     void log_static_configuration(QDateTime date,QVariantMap fields){
+        m_mutex4static_conf.lock();
         if(m_file_static_conf.isOpen()){
-            m_mutex4static_conf.lock();
 
             if(init_file4static_conf){
                 m_textstream4static_conf<<"[\n";
@@ -144,8 +145,8 @@ public:
             m_textstream4static_conf<<"}\n";
 
             m_textstream4static_conf.flush();
-            m_mutex4static_conf.unlock();
         }
+        m_mutex4static_conf.unlock();
 
     }
     void log_position(QDateTime date , QString name, QVector3D translation, QVector3D angles){
@@ -155,8 +156,6 @@ public:
                     fabs(prev_rot.x()-angles.x())<5 &&
                     fabs(prev_rot.y()-angles.y())<5 &&
                     fabs(prev_rot.z()-angles.z())<5){
-                prev_translations[name]=translation;
-                prev_rotations[name]=angles;
                 return;
             }
         }
@@ -164,9 +163,8 @@ public:
         prev_translations[name]=translation;
         prev_rotations[name]=angles;
 
-
+        m_mutex4positions.lock();
         if(m_file_positions.isOpen()){
-            m_mutex4positions.lock();
 
             if(init_file4positions){
                 m_textstream4file_positions<<"[\n";
@@ -183,13 +181,16 @@ public:
                                          angles.y()<<","<<angles.z()<<")\"\n";
             m_textstream4file_positions<<"}\n";
             m_textstream4file_positions.flush();
-            m_mutex4positions.unlock();
         }
+        m_mutex4positions.unlock();
 
     }
 
     void restart_logger(){
-        close_logger();       
+        close_logger();
+        m_mutex.lock();
+        m_mutex4positions.lock();
+        m_mutex4static_conf.lock();
         QDir localDir;
         bool directoryAvailable=localDir.exists(logFilesPath);
         if(!directoryAvailable){
@@ -201,11 +202,10 @@ public:
                 directoryAvailable=true;
         }
         if(directoryAvailable) {
-            QString log_file_name=QDateTime::currentDateTime().toString("dMyyhms");
-            m_file.setFileName(logFilesPath+"user_actions_"+log_file_name+".json");
-            m_file_positions.setFileName(logFilesPath+"positions_"+log_file_name+".json");
-            m_file_static_conf.setFileName(logFilesPath+"static_config_"+log_file_name+".json");
-
+            QString log_file_name=QDateTime::currentDateTime().toString("dd_MMM_yy_hh_mm_ss");
+            m_file.setFileName(logFilesPath+log_file_name+"_user_actions.json");
+            m_file_positions.setFileName(logFilesPath+log_file_name+"_positions.json");
+            m_file_static_conf.setFileName(logFilesPath+log_file_name+"_static_configs.json");
         }
         init_file=true;
         if(!m_file.open(QFile::WriteOnly))
@@ -227,31 +227,34 @@ public:
         init_file4static_conf=true;
         prev_rotations.clear();
         prev_translations.clear();
+        m_mutex.unlock();
+        m_mutex4positions.unlock();
+        m_mutex4static_conf.unlock();
     }
     void close_logger(){
+        m_mutex.lock();
         if(m_file.isOpen()){
-            m_mutex.lock();
             m_textstream<<"\n]";
             m_textstream.flush();
             m_file.close();
-            m_mutex.unlock();
         }
+        m_mutex.unlock();
 
+        m_mutex4positions.lock();
         if(m_file_positions.isOpen()){
-            m_mutex4positions.lock();
             m_textstream4file_positions<<"\n]";
             m_textstream4file_positions.flush();
             m_file_positions.close();
-            m_mutex4positions.unlock();
         }
+        m_mutex4positions.unlock();
 
+        m_mutex4static_conf.lock();
         if(m_file_static_conf.isOpen()){
-            m_mutex4static_conf.lock();
             m_textstream4static_conf<<"\n]";
             m_textstream4static_conf.flush();
             m_file_static_conf.close();
-            m_mutex4static_conf.unlock();
         }
+        m_mutex4static_conf.unlock();
     }
 
     static LoggerPrivate& get_instance(){

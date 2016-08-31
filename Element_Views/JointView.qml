@@ -109,7 +109,7 @@ Entity{
             hoverEnabled: false
             onClicked: {
                 sceneRoot.mouseEventHasBeenAccepted=true;
-                if(settings.joint_is_selectable){
+                if(settings.joint_is_selectable && infobox.current_item!=root){
                     infobox.current_item=root
                 }
 

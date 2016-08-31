@@ -11,7 +11,9 @@ Rectangle {
     property alias loader_beam: loader_beam
     property alias loader_designer: loader_designer
     property alias loader_joint: loader_joint
-
+    MouseArea{
+        anchors.fill: parent
+    }
 
     color:"transparent"
     radius:5
@@ -131,7 +133,7 @@ Rectangle {
             if(item && item.current_item)
                 logger.log("infobox_designer_loader_visibility",{"visible":visible,"item": item.current_item.objectName})
             else
-                logger.log("infobox_custom_loader_visibility",{"visible":visible,"item": ""})
+                logger.log("infobox_designer_loader_visibility",{"visible":visible,"item": ""})
         }
     }
     Loader{
@@ -145,7 +147,7 @@ Rectangle {
             if(item && item.current_item)
                 logger.log("infobox_beam_loader_visibility",{"visible":visible,"item": item.current_item.objectName})
             else
-                logger.log("infobox_custom_loader_visibility",{"visible":visible,"item": ""})
+                logger.log("infobox_beam_loader_visibility",{"visible":visible,"item": ""})
         }
     }
     Loader{
@@ -159,7 +161,7 @@ Rectangle {
             if(item && item.current_item)
                 logger.log("infobox_joint_loader_visibility",{"visible":visible,"item": item.current_item.objectName})
             else
-                logger.log("infobox_custom_loader_visibility",{"visible":visible,"item": ""})
+                logger.log("infobox_joint_loader_visibility",{"visible":visible,"item": ""})
         }
 
     }

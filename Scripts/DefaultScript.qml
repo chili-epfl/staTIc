@@ -20,6 +20,7 @@ Item{
         logger.log("exit_default_script");
     }
 
+    property alias suggestion_box: suggestion_box
     property alias currentViewFilter: viewFilterBar.selection
     property alias materialsManager: staticsmodule.materialsManager
     property alias vmManager: vmFrame3DDManager
@@ -290,7 +291,7 @@ Item{
         }
         onStabilityChanged: {
             if(stability==Frame3DDKernel.UNSTABLE){
-                suggestion_box.text="The structure is unstable. Check the supports"
+                suggestion_box.show_message("The structure is unstable. Check the supports")
             }
         }
         onUpdated: {

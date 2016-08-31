@@ -40,8 +40,10 @@ Entity{
                                                 Qt.vector3d(-transform.translation.y/rootEntity.parent.length + 0.5,-transform.translation.y/rootEntity.parent.length + 0.5,-transform.translation.y/rootEntity.parent.length + 0.5):
                                                 Qt.vector3d(0,0,0);
     onRelativeLocalPositionChanged: {
-        if(dragging)
-            logger.log("Trapezoidal_force_move", {"realtive_position":relativeLocalPosition,"beam":parent.objectName})
+        if(dragging){
+            var pos_text="("+relativeLocalPosition.x+","+relativeLocalPosition.y+","+relativeLocalPosition.z+")"
+            logger.log("Trapezoidal_force_move", {"relative_position":pos_text,"beam":parent.objectName})
+        }
     }
 
     property bool dragging: settings.beam_dragging_ownership==rootEntity;
@@ -85,7 +87,7 @@ Entity{
         id:valid_picker
         hoverEnabled: false
         onPressedChanged: if(pressed && settings.beam_dragging_ownership==0){
-                              if(settings.load_is_selectable)
+                              if(settings.load_is_selectable && infobox.current_item!=rootEntity)
                                   infobox.current_item=rootEntity
                               if(settings.load_is_draggable){
                                   settings.beam_dragging_ownership=rootEntity
@@ -102,7 +104,7 @@ Entity{
                           }
         onClicked: {
             sceneRoot.mouseEventHasBeenAccepted=true;
-            if(settings.load_is_selectable)
+            if(settings.load_is_selectable && infobox.current_item!=rootEntity)
                     infobox.current_item=rootEntity
             if(dragging){
                 rootEntity.parent.drag_anchor_enabled=false;

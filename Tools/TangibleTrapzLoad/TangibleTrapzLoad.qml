@@ -83,7 +83,7 @@ Entity {
         hoverEnabled: false
         onClicked: {
             sceneRoot.mouseEventHasBeenAccepted=true;
-            if(applicationRoot.currentViewFilter=='DESIGNER')
+            if(applicationRoot.currentViewFilter=='DESIGNER' && infobox.current_item!=rootEntity)
                 infobox.current_item=rootEntity
         }
     }

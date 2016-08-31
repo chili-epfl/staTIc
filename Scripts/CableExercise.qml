@@ -310,7 +310,7 @@ Item {
                     cable_exercise.state="EXPLORING"
                 }
                 else if(cable_exercise.state=="EXPLORING")
-                    pageExit()
+                    default_script.pageExit()
             }
         }
 

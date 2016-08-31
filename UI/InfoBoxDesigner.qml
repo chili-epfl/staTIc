@@ -139,7 +139,7 @@ Rectangle {
                                             infobox.current_item=0;
                                         }
                                         else{
-                                            suggestion_box.text="You need to select a load first"
+                                            suggestion_box.show_message("You need to select a load first")
                                         }
                                     }
                                 }
@@ -167,7 +167,7 @@ Rectangle {
                                             current_item.asset3DTextureURL=warehouse3d.get(catalog_grid.currentIndex,"main_asset_diffuse_map_url")
                                         }
                                         else{
-                                            suggestion_box.text="You need to select a beam first"
+                                            suggestion_box.show_message("You need to select a beam first")
                                         }
                                     }
                                 }

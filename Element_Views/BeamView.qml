@@ -142,7 +142,6 @@ Entity{
     components: [transform]
 
     property real main_mesh_lenght: settings.show_beam_axial_loads ? Math.max(rootEntity.length/2-50,5) : Math.max(rootEntity.length/2-25,5)
-    onMain_mesh_lenghtChanged: console.log(main_mesh_lenght)
     Entity{
         enabled: settings.show_beam && !settings.show_displacement
         property Transform transform: Transform{
@@ -249,7 +248,7 @@ Entity{
             onEntered: current_anchor_position=Qt.vector3d(0,0,0);
             onClicked: {
                 sceneRoot.mouseEventHasBeenAccepted=true;
-                if(parent.enabled)
+                if(parent.enabled && infobox.current_item!=rootEntity)
                     infobox.current_item=rootEntity
             }
         }
