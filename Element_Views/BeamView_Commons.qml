@@ -1,5 +1,6 @@
 import Qt3D.Core 2.0
 import Qt3D.Render 2.0
+import "qrc:/opengl/Opengl"
 
 Entity{
 
@@ -26,6 +27,13 @@ Entity{
     property SphereMesh sphere_mesh:
         SphereMesh{
         radius: 7.5
+    }
+    property Mesh cube_mesh_inv_normals:
+        Mesh{
+        source: "qrc:/UIMesh/3DObjects/cube_inv_normals.obj"
+    }
+    property TransparentMaterial transparent_material_forAR:
+    TransparentMaterial{
     }
 
     property Mesh spring_mesh:

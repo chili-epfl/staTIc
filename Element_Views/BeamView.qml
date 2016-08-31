@@ -125,12 +125,12 @@ Entity{
         running: false
     }
 
-    PhongAlphaMaterial{
+    PhongMaterial{
         id:main_mesh_material
         ambient: infobox.current_item == rootEntity ? "green" : "grey"
         diffuse:"grey"
         specular:"black"
-        alpha:0.75
+        //alpha:0.75
     }
 
     Transform{
@@ -162,19 +162,12 @@ Entity{
         components: [beam_commons.main_mesh_cylinder,this.transform,main_mesh_material]
     }
 
-//    Entity{
-//        property Transform transform: Transform{
-//                scale3D:  Qt.vector3d(1,main_mesh_lenght/beam_commons.main_mesh_cylinder.length,1)
-//                translation:Qt.vector3d(0,-0.5*main_mesh_lenght-15,0)
-//        }
-//        TransparentMaterial{
-//            id:met
-//        }
-
-//        components: [beam_commons.main_mesh_cylinder,met,this.transform]
-
-//    }
-
+    Entity{
+        property Transform transform: Transform{
+                scale3D:  Qt.vector3d(rootEntity.tangibleSection.height/2,rootEntity.length/2-20,rootEntity.tangibleSection.width/2)
+        }
+        components: [beam_commons.cube_mesh_inv_normals,beam_commons.transparent_material_forAR,this.transform]
+    }
 
     Entity{
         enabled: settings.show_beam_sphere
