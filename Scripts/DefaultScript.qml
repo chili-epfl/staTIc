@@ -47,7 +47,7 @@ Item{
     }
 
     state: "LoadingCamera"
-    onStateChanged: console.log("State:"+state)
+//    onStateChanged: console.log("State:"+state)
     states: [
         //....Init states....
         State {
@@ -231,8 +231,8 @@ Item{
     Component.onCompleted: if(Platform=="ANDROID"){
                                camDevice.deviceId=QtMultimedia.availableCameras[0].deviceId
                                marker_detector.projectionMatrix=Qt.matrix4x4(
-                                           1.4272479930179818e+03 ,0 ,6.4750000000000000e+02,0,
-                                           0, 1.4272479930179818e+03 , 4.8550000000000000e+02,0,
+                                           1.0352696831776980e+03 ,0 ,6.4750000000000000e+02,0,
+                                           0, 1.0352696831776980e+03 , 4.8550000000000000e+02,0,
                                            0,0,1,0,
                                            0,0,0,1)
                            }
