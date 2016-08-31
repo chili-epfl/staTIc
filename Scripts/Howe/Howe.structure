@@ -31,17 +31,17 @@ H,4680,300,0,0
 13
 
 #Beam name,node 1,node 2,width,height,MaterialID,tangibleWidth,tangibleHeight
-AB,0,1,40,60,default,0,13
-AC,0,2,40,60,default,0,13
-BC,2,1,40,60,default,0,13
-BD,1,3,40,60,default,0,13
-BE,1,4,40,60,default,0,13
-CE,2,4,40,60,default,0,13
-DE,4,3,40,60,default,0,13
-DF,3,5,40,60,default,0,13
-EF,4,5,40,60,default,0,13
-EG,4,6,40,60,default,0,13
-FG,6,5,40,60,default,0,13
-GH,6,7,40,60,default,0,13
-FH,5,7,40,60,default,0,13
+AB,0,1,40,60,default,18,13
+AC,0,2,40,60,default,18,13
+BC,2,1,40,60,default,18,13
+BD,1,3,40,60,default,18,13
+BE,1,4,40,60,default,18,13
+CE,2,4,40,60,default,18,13
+DE,4,3,40,60,default,18,13
+DF,3,5,40,60,default,18,13
+EF,4,5,40,60,default,18,13
+EG,4,6,40,60,default,18,13
+FG,6,5,40,60,default,18,13
+GH,6,7,40,60,default,18,13
+FH,5,7,40,60,default,18,13
 
