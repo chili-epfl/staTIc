@@ -141,26 +141,40 @@ Entity{
 
     components: [transform]
 
-    property real main_mesh_lenght: settings.show_beam_axial_loads ? rootEntity.length/2-80 : rootEntity.length/2-25
-
+    property real main_mesh_lenght: settings.show_beam_axial_loads ? Math.max(rootEntity.length/2-50,5) : Math.max(rootEntity.length/2-25,5)
+    onMain_mesh_lenghtChanged: console.log(main_mesh_lenght)
     Entity{
         enabled: settings.show_beam && !settings.show_displacement
         property Transform transform: Transform{
                 scale3D:  Qt.vector3d(1,main_mesh_lenght/beam_commons.main_mesh_cylinder.length,1)
-                translation:length > (2* main_mesh_lenght + 30) ?
-                                Qt.vector3d(0,0.5*main_mesh_lenght+15,0):
-                                Qt.vector3d(0,0,0)
+                translation://length > (2* main_mesh_lenght + 30) ?
+                                Qt.vector3d(0,0.5*main_mesh_lenght+10,0)
+                              //:Qt.vector3d(0,0,0)
         }
         components: [beam_commons.main_mesh_cylinder,this.transform,main_mesh_material]
     }
     Entity{
-        enabled: settings.show_beam && !settings.show_displacement && length > (2*main_mesh_lenght + 30)
+        enabled: settings.show_beam && !settings.show_displacement// && length > (2*main_mesh_lenght + 30)
         property Transform transform: Transform{
                 scale3D:  Qt.vector3d(1,main_mesh_lenght/beam_commons.main_mesh_cylinder.length,1)
-                translation:Qt.vector3d(0,-0.5*main_mesh_lenght-15,0)
+                translation:Qt.vector3d(0,-0.5*main_mesh_lenght-10,0)
         }
         components: [beam_commons.main_mesh_cylinder,this.transform,main_mesh_material]
     }
+
+//    Entity{
+//        property Transform transform: Transform{
+//                scale3D:  Qt.vector3d(1,main_mesh_lenght/beam_commons.main_mesh_cylinder.length,1)
+//                translation:Qt.vector3d(0,-0.5*main_mesh_lenght-15,0)
+//        }
+//        TransparentMaterial{
+//            id:met
+//        }
+
+//        components: [beam_commons.main_mesh_cylinder,met,this.transform]
+
+//    }
+
 
     Entity{
         enabled: settings.show_beam_sphere
