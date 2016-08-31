@@ -195,6 +195,7 @@
         <file>3DObjects/pin support.obj</file>
         <file>3DObjects/S2.obj</file>
         <file>3DObjects/S1.obj</file>
+        <file>3DObjects/cube_inv_normals.obj</file>
     </qresource>
     <qresource prefix="/resources">
         <file>Resources/Assets3D/solar_pannel/Solar.png</file>
