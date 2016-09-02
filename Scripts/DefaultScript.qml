@@ -143,6 +143,18 @@ Item{
                     show_info_box: false
                 }
             },
+            State{
+                name:"analysis_suggestion"
+                when:!firstInit && settings.show_filter_bar && currentViewFilter=='ANALYSIS' &&
+                     infobox.current_item==0 && applicationRoot.state==""
+                StateChangeScript{
+                    script: suggestion_box.show_message("Select either a joint or a beam to analyse it");
+                }
+                PropertyChanges{
+                    target:settings
+                    show_info_box: false
+                }
+            },
             State {
                 name: "beam"
                 when: !firstInit && settings.show_filter_bar && currentViewFilter=='ANALYSIS' &&

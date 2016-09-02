@@ -105,7 +105,7 @@ Rectangle {
         }
         MouseArea{
             anchors.fill: parent
-            onClicked: hideButton.state==="Visible" ? hideButton.state="Hidden": hideButton.state="Visible"
+            onPressed: hideButton.state==="Visible" ? hideButton.state="Hidden": hideButton.state="Visible"
         }
     }
 
