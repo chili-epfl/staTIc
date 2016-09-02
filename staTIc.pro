@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += qml quick widgets 3dcore 3drender 3dinput multimedia network
+QT += qml quick widgets 3dcore 3drender 3dinput multimedia network sensors
 DEFINES += VIDEOFORMAT=43
 CONFIG += c++11 concurrent
 SOURCES += main.cpp \

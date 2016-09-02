@@ -57,6 +57,12 @@
         <file>Images/support.png</file>
         <file>Images/wood_beam2.png</file>
         <file>Images/boss.png</file>
+        <file>Images/fix_support.png</file>
+        <file>Images/fix_support_react.png</file>
+        <file>Images/pinned_support.png</file>
+        <file>Images/pinned_support_react.png</file>
+        <file>Images/rolling_support.png</file>
+        <file>Images/rolling_support_react.png</file>
     </qresource>
     <qresource prefix="/element_views">
         <file>Element_Views/AnimationUnitDy.qml</file>
@@ -135,6 +141,19 @@
         <file>UI/Eye_tracking_tags/011.png</file>
         <file>UI/Eye_tracking_tags/012.png</file>
         <file>UI/Eye_tracking_tags/013.png</file>
+        <file>UI/Help/Tutorial.qml</file>
+        <file>UI/Help/page_1.jpg</file>
+        <file>UI/Help/page_4.gif</file>
+        <file>UI/Help/page_5.png</file>
+        <file>UI/Help/page_2.gif</file>
+        <file>UI/Help/page_6.gif</file>
+        <file>UI/Help/page_7.gif</file>
+        <file>UI/Help/page_8.gif</file>
+        <file>UI/Help/page_9.gif</file>
+        <file>UI/Help/page_10.gif</file>
+        <file>UI/Help/page_11.gif</file>
+        <file>UI/Help/page_12.gif</file>
+        <file>UI/Help/page_3.gif</file>
     </qresource>
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>
@@ -196,6 +215,7 @@
         <file>3DObjects/S2.obj</file>
         <file>3DObjects/S1.obj</file>
         <file>3DObjects/cube_inv_normals.obj</file>
+        <file>3DObjects/fix support.obj</file>
     </qresource>
     <qresource prefix="/resources">
         <file>Resources/Assets3D/solar_pannel/Solar.png</file>
