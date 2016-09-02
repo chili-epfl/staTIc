@@ -45,6 +45,10 @@ Entity{
         Mesh{
         source: "qrc:/UIMesh/3DObjects/rolling support.obj"
     }
+    property Mesh fixed_support_mesh:
+        Mesh{
+        source: "qrc:/UIMesh/3DObjects/fix support.obj"
+    }
     property Mesh empty_mesh:
         Mesh{
     }

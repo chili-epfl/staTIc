@@ -25,6 +25,8 @@ public slots:
     void onDisplacementChanged();
     void onSupportChanged();
     /*---------*/
+    void updateSupportType(QString type);
+
 signals:
 private:
     void createEntityForBeam(BeamPtr b);

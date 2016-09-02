@@ -11,7 +11,19 @@ Rectangle {
         if(current_item!=0 &&
             current_item.type==="beam" &&
                 tab_view.currentIndex===1)
-                tab_view.getTab(1).item.currentIndex=materialsManager.get(current_item.materialID ,"Index");
+                tab_view.getTab(1).item.currentIndex=materialsManager.get(current_item.materialID ,"Index")
+        else if(current_item!=0 &&
+                current_item.type==="joint" &&
+                    tab_view.currentIndex===2){
+            if(current_item.supportType=="Pinned")
+                tab_view.getTab(2).item.support_selection="Pinned";
+            else  if(current_item.supportType=="Rolling")
+                tab_view.getTab(2).item.support_selection="Rolling Horizontal";
+            else  if(current_item.supportType=="Fixed")
+                tab_view.getTab(2).item.support_selection="Fixed";
+            else if(current_item.supportType=="none")
+                tab_view.getTab(2).item.support_selection="none";
+        }
     }
     color: "transparent"
     TabView{
@@ -19,29 +31,44 @@ Rectangle {
         onCurrentIndexChanged: if(current_item.type==="beam" && currentIndex===1){
                                    tab_view.getTab(1).item.currentIndex=materialsManager.get(current_item.materialID ,"Index");
                                }
+                               else if(current_item.type==="joint" && currentIndex===2){
+                                   if(current_item.supportType=="Pinned")
+                                       tab_view.getTab(2).item.support_selection="Pinned";
+                                   else  if(current_item.supportType=="Rolling")
+                                       tab_view.getTab(2).item.support_selection="Rolling Horizontal";
+                                   else  if(current_item.supportType=="Fixed")
+                                       tab_view.getTab(2).item.support_selection="Fixed";
+                                   else if(current_item.supportType=="none")
+                                       tab_view.getTab(2).item.support_selection="none";
+                               }
+
         anchors.fill: parent
         style:TabViewStyle {
             tabOverlap: 0
             frame: Rectangle {
                 color: "transparent"
             }
-            tab:Rectangle {
-                color: styleData.selected ? "steelblue" :"#F0F0F0"
-                border.color:  color
-                implicitWidth: Math.min(text.implicitWidth + 4, styleData.availableWidth)
-                implicitHeight: pt2px(14)
-                radius: 2
-                Text {
-                    id: text
-                    anchors.centerIn: parent
-                    width: Math.min(implicitWidth,parent.width)
-                    height: parent.height
-                    text: styleData.title
-                    color: styleData.selected ? "white" : "black"
-                    fontSizeMode: Text.Fit
-                    wrapMode: Text.WordWrap
-                    verticalAlignment: Text.AlignVCenter
+            tab:Item{
+                implicitWidth: Math.min(text.implicitWidth + 4, styleData.availableWidth)+10
+                implicitHeight: pt2px(14)+10
+                Rectangle {
+                    color: styleData.selected ? "steelblue" :"#F0F0F0"
+                    border.color:  color
+                    anchors.fill: parent
+                    anchors.margins: 5
+                    radius: 2
+                    Text {
+                        id: text
+                        anchors.centerIn: parent
+                        width: Math.min(implicitWidth,parent.width)
+                        height: parent.height
+                        text: styleData.title
+                        color: styleData.selected ? "white" : "black"
+                        fontSizeMode: Text.Fit
+                        wrapMode: Text.WordWrap
+                        verticalAlignment: Text.AlignVCenter
 
+                    }
                 }
             }
         }
@@ -419,6 +446,227 @@ Rectangle {
                 }
 
             }
+
+        }
+        Tab{
+            title:"Joint Design"
+            Item{
+                property alias support_selection: support_designer_rect.selection
+                anchors.fill: parent
+                Rectangle{
+                    id:support_design_joint_name
+                    border.color: "#F0F0F0"
+                    border.width: 5
+                    color: "#2f3439"
+                    Text {
+                        color: "white"
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        text: current_item!=0 && current_item.type=="joint"? "Joint "+ current_item.objectName : "Select a joint"
+                        font.pointSize: 30
+                        fontSizeMode: Text.Fit
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    width: parent.width
+                    height: parent.height*0.07
+                    anchors.margins: 10
+
+                }
+
+                Rectangle{
+                    anchors.top: support_design_joint_name.bottom
+                    id:support_designer_rect
+                    border.color: "#F0F0F0"
+                    border.width: 5
+                    color: "#2f3439"
+                    width: parent.width
+                    height: parent.height*0.8
+                    anchors.margins: 10
+
+                    property string selection:"none";
+
+                    GridLayout{
+                        columns: 3
+                        rows: 4
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        Text{
+                            text:"Name"
+                            color:"white"
+                            font.bold: true
+                            font.pointSize: 12
+                            Layout.preferredWidth: 1/4*support_designer_rect.width
+                            Layout.alignment: Qt.AlignHCenter
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                        Text{
+                            text:"Symbol"
+                            color:"white"
+                            font.bold: true
+                            font.pointSize: 12
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignHCenter
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                        Text{
+                            text:"Reaction"
+                            color:"white"
+                            font.bold: true
+                            font.pointSize: 12
+                            Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignHCenter
+                            horizontalAlignment: Text.AlignHCenter
+
+                        }
+
+                        Rectangle{
+                            visible: true
+                            color: "transparent"
+                            border.color: support_designer_rect.selection=="Fixed"? "red" : "transparent"
+                            border.width: 5
+                            Layout.preferredWidth: 1/4*support_designer_rect.width
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredHeight: support_designer_rect.height/4
+                            Text{
+                                text:"Fixed"
+                                color:"white"
+                                font.pointSize: 11
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                anchors.fill: parent
+                                anchors.margins: 10
+                                fontSizeMode: Text.Fit
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                            if(support_designer_rect.selection=="Fixed")
+                                               support_designer_rect.selection="none"
+                                           else
+                                               support_designer_rect.selection="Fixed"
+                                           if(current_item!=0 && current_item.type==="joint")
+                                               current_item.setSupportType(support_designer_rect.selection)
+                                }
+                            }
+                        }
+
+                        Image{
+                            visible: true
+                            source: "qrc:/images/Images/fix_support.png"
+                            Layout.fillWidth: true
+                            fillMode: Image.PreserveAspectFit
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredHeight: support_designer_rect.height/4
+
+                        }
+                        Image{
+                            visible: true
+                            source: "qrc:/images/Images/fix_support_react.png"
+                            Layout.fillWidth: true
+                            fillMode: Image.PreserveAspectFit
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredHeight: support_designer_rect.height/4
+                        }
+
+                        Rectangle{
+                            color: "transparent"
+                            border.color: support_designer_rect.selection=="Pinned"? "red" : "transparent"
+                            border.width: 5
+                            Layout.preferredWidth: 1/4*support_designer_rect.width
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredHeight: support_designer_rect.height/4
+                            Text{
+                                text:"Pinned"
+                                color:"white"
+                                font.pointSize: 11
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                anchors.fill: parent
+                                anchors.margins: 10
+                                fontSizeMode: Text.Fit
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked:  {
+                                            if(support_designer_rect.selection=="Pinned")
+                                               support_designer_rect.selection="none"
+                                            else
+                                               support_designer_rect.selection="Pinned"
+                                            if(current_item!=0 && current_item.type==="joint")
+                                                current_item.setSupportType(support_designer_rect.selection)
+                                }
+                            }
+                        }
+                        Image{
+                            source: "qrc:/images/Images/pinned_support.png"
+                            Layout.fillWidth: true
+                            fillMode: Image.PreserveAspectFit
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredHeight: support_designer_rect.height/4
+
+                        }
+                        Image{
+                            source: "qrc:/images/Images/pinned_support_react.png"
+                            Layout.fillWidth: true
+                            fillMode: Image.PreserveAspectFit
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredHeight: support_designer_rect.height/4
+
+                        }
+                        Rectangle{
+                            color: "transparent"
+                            border.color: support_designer_rect.selection=="Rolling Horizontal"? "red" : "transparent"
+                            border.width: 5
+                            Layout.preferredWidth: 1/4*support_designer_rect.width
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredHeight: support_designer_rect.height/4
+                            Text{
+                                text:"Rolling Horizontal"
+                                color:"white"
+                                font.pointSize: 11
+                                horizontalAlignment: Text.AlignHCenter
+                                verticalAlignment: Text.AlignVCenter
+                                anchors.fill: parent
+                                anchors.margins: 10
+                                fontSizeMode: Text.Fit
+                                wrapMode: Text.WordWrap
+                            }
+                            MouseArea{
+                                anchors.fill: parent
+                                onClicked: {
+                                    if(support_designer_rect.selection=="Rolling Horizontal")
+                                        support_designer_rect.selection="none"
+                                    else
+                                        support_designer_rect.selection="Rolling Horizontal"
+                                    if(current_item!=0 && current_item.type==="joint")
+                                        if(support_designer_rect.selection!="none")
+                                            current_item.setSupportType("Rolling")
+                                        else
+                                            current_item.setSupportType(support_designer_rect.selection)
+                                }
+                            }
+                        }
+                        Image{
+                            source: "qrc:/images/Images/rolling_support.png"
+                            Layout.fillWidth: true
+                            fillMode: Image.PreserveAspectFit
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredHeight: support_designer_rect.height/4
+
+                        }
+                        Image{
+                            source: "qrc:/images/Images/rolling_support_react.png"
+                            Layout.fillWidth: true
+                            fillMode: Image.PreserveAspectFit
+                            Layout.alignment: Qt.AlignHCenter
+                            Layout.preferredHeight: support_designer_rect.height/4
+                        }
+
+                    }
+                }
+            }
+
 
         }
     }

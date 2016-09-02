@@ -6,6 +6,17 @@ Entity{
     id:root
     readonly property string type: "joint"
     property string supportType:"none"
+
+    function setSupportType(type){
+        if(supportType!=type){
+            supportType=type
+            logger.log("joint_change_support_type",{"Joint":root.objectName,"Support":supportType})
+            updateSupportType(type)
+        }
+
+    }
+    signal updateSupportType(string type);
+
     onEnabledChanged: {
         if(infobox.current_item == root)
             infobox.current_item=0;
@@ -170,10 +181,11 @@ Entity{
             }]
     }
     Entity{
-        enabled: supportType=="Pinned" || supportType=="Rolling"
+        enabled: supportType=="Pinned" || supportType=="Rolling" || supportType=="Fixed"
         property Mesh support_mesh: {
             if(supportType=="Pinned") return joint_commons.pinned_support_mesh
             else if(supportType=="Rolling") return joint_commons.rolling_support_mesh
+            else if(supportType=="Fixed") return joint_commons.fixed_support_mesh
             else return joint_commons.empty_mesh
         }
         Transform{

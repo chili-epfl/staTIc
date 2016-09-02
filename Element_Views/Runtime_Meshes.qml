@@ -18,7 +18,7 @@ Entity {
                 node_instatiator_mesh.objectAt(first_available_mesh).source=url;
                 loaded_mesh[url]=first_available_mesh;
                 first_available_mesh++;
-                console.log(first_available_mesh)
+                console.log("av",first_available_mesh)
                 return node_instatiator_mesh.objectAt(loaded_mesh[url])
             }
         }

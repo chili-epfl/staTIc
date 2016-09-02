@@ -23,6 +23,7 @@ JointVM::JointVM(JointPtr joint,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     connect(m_joint.data(),SIGNAL(connectedBeamsChanged()),this,SLOT(onConnectedBeamChanged()));
     connect(m_joint.data(),SIGNAL(displacementChanged()),this,SLOT(onDisplacementChanged()));
     connect(m_joint.data(),SIGNAL(supportChanged()),this,SLOT(onSupportChanged()));
+    connect(m_component3D,SIGNAL(updateSupportType(QString)),this,SLOT(updateSupportType(QString)));
 }
 
 JointVM::JointVM(JointPtr joint, Qt3DCore::QEntity *entity, QQmlContext *context, Qt3DCore::QEntity *sceneRoot, QObject *parent)
@@ -36,7 +37,8 @@ JointVM::JointVM(JointPtr joint, Qt3DCore::QEntity *entity, QQmlContext *context
     connect(m_joint.data(),SIGNAL(destroyed(QObject*)),this,SLOT(deleteLater()));
     connect(m_joint.data(),SIGNAL(connectedBeamsChanged()),this,SLOT(onConnectedBeamChanged()));
     connect(m_joint.data(),SIGNAL(displacementChanged()),this,SLOT(onDisplacementChanged()));
-    connect(m_joint.data(),SIGNAL(supportChanged()),this,SLOT(onSupportChanged()));
+    connect(m_joint.data(),SIGNAL(supportChanged()),this,SLOT(onSupportChanged()));    connect(m_component3D,SIGNAL(updateSupportType()),this,SLOT(updateSupportType()));
+    connect(m_component3D,SIGNAL(updateSupportType(QString)),this,SLOT(updateSupportType(QString)));
 
 }
 
@@ -125,7 +127,7 @@ void JointVM::onSupportChanged(){
                 supportType="Pinned";
             else if(!X && Y && Z && XX && YY && !ZZ)
                 supportType="Rolling";
-            else if(!X && !Y && Z && XX && YY && ZZ)
+            else if(!X && !Y && Z && XX && YY && !ZZ)
                 supportType="none";
         }
         else
@@ -141,6 +143,28 @@ void JointVM::onSupportChanged(){
     }
 }
 
+void JointVM::updateSupportType(QString type){
+    JointPtr joint_str_ref=m_joint.toStrongRef();
+    Frame3DDVMManager* parent_vm_manager=static_cast<Frame3DDVMManager*>(parent());
+    if(parent_vm_manager->staticsModule()->is2D()){
+        if(type=="none")
+            joint_str_ref->setSupport(0,0,1,1,1,0);
+        else if(type=="Pinned")
+            joint_str_ref->setSupport(1,1,1,1,1,0);
+        else if(type=="Rolling")
+            joint_str_ref->setSupport(0,1,1,1,1,0);
+    }else{
+        if(type=="none")
+            joint_str_ref->setSupport(0,0,0,0,0,0);
+        else if(type=="Pinned")
+            joint_str_ref->setSupport(0,1,0,0,0,0);
+        else if(type=="Rolling")
+            joint_str_ref->setSupport(1,1,1,0,0,0);
+    }
+    if(type=="Fixed")
+        joint_str_ref->setSupport(1,1,1,1,1,1);
+
+}
 
 void JointVM::initView(){
     JointPtr joint_str_ref=m_joint.toStrongRef();
