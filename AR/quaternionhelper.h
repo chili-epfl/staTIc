@@ -12,6 +12,7 @@ public:
     Q_INVOKABLE QQuaternion product(QQuaternion q1,QQuaternion q2);
     Q_INVOKABLE QQuaternion invert(QQuaternion q);
 
+    Q_INVOKABLE QVector3D eulerAngles(QQuaternion q);
 signals:
 
 public slots:

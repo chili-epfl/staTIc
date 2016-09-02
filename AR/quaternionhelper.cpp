@@ -19,3 +19,8 @@ QQuaternion QuaternionHelper::invert(QQuaternion q)
 {
     return q.inverted();
 }
+
+QVector3D QuaternionHelper::eulerAngles(QQuaternion q)
+{
+    return q.toEulerAngles();
+}
