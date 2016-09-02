@@ -39,7 +39,7 @@ Item {
             ,"imageUrl":"qrc:/ui/UI/Help/page_6.gif"
         }
         ,{
-            "description":"you can chenge the material and the section of the beams"
+            "description":"you can change the material and the section of the beams"
             ,"imageUrl":"qrc:/ui/UI/Help/page_7.gif"
         }
         ,{
@@ -51,8 +51,7 @@ Item {
             ,"imageUrl":"qrc:/ui/UI/Help/page_9.gif"
         }
         ,{
-            "description":"or click on a joint to explore the composition of the forces from
-                            the connected elements by adding or removing the single contributions."
+            "description":"or click on a joint to explore the composition of the forces from the connected elements by adding or removing the single contributions."
             ,"imageUrl":"qrc:/ui/UI/Help/page_10.gif"
         }
         ,{
