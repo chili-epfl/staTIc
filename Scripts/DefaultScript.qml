@@ -11,6 +11,7 @@ import Frame3DDVMManager 1.0
 import "qrc:/ui/UI/"
 import "qrc:/"
 import Warehouse3D 1.0
+import "qrc:/ui/UI/Help/"
 Item{
 
     id: applicationRoot
@@ -25,6 +26,8 @@ Item{
     property alias materialsManager: staticsmodule.materialsManager
     property alias vmManager: vmFrame3DDManager
     property alias warehouse: warehouse3d
+    property alias tutorial:tutorial
+
 
     property alias maxForce : staticsmodule.maxForce
     property alias minForce : staticsmodule.minForce
@@ -705,6 +708,22 @@ Item{
                     }
                 }
 
+                Image{
+                    visible: !tutorial.visible
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.top: parent.bottom
+                    anchors.margins: 10
+                    width: 50
+                    height: 50
+                    source: "qrc:/icons/Icons/help.png"
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: {tutorial.interactive=false;tutorial.visible=true;logger.log("open_help",{})}
+                    }
+                }
+
+
+
                 Slider{
                     id:clippingPlaneSlider
                     anchors.left: parent.left
@@ -770,6 +789,12 @@ Item{
             marker_detector.registerObserver(structure_tag)
         }
 
+     }
+
+     Tutorial{
+         id:tutorial
+         interactive:false
+         visible:false
      }
 
 

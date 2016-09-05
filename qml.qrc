@@ -40,6 +40,8 @@
         <file>Icons/delete_load.png</file>
         <file>Icons/next_pressed.png</file>
         <file>Icons/next.png</file>
+        <file>Icons/help.png</file>
+        <file>Icons/help_pressed.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>Images/mainbanner.png</file>

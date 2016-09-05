@@ -2,9 +2,41 @@ import QtQuick 2.0
 import QtQuick.Controls 1.4
 Item {
     signal exitTutorial();
+
+    property bool interactive: true
+
+    property bool interactive_visibility: true
+
+    Button{
+        id:done_button
+        visible: false
+        text:"Done"
+        anchors.right: parent.right
+        anchors.bottom: parent.bottom
+        anchors.margins: 10
+        onClicked: {
+            interactive_visibility=true;
+            visible=false
+        }
+    }
+
+    onExitTutorial:{
+        visible=false;
+        stack.pop({item:stack.get(0), immediate: true})
+    }
+
+    onVisibleChanged: {
+        if(visible){
+            interactive_visibility=true;
+            if(stack.depth==0)
+                stack.push(tutorial_window)
+        }
+    }
+
     anchors.fill: parent
 
     MouseArea{
+        enabled:interactive_visibility
         anchors.fill: parent
     }
 
@@ -67,6 +99,7 @@ Item {
 
 
     Rectangle{
+        visible: interactive_visibility
         anchors.centerIn: parent
         width: parent.width*0.8
         height: parent.height*0.8
@@ -170,23 +203,34 @@ Item {
 
             }
 
-            Button{
-                id:next_button
-                text:"Next"
+            Row{
+                spacing: 10
                 anchors.right: parent.right
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.margins: 10
-                onClicked: if(stack.depth<pages.length)
-                               stack.push({item:tutorial_window,immediate:true})
-                           else exitTutorial();
-            }
-            Button{
-                id:back_button
-                text:"Back"
-                anchors.right: next_button.left
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.margins: 10
-                onClicked: if(stack.depth>1) stack.pop({immediate: true})
+                Button{
+                    id:back_button
+                    text:"Back"
+                    onClicked: if(stack.depth>1) stack.pop({immediate: true})
+                }
+                Button{
+                    id:try_button
+                    text:"Try"
+                    visible: interactive
+                    onClicked: {
+                        interactive_visibility=false;
+                        done_button.visible=true;
+
+                    }
+                }
+                Button{
+                    id:next_button
+                    text:"Next"
+                    onClicked: if(stack.depth<pages.length)
+                                   stack.push({item:tutorial_window,immediate:true})
+                               else exitTutorial();
+                }
+
             }
         }
 

@@ -35,6 +35,7 @@ Item{
             "story_type":"Default",
             "story_picture":"qrc:/scripts/Scripts/default.jpg",
             "structure_url":"qrc:/scripts/Scripts/Demo.structure",
+            "show_demo":true
         },
         {
             "story_type":"FindAxialEx",

@@ -5,19 +5,30 @@ import QtQuick.Layouts 1.1
 import ScenarioListModel 1.0
 import ResourcesFetcher 1.0
 import QtQuick.Dialogs 1.2
+import QtSensors 5.3
 import "qrc:/ui"
 import "qrc:/scripts/Scripts"
+import "qrc:/ui/UI/Help"
 Item {
 
     function pt2px(pt){return pt*0.3759*Screen.pixelDensity}
     id: applicationWindow
     visible: true
 
+//    RotationSensor{
+//        id: rotationSensor
+//        active: true
+
+//    }
+//    Accelerometer{
+//        id:accelormeter
+//        active: true
+//    }
+
     property bool use_custom_board:false
 
     focus:true
     Keys.onReleased: {
-        console.log(event.key)
         if (event.key === Qt.Key_Back) {
             event.accepted = true
         }
@@ -63,6 +74,11 @@ Item {
                 item.loadsOnBeams=stories.list[gridview.currentIndex].loadsOnBeams;
                 item.hidden_beams=stories.list[gridview.currentIndex].hidden_beams;
                 item.question_beams=stories.list[gridview.currentIndex].question_beams
+            }
+            if(stories.list[gridview.currentIndex].story_type=="Default" && stories.list[gridview.currentIndex].show_demo){
+                item.tutorial.interactive=true;
+                item.tutorial.visible=true;
+
             }
         }
     }
@@ -255,7 +271,6 @@ Item {
             height: parent.height*0.75
         }
     }
-
 
 
 }
