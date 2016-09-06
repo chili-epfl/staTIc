@@ -334,7 +334,7 @@ Entity{
                     rotation:displacementQuaternion
                     translation:displacementTranslation
                 }
-                components: [displacement_transform,beam_commons.dispalcement_mesh,beam_commons.phong_alpha_70_material_green]
+                components: [displacement_transform,beam_commons.dispalcement_mesh,beam_commons.phong_material_green]
             }
         }
 

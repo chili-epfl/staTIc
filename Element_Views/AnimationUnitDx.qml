@@ -22,7 +22,7 @@ Entity{
     property bool rotate:false
     property real scaleFactor: 1
     property bool isReaction: false
-    property int offset: isReaction ? -2:2
+    property int offset: isReaction ? -2:6
     Transform{
         id:transform
         matrix: {

@@ -69,6 +69,9 @@ Entity{
         ambient:  "green"
         alpha:0.75
     }
+    property PhongMaterial phong_material_green: PhongMaterial{
+        ambient:  "green"
+    }
     property CylinderMesh dispalcement_mesh:
         CylinderMesh{
         radius: 2.5

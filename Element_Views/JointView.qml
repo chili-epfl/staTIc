@@ -48,7 +48,7 @@ Entity{
 
     property real reactionMagnitude: reaction.length()
 
-    property real scaleFactor: 2*(reactionMagnitude-minForce)/(maxForce-minForce) + 1
+    property real scaleFactor: Math.min(2*(reactionMagnitude-minForce)/(maxForce-minForce) + 2,4)
 
 
     onPositionChanged: computeTransform()

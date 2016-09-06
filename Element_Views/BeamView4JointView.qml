@@ -75,7 +75,7 @@ Entity{
             globalForceExtreme1=ab.plus(shearY).plus(shearZ);
     }
 
-    property real scaleFactor: Math.min(2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 1,3)
+    property real scaleFactor: Math.min(2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 2,4)
 
     property int nModels: 5
     property matrix4x4 poseMatrix: Qt.matrix4x4()
@@ -173,17 +173,17 @@ Entity{
             scaleFactor: root.scaleFactor
             rotate: root.axialForceType < 0
         }
-        AnimationUnitDx{
-            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement && non_default_visibility
-            unitId: 4
-            unitMesh: joint_commons.tiny_arrow_mesh
-            step: root.step
-            animationValue: root.animationValue
-            module: 50
-            direction: 1
-            scaleFactor: root.scaleFactor
-            rotate: root.axialForceType < 0
-        }
+//        AnimationUnitDx{
+//            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement && non_default_visibility
+//            unitId: 4
+//            unitMesh: joint_commons.tiny_arrow_mesh
+//            step: root.step
+//            animationValue: root.animationValue
+//            module: 50
+//            direction: 1
+//            scaleFactor: root.scaleFactor
+//            rotate: root.axialForceType < 0
+//        }
 
         Transform{
             id:transform
