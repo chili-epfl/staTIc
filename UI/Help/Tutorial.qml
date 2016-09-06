@@ -22,14 +22,13 @@ Item {
 
     onExitTutorial:{
         visible=false;
-        stack.pop({item:stack.get(0), immediate: true})
+        stack.depth=1;
     }
 
     onVisibleChanged: {
         if(visible){
             interactive_visibility=true;
-            if(stack.depth==0)
-                stack.push(tutorial_window)
+            stack.depth=1;
         }
     }
 
@@ -107,18 +106,16 @@ Item {
         border.width: 5
         border.color: "#F0F0F0"
 
-        StackView{
+        Item{
             width: parent.width-20
             height: parent.height*0.75 -20
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottom: navigation_bar.top
             id:stack
-            initialItem: tutorial_window
-        }
+            property real depth: 1
 
-        Component{
-            id:tutorial_window
             Column{
+                anchors.fill: parent
                 spacing: 20
                 Text {
                     text: pages[stack.depth-1].description
@@ -138,10 +135,12 @@ Item {
                     height: parent.height*0.7
                     fillMode: Image.PreserveAspectFit
                     anchors.horizontalCenter: parent.horizontalCenter
-                    playing: stack.busy==false
+                    playing: true
                     onStatusChanged:
-                        if(status == AnimatedImage.Ready)
+                        if(status == AnimatedImage.Ready){
                             repeter_gif.model=frameCount
+                            playing=true
+                        }
                     Row{
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.bottom: parent.top
@@ -166,9 +165,9 @@ Item {
                     }
                 }
 
+
             }
         }
-
         Item{
             id:navigation_bar
             width: parent.width
@@ -211,7 +210,7 @@ Item {
                 Button{
                     id:back_button
                     text:"Back"
-                    onClicked: if(stack.depth>1) stack.pop({immediate: true})
+                    onClicked: if(stack.depth>1) stack.depth--
                 }
                 Button{
                     id:try_button
@@ -227,7 +226,7 @@ Item {
                     id:next_button
                     text:"Next"
                     onClicked: if(stack.depth<pages.length)
-                                   stack.push({item:tutorial_window,immediate:true})
+                                   stack.depth++
                                else exitTutorial();
                 }
 

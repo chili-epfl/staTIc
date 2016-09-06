@@ -98,6 +98,7 @@ Item {
                                                                     load.warehouseIndex,"properties"));
                     }
                 }
+                next_button.visible=true
             }
     }
 
@@ -127,7 +128,7 @@ Item {
             }
             PropertyChanges{
                 target: next_button
-                visible:true
+                visible:false
             }
             PropertyChanges{
                 target: default_script.settings
@@ -423,10 +424,15 @@ Item {
             anchors.fill: parent
             property bool firstClick:true;
             onClicked: {
-                if(exercise.state=="PRESENTING")
+                if(exercise.state=="PRESENTING"){
                     exercise.state="SOLVING"
+                    next_button_area.enabled=false;
+                    latency.start()
+                }
                 else if(exercise.state=="SOLVED"){
                     exercise.state="EXPLORING"
+                    next_button_area.enabled=false;
+                    latency.start()
                 }
                 else if(exercise.state=="EXPLORING" && !firstClick)
                     default_script.pageExit()
@@ -441,6 +447,12 @@ Item {
                 interval: 5000
                 running: false
                 onTriggered: next_button_area.firstClick=true
+            }
+            Timer{
+                interval: 2000
+                id:latency
+                running: false
+                onTriggered: next_button_area.enabled=true;
             }
         }
 
