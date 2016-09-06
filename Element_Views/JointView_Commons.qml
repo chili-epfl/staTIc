@@ -3,6 +3,11 @@ import Qt3D.Render 2.0
 
 Entity{
 
+    property quaternion char_mesh_rotation:
+        quaternion_helper.product(
+            structureLoaderTransform.fromEulerAngles(structureLoaderTransform.euler_angles.x,0,structureLoaderTransform.euler_angles.z),
+                                  structureLoaderTransform.inv_rotation)
+
     property SphereMesh sphere_mesh:SphereMesh{
         radius: 2
     }

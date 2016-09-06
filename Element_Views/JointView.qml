@@ -107,28 +107,43 @@ Entity{
     components: visible && settings.show_joint ? [joint_commons.sphere_mesh,transform,material] : [transform,material]
 
     Entity{
-        enabled: visible && settings.show_joint
-        property Mesh label_mesh: char_meshes.getMesh(root.objectName)
-        Transform{
-            id:label_transform
-            translation:Qt.vector3d(0,10,5)
-            rotation:fromEulerAngles(0,-90,-90)/*quaternion_helper.invert(structure_tag.rotationQuaternion)*/
-            scale: 2
-        }
-        ObjectPicker {
-            id:label_picker
-            hoverEnabled: false
-            onClicked: {
-                sceneRoot.mouseEventHasBeenAccepted=true;
-                if(settings.joint_is_selectable && infobox.current_item!=root){
-                    infobox.current_item=root
+        components:[
+            Transform{
+                translation:Qt.vector3d(-position.x,-position.y,-position.z)
+            }]
+        Entity{
+            components:[
+                Transform{
+                    rotation:joint_commons.char_mesh_rotation
+                    translation:Qt.vector3d(position.x,position.y,position.z)
+                }]
+            Entity{
+                enabled: visible && settings.show_joint
+                property Mesh label_mesh: char_meshes.getMesh(root.objectName)
+                Transform{
+                    id:label_transform
+                    translation:Qt.vector3d(0,10,5)
+                    rotation:fromEulerAngles(0,-90,-90)/*quaternion_helper.invert(structure_tag.rotationQuaternion)*/
+                    scale: 2
                 }
+                ObjectPicker {
+                    id:label_picker
+                    hoverEnabled: false
+                    onClicked: {
+                        sceneRoot.mouseEventHasBeenAccepted=true;
+                        if(settings.joint_is_selectable && infobox.current_item!=root){
+                            infobox.current_item=root
+                        }
 
+                    }
+                }
+                components: infobox.current_item===root ?
+                                [label_mesh,label_transform,joint_commons.phong_material_green,label_picker]
+                              :
+                                [label_mesh,label_transform,joint_commons.label_material,label_picker]
             }
         }
-        components: [label_mesh,label_transform,joint_commons.label_material,label_picker]
     }
-
     //Displacement entity
     Entity{
         enabled: visible && settings.show_joint && settings.show_displacement
