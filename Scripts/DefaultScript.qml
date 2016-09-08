@@ -12,6 +12,7 @@ import "qrc:/ui/UI/"
 import "qrc:/"
 import Warehouse3D 1.0
 import "qrc:/ui/UI/Help/"
+import QtGraphicalEffects 1.0
 Item{
 
     id: applicationRoot
@@ -252,7 +253,7 @@ Item{
                                            0,0,1,0,
                                            0,0,0,1)
                            }
-                           else {
+                           else  {
                                camDevice.deviceId=QtMultimedia.availableCameras[1].deviceId
                            }
 
@@ -403,12 +404,13 @@ Item{
                                      -16*(1-0.8)*(parent.width*parent.height))) //80% of screen
              border.color: "#80000000"
 
+
              Scene3D {
                  id:scene3DContainer
                  anchors.fill: parent
                  focus: true
                  aspects: ["input","physics"]
-                // aspects:["input"]
+                 // aspects:["input"]
                  multisample:true
                  DefaultScriptScene3D {
                     id:scene3D
@@ -418,6 +420,69 @@ Item{
                      cameraScaleY: view_finder_width/scene3DContainer.width
                  }
              }
+//             FastBlur{
+//                 anchors.fill: parent
+//                 source: scene3DContainer
+//                 radius: structure_tag.objectIsVisible ? 0:64
+//                 NumberAnimation on radius {
+//                    duration: 3000
+
+//                 }
+//             }
+                /*Item {
+                    // Public properties.
+                    property Item scene: scene3DContainer
+                    property MouseArea area: null
+                    anchors.fill: parent
+                    visible: scene != null
+                    property real __scaling: 1
+                    property variant __translation: Qt.point(0,0)
+
+                    // The FBO abstraction handling our first offscreen pass.
+                    ShaderEffectSource {
+                        id: effectSource
+                        anchors.fill: parent
+                        sourceItem: parent.scene
+                        hideSource: true//parent.scene != null
+                        visible: false
+                        smooth: false  // Nearest neighbour texture filtering.
+                    }
+
+                    // The shader abstraction handling our second pass with the
+                    // translation and scaling in the vertex shader and the simple
+                    // texturing from the FBO in the fragment shader.
+                    ShaderEffect {
+                            id: effect
+                            anchors.fill: parent
+                            property real scaling: parent.__scaling
+                            property variant translation:parent.__translation
+                            property variant texture: effectSource
+
+                            vertexShader: "
+                                uniform highp mat4 qt_Matrix;
+                                uniform mediump float scaling;
+                                uniform mediump vec2 translation;
+                                attribute highp vec4 qt_Vertex;
+                                attribute mediump vec2 qt_MultiTexCoord0;
+                                varying vec2 texCoord;
+                                void main() {
+                                    texCoord =
+                                        (qt_MultiTexCoord0 )* vec2(scaling)+translation;
+                                    gl_Position = qt_Matrix * qt_Vertex;
+                                }"
+                            fragmentShader: "
+                                uniform sampler2D texture;
+                                uniform lowp float qt_Opacity;
+                                varying mediump vec2 texCoord;
+                                void main() {
+                                    vec2 dir_1=vec2(-1,1);
+                                    gl_FragColor =
+                                        texture2D(texture, texCoord) * qt_Opacity;
+                                }"
+                    }
+
+                }*/
+
 
              Rectangle{
                 anchors.centerIn: parent
@@ -638,17 +703,18 @@ Item{
                     Slider{
                         id:exagerate_disp_slider
                         visible:false
-                        Timer{
-                            running:!show_disp_button.pressed && !exagerate_disp_slider.hovered && exagerate_disp_slider.visible
-                            onTriggered: exagerate_disp_slider.visible=false
-                            interval: 5000
-                        }
+//                        Timer{
+//                            running:!show_disp_button.pressed && !exagerate_disp_slider.hovered && exagerate_disp_slider.visible
+//                            onTriggered: exagerate_disp_slider.visible=false
+//                            interval: 5000
+//                        }
                         width: parent.width
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.bottom: parent.top
                         anchors.margins: 10
                         stepSize: 1
                         minimumValue: 0
+                        tickmarksEnabled: true
                         maximumValue: 4
                         value: 0
                         onValueChanged: {
@@ -660,7 +726,7 @@ Item{
                             value: Math.pow(10,exagerate_disp_slider.value)
                         }
                         Text{
-                            text:"Exagerate"
+                            text:"Exagerate: "+settings.exagerate_displacement_factor+"x"
                             fontSizeMode: Text.Fit
                             horizontalAlignment: Text.AlignHCenter
                             color: "#F8F8F8"
@@ -668,7 +734,6 @@ Item{
                             width: parent.width
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.bottom: parent.top
-                            visible: !parent.hovered
                         }
 
                     }
@@ -687,9 +752,22 @@ Item{
                     minimumValue: 30
                     maximumValue: 220
                     stepSize: 5
-
                 }
-
+                Slider{
+                    id:sample_rate_slider
+                    anchors.top:parent.bottom
+                    anchors.left: labeling_threshold_slider.right
+                    anchors.margins: 10
+                    width: 200
+                    value: 20
+                    minimumValue: 1
+                    maximumValue: 100
+                    stepSize: 1
+                    Text{
+                        text:parent.value
+                        anchors.left: parent.right
+                    }
+                }
                 SuggestionBox{
                     id:suggestion_box
                 }
@@ -767,6 +845,8 @@ Item{
 
      ARToolkit{
         id:marker_detector
+        filter_sample_rate:sample_rate_slider.value
+        filter_cutoff_freq:sample_rate_slider.value/2
         labelingThreshold: labeling_threshold_slider.value
         matrixCode: ARToolkit.MATRIX_CODE_4x4_BCH_13_9_3
         defaultMarkerSize: 50
@@ -781,6 +861,11 @@ Item{
      ARToolkitObject{
         id:structure_tag
         objectId: "default"
+        property vector3d last_sensor_read;
+        onObjectIsVisibleChanged:
+            if(!objectIsVisible)
+                last_sensor_read=Qt.vector3d(rotationSensor.reading.x,rotationSensor.reading.y,rotationSensor.reading.z)
+
         Q3D.QuaternionAnimation on rotation{
             type: Q3D.QuaternionAnimation.Nlerp
         }       

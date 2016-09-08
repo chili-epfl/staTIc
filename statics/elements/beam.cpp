@@ -428,7 +428,7 @@ void Beam::extremeDisplacements(QVector3D& ex1, QVector3D& ex2)
         ex2=m_extreme2.toStrongRef()->displacement();
     }
     else{
-        ex1=QVector3D();
+        ex1=QVector3D(0,0,0);
         ex2=ex1;
     }
 }

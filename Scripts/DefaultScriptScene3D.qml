@@ -169,14 +169,30 @@ Entity {
    }
 
 
-
+   Entity{
+       components:[
+           Transform {
+               rotation:  !structure_tag.objectIsVisible ?
+                              quaternion_helper.product(
+                                  quaternion_helper.product(
+                                      fromAxisAndAngle(0,1,0,-(rotationSensor.reading.z-
+                                                               structure_tag.last_sensor_read.z)),
+                                      fromAxisAndAngle(0,0,-1,-(rotationSensor.reading.x-
+                                                               structure_tag.last_sensor_read.x))),
+                                      fromAxisAndAngle(-1,0,0,-(rotationSensor.reading.y-
+                                                          structure_tag.last_sensor_read.y)))
+                            :
+                              Qt.quaternion(1,0,0,0)
+           }
+       ]
     Entity {
         id:structureEntity
         Transform {
             id: structureLoaderTransform
 //            translation:Qt.vector3d(0,-100,-1000)
-            rotation:structure_tag.rotationQuaternion
+            rotation: structure_tag.rotationQuaternion
             property quaternion inv_rotation: quaternion_helper.invert(rotation)
+            property vector3d euler_angles: quaternion_helper.eulerAngles(rotation)
             QQ2.Timer{
                 running: true
                 repeat: true
@@ -252,6 +268,7 @@ Entity {
 //        }
 
     }
+   }
 
 
 

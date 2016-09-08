@@ -56,7 +56,30 @@ Rectangle {
                 multisample: true
                 InfoBoxScene3DBeam {
                     id:infoboxscene3d
-                    exagerate:exagerateSlider.value
+                    exagerate:{
+                        switch( exagerateSlider.value){
+                        case 1 :
+                            return 1
+                        case 2 :
+                            return 2
+                        case 3 :
+                            return 5
+                        case 4 :
+                            return 10
+                        case 5 :
+                            return 25
+                        case 6 :
+                            return 50
+                        case 7 :
+                            return 100
+                        case 8 :
+                            return 200
+                        case 9 :
+                            return 400
+                        default:
+                            return 1
+                        }
+                    }
                     Binding on beamSize {
                         when: current_item!=0 && current_item.type=="beam"
                         value:current_item.beamSize
@@ -275,7 +298,7 @@ Rectangle {
                 anchors.margins: 10
                 Text {
                     id:exagerateLabel
-                    text: qsTr("Exagerate")
+                    text: "Exagerate: "+infoboxscene3d.exagerate+"x"
                     color: "white"
                 }
                 Slider{
@@ -283,8 +306,10 @@ Rectangle {
                     anchors.top: exagerateLabel.bottom
                     width: parent.width
                     value:1
+                    stepSize: 1
+                    tickmarksEnabled: true
                     minimumValue: 1
-                    maximumValue: 400
+                    maximumValue: 9
                     onValueChanged:
                         logger.log("infobox_beam_exagerate",{"value":value})
                 }
