@@ -313,6 +313,7 @@ Item {
                 lineHeight: 1.5
             }
             Rectangle{
+                visible: enable_eye_tracking_tags
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 100
                 height: 100

@@ -11,15 +11,17 @@ import "qrc:/scripts/Scripts"
 import "qrc:/ui/UI/Help"
 Item {
 
+    property bool enable_eye_tracking_tags: false
+
     function pt2px(pt){return pt*0.3759*Screen.pixelDensity}
     id: applicationWindow
     visible: true
 
-//    RotationSensor{
-//        id: rotationSensor
-//        active: true
+    RotationSensor{
+        id: rotationSensor
+        active: true
 
-//    }
+    }
 //    Accelerometer{
 //        id:accelormeter
 //        active: true
@@ -226,6 +228,7 @@ Item {
                 }
             }
             Rectangle{
+                visible: enable_eye_tracking_tags
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: 100
                 height: 100
@@ -249,6 +252,7 @@ Item {
     }
 
     Rectangle{
+        visible: enable_eye_tracking_tags
         width: 100
         height: 100
         Image {
@@ -260,6 +264,7 @@ Item {
     }
 
     Rectangle{
+        visible: enable_eye_tracking_tags
         width: 100
         height: 100
         anchors.top: parent.top
