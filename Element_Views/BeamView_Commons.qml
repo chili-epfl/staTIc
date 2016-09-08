@@ -60,10 +60,10 @@ Entity{
         alpha:0
     }
 
-    property CylinderMesh drag_mesh:
-        CylinderMesh{
+    property SphereMesh drag_mesh:
+        SphereMesh{
         radius: 5
-        length: 40
+        //length: 40
     }
     property PhongAlphaMaterial phong_alpha_70_material_green: PhongAlphaMaterial{
         ambient:  "green"

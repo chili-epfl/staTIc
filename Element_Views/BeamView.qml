@@ -9,6 +9,9 @@ import "qrc:/opengl/Opengl"
 Entity{
     id:rootEntity
 
+    QQ2.Component.onCompleted: {
+        computeTransform4Displacement()
+    }
     onEnabledChanged: {
         if(infobox.current_item == rootEntity)
             infobox.current_item=0;
@@ -56,8 +59,8 @@ Entity{
     property real relativeDisplacementY:0
     property real relativeDisplacementZ:0
 
-    property vector3d extreme1Displacement;
-    property vector3d extreme2Displacement;
+    property vector3d extreme1Displacement:Qt.vector3d(0,0,0);
+    property vector3d extreme2Displacement:Qt.vector3d(0,0,0);
 
     onExtreme1DisplacementChanged: computeTransform4Displacement();
     onExtreme2DisplacementChanged: computeTransform4Displacement();
@@ -239,7 +242,7 @@ Entity{
 //    }
 
     Entity{
-        enabled: settings.beam_is_selectable
+        enabled: settings.beam_is_selectable && infobox.current_item!=rootEntity
         property Transform transform: Transform{
             rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
         }

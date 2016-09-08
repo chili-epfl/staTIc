@@ -115,7 +115,7 @@ Entity{
     }
 
 
-    components: [transform,customMesh,material,valid_picker]
+    components: infobox.current_item!=rootEntity ? [transform,customMesh,material,valid_picker]:[transform,customMesh,material]
 
 
     QQ2.Timer{
