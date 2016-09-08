@@ -12,6 +12,7 @@
 #include "logger.h"
 class Frame3DDKernel : public AbstractStaticsModule
 {
+    /*Positions are in opengl coordinate system*/
     Q_OBJECT
     Q_PROPERTY(QVector3D gravity READ gravity WRITE setGravity NOTIFY gravityChanged)
 public:
@@ -110,6 +111,7 @@ private:
     qreal m_relative_equilibrium_error;
     QTimer m_lazyupdateTimer;
     Logger m_logger;
+    void truss_solve();
 };
 
 #endif // FRAME3DDKERNEL_H

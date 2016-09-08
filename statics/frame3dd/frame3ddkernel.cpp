@@ -369,6 +369,8 @@ void Frame3DDKernel::update(){
 void Frame3DDKernel::solve(){
     if(m_status!=Status::LOADED) return;
 
+    //truss_solve();
+
     vec3	*xyz;		// X,Y,Z node coordinates (global)
 
     float	*rj = NULL,	// node size radius, for finite sizes
@@ -560,7 +562,7 @@ void Frame3DDKernel::solve(){
 //            xyz[i+1].z=joint->position().y();
 //            xyz[i+1].y=-joint->position().z();
             xyz[i+1].y=static_cast<double>(joint->position().y());
-            xyz[i+1].z=static_cast<double>(joint->position().z());
+            xyz[i+1].z=-static_cast<double>(joint->position().z());
         }
         rj[i+1]=0.0;
     }
@@ -577,12 +579,12 @@ void Frame3DDKernel::solve(){
         pos=_e1->position()+100*(_e2->position()-_e1->position()).normalized();
         xyz[i*2+1+m_joints.length()].x=static_cast<double>(pos.x());
         xyz[i*2+1+m_joints.length()].y=static_cast<double>(pos.y());
-        xyz[i*2+1+m_joints.length()].z=static_cast<double>(pos.z());
+        xyz[i*2+1+m_joints.length()].z=-static_cast<double>(pos.z());
         //Virtual extreme 2
         pos=_e2->position()+100*(_e1->position()-_e2->position()).normalized();
         xyz[i*2+2+m_joints.length()].x=static_cast<double>(pos.x());
         xyz[i*2+2+m_joints.length()].y=static_cast<double>(pos.y());
-        xyz[i*2+2+m_joints.length()].z=static_cast<double>(pos.z());
+        xyz[i*2+2+m_joints.length()].z=-static_cast<double>(pos.z());
     }
 #endif
 
@@ -621,7 +623,7 @@ void Frame3DDKernel::solve(){
         }
     }
 #ifdef JOINT_MODELLING
-    for(i=m_joints.size();i<nN;i++){
+    for(i=m_joints.size();i<nN;i++){        
             r[i*6+1]=0;
             r[i*6+2]=0;
             r[i*6+3]=1;
@@ -677,13 +679,30 @@ void Frame3DDKernel::solve(){
                 ;
         WeakJointPtr e1,e2;
         beam->extremes(e1,e2);
-#ifdef JOINT_MODELLING
-        N1[i+1]=m_joints.length()+2*i+1;
-        N2[i+1]=m_joints.length()+2*i+2;
-#else
+        bool need_swap=false;
 
-        N1[i+1]=m_joints.indexOf(e1.toStrongRef())+1;
-        N2[i+1]=m_joints.indexOf(e2.toStrongRef())+1;
+        QVector3D pos_e1=e1.toStrongRef()->position();
+        QVector3D pos_e2=e2.toStrongRef()->position();
+
+        if(!m_is2D && qFuzzyCompare(pos_e1.x(),pos_e2.x()) && qFuzzyCompare(pos_e1.y(),pos_e2.y()))
+            need_swap=true;
+
+#ifdef JOINT_MODELLING
+        if(need_swap){
+            N1[i+1]=m_joints.length()+2*i+2;
+            N2[i+1]=m_joints.length()+2*i+1;
+        }else{
+            N1[i+1]=m_joints.length()+2*i+1;
+            N2[i+1]=m_joints.length()+2*i+2;
+        }
+#else
+        if(need_swap){
+            N1[i+1]=m_joints.indexOf(e2.toStrongRef())+1;
+            N2[i+1]=m_joints.indexOf(e1.toStrongRef())+1;
+        }else{
+            N1[i+1]=m_joints.indexOf(e1.toStrongRef())+1;
+            N2[i+1]=m_joints.indexOf(e2.toStrongRef())+1;
+        }
 
 #endif
         qreal beam_Ax,beam_Asy,beam_Asz,beam_Jx,beam_Iy,beam_Iz,beam_E,beam_G,beam_p,beam_d;
@@ -971,6 +990,256 @@ void Frame3DDKernel::solve(){
                  );
 
 }
+
+
+void Frame3DDKernel::truss_solve(){
+
+    int dof=0;
+    int n_eq;
+
+    if(m_is2D)
+        dof=2*m_joints.size();
+    else
+        dof=3*m_joints.size();
+
+    n_eq=dof;
+
+    QVector<BeamPtr> active_beams;
+    Q_FOREACH(BeamPtr beam,m_beams){
+        if(beam->enable()){
+            active_beams.append(beam);
+        }
+    }
+
+    dof-=active_beams.size();
+
+    QVector<JointPtr> supporting_joints;
+    QVector<short> support_dim;//1 -> x; 2-> y; 3-> z;
+    Q_FOREACH(JointPtr j, m_joints){
+        bool x,y,z,dummy;
+        j->support(x,y,z,dummy,dummy,dummy);
+        dof-=x;
+        dof-=y;
+        if(!m_is2D)
+            dof-=z;
+        if(x){
+            supporting_joints.append(j);
+            support_dim.append(1);
+        }
+        if(y){
+            supporting_joints.append(j);
+            support_dim.append(2);
+        }
+
+        if(!m_is2D)
+            if(z){
+                supporting_joints.append(j);
+                support_dim.append(3);
+            }
+    }
+
+    if(dof>0){
+        qDebug()<<"Instable";
+        return;
+    }
+    if(dof<0){
+        qDebug()<<"Indetermita";
+        return;
+    }
+
+    /*Allocation*/
+    float** A=(float**)malloc(sizeof(float*)*n_eq+1);
+    for(int i=1;i<=n_eq;i++){
+        A[i]=(float*)malloc(sizeof(float)*n_eq+1);
+    }
+    for(int i=1;i<=n_eq;i++)
+        for (int j = 1; j <= n_eq; j++)
+            A[i][j]=0.0f;
+
+
+    float** B=(float**)malloc(sizeof(float*)*n_eq+1);
+    for(int i=1;i<=n_eq;i++){
+       B[i]=(float*)malloc(sizeof(float)+1);
+    }
+    for(int i=1;i<=n_eq;i++)
+            B[i][1]=0.0f;
+
+    /*i moves on joints; j on active beams and reactions*/
+    JointPtr e1,e2,current_joint;
+    WeakJointPtr w_e1,w_e2;
+    QVector3D dir;
+    for(int i=0;i<m_joints.size();i++){
+        current_joint=m_joints[i];
+        for(int j=1;j<=n_eq;j++){
+            if(j-1<active_beams.size()){
+                active_beams[j-1]->extremes(w_e1,w_e2);
+                e1=w_e1.toStrongRef();
+                e2=w_e2.toStrongRef();
+                if( e1==current_joint || e2==current_joint ){
+                    if(e1==current_joint)
+                        dir=-(current_joint->position()-e2->position()).normalized();
+                    else
+                        dir=-(current_joint->position()-e1->position()).normalized();
+                    if(m_is2D){
+                        A[i*2+1][j]=dir.x();
+                        A[i*2+2][j]=dir.y();
+                    }else{
+                        A[i*3+1][j]=dir.x();
+                        A[i*3+2][j]=dir.y();
+                        A[i*3+3][j]=dir.z();
+                    }
+                }
+
+
+            }
+            else{
+                /*Reactions*/
+                int react_index=j-1-active_beams.size();
+                if(current_joint!=supporting_joints[react_index]) continue;
+                switch (support_dim[react_index]) {
+                case 1:
+                    if(m_is2D){
+                        A[i*2+1][j]=1;
+                    }else{
+                        A[i*3+1][j]=1;
+                    }
+                    break;
+                case 2:
+                    if(m_is2D){
+                        A[i*2+2][j]=1;
+                    }else{
+                        A[i*3+2][j]=1;
+                    }
+                    break;
+                case 3:
+                    if(!m_is2D)
+                        A[i*3+3][j]=1;
+                    break;
+                }
+            }
+        }
+    }
+
+    Q_FOREACH(TrapezoidalForcePtr load,m_trapezoidal_loads){
+        BeamPtr b=load->beam().toStrongRef();
+        if(b->enable()){
+            WeakJointPtr w_e1,w_e2;
+            JointPtr e1,e2;
+            b->extremes(w_e1,w_e2);
+            e1=w_e1.toStrongRef();
+            e2=w_e2.toStrongRef();
+            QVector3D force=load->force();
+            force*=b->length();
+            QVector3D rel_pos;
+            QVector2D dummy;
+            load->relativePosition(rel_pos,dummy);
+            QVector3D force_on_e1=force*(1-rel_pos.x());
+            QVector3D force_on_e2=force*rel_pos.x();
+
+            int index_e1=m_joints.indexOf(e1);
+            int index_e2=m_joints.indexOf(e2);
+
+            if(m_is2D){
+                B[index_e1*2+1][1]-=force_on_e1.x();
+                B[index_e1*2+2][1]-=force_on_e1.y();
+
+                B[index_e2*2+1][1]-=force_on_e2.x();
+                B[index_e2*2+2][1]-=force_on_e2.y();
+            }else{
+
+                B[index_e1*3+1][1]-=force_on_e1.x();
+                B[index_e1*3+2][1]-=force_on_e1.y();
+                B[index_e1*3+3][1]-=force_on_e1.z();
+
+                B[index_e2*3+1][1]-=force_on_e2.x();
+                B[index_e2*3+2][1]-=force_on_e2.y();
+                B[index_e2*3+3][1]-=force_on_e2.z();
+            }
+        }
+    }
+
+    gaussj(A,n_eq,B,1);
+
+//    QString line="";
+//    for(int i=1;i<=n_eq;i++){
+//        line="";
+//        for (int j = 1; j <= n_eq; j++)
+//            line+=", "+QString::number(A[i][j]);
+//        qDebug()<<line;
+//    }
+
+//    for(int i=1;i<=n_eq;i++){
+//        qDebug()<<B[i][1];
+//    }
+
+    QList<QVector4D> segments;
+    segments.push_back(QVector4D());
+    segments.push_back(QVector4D());
+
+    Q_FOREACH(JointPtr j,m_joints) {
+        j->setDisplacement(QVector3D());
+        j->setDisplacementRot(QVector3D());
+        j->setReaction(QVector3D());
+        j->setReactionMomentum(QVector3D());
+    }
+
+    JointPtr prev_j;
+    QVector3D current_reaction;
+    for(int i=1;i<=n_eq;i++){
+        if(i-1<active_beams.size()){
+            BeamPtr b=active_beams[i-1];
+            int axial_type=0;
+            if(qFuzzyCompare(B[i][1],0.0))
+                if(B[i][1]>0.0)
+                    axial_type=1;
+                else if(B[i][1]<0.0)
+                    axial_type=-1;
+
+            b->setForcesAndMoments(axial_type,-B[i][1],0,0,0,0,0,1);
+            b->setForcesAndMoments(axial_type,B[i][1],0,0,0,0,0,2);
+
+            b->setForcesAndMoments(axial_type,fabs(B[i][1]),0,0,0,0,0,3);
+            b->setPeakDisplacements(QVector4D(),QVector4D());
+            b->setStressSegment(segments);
+        }else{
+            int support_index=i-1-active_beams.size();
+            if(prev_j!=supporting_joints[support_index]){
+                if(!prev_j.isNull()){
+                    prev_j->setReaction(current_reaction);
+                    current_reaction=QVector3D(0,0,0);
+                }
+                prev_j=supporting_joints[support_index];
+                switch (support_dim[support_index]) {
+                case 1:
+                    current_reaction.setX(B[i][1]);
+                    break;
+                case 2:
+                    current_reaction.setY(B[i][1]);
+                    break;
+                case 3:
+                    current_reaction.setZ(B[i][1]);
+                    break;
+                }
+            }
+        }
+    }
+    prev_j->setReaction(current_reaction);
+
+
+    /*Deallocation*/
+    for(int i=1;i<=n_eq;i++){
+        free(A[i]);
+    }
+    free(A);
+
+    for(int i=1;i<=n_eq;i++){
+        free(B[i]);
+    }
+    free(B);
+
+}
+
+
 
 void Frame3DDKernel::write_internal_forces (
         int lc, int nL, float dx,
@@ -1326,7 +1595,10 @@ void Frame3DDKernel::write_internal_forces (
                                           qMax(fabs(maxMz),fabs(minMz)),
                                           3);
 
-        active_beams[m-1]->setPeakDisplacements(QVector4D(minDx,minDy,minDz,minRx),QVector4D(maxDx,maxDy,maxDz,maxRx));
+        if(m_is2D)
+             active_beams[m-1]->setPeakDisplacements(QVector4D(minDx,minDy,minDz,minRx),QVector4D(maxDx,maxDy,maxDz,maxRx));
+        else
+            active_beams[m-1]->setPeakDisplacements(QVector4D(minDx,minDy,-minDz,minRx),QVector4D(maxDx,maxDy,-maxDz,maxRx));
 
         // free memory
         free_dvector(x,0,nx);
