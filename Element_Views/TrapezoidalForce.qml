@@ -48,7 +48,7 @@ Entity{
 
     property bool dragging: settings.beam_dragging_ownership==rootEntity;
     property vector3d offsetAugmentation: rootEntity.parent? Qt.vector3d(rootEntity.parent.tangibleSection.height/2,0,
-                                                                         -rootEntity.parent.tangibleSection.width/2):
+                                                                         0)://-rootEntity.parent.tangibleSection.width/2):
                                                              Qt.vector3d(0,0,0)
     onDraggingChanged: {
         if(dragging && rootEntity.parent!=null){
