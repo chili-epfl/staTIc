@@ -369,8 +369,6 @@ void Frame3DDKernel::update(){
 void Frame3DDKernel::solve(){
     if(m_status!=Status::LOADED) return;
 
-    //truss_solve();
-
     vec3	*xyz;		// X,Y,Z node coordinates (global)
 
     float	*rj = NULL,	// node size radius, for finite sizes
