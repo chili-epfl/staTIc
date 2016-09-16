@@ -39,6 +39,7 @@ Item{
         },
         {
             "story_type":"FindAxialEx",
+            "exerciseID":1,
             "story_picture":"qrc:/scripts/Scripts/Howe/howe.jpg",
             "story_description":"
              <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
@@ -51,6 +52,7 @@ Item{
         },
         {
             "story_type":"FindAxialEx",
+            "exerciseID":2,
             "story_picture":"qrc:/scripts/Scripts/Vault/vault.png",
             "story_description":"
              <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
@@ -64,6 +66,7 @@ Item{
         },
         {
             "story_type":"FindAxialEx",
+            "exerciseID":3,
             "story_picture":"qrc:/scripts/Scripts/Full_Roof/full-roof.jpg",
             "story_description":"
              <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
@@ -76,6 +79,7 @@ Item{
         },
         {
             "story_type":"FindAxialEx",
+            "exerciseID":4,
             "story_picture":"qrc:/scripts/Scripts/Gazebo/gazebo.jpg",
             "story_description":"
              <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>

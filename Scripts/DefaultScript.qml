@@ -588,6 +588,7 @@ Item{
                     spacing: 10
                 Image {
                     id:ar_button
+                    visible: settings.show_AR_button
                     Layout.preferredWidth:  100
                     Layout.preferredHeight: 100
                     source: camDevice.isRunning ?

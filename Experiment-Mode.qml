@@ -11,9 +11,15 @@ import "qrc:/scripts/Scripts"
 import "qrc:/ui/UI/Help"
 Item {
 
-    property bool enable_eye_tracking_tags: false
+    property bool enable_eye_tracking_tags: true
+    property int tag_dim: 15
+    property string condition: "Hands"     //Hands or Fixed
+    property string participantID:""
+
 
     function pt2px(pt){return pt*0.3759*Screen.pixelDensity}
+    function mm2px(mm){return mm*Screen.pixelDensity}
+
     id: applicationWindow
     visible: true
 
@@ -27,7 +33,7 @@ Item {
 //        active: true
 //    }
 
-    property bool use_custom_board:false
+    property bool use_custom_board: Platform=="ANDROID" ? true : false
 
     focus:true
     Keys.onReleased: {
@@ -76,6 +82,7 @@ Item {
                 item.loadsOnBeams=stories.list[gridview.currentIndex].loadsOnBeams;
                 item.hidden_beams=stories.list[gridview.currentIndex].hidden_beams;
                 item.question_beams=stories.list[gridview.currentIndex].question_beams
+                item.exerciseID=stories.list[gridview.currentIndex].exerciseID
             }
             if(stories.list[gridview.currentIndex].story_type=="Default" && stories.list[gridview.currentIndex].show_demo){
                 item.tutorial.interactive=true;
@@ -210,19 +217,19 @@ Item {
                                    logger.restart_logger();
                                     if(stories.list[gridview.currentIndex].story_type=="SupportEx"){
                                         scriptLoader.source="qrc:/scripts/Scripts/SupportExercise.qml";
-                                        logger.log("Exercise_SupportEx_Start",{"Story":gridview.currentIndex})
+                                        logger.log("Exercise_SupportEx_Start",{"Story":gridview.currentIndex,"ParticipantID":participantID})
                                     }
                                     else if(stories.list[gridview.currentIndex].story_type=="CableEx"){
                                         scriptLoader.source="qrc:/scripts/Scripts/CableExercise.qml";
-                                        logger.log("Exercise_CableEx_Start",{"Story":gridview.currentIndex})
+                                        logger.log("Exercise_CableEx_Start",{"Story":gridview.currentIndex,"ParticipantID":participantID})
                                     }
                                     else if(stories.list[gridview.currentIndex].story_type=="FindAxialEx"){
                                         scriptLoader.source="qrc:/scripts/Scripts/FindAxialForceExercise.qml";
-                                        logger.log("Exercise_FindAxialForce_Start",{"Story":gridview.currentIndex})
+                                        logger.log("Exercise_FindAxialForce_Start",{"Story":gridview.currentIndex,"ParticipantID":participantID,"Condition":condition,"ExerciseID":stories.list[gridview.currentIndex].exerciseID})
                                     }
                                     else if(stories.list[gridview.currentIndex].story_type=="Default"){
                                         scriptLoader.source="qrc:/scripts/Scripts/DefaultScript.qml";
-                                        logger.log("Exercise_Default_Start",{"Story":gridview.currentIndex})
+                                        logger.log("Exercise_Default_Start",{"Story":gridview.currentIndex,"ParticipantID":participantID})
                                     }
                                }
                 }
@@ -230,15 +237,15 @@ Item {
             Rectangle{
                 visible: enable_eye_tracking_tags
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: 100
-                height: 100
+                width: mm2px(tag_dim+5)
+                height: width
                 anchors.bottom: parent.bottom
                 Image {
                     id: stop_marker
-                    source: "qrc:/ui/UI/Eye_tracking_tags/010.png"
+                    source: "qrc:/ui/UI/Eye_tracking_tags/009.png"
                     anchors.centerIn: parent
-                    width: parent.width*0.75
-                    height: parent.height*0.75
+                    width: mm2px(tag_dim)
+                    height: width
                 }
             }
         }
@@ -252,29 +259,84 @@ Item {
     }
 
     Rectangle{
-        visible: enable_eye_tracking_tags
-        width: 100
-        height: 100
+        visible: false
+        width: mm2px(tag_dim+5)
+        height: width
         Image {
             source: "qrc:/ui/UI/Eye_tracking_tags/012.png"
             anchors.centerIn: parent
-            width: parent.width*0.75
-            height: parent.height*0.75
+            width: mm2px(tag_dim)
+            height: width
         }
     }
 
     Rectangle{
-        visible: enable_eye_tracking_tags
-        width: 100
-        height: 100
+        visible: false
+        width: mm2px(tag_dim+5)
+        height: width
         anchors.top: parent.top
         anchors.right: parent.right
         Image {
             source: "qrc:/ui/UI/Eye_tracking_tags/013.png"
             anchors.centerIn: parent
-            width: parent.width*0.75
-            height: parent.height*0.75
+            width: mm2px(tag_dim)
+            height: width
         }
+    }
+
+
+    Item{
+        id:experiment_settings
+        anchors.fill: parent
+        MouseArea{
+            anchors.fill: parent
+            onClicked: {}
+        }
+        Rectangle{
+            anchors.centerIn: parent
+            color:"#2f3439"
+            width: parent.width*0.5
+            height: 0.5*parent.height
+            Column{
+                anchors.centerIn: parent
+                spacing: 25
+                TextField{
+                    id:participantID_line
+                    placeholderText: "ParticipantId"
+                    width: 200
+                    anchors.horizontalCenter: parent.horizontalCenter
+                }
+                Row{
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    ExclusiveGroup{
+                        id:condition_ex_group
+                    }
+                    RadioButton{
+                        exclusiveGroup: condition_ex_group
+                        text: "Hands"
+                        onCheckedChanged: if(checked) condition="Hands"
+                        checked: true
+                    }
+                    RadioButton{
+                        exclusiveGroup: condition_ex_group
+                        text: "Fixed"
+                        onCheckedChanged: if(checked) condition="Fixed"
+                    }
+                }
+                Button{
+                    text: "Ok"
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    onClicked: {
+                        participantID=participantID_line.text;
+                        experiment_settings.visible=false;
+                    }
+                }
+            }
+
+        }
+
+
+
     }
 
 

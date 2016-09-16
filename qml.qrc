@@ -156,6 +156,15 @@
         <file>UI/Help/page_11.gif</file>
         <file>UI/Help/page_12.gif</file>
         <file>UI/Help/page_3.gif</file>
+        <file>UI/Eye_tracking_tags/001.png</file>
+        <file>UI/Eye_tracking_tags/002.png</file>
+        <file>UI/Eye_tracking_tags/003.png</file>
+        <file>UI/Eye_tracking_tags/004.png</file>
+        <file>UI/Eye_tracking_tags/005.png</file>
+        <file>UI/Eye_tracking_tags/006.png</file>
+        <file>UI/Eye_tracking_tags/007.png</file>
+        <file>UI/Eye_tracking_tags/008.png</file>
+        <file>UI/Eye_tracking_tags/009.png</file>
     </qresource>
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>

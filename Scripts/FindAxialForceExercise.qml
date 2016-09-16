@@ -14,6 +14,8 @@ Item {
     property url problem_image_url;
     property url proposed_solution_url;
 
+    property int exerciseID;
+
     property var question_beams;
     property var loadsOnBeams;
 
@@ -113,7 +115,6 @@ Item {
     states:[
         State {
             name: "PRESENTING"
-            extend: "SOLVING"
             PropertyChanges{
                 target: story_box
                 visible:true
@@ -130,10 +131,34 @@ Item {
                 target: next_button
                 visible:false
             }
-            PropertyChanges{
+            PropertyChanges {
                 target: default_script.settings
                 show_back_button:false
+                show_stress: false
+                show_displacement:false
+                beam_is_selectable: false
+                joint_is_selectable: false
+                load_is_selectable: false
+                load_is_draggable:false
+                show_beam: true
+                show_beam_spring: false
+                show_joint: true
+                show_load: false
+                show_spatial_references: false
+                show_info_box:true
+                show_beam_sphere: true
+                show_stress_button:false
+                show_displacement_button:false
+                show_beam_axial_loads:true
+                enable_scaffold:false
+                show_legend:true
+                show_filter_bar:false
+                visible_loader:"CUSTOM"
                 restoreEntryValues: false
+            }
+            PropertyChanges {
+                target: default_script.infobox
+                lateral_visibility: "Visible"
             }
         },
         State {
@@ -312,19 +337,7 @@ Item {
                 textFormat: Text.RichText
                 lineHeight: 1.5
             }
-            Rectangle{
-                visible: enable_eye_tracking_tags
-                anchors.horizontalCenter: parent.horizontalCenter
-                width: 100
-                height: 100
-                anchors.bottom: parent.bottom
-                Image {
-                    source: "qrc:/ui/UI/Eye_tracking_tags/011.png"
-                    anchors.centerIn: parent
-                    width: parent.width*0.75
-                    height: parent.height*0.75
-                }
-            }
+
         }
         Item{
             id:score_box
@@ -459,6 +472,53 @@ Item {
 
     }
 
-
+    Rectangle{
+        visible: enable_eye_tracking_tags
+        width: mm2px(tag_dim+5)
+        height: width
+        anchors.bottom: parent.bottom
+        anchors.right: parent.right
+        anchors.bottomMargin: 50
+        anchors.rightMargin: 100
+        Timer{
+            id:hide_tag_timer
+            interval: 5000
+            onTriggered: parent.visible=false;
+            running: false
+        }
+        Image {
+            source: {
+                if(exercise.state=="SOLVED") return "qrc:/ui/UI/Eye_tracking_tags/011.png"
+                else if(exercise.state=="EXPLORING") return "qrc:/ui/UI/Eye_tracking_tags/010.png"
+                else if(exercise.state=="SOLVING"){
+                    switch(exerciseID){
+                    case 1:
+                        if(condition=="Fixed") return "qrc:/ui/UI/Eye_tracking_tags/005.png"
+                        else "qrc:/ui/UI/Eye_tracking_tags/001.png"
+                        break;
+                    case 2:
+                        if(condition=="Fixed") return "qrc:/ui/UI/Eye_tracking_tags/006.png"
+                        else "qrc:/ui/UI/Eye_tracking_tags/002.png"
+                        break;
+                    case 3:
+                        if(condition=="Fixed") return "qrc:/ui/UI/Eye_tracking_tags/007.png"
+                        else "qrc:/ui/UI/Eye_tracking_tags/003.png"
+                        break;
+                    case 4:
+                        if(condition=="Fixed") return "qrc:/ui/UI/Eye_tracking_tags/008.png"
+                        else "qrc:/ui/UI/Eye_tracking_tags/004.png"
+                        break;
+                    default:
+                        return ""
+                    }
+                }
+                else return ""
+            }
+            onSourceChanged: {parent.visible=true;hide_tag_timer.start()}
+            anchors.centerIn: parent
+            width: mm2px(tag_dim)
+            height: width
+        }
+    }
 
 }

@@ -8,6 +8,7 @@ Item {
     property bool show_stress: false
     property bool show_displacement:false
     property bool show_stress_button: true
+    property bool show_AR_button: condition=="Hands" ? true : false
     property bool show_displacement_button:true
 
     property bool beam_is_selectable: true
@@ -61,7 +62,7 @@ Item {
         show_legend= true
 
         enable_scaffold= true;
-
+        show_AR_button= condition=="Hands" ? true : false
         visible_loader="DESIGNER";
 
 
