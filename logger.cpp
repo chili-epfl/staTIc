@@ -287,7 +287,7 @@ private:
 
 Logger::Logger(QObject *parent): QObject(parent)
 {
-
+    m_enabled=true;
 }
 
 Logger::~Logger()
@@ -295,30 +295,40 @@ Logger::~Logger()
 
 }
 
+void Logger::enableLogger(bool enabled)
+{
+    m_enabled=enabled;
+}
+
 void Logger::log(QString action, QVariantMap fields)
 {
-    QtConcurrent::run(&LoggerPrivate::get_instance(),&LoggerPrivate::log,QDateTime::currentDateTime(),action,fields);
+    if(m_enabled)
+        QtConcurrent::run(&LoggerPrivate::get_instance(),&LoggerPrivate::log,QDateTime::currentDateTime(),action,fields);
 }
 
 void Logger::log_static_configuration(QVariantMap fields)
 {
-    QtConcurrent::run(&LoggerPrivate::get_instance(),&LoggerPrivate::log_static_configuration,QDateTime::currentDateTime(),fields);
+    if(m_enabled)
+        QtConcurrent::run(&LoggerPrivate::get_instance(),&LoggerPrivate::log_static_configuration,QDateTime::currentDateTime(),fields);
 }
 
 void Logger::log_position(QString name, QVector3D translation, qreal angle_x,qreal angle_y,qreal angle_z)
 {
     QVector3D angles(angle_x,angle_y,angle_z);
-    QtConcurrent::run(&LoggerPrivate::get_instance(),&LoggerPrivate::log_position,QDateTime::currentDateTime(),name,translation,angles);
+    if(m_enabled)
+        QtConcurrent::run(&LoggerPrivate::get_instance(),&LoggerPrivate::log_position,QDateTime::currentDateTime(),name,translation,angles);
 }
 
 void Logger::restart_logger()
 {
-    QtConcurrent::run(&LoggerPrivate::get_instance(),&LoggerPrivate::restart_logger);
+    if(m_enabled)
+        QtConcurrent::run(&LoggerPrivate::get_instance(),&LoggerPrivate::restart_logger);
 
 }
 
 void Logger::close_logger()
 {
-    QtConcurrent::run(&LoggerPrivate::get_instance(),&LoggerPrivate::close_logger);
+    if(m_enabled)
+        QtConcurrent::run(&LoggerPrivate::get_instance(),&LoggerPrivate::close_logger);
 
 }

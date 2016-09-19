@@ -13,6 +13,7 @@ class Logger : public QObject
 public:
     explicit Logger(QObject* parent=0);
     ~Logger();
+    Q_INVOKABLE void enableLogger(bool enabled);
     Q_INVOKABLE void log(QString action, QVariantMap fields=QVariantMap());
     Q_INVOKABLE void log_static_configuration(QVariantMap fields);
     Q_INVOKABLE void log_position(QString name, QVector3D translation, qreal angle_x, qreal angle_y, qreal angle_z);
@@ -23,8 +24,7 @@ signals:
 public slots:
 
 private:
-
-
+    bool m_enabled;
 };
 
 #endif // LOGGER_H
