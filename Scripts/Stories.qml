@@ -89,6 +89,12 @@ Item{
              "question_beams":["GI","HO","AG"],
              "hidden_beams":["IM","GO","HL"],
              "loadsOnBeams":[{"beamName":"HL", "warehouseIndex":0}, {"beamName":"LN", "warehouseIndex":0}, {"beamName":"OL", "warehouseIndex":0}]
+        },
+        {
+            "story_type":"Default",
+            "story_picture":"qrc:/scripts/Scripts/Howe/howe.jpg",
+            "structure_url":"qrc:/scripts/Scripts/Howe/Howe.structure",
+            "show_demo":true
         }
     ]
 }
