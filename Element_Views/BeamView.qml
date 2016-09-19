@@ -166,7 +166,7 @@ Entity{
 
     Entity{
         property Transform transform: Transform{
-                scale3D:  Qt.vector3d(rootEntity.tangibleSection.height/2,rootEntity.length/2-20,rootEntity.tangibleSection.width/2)
+                scale3D:  Qt.vector3d(rootEntity.tangibleSection.height/2,rootEntity.length/2-30,rootEntity.tangibleSection.width/2)
         }
         components: [beam_commons.cube_mesh_inv_normals,beam_commons.transparent_material_forAR,this.transform]
     }
