@@ -323,6 +323,16 @@ Item {
                         onCheckedChanged: if(checked) condition="Fixed"
                     }
                 }
+                CheckBox{
+                    text: "Enable Eye Tracking"
+                    onCheckedChanged: enable_eye_tracking_tags=!enable_eye_tracking_tags
+                    checked: enable_eye_tracking_tags
+                }
+                CheckBox{
+                    text: "Enable Logging"
+                    onCheckedChanged:logger.enableLogger(checked)
+                    checked: true
+                }
                 Button{
                     text: "Ok"
                     anchors.horizontalCenter: parent.horizontalCenter
