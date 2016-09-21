@@ -115,6 +115,7 @@
         <file>Scripts/Gazebo/gazebo.jpg</file>
         <file>Scripts/Howe/howe.jpg</file>
         <file>Scripts/Demo.structure</file>
+        <file>Scripts/test.structure</file>
     </qresource>
     <qresource prefix="/ui">
         <file>UI/ViewFilterBar.qml</file>

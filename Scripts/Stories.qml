@@ -95,6 +95,12 @@ Item{
             "story_picture":"qrc:/scripts/Scripts/Howe/howe.jpg",
             "structure_url":"qrc:/scripts/Scripts/Howe/Howe.structure",
             "show_demo":true
+        },
+        {
+            "story_type":"Default",
+            "story_picture":"",
+            "structure_url":"qrc:/scripts/Scripts/test.structure",
+            "show_demo":true
         }
     ]
 }

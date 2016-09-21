@@ -18,9 +18,6 @@ Item{
     id: applicationRoot
     anchors.fill: parent
     signal pageExit();
-    onPageExit: {
-        logger.log("exit_default_script");
-    }
 
     property alias suggestion_box: suggestion_box
     property alias currentViewFilter: viewFilterBar.selection
@@ -783,7 +780,9 @@ Item{
                     source: "qrc:/icons/Icons/back.png"
                     MouseArea{
                         anchors.fill: parent
-                        onClicked:pageExit()
+                        onClicked:{
+                            pageExit()
+                        }
                     }
                 }
 
