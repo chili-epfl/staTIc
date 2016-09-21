@@ -96,6 +96,7 @@ Item {
         ignoreUnknownSignals: true
         target: scriptLoader.valid ? scriptLoader.item : null
         onPageExit: {
+            logger.log("Exit_exercise");
             logger.close_logger();
             intromenu.visible=true;intromenu.enabled=true;scriptLoader.source=""
         }
@@ -325,8 +326,8 @@ Item {
                 }
                 CheckBox{
                     text: "Enable Eye Tracking"
-                    onCheckedChanged: enable_eye_tracking_tags=!enable_eye_tracking_tags
-                    checked: enable_eye_tracking_tags
+                    onCheckedChanged: enable_eye_tracking_tags=checked
+                    checked: true
                 }
                 CheckBox{
                     text: "Enable Logging"
