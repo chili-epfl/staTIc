@@ -40,95 +40,103 @@ Entity{
                                                 Qt.vector3d(-transform.translation.y/rootEntity.parent.length + 0.5,-transform.translation.y/rootEntity.parent.length + 0.5,-transform.translation.y/rootEntity.parent.length + 0.5):
                                                 Qt.vector3d(0,0,0);
     onRelativeLocalPositionChanged: {
-        if(dragging){
+        if(isSelected){
             var pos_text="("+relativeLocalPosition.x+","+relativeLocalPosition.y+","+relativeLocalPosition.z+")"
             logger.log("Trapezoidal_force_move", {"relative_position":pos_text,"beam":parent.objectName})
         }
     }
 
-    property bool dragging: settings.beam_dragging_ownership==rootEntity;
+//    property bool dragging: settings.beam_dragging_ownership===rootEntity;
     property vector3d offsetAugmentation: rootEntity.parent? Qt.vector3d(rootEntity.parent.tangibleSection.height/2,0,
                                                                          0)://-rootEntity.parent.tangibleSection.width/2):
                                                              Qt.vector3d(0,0,0)
-    onDraggingChanged: {
-        if(dragging && rootEntity.parent!=null){
-            transform.translation=Qt.binding(function(){
-                    return offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
-            })
-        }
-        else
-            transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
+//    onDraggingChanged: {
+//        if(dragging && rootEntity.parent!=null){
+//            transform.translation=Qt.binding(function(){
+//                    return offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
+//            })
+//        }
+//        else
+//            transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
+//    }
+
+    QQ2.Connections{
+        target: rootEntity.parent!=null && isSelected ? rootEntity.parent : null
+        onCurrent_anchor_positionChanged: transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position)
     }
+
 
     /*Visual aspect*/
     Transform{
         id:transform
         rotation:fromAxisAndAngle(Qt.vector3d(0, 0, 1), -90)
         translation:offsetAugmentation
-        onTranslationChanged:{
-                    resetTimer.restart()
-        }
+//        onTranslationChanged:{
+//                    resetTimer.restart()
+//        }
     }
 
 
     property Mesh customMesh: runtime_meshes.getMesh(asset3DMeshURL)
     property DiffuseMapMaterial material_diffuse: runtime_meshes.getTexture(asset3DTextureURL)
 
-    property Material material: isSelected || dragging ? trapz_force_commons.material_for_selection :material_diffuse
+    property Material material: isSelected  ? trapz_force_commons.material_for_selection :material_diffuse
 
-    property bool isSelected: infobox.current_item==rootEntity
+    property bool isSelected: infobox.current_item===rootEntity
 
-    onIsSelectedChanged: {
-        if(!isSelected)
-            rootEntity.parent.drag_anchor_enabled=false
-    }
+//    onIsSelectedChanged: {
+//        if(!isSelected)
+//            rootEntity.parent.drag_anchor_enabled=false
+//    }
 
     ObjectPicker {
         id:valid_picker
         hoverEnabled: false
-        onPressedChanged: if(pressed && settings.beam_dragging_ownership==0){
-                              if(settings.load_is_selectable && infobox.current_item!=rootEntity)
-                                  infobox.current_item=rootEntity
-                              if(settings.load_is_draggable){
-                                  settings.beam_dragging_ownership=rootEntity
-                                  rootEntity.parent.drag_anchor_enabled=true;
-                                  rootEntity.parent.current_anchor_position=transform.translation.minus(offsetAugmentation)
-                                  resetTimer.restart()
-                              }
-                          }
-                          else if(!pressed && settings.beam_dragging_ownership==rootEntity){
-                              sceneRoot.mouseEventHasBeenAccepted=true;
-                              rootEntity.parent.drag_anchor_enabled=false;
-                              settings.beam_dragging_ownership=0;
-                              transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
-                          }
+//        onPressedChanged: if(pressed && settings.beam_dragging_ownership==0){
+//                              if(settings.load_is_selectable && infobox.current_item!=rootEntity)
+//                                  infobox.current_item=rootEntity
+//                              if(settings.load_is_draggable){
+//                                  settings.beam_dragging_ownership=rootEntity
+//                                  rootEntity.parent.drag_anchor_enabled=true;
+//                                  rootEntity.parent.current_anchor_position=transform.translation.minus(offsetAugmentation)
+//                                  resetTimer.restart()
+//                              }
+//                          }
+//                          else if(!pressed && settings.beam_dragging_ownership==rootEntity){
+//                              sceneRoot.mouseEventHasBeenAccepted=true;
+//                              rootEntity.parent.drag_anchor_enabled=false;
+//                              settings.beam_dragging_ownership=0;
+//                              transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
+//                          }
         onClicked: {
             sceneRoot.mouseEventHasBeenAccepted=true;
-            if(settings.load_is_selectable && infobox.current_item!=rootEntity)
+            if(settings.load_is_selectable && !isSelected){
                     infobox.current_item=rootEntity
-            if(dragging){
-                rootEntity.parent.drag_anchor_enabled=false;
-                settings.beam_dragging_ownership=0
-                transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
+                    rootEntity.parent.drag_anchor_enabled=Qt.binding(function(){return isSelected});
             }
+//            if(dragging){
+//                rootEntity.parent.drag_anchor_enabled=false;
+//                settings.beam_dragging_ownership=0
+//                transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
+//            }
         }
     }
 
 
-    components: infobox.current_item!=rootEntity ? [transform,customMesh,material,valid_picker]:[transform,customMesh,material]
+    components: !isSelected ? [transform,customMesh,material,valid_picker]:[transform,customMesh,material]
 
 
-    QQ2.Timer{
-        id:resetTimer
-        interval: 2000
-        onTriggered: {
-            if(dragging){
-                rootEntity.parent.drag_anchor_enabled=false;
-                settings.beam_dragging_ownership=0
-                transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
-            }
-        }
-        running: false;
-    }
+//    QQ2.Timer{
+//        id:resetTimer
+//        interval: 2000
+//        onTriggered: {
+//            if(dragging){
+//                rootEntity.parent.drag_anchor_enabled=false;
+//                settings.beam_dragging_ownership=0
+//                transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
+//            }
+//        }
+//        running: false;
+//    }
 
 }

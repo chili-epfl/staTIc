@@ -245,17 +245,28 @@ Entity{
         enabled: settings.beam_is_selectable && infobox.current_item!=rootEntity
         property Transform transform: Transform{
             rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+            scale3D: Qt.vector3d(1,1,1)
         }
         property ObjectPicker objectPicker:ObjectPicker{
-            hoverEnabled: drag_anchor_enabled
-            onEntered: current_anchor_position=Qt.vector3d(0,0,0);
             onClicked: {
                 sceneRoot.mouseEventHasBeenAccepted=true;
-                if(parent.enabled && infobox.current_item!=rootEntity)
+                if(drag_anchor_enabled)
+                   current_anchor_position=Qt.vector3d(0,0,0)
+                else if(parent.enabled && infobox.current_item!=rootEntity){
                     infobox.current_item=rootEntity
+                }
             }
         }
-        components: [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,objectPicker]
+        components: infobox.current_item!==rootEntity ?
+                        [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,objectPicker]:
+                        [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform]
+        Entity{
+            enabled: drag_anchor_enabled
+            property Transform transform: Transform{
+               scale3D:Qt.vector3d(0.5,0.5,0.5)
+           }
+           components: [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]
+        }
     }
 
     NodeInstantiator {
@@ -264,13 +275,23 @@ Entity{
             enabled: settings.beam_is_selectable
             property Transform transform: Transform{
                 rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
-                translation:Qt.vector3d(0,(index+1)*(2*(beam_commons.drag_mesh.radius+2)),0)
+                translation:Qt.vector3d(beam_commons.drag_mesh.radius+tangibleSection.height/2,(index+1)*(2*(beam_commons.drag_mesh.radius+2)),0)
             }
             property ObjectPicker objectPicker:ObjectPicker{
-                hoverEnabled: drag_anchor_enabled
-                onEntered: current_anchor_position=transform.translation;
+                onClicked: {
+                    sceneRoot.mouseEventHasBeenAccepted=true;
+                    current_anchor_position=Qt.vector3d(0,transform.translation.y,0);
+                }
             }
             components: drag_anchor_enabled ? [beam_commons.drag_mesh,beam_commons.transparent_material,transform,objectPicker] : []
+            Entity{
+                enabled: drag_anchor_enabled
+                property Transform transform: Transform{
+                   scale3D:Qt.vector3d(0.5,0.5,0.5)
+               }
+               components: [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]
+
+            }
         }
     }
     NodeInstantiator {
@@ -280,14 +301,24 @@ Entity{
              property Transform transform: Transform{
                 id:drag_transform
                 rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
-                translation:Qt.vector3d(0,-(index+1)*(2*(beam_commons.drag_mesh.radius+2)),0)
+                translation:Qt.vector3d(beam_commons.drag_mesh.radius+tangibleSection.height/2,-(index+1)*(2*(beam_commons.drag_mesh.radius+2)),0)
             }
             property ObjectPicker objectPicker: ObjectPicker{
-                hoverEnabled: drag_anchor_enabled
-                onEntered: current_anchor_position=transform.translation
+                onClicked: {
+                    sceneRoot.mouseEventHasBeenAccepted=true;
+                    current_anchor_position=Qt.vector3d(0,transform.translation.y,0);
+                }
             }
-            components: drag_anchor_enabled ? [beam_commons.drag_mesh,beam_commons.transparent_material,transform,objectPicker] : []
 
+            components: drag_anchor_enabled ? [beam_commons.drag_mesh,beam_commons.transparent_material,transform,objectPicker] : []
+            Entity{
+                enabled: drag_anchor_enabled
+                property Transform transform: Transform{
+                   scale3D:Qt.vector3d(0.5,0.5,0.5)
+               }
+               components: [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]
+
+            }
         }
     }
 

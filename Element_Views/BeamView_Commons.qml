@@ -57,12 +57,12 @@ Entity{
     }
     property PhongAlphaMaterial transparent_material:
         PhongAlphaMaterial{
-        alpha:0
+        alpha:0.0
     }
 
     property SphereMesh drag_mesh:
         SphereMesh{
-        radius: 5
+        radius: 10
         //length: 40
     }
     property PhongAlphaMaterial phong_alpha_70_material_green: PhongAlphaMaterial{
