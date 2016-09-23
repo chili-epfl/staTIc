@@ -1805,17 +1805,17 @@ void Frame3DDKernel::assemble_loads (
         trz_load->positionOnBeam(begin,end);
         QVector3D localForce=trz_load->forceLocal();
         W[1][i][1] = (double) n;
-        W[1][i][2]=begin.x();//xx1
-        W[1][i][3]=end.x();//xx2
+        W[1][i][2]=floor(begin.x());//xx1
+        W[1][i][3]=floor(end.x());//xx2
         W[1][i][4]=localForce.x();//wx1
         W[1][i][5]=localForce.x();//wx1
         if(m_is2D){
-            W[1][i][6]=begin.y();
-            W[1][i][7]=end.y();
+            W[1][i][6]=floor(begin.y());
+            W[1][i][7]=floor(end.y());
             W[1][i][8]=localForce.y();
             W[1][i][9]=localForce.y();
-            W[1][i][10]=begin.z();
-            W[1][i][11]=end.z();
+            W[1][i][10]=floor(begin.z());
+            W[1][i][11]=floor(end.z());
             W[1][i][12]=localForce.z();
             W[1][i][13]=localForce.z();
         }else{
@@ -1828,12 +1828,12 @@ void Frame3DDKernel::assemble_loads (
 //            W[1][i][11]=end.y();
 //            W[1][i][12]=trz_load->forceLocal().y();
 //            W[1][i][13]=trz_load->forceLocal().y();
-            W[1][i][6]=begin.y();
-            W[1][i][7]=end.y();
+            W[1][i][6]=floor(begin.y());
+            W[1][i][7]=floor(end.y());
             W[1][i][8]=localForce.y();
             W[1][i][9]=localForce.y();
-            W[1][i][10]=begin.z();
-            W[1][i][11]=end.z();
+            W[1][i][10]=floor(begin.z());
+            W[1][i][11]=floor(end.z());
             W[1][i][12]=-localForce.z();
             W[1][i][13]=-localForce.z();
 
