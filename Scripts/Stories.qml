@@ -39,6 +39,19 @@ Item{
         },
         {
             "story_type":"FindAxialEx",
+            "exerciseID":0,
+            "story_picture":"qrc:/scripts/Scripts/default.jpg",
+            "structure_url":"qrc:/scripts/Scripts/Demo.structure",
+            "story_description":"
+             <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
+             <p>For each beams you can choose either <b><i>Compression</i></b> or <b><i>Tension</i></b>. If you don't know just do not check any box</p>
+             <p>Are you ready?</p>",
+            "question_beams":["AB","BC"],
+            "hidden_beams":[],
+            "loadsOnBeams":[{"beamName":"AB", "warehouseIndex":0}]
+        },
+        {
+            "story_type":"FindAxialEx",
             "exerciseID":1,
             "story_picture":"qrc:/scripts/Scripts/Howe/howe.jpg",
             "story_description":"
