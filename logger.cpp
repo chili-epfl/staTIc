@@ -28,11 +28,11 @@ public:
             m_textstream<<"{\n";
             m_textstream<<"\t\"Date\":"<<"\""<<date.toString("yyyy.MM.dd.HH.mm.ss.zzz")<<"\",\n";
             m_textstream<<"\t\"Action\":"<<"\""<<action<<"\",\n";
-            m_textstream<<"\t\"Fields\":[\n";
+            m_textstream<<"\t\"Fields\":{\n";
             int i=1;
             Q_FOREACH(QString field, fields.keys()){
                 if(fields[field].canConvert(QVariant::List)){
-                    m_textstream<<"\t\t{\""<<field<<"\":[";
+                    m_textstream<<"\t\t\""<<field<<"\":[";
                     int j=1;
                     Q_FOREACH(QString s, fields[field].toStringList()){
                         m_textstream<<"\""<<s<<"\"";
@@ -40,10 +40,10 @@ public:
                             m_textstream<<",";
                         j++;
                     }
-                    m_textstream<<"]}";
+                    m_textstream<<"]";
                 }
                 else
-                    m_textstream<<"\t\t{\""<<field<<"\":\""<<fields[field].toString()<<"\"}";
+                    m_textstream<<"\t\t\""<<field<<"\":\""<<fields[field].toString()<<"\"";
 
                 if(i<fields.keys().size())
                     m_textstream<<",\n";
@@ -51,7 +51,7 @@ public:
                     m_textstream<<"\n";
                 i++;
             }
-            m_textstream<<"\t]\n";
+            m_textstream<<"\t}\n";
             m_textstream<<"}\n";
             m_textstream.flush();
         }
