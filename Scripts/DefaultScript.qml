@@ -808,7 +808,7 @@ Item{
                     anchors.verticalCenter: parent.verticalCenter
                     orientation: Qt.Vertical
                     height: parent.height*0.3
-                    value: 1000
+                    value: 3000
                     stepSize: 100
                     minimumValue: 100
                     maximumValue: 3000
