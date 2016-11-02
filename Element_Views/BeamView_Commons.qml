@@ -1,6 +1,7 @@
 import Qt3D.Core 2.0
 import Qt3D.Render 2.0
 import "qrc:/opengl/Opengl"
+import DeformingBeamMesh 1.0
 
 Entity{
 
@@ -76,5 +77,18 @@ Entity{
         CylinderMesh{
         radius: 2.5
         length: 5
+    }
+    property DeformingBeamMesh deforming_mesh:
+        DeformingBeamMesh{
+        segments: 50
+        keyframes: 20
+        exagerate:1
+    }
+   property DiffuseMapMaterial deformingMeshMaterial:
+        DiffuseMapMaterial{
+                id: deformingMeshMaterial
+                diffuse: "qrc:/images/Images/woodbackground.png"
+                specular: Qt.rgba( 0.2, 0.2, 0.2, 1.0 )
+                shininess: 2.0
     }
 }

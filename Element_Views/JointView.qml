@@ -21,6 +21,8 @@ Entity{
         if(infobox.current_item == root)
             infobox.current_item=0;
     }
+
+    //type of BeamView4JointView
     property var connected_beams: []
 
     property bool visible:  true
@@ -210,6 +212,34 @@ Entity{
         }
         components: [support_mesh,support_transform,joint_commons.phon_alpha_1]
     }
+
+    Entity{
+        enabled: settings.focus_on_joint && infobox.current_item===root;
+        onEnabledChanged: {
+            var j,b;
+            if(enabled){
+                for(j=0;j<connected_beams.length;j++){
+                    b=connected_beams[j]
+                    b.non_default_visibility=false;
+                }
+            }
+            else{
+                for(j=0;j<connected_beams.length;j++){
+                    b=connected_beams[j]
+                    b.non_default_visibility=true;
+                }
+            }
+        }
+
+        components: [joint_commons.focus_view_color_centre,joint_commons.sphere_mesh]
+
+        Entity{
+            components: [joint_commons.sphere_mesh_r3,joint_commons.focus_view_target_transform,joint_commons.focus_view_color_target]
+        }
+
+
+    }
+
 }
 
 

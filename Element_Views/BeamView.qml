@@ -4,14 +4,15 @@ import Qt3D.Input 2.0
 
 import QtQuick 2.0 as QQ2
 import QtPhysics.unofficial 1.0
+import DeformingBeamMesh 1.0
+
 import "qrc:/ui/UI"
 import "qrc:/opengl/Opengl"
 Entity{
     id:rootEntity
 
-    QQ2.Component.onCompleted: {
-        computeTransform4Displacement()
-    }
+    property bool disable_beam_selection_for_load: false
+
     onEnabledChanged: {
         if(infobox.current_item == rootEntity)
             infobox.current_item=0;
@@ -41,7 +42,7 @@ Entity{
     onBeamSizeChanged: apply_animation.start();
 
     property size realBeamSize
-    property size tangibleSection: "34x17"
+    property size tangibleSection: "18x13"
     property int axialForceType: 0 //-1 compression,0 nul, 1 tension
 
     /*The stress relative to the size and material.
@@ -62,12 +63,15 @@ Entity{
     property vector3d extreme1Displacement:Qt.vector3d(0,0,0);
     property vector3d extreme2Displacement:Qt.vector3d(0,0,0);
 
-    onExtreme1DisplacementChanged: computeTransform4Displacement();
-    onExtreme2DisplacementChanged: computeTransform4Displacement();
+
+//    onExtreme1DisplacementChanged: computeTransform4Displacement();
+//    onExtreme2DisplacementChanged: computeTransform4Displacement();
 
     property matrix4x4 poseMatrix
     property quaternion quaternionTest;
     property vector3d translationTest;
+
+    property bool enable_deformation:settings.show_displacement
 
     Entity{
         enabled: settings.show_stress
@@ -85,15 +89,12 @@ Entity{
         }       
         Transform{
             id:text_transform            
-            translation:Qt.vector3d(0,0,20)
+            translation:enable_deformation? Qt.vector3d(0,0,20+tangibleSection.width) : Qt.vector3d(0,0,20)
             rotation:quaternion_helper.invert(quaternionTest)
             scale: 10
         }
         components:[text_transform]
     }
-
-
-
 
     function computeTransform(){
         var b=extreme2.minus(extreme1).normalized();
@@ -145,8 +146,9 @@ Entity{
     components: [transform]
 
     property real main_mesh_lenght: settings.show_beam_axial_loads ? Math.max(rootEntity.length/2-50,5) : Math.max(rootEntity.length/2-25,5)
+
     Entity{
-        enabled: settings.show_beam && !settings.show_displacement
+        enabled: settings.show_beam && !settings.show_displacement && !enable_deformation
         property Transform transform: Transform{
                 scale3D:  Qt.vector3d(1,main_mesh_lenght/beam_commons.main_mesh_cylinder.length,1)
                 translation://length > (2* main_mesh_lenght + 30) ?
@@ -156,7 +158,7 @@ Entity{
         components: [beam_commons.main_mesh_cylinder,this.transform,main_mesh_material]
     }
     Entity{
-        enabled: settings.show_beam && !settings.show_displacement// && length > (2*main_mesh_lenght + 30)
+        enabled: settings.show_beam && !settings.show_displacement&& !enable_deformation// && length > (2*main_mesh_lenght + 30)
         property Transform transform: Transform{
                 scale3D:  Qt.vector3d(1,main_mesh_lenght/beam_commons.main_mesh_cylinder.length,1)
                 translation:Qt.vector3d(0,-0.5*main_mesh_lenght-10,0)
@@ -165,6 +167,7 @@ Entity{
     }
 
     Entity{
+        enabled: !settings.show_displacement && !enable_deformation
         property Transform transform: Transform{
                 scale3D:  Qt.vector3d(rootEntity.tangibleSection.height/2,rootEntity.length/2-10,rootEntity.tangibleSection.width/2)
         }
@@ -172,7 +175,7 @@ Entity{
     }
 
     Entity{
-        enabled: settings.show_beam_sphere
+        enabled: settings.show_beam_sphere && !enable_deformation
         components: [
             beam_commons.sphere_mesh
             ,
@@ -183,7 +186,7 @@ Entity{
 
 
     Entity{
-        enabled: settings.show_beam_spring && !settings.show_displacement
+        enabled: settings.show_beam_spring && !settings.show_displacement && !enable_deformation
         property Transform transform:Transform{
             //z:width,x:height,y:lenght
             //scale3D:Qt.vector3d(17/9,1,35/9)
@@ -198,9 +201,7 @@ Entity{
     }
 
     Entity{
-        enabled: settings.show_spatial_references &&
-                 infobox.current_item == rootEntity ?
-                     true: false
+        enabled:  false
         property Transform transform: Transform{
             translation:Qt.vector3d(20,0,0)
         }
@@ -232,9 +233,92 @@ Entity{
 
     }
 
+
+
+
+//    /*Displacement entity*/
+//    property quaternion displacementQuaternion;
+//    property vector3d displacementTranslation;
+//    property real displacementMeshLenght;
+
+//    QQ2.Connections{
+//        target: settings
+//        onExagerate_displacement_factorChanged:computeTransform4Displacement()
+//    }
+
+//    function computeTransform4Displacement(){
+//        var e1=extreme1.plus(extreme1Displacement.times(settings.exagerate_displacement_factor))
+//        var e2=extreme2.plus(extreme2Displacement.times(settings.exagerate_displacement_factor))
+//        displacementMeshLenght=e2.minus(e1).length();
+//        var b=e2.minus(e1).normalized();
+//        displacementQuaternion=displacement_transform.fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+//        if(b.x!=1 && b.x!=-1){
+//            var axis=Qt.vector3d(1,0,0).crossProduct(b).normalized();
+//            var angle=Math.acos(Qt.vector3d(1,0,0).dotProduct(b));
+//            displacementQuaternion=quaternion_helper.product(displacement_transform.fromAxisAndAngle(axis, angle*180.0/Math.PI),displacementQuaternion)
+//        }
+//        var center=e2.plus(e1).times(0.5);
+//        displacementTranslation.x=center.x;
+//        displacementTranslation.y=center.y;
+//        displacementTranslation.z=center.z;
+//    }
+
+//    Entity{
+//        enabled: settings.show_displacement
+//        components: [Transform{
+//                rotation:quaternion_helper.invert(quaternionTest)
+//                }
+//        ]
+
+//        Entity{
+//            components: [Transform{
+//                translation:translationTest.times(-1)
+//            }]
+//            Entity{
+//                Transform{
+//                    id:displacement_transform
+//                    scale3D:Qt.vector3d(1,(displacementMeshLenght-50)/beam_commons.dispalcement_mesh.length,1)
+//                    rotation:displacementQuaternion
+//                    translation:displacementTranslation
+//                }
+//                components: [displacement_transform,beam_commons.dispalcement_mesh,beam_commons.phong_material_green]
+//            }
+//        }
+
+
+//    }
+
+    /*Deforming Mesh*/
+
+    Entity{
+        id:deforming_entity
+        enabled: enable_deformation
+        property real deforming_length:Math.max(10,rootEntity.length-60)
+        Transform{
+            id:deforming_transform
+            rotation:transform.fromAxisAndAngle(Qt.vector3d(0, 0, 1), -90)
+            translation: Qt.vector3d(0,deforming_entity.deforming_length/2,0)
+        }
+        DeformingBeamMesh{
+            id:deforming_mesh
+            offset:Qt.vector2d(30,30)
+            segments: 30
+            keyframes: 1
+            exagerate:settings.exagerate_displacement_factor*staticsModule.modelScale;
+            displacements:rootEntity.segments
+            length:deforming_entity.deforming_length
+            size:tangibleSection
+        }
+
+        components: infobox.current_item == rootEntity ?
+                        [deforming_mesh,deforming_transform,main_mesh_material]
+                      :
+                        [deforming_mesh,deforming_transform,beam_commons.deformingMeshMaterial]
+
+    }
+
+
     /*Pickers and Dragging anchors*/
-    property bool drag_anchor_enabled:false;
-    property vector3d current_anchor_position: Qt.vector3d(0,0,0);
 
 //    SphereMesh{
 //        id:drag_mesh
@@ -250,130 +334,71 @@ Entity{
         property ObjectPicker objectPicker:ObjectPicker{
             onClicked: {
                 sceneRoot.mouseEventHasBeenAccepted=true;
-                if(drag_anchor_enabled)
-                   current_anchor_position=Qt.vector3d(0,0,0)
-                else if(parent.enabled && infobox.current_item!=rootEntity){
+                if(parent.enabled && infobox.current_item!=rootEntity && !disable_beam_selection_for_load){
                     infobox.current_item=rootEntity
                 }
             }
         }
-        components: infobox.current_item!==rootEntity ?
+        components: infobox.current_item!==rootEntity && !disable_beam_selection_for_load ?
                         [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,objectPicker]:
                         [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform]
-        Entity{
-            enabled: drag_anchor_enabled
-            property Transform transform: Transform{
-               scale3D:Qt.vector3d(0.5,0.5,0.5)
-           }
-           components: [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]
-        }
     }
 
-    NodeInstantiator {
-        model: (length-40)/(4*(beam_commons.drag_mesh.radius+2))-1;
-        delegate:Entity{
-            enabled: settings.beam_is_selectable
-            property Transform transform: Transform{
-                rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
-                translation:Qt.vector3d(beam_commons.drag_mesh.radius+tangibleSection.height/2,(index+1)*(2*(beam_commons.drag_mesh.radius+2)),0)
-            }
-            property ObjectPicker objectPicker:ObjectPicker{
-                onClicked: {
-                    sceneRoot.mouseEventHasBeenAccepted=true;
-                    current_anchor_position=Qt.vector3d(0,transform.translation.y,0);
-                }
-            }
-            components: drag_anchor_enabled ? [beam_commons.drag_mesh,beam_commons.transparent_material,transform,objectPicker] : []
-            Entity{
-                enabled: drag_anchor_enabled
-                property Transform transform: Transform{
-                   scale3D:Qt.vector3d(0.5,0.5,0.5)
-               }
-               components: [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]
+    property int pickersCount:0;
+    function updatePickerCount(){pickersCount=(length-40)/(4*(beam_commons.drag_mesh.radius+2))-1;}
 
-            }
-        }
-    }
-    NodeInstantiator {
-        model: (length-40)/(4*(beam_commons.drag_mesh.radius+2))-1;
-        delegate:Entity{
-            enabled: settings.beam_is_selectable
-             property Transform transform: Transform{
-                id:drag_transform
-                rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
-                translation:Qt.vector3d(beam_commons.drag_mesh.radius+tangibleSection.height/2,-(index+1)*(2*(beam_commons.drag_mesh.radius+2)),0)
-            }
-            property ObjectPicker objectPicker: ObjectPicker{
-                onClicked: {
-                    sceneRoot.mouseEventHasBeenAccepted=true;
-                    current_anchor_position=Qt.vector3d(0,transform.translation.y,0);
-                }
-            }
+//    NodeInstantiator {
+//        model:
+//        delegate:Entity{
+//            enabled: settings.beam_is_selectable
+//            property Transform transform: Transform{
+//                rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+//                translation:Qt.vector3d(beam_commons.drag_mesh.radius+tangibleSection.height/2,(index+1)*(2*(beam_commons.drag_mesh.radius+2)),0)
+//            }
+//            property ObjectPicker objectPicker:ObjectPicker{
+//                onClicked: {
+//                    sceneRoot.mouseEventHasBeenAccepted=true;
+//                    current_anchor_position=Qt.vector3d(0,transform.translation.y,0);
+//                }
+//            }
+//            components: drag_anchor_enabled ? [beam_commons.drag_mesh,beam_commons.transparent_material,transform,objectPicker] : []
+//            Entity{
+//                enabled: drag_anchor_enabled
+//                property Transform transform: Transform{
+//                   scale3D:Qt.vector3d(0.5,0.5,0.5)
+//               }
+//               components: [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]
 
-            components: drag_anchor_enabled ? [beam_commons.drag_mesh,beam_commons.transparent_material,transform,objectPicker] : []
-            Entity{
-                enabled: drag_anchor_enabled
-                property Transform transform: Transform{
-                   scale3D:Qt.vector3d(0.5,0.5,0.5)
-               }
-               components: [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]
+//            }
+//        }
+//    }
+//    NodeInstantiator {
+//        model: (length-40)/(4*(beam_commons.drag_mesh.radius+2))-1;
+//        delegate:Entity{
+//            enabled: settings.beam_is_selectable
+//             property Transform transform: Transform{
+//                id:drag_transform
+//                rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+//                translation:Qt.vector3d(beam_commons.drag_mesh.radius+tangibleSection.height/2,-(index+1)*(2*(beam_commons.drag_mesh.radius+2)),0)
+//            }
+//            property ObjectPicker objectPicker: ObjectPicker{
+//                onClicked: {
+//                    sceneRoot.mouseEventHasBeenAccepted=true;
+//                    current_anchor_position=Qt.vector3d(0,transform.translation.y,0);
+//                }
+//            }
 
-            }
-        }
-    }
+//            components: drag_anchor_enabled ? [beam_commons.drag_mesh,beam_commons.transparent_material,transform,objectPicker] : []
+//            Entity{
+//                enabled: drag_anchor_enabled
+//                property Transform transform: Transform{
+//                   scale3D:Qt.vector3d(0.5,0.5,0.5)
+//               }
+//               components: [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]
 
-
-    /*Displacement entity*/
-    property quaternion displacementQuaternion;
-    property vector3d displacementTranslation;
-    property real displacementMeshLenght;
-
-    QQ2.Connections{
-        target: settings
-        onExagerate_displacement_factorChanged:computeTransform4Displacement()
-    }
-
-    function computeTransform4Displacement(){
-        var e1=extreme1.plus(extreme1Displacement.times(settings.exagerate_displacement_factor))
-        var e2=extreme2.plus(extreme2Displacement.times(settings.exagerate_displacement_factor))
-        displacementMeshLenght=e2.minus(e1).length();
-        var b=e2.minus(e1).normalized();
-        displacementQuaternion=displacement_transform.fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
-        if(b.x!=1 && b.x!=-1){
-            var axis=Qt.vector3d(1,0,0).crossProduct(b).normalized();
-            var angle=Math.acos(Qt.vector3d(1,0,0).dotProduct(b));
-            displacementQuaternion=quaternion_helper.product(displacement_transform.fromAxisAndAngle(axis, angle*180.0/Math.PI),displacementQuaternion)
-        }
-        var center=e2.plus(e1).times(0.5);
-        displacementTranslation.x=center.x;
-        displacementTranslation.y=center.y;
-        displacementTranslation.z=center.z;
-    }
-
-    Entity{
-        enabled: settings.show_displacement
-        components: [Transform{
-                rotation:quaternion_helper.invert(quaternionTest)
-                }
-        ]
-
-        Entity{
-            components: [Transform{
-                translation:translationTest.times(-1)
-            }]
-            Entity{
-                Transform{
-                    id:displacement_transform
-                    scale3D:Qt.vector3d(1,(displacementMeshLenght-50)/beam_commons.dispalcement_mesh.length,1)
-                    rotation:displacementQuaternion
-                    translation:displacementTranslation
-                }
-                components: [displacement_transform,beam_commons.dispalcement_mesh,beam_commons.phong_material_green]
-            }
-        }
-
-
-    }
+//            }
+//        }
+//    }
 
 
 }

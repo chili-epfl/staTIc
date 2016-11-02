@@ -55,7 +55,7 @@ Entity {
     }
     property bool structureLoaded: true
     property alias structureEntity: structureEntity
-
+    property alias scene_camera: scene_camera
     property bool ghostMode: false
 
     property int globalNumericAnimation;
@@ -178,96 +178,110 @@ Entity {
                                       fromAxisAndAngle(0,1,0,-(rotationSensor.reading.z-
                                                                structure_tag.last_sensor_read.z)),
                                       fromAxisAndAngle(0,0,-1,-(rotationSensor.reading.x-
-                                                               structure_tag.last_sensor_read.x))),
-                                      fromAxisAndAngle(-1,0,0,-(rotationSensor.reading.y-
-                                                          structure_tag.last_sensor_read.y)))
+                                                                structure_tag.last_sensor_read.x))),
+                                  fromAxisAndAngle(-1,0,0,-(rotationSensor.reading.y-
+                                                            structure_tag.last_sensor_read.y)))
                             :
                               Qt.quaternion(1,0,0,0)
            }
        ]
-    Entity {
-        id:structureEntity
-        Transform {
-            id: structureLoaderTransform
-//            translation:Qt.vector3d(0,-100,-1000)
-            rotation: structure_tag.rotationQuaternion
-            property quaternion inv_rotation: quaternion_helper.invert(rotation)
-            property vector3d euler_angles: quaternion_helper.eulerAngles(rotation)
-            QQ2.Timer{
-                running: true
-                repeat: true
-                interval: 3000
-                onTriggered: logger.log_position("Structure",structure_tag.translation,structureLoaderTransform.rotationX,structureLoaderTransform.rotationY,structureLoaderTransform.rotationZ)
-            }
-//            QuaternionAnimation on rotation{
-//            }
-            translation:structure_tag.translation
 
-            QQ2.Component.onCompleted:
-                //structure_tag.appendQuaternion(fromAxisAndAngle(1,1,1,120))
-                structure_tag.appendQuaternion(fromAxisAndAngle(1,0,0,90))
-        }
+       Entity{
+           Transform {
+               id: structureLoaderTransform
+               //            translation:Qt.vector3d(0,-100,-1000)
+               rotation: structure_tag.rotationQuaternion
+               property quaternion inv_rotation: quaternion_helper.invert(rotation)
+               property vector3d euler_angles: quaternion_helper.eulerAngles(rotation)
+               QQ2.Timer{
+                   running: true
+                   repeat: true
+                   interval: 3000
+                   onTriggered: logger.log_position("Structure",structure_tag.translation,structureLoaderTransform.rotationX,structureLoaderTransform.rotationY,structureLoaderTransform.rotationZ)
+               }
+               //            QuaternionAnimation on rotation{
+               //            }
+              // translation:settings.focus_on_joint ? Qt.vector3d(0,0,-300) : structure_tag.translation
+               translation: structure_tag.translation
 
-
-        components: [structureLoaderTransform]
-
-        Entity{
-            enabled:ghostMode
-            Mesh{
-                id:meshStructure
-            }
-            SceneLoader{
-                id:structureLoader
-                objectName: "structureLoader"
-            }
-            PhongAlphaMaterial {
-                id:material
-                ambient:  "#783e0b"
-                diffuse:"grey"
-                specular:"black"
-                alpha:0.80
-            }
-            components: structureLoader.status==SceneLoader.Loaded?
-                            [structureLoader]:
-                            [meshStructure, material]
+               QQ2.Component.onCompleted:
+                   //structure_tag.appendQuaternion(fromAxisAndAngle(1,1,1,120))
+                   structure_tag.appendQuaternion(fromAxisAndAngle(1,0,0,90))
+           }
+           components: [structureLoaderTransform]
 
 
-        }
+           Entity {
+               id:structureEntity
 
-        Scaffold{
-            extreme1_tag: ARToolkitObject{
-                objectId: "Mat_240"
-                QQ2.Component.onCompleted: marker_detector.registerObserver(this)
-            }
-            extreme2_tag: ARToolkitObject{
-                objectId: "Mat_241"
-                QQ2.Component.onCompleted: marker_detector.registerObserver(this)
-            }
-        }
+               components: [
+                   Transform{
+//                    translation:settings.focus_on_joint ?
+//                                    infobox.current_item.position.times(-1)
+//                                  :
+//                                    Qt.vector3d(0,0,0)
+                   }
+               ]
 
-//        Scaffold{
-//            extreme1_tag: ArucoObject{
-//                objectId: "242"
-//                QQ2.Component.onCompleted: aruco.registerObserver(this)
-//            }
-//            extreme2_tag: ArucoObject{
-//                objectId: "243"
-//                QQ2.Component.onCompleted: aruco.registerObserver(this)
-//            }
-//        }
-        /*Tools*/
 
-//        ConcentratedForce{
+               Entity{
+                   enabled:ghostMode
+                   Mesh{
+                       id:meshStructure
+                   }
+                   SceneLoader{
+                       id:structureLoader
+                       objectName: "structureLoader"
+                   }
+                   PhongAlphaMaterial {
+                       id:material
+                       ambient:  "#783e0b"
+                       diffuse:"grey"
+                       specular:"black"
+                       alpha:0.80
+                   }
+                   components: structureLoader.status==SceneLoader.Loaded?
+                                   [structureLoader]:
+                                   [meshStructure, material]
 
-//        }
 
-        /*Scaffold{
+               }
+
+               Scaffold{
+                   extreme1_tag: ARToolkitObject{
+                       objectId: "Mat_240"
+                       QQ2.Component.onCompleted: marker_detector.registerObserver(this)
+                   }
+                   extreme2_tag: ARToolkitObject{
+                       objectId: "Mat_241"
+                       QQ2.Component.onCompleted: marker_detector.registerObserver(this)
+                   }
+               }
+
+               //        Scaffold{
+               //            extreme1_tag: ArucoObject{
+               //                objectId: "242"
+               //                QQ2.Component.onCompleted: aruco.registerObserver(this)
+               //            }
+               //            extreme2_tag: ArucoObject{
+               //                objectId: "243"
+               //                QQ2.Component.onCompleted: aruco.registerObserver(this)
+               //            }
+               //        }
+               /*Tools*/
+
+               //        ConcentratedForce{
+
+               //        }
+
+               /*Scaffold{
 
         }*/
-//        Snow{
-//        }
+               //        Snow{
+               //        }
 
-    }
+           }
+       }
    }
 
 

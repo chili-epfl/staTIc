@@ -20,9 +20,9 @@ Item{
     signal pageExit();
 
     property alias suggestion_box: suggestion_box
-    property alias currentViewFilter: viewFilterBar.selection
     property alias materialsManager: staticsmodule.materialsManager
     property alias vmManager: vmFrame3DDManager
+    property alias staticsModule: staticsmodule
     property alias warehouse: warehouse3d
     property alias tutorial:tutorial
 
@@ -135,99 +135,86 @@ Item{
         }
     ]
 
-    Item{
-        states: [
-            State{
-                name:""
-                PropertyChanges{
-                    target:settings
-                    show_info_box: false
-                }
-            },
-            State{
-                name:"analysis_suggestion"
-                when:!firstInit && settings.show_filter_bar && currentViewFilter=='ANALYSIS' &&
-                     infobox.current_item==0 && applicationRoot.state==""
-                StateChangeScript{
-                    script: suggestion_box.show_message("Select either a joint or a beam to analyse it");
-                }
-                PropertyChanges{
-                    target:settings
-                    show_info_box: false
-                }
-            },
-            State {
-                name: "beam"
-                when: !firstInit && settings.show_filter_bar && currentViewFilter=='ANALYSIS' &&
-                      infobox.current_item!=0 && infobox.current_item.type==="beam"
-                      && applicationRoot.state==""
-//                PropertyChanges {
-//                    target: infobox.loader
-//                    source:"qrc:/ui/UI/InfoBoxBeam.qml"
-//                    restoreEntryValues: false
+//    Item{
+//        states: [
+//            State{
+//                name:""
+//                PropertyChanges{
+//                    target:settings
+//                    show_info_box: false
 //                }
-                PropertyChanges {
-                    target: infobox
-                    lateral_visibility:"Visible"
-
-                }
-                PropertyChanges {
-                    target:settings
-                    show_spatial_references: true
-                    show_info_box: true
-                    load_is_selectable:false
-                    visible_loader:"BEAM"
-
-                }
-            },
-            State {
-                name: "joint"
-                when: !firstInit &&  settings.show_filter_bar && currentViewFilter=='ANALYSIS' &&
-                      infobox.current_item!=0 && infobox.current_item.type==="joint"
-                      && applicationRoot.state==""
-//                PropertyChanges {
-//                    target: infobox.loader
-//                    source:"qrc:/ui/UI/InfoBoxJoint.qml"
-//                    restoreEntryValues: false
+//            },
+//            State{
+//                name:"analysis_suggestion"
+//                when:!firstInit && settings.show_filter_bar && currentViewFilter=='ANALYSIS' &&
+//                     infobox.current_item==0 && applicationRoot.state==""
+//                StateChangeScript{
+//                    script: suggestion_box.show_message("Select either a joint or a beam to analyse it");
 //                }
-                PropertyChanges {
-                    target: infobox
-                    lateral_visibility:"Visible"
-                }
-                PropertyChanges {
-                    target:settings
-                    show_spatial_references: true
-                    show_info_box: true
-                    load_is_selectable:false
-                    visible_loader:"JOINT"
-                }
-            },
-            State {
-                name: "designer"
-                when: !firstInit && settings.show_filter_bar && currentViewFilter=='DESIGNER'
-                      && applicationRoot.state==""
-//                PropertyChanges {
-//                    target: infobox.loader
-//                    source:"qrc:/ui/UI/InfoBoxDesigner.qml"
-//                    restoreEntryValues: false
+//                PropertyChanges{
+//                    target:settings
+//                    show_info_box: false
 //                }
-                PropertyChanges {
-                    target: infobox
-                    lateral_visibility:"Visible"
-                }
-                PropertyChanges {
-                    target: settings
-                    show_spatial_references: false
-                    show_info_box:true
-                    load_is_selectable:true
-                    visible_loader:"DESIGNER"
+//            },
+//            State {
+//                name: "joint"
+//                when: !firstInit &&  settings.show_filter_bar && currentViewFilter=='ANALYSIS' &&
+//                      infobox.current_item!=0 && infobox.current_item.type==="joint"
+//                      && applicationRoot.state==""
+////                PropertyChanges {
+////                    target: infobox.loader
+////                    source:"qrc:/ui/UI/InfoBoxJoint.qml"
+////                    restoreEntryValues: false
+////                }
+//                PropertyChanges {
+//                    target: infobox
+//                    lateral_visibility:"Visible"
+//                }
+//                PropertyChanges {
+//                    target:settings
+//                    show_spatial_references: true
+//                    show_info_box: true
+//                    load_is_selectable:false
+//                    visible_loader:"JOINT"
+//                }
+//                PropertyChanges {
+//                    target: scene3D.scene_camera
+//                    position:Qt.vector3d(0,0,300)
+//                    viewCenter: Qt.vector3d(0,0,299)
+//                    explicit: true
+//                }
+//                PropertyChanges {
+//                    target: settings
+//                    use_device_orientation:true
+//                }
 
-                }
-            }
-        ]
+//            },
+//            State {
+//                name: "designer"
+//                when: !firstInit && settings.show_filter_bar && currentViewFilter=='DESIGNER'
+//                      && applicationRoot.state==""
+////                PropertyChanges {
+////                    target: infobox.loader
+////                    source:"qrc:/ui/UI/InfoBoxDesigner.qml"
+////                    restoreEntryValues: false
+////                }
+//                PropertyChanges {
+//                    target: infobox
+//                    lateral_visibility:"Visible"
+//                }
+//                PropertyChanges {
+//                    target: settings
+//                    show_spatial_references: false
+//                    show_info_box:true
+//                    load_is_selectable:true
+//                    visible_loader:"DESIGNER"
+
+//                }
+//            }
+//        ]
 
 
-    }
+//    }
 
 
     Timer{
@@ -489,10 +476,6 @@ Item{
                 border.color: "#F0F0F0"
                 radius:5
 
-                ViewFilterBar{
-                    id:viewFilterBar
-                    anchors.horizontalCenter: parent.horizontalCenter
-                }
                 InfoBox{
                     id:infobox
                     width: parent.width/3;
@@ -583,22 +566,41 @@ Item{
                     anchors.left: parent.left
                     anchors.margins: 10
                     spacing: 10
-                Image {
-                    id:ar_button
-                    visible: settings.show_AR_button
-                    Layout.preferredWidth:  100
-                    Layout.preferredHeight: 100
-                    source: camDevice.isRunning ?
-                            "qrc:/icons/Icons/AR_ON.png" :
-                            "qrc:/icons/Icons/AR_OFF.png"
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            camDevice.isRunning = !camDevice.isRunning
-                            logger.log("AR_Button_Click",{"running":camDevice.isRunning})
+                    Image {
+                        visible: settings.show_AR_button
+                        Layout.preferredWidth:  100
+                        Layout.preferredHeight: 100
+                        source:"qrc:/icons/Icons/TANGIBLE.png"
+                        MouseArea{
+                            anchors.fill: parent
+                            onPressedChanged: {
+                                if(pressed){
+                                    settings.enable_scaffold=true;
+                                }
+                                else
+                                    settings.enable_scaffold=false;
+                            }
                         }
                     }
-                }
+
+                    Image {
+                        id:ar_button
+                        visible: settings.show_AR_button
+                        Layout.preferredWidth:  100
+                        Layout.preferredHeight: 100
+                        source: camDevice.isRunning ?
+                                    "qrc:/icons/Icons/AR_ON.png" :
+                                    "qrc:/icons/Icons/AR_OFF.png"
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                camDevice.isRunning = !camDevice.isRunning
+                                logger.log("AR_Button_Click",{"running":camDevice.isRunning})
+                            }
+                        }
+                    }
+
+
 
                 Image {
                     id:ghostMode_button
@@ -626,8 +628,8 @@ Item{
                         anchors.fill: parent
                         onClicked: {
                             settings.show_stress = !settings.show_stress
-                            if(settings.show_displacement && settings.show_stress)
-                                settings.show_displacement=false;
+//                            if(settings.show_displacement && settings.show_stress)
+//                                settings.show_displacement=false;
                             settings.blink_stress=0;
                             logger.log("Show_Stress_Click",{"visible":settings.show_stress})
                         }
@@ -666,8 +668,8 @@ Item{
                         anchors.fill: parent
                         onClicked: {
                             settings.show_displacement = !settings.show_displacement
-                            if(settings.show_displacement && settings.show_stress)
-                                settings.show_stress=false
+//                            if(settings.show_displacement && settings.show_stress)
+//                                settings.show_stress=false
                             settings.blink_displacement=0;
                             if(settings.show_displacement)
                                 exagerate_disp_slider.visible=true
@@ -706,22 +708,32 @@ Item{
 //                            onTriggered: exagerate_disp_slider.visible=false
 //                            interval: 5000
 //                        }
-                        width: parent.width
+                        width: parent.width*2
                         anchors.horizontalCenter: parent.horizontalCenter
                         anchors.bottom: parent.top
                         anchors.margins: 10
                         stepSize: 1
-                        minimumValue: 0
+                        minimumValue: 1
                         tickmarksEnabled: true
-                        maximumValue: 4
-                        value: 0
+                        maximumValue: 25
+                        value: 1
                         onValueChanged: {
                             logger.log("Show_Displacement_Click",{"visible":settings.show_displacement,"exagerate":exagerate_disp_slider.value})
                         }
                         Binding{
                             target:settings
                             property: "exagerate_displacement_factor"
-                            value: Math.pow(10,exagerate_disp_slider.value)
+                            value: if(exagerate_disp_slider.value<10){
+                                       return exagerate_disp_slider.value;
+                                   }
+                                   else if(exagerate_disp_slider.value<20){
+                                       return (exagerate_disp_slider.value-9)*10
+                                   }
+                                   else {
+                                       return 100+(exagerate_disp_slider.value%20)*50;
+                                   }
+
+
                         }
                         Text{
                             text:"Exagerate: "+settings.exagerate_displacement_factor+"x"

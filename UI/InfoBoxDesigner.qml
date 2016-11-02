@@ -9,37 +9,55 @@ Rectangle {
     property var current_item: 0
     onCurrent_itemChanged: {
         if(current_item!=0 &&
-            current_item.type==="beam" &&
-                tab_view.currentIndex===1)
+                current_item.type==="beam"){
+            if(tab_view.currentIndex===1)
                 tab_view.getTab(1).item.currentIndex=materialsManager.get(current_item.materialID ,"Index")
-        else if(current_item!=0 &&
-                current_item.type==="joint" &&
-                    tab_view.currentIndex===2){
-            if(current_item.supportType=="Pinned")
-                tab_view.getTab(2).item.support_selection="Pinned";
-            else  if(current_item.supportType=="Rolling")
-                tab_view.getTab(2).item.support_selection="Rolling Horizontal";
-            else  if(current_item.supportType=="Fixed")
-                tab_view.getTab(2).item.support_selection="Fixed";
-            else if(current_item.supportType=="none")
-                tab_view.getTab(2).item.support_selection="none";
+            settings.focus_on_joint=false;
         }
+        else if(current_item!=0 &&
+                current_item.type==="joint"){
+            if(tab_view.currentIndex===2){
+                if(current_item.supportType=="Pinned")
+                    tab_view.getTab(2).item.support_selection="Pinned";
+                else  if(current_item.supportType=="Rolling")
+                    tab_view.getTab(2).item.support_selection="Rolling Horizontal";
+                else  if(current_item.supportType=="Fixed")
+                    tab_view.getTab(2).item.support_selection="Fixed";
+                else if(current_item.supportType=="none")
+                    tab_view.getTab(2).item.support_selection="none";
+                settings.focus_on_joint=false;
+            }
+            else if(tab_view.currentIndex===3)
+                settings.focus_on_joint=true;
+        }
+        else
+            settings.focus_on_joint=false;
     }
     color: "transparent"
     TabView{
         id:tab_view
         onCurrentIndexChanged: if(current_item.type==="beam" && currentIndex===1){
                                    tab_view.getTab(1).item.currentIndex=materialsManager.get(current_item.materialID ,"Index");
+                                   settings.focus_on_joint=false;
                                }
-                               else if(current_item.type==="joint" && currentIndex===2){
-                                   if(current_item.supportType=="Pinned")
-                                       tab_view.getTab(2).item.support_selection="Pinned";
-                                   else  if(current_item.supportType=="Rolling")
-                                       tab_view.getTab(2).item.support_selection="Rolling Horizontal";
-                                   else  if(current_item.supportType=="Fixed")
-                                       tab_view.getTab(2).item.support_selection="Fixed";
-                                   else if(current_item.supportType=="none")
-                                       tab_view.getTab(2).item.support_selection="none";
+                               else if(current_item.type==="joint"){
+                                   if(currentIndex===2){
+                                       if(current_item.supportType=="Pinned")
+                                           tab_view.getTab(2).item.support_selection="Pinned";
+                                       else  if(current_item.supportType=="Rolling")
+                                           tab_view.getTab(2).item.support_selection="Rolling Horizontal";
+                                       else  if(current_item.supportType=="Fixed")
+                                           tab_view.getTab(2).item.support_selection="Fixed";
+                                       else if(current_item.supportType=="none")
+                                           tab_view.getTab(2).item.support_selection="none";
+                                       settings.focus_on_joint=false;
+                                   }
+                                   else if(currentIndex===3){
+                                       settings.focus_on_joint=true;
+                                   }
+                               }
+                               else{
+                                   settings.focus_on_joint=false;
                                }
 
         anchors.fill: parent
@@ -49,24 +67,38 @@ Rectangle {
                 color: "transparent"
             }
             tab:Item{
-                implicitWidth: Math.min(text.implicitWidth + 4, styleData.availableWidth)+10
-                implicitHeight: pt2px(14)+10
+                implicitWidth: styleData.selected ?
+                                  styleData.availableWidth/2
+                                 :
+                                  0.5*styleData.availableWidth/tab_view.count
+
+                implicitHeight: pt2px(14)+30
                 Rectangle {
-                    color: styleData.selected ? "steelblue" :"#F0F0F0"
+                    color: "#2f3439"
                     border.color:  color
                     anchors.fill: parent
                     anchors.margins: 5
                     radius: 2
+                    Rectangle{
+                        visible: styleData.selected
+                        color: "#33b5e5"
+                        width: parent.width
+                        height: 5
+                        anchors.bottom: parent.bottom
+                    }
                     Text {
                         id: text
                         anchors.centerIn: parent
-                        width: Math.min(implicitWidth,parent.width)
-                        height: parent.height
+                        width: parent.width
+                        height: parent.height-8
                         text: styleData.title
-                        color: styleData.selected ? "white" : "black"
-                        fontSizeMode: Text.Fit
-                        wrapMode: Text.WordWrap
+                        color: "#F0F0F0"
+//                        fontSizeMode: Text.Fit
+                        //wrapMode: Text.WordWrap
                         verticalAlignment: Text.AlignVCenter
+                        elide: Text.ElideRight
+                        font.pointSize: 14
+//                        minimumPointSize: 10
 
                     }
                 }
@@ -74,6 +106,7 @@ Rectangle {
         }
 
         Tab{
+            id:catalog_tab
             title: "Catalog"
             Rectangle{
                 id:catalogItem
@@ -209,6 +242,7 @@ Rectangle {
             }
         }
         Tab{
+            id:material_tab
             title:"Beam Materials"
             Rectangle{                
                 id:materialItem
@@ -449,6 +483,7 @@ Rectangle {
 
         }
         Tab{
+            id:joint_design
             title:"Joint Design"
             Item{
                 property alias support_selection: support_designer_rect.selection
@@ -666,8 +701,155 @@ Rectangle {
                     }
                 }
             }
+        }
+        Tab{
+            id:joint_analysis
+            title:"Joint Analysis"
 
 
+            Item{
+                property bool hasReaction:false;
+                Component.onCompleted: updateModel()
+
+                Connections{
+                    target: root
+                    onCurrent_itemChanged: {
+                        updateModel()
+                    }
+                }
+
+
+                function updateModel(){
+                    forceListModel.clear()
+                    hasReaction=false;
+                    if(current_item != 0 && current_item.type=="joint"){
+                        for(var i=0;i<current_item.connected_beams.length;i++){
+                            forceListModel.append({isAdded:false,
+                                                      beam:current_item.connected_beams[i],
+                                                  })
+                        }
+                        //Important that this stays at the end!
+                        if(Math.abs(current_item.reaction.length())>0.0001){
+                            hasReaction=true;
+                            forceListModel.append({isAdded:false,
+                                                      joint:current_item,
+                                                  })
+                        }
+                        updateSumOfForces()
+                        //logger.log("infobox_joint_item_changed",{"item":current_item.objectName})
+                    }
+                }
+
+
+                function updateSumOfForces(){
+                    var sum=Qt.vector3d(0,0,0)
+                    var max=computeMaxForce(0);
+                    var logging_fields={};
+                    for(var i=0;i<current_item.connected_beams.length;i++){
+                        sum=sum.plus(forceListModel.get(i).beam.globalForceExtreme1.times(forceListModel.get(i).isAdded))
+                        logging_fields[forceListModel.get(i).beam.objectName]=forceListModel.get(i).isAdded;
+                    };
+                    if(hasReaction){
+                        sum=sum.plus(forceListModel.get(current_item.connected_beams.length).joint.reaction.times(forceListModel.get(current_item.connected_beams.length).isAdded));
+                        max=max.length() > max.plus(forceListModel.get(current_item.connected_beams.length).joint.reaction).length() ?
+                                    max:max.plus(forceListModel.get(current_item.connected_beams.length).joint.reaction)
+
+                        logging_fields[forceListModel.get(current_item.connected_beams.length).joint.objectName]=forceListModel.get(current_item.connected_beams.length).isAdded;
+
+                    }
+                    settings.focus_view_currentForce=sum
+                    settings.focus_view_maxForce=max;
+                }
+
+                function computeMaxForce(index){
+                    if (index==current_item.connected_beams.length) return Qt.vector3d(0,0,0);
+                    var next=computeMaxForce(index+1);
+                    if(next.length() > next.plus(forceListModel.get(index).beam.globalForceExtreme1).length())
+                        return next;
+                    else
+                        return next.plus(forceListModel.get(index).beam.globalForceExtreme1)
+                }
+
+                anchors.fill: parent
+                Rectangle{
+                    id:joint_analysis_joint_name
+                    border.color: "#F0F0F0"
+                    border.width: 5
+                    color: "#2f3439"
+                    Text {
+                        color: "white"
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        text: current_item!=0 && current_item.type=="joint"? "Joint "+ current_item.objectName : "Select a joint"
+                        font.pointSize: 30
+                        fontSizeMode: Text.Fit
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    width: parent.width
+                    height: parent.height*0.07
+                    anchors.margins: 10
+
+                }
+
+                Rectangle{
+                    anchors.top: joint_analysis_joint_name.bottom
+                    border.color: "#F0F0F0"
+                    border.width: 5
+                    color: "#2f3439"
+                    width: parent.width
+                    height: parent.height*0.8
+                    anchors.margins: 10
+                    ListModel{
+                        id:forceListModel
+                    }
+                    ListView{
+                        id:forceListView
+                        clip: true
+                        anchors.fill: parent
+                        anchors.margins: 10
+                        model: forceListModel
+                        delegate: Item {
+                            width: root.width-20
+                            height: 2* forceList_switch.height
+                            Text {
+                                id:forceList_label
+                                text: beam ? "Force from beam " + beam.objectName : "Reaction force from support"
+                                fontSizeMode: Text.Fit;
+                                minimumPixelSize: 10;
+                                color: "white"
+                                width: parent.width-forceList_switch.width-10
+                                anchors.verticalCenter: forceList_switch.verticalCenter
+                            }
+                            Switch{
+                                id:forceList_switch
+                                anchors.right: parent.right
+                                checked: false
+                                width: height*2
+                                height: forceList_label.height*1.5
+                                style: CustomSwitchStyle{
+                                }
+                                property vector3d forceVectorDel: (beam) ? beam.globalForceExtreme1 : joint.reaction
+                                onForceVectorDelChanged: updateSumOfForces()
+                                onCheckedChanged:
+                                {
+                                    forceListModel.setProperty(index, "isAdded", checked)
+                                    updateSumOfForces()
+                                    var logging_fields={};
+                                    for(var i=0;i<current_item.connected_beams.length;i++){
+                                        logging_fields[forceListModel.get(i).beam.objectName]=forceListModel.get(i).isAdded;
+                                    };
+                                    if(hasReaction){
+                                        logging_fields[forceListModel.get(current_item.connected_beams.length).joint.objectName]=forceListModel.get(current_item.connected_beams.length).isAdded;
+                                    }
+                                   logger.log("infobox_joint_change_force_list",logging_fields);
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
         }
     }
 

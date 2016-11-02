@@ -12,32 +12,11 @@ Entity{
     property vector2d extent
 
     signal killMe();
+    onEnabledChanged: rootEntity.parent.disable_beam_selection_for_load=false
 
 
-//    property vector3d localForce: globalToLocalMat.times(globalForce);
-//    onLocalForceChanged: console.log(localForce);
-//    property matrix4x4 globalToLocalMat;
-//    function computeGlobalToLocal(){
-//        var a=Qt.vector3d(1,0,0);
-//        var b=rootEntity.parent.extreme2.minus(rootEntity.parent.extreme1).normalized();
-//        var axb=a.crossProduct(b);
-//        var result=Qt.matrix4x4(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
-//        if(axb.x!==0 || axb.y!==0 || axb.z!==0){
-//            var tmp_ssc=ssc(axb);
-//            result=result.plus(tmp_ssc).plus(tmp_ssc.times(tmp_ssc).times((1-a.dotProduct(b))/Math.pow(axb.length(),2)));
-//            result.m44=1;
-//        }else{
-//            if(b.x===-1){
-//                result.m11=-1;
-//                result.m22=-1;
-//            }
-//        }
-//        return result.inverted();
-//    }
-
-    /*Force is acting in the y direction*/
     property vector3d relativeLocalPosition:rootEntity.parent?
-                                                Qt.vector3d(-transform.translation.y/rootEntity.parent.length + 0.5,-transform.translation.y/rootEntity.parent.length + 0.5,-transform.translation.y/rootEntity.parent.length + 0.5):
+                                                Qt.vector3d(-root_transform.translation.y/rootEntity.parent.length + 0.5,-root_transform.translation.y/rootEntity.parent.length + 0.5,-root_transform.translation.y/rootEntity.parent.length + 0.5):
                                                 Qt.vector3d(0,0,0);
     onRelativeLocalPositionChanged: {
         if(isSelected){
@@ -46,34 +25,16 @@ Entity{
         }
     }
 
-//    property bool dragging: settings.beam_dragging_ownership===rootEntity;
     property vector3d offsetAugmentation: rootEntity.parent? Qt.vector3d(rootEntity.parent.tangibleSection.height/2,0,
                                                                          0)://-rootEntity.parent.tangibleSection.width/2):
                                                              Qt.vector3d(0,0,0)
-//    onDraggingChanged: {
-//        if(dragging && rootEntity.parent!=null){
-//            transform.translation=Qt.binding(function(){
-//                    return offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
-//            })
-//        }
-//        else
-//            transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
-//    }
-
-    QQ2.Connections{
-        target: rootEntity.parent!=null && isSelected ? rootEntity.parent : null
-        onCurrent_anchor_positionChanged: transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position)
-    }
 
 
     /*Visual aspect*/
     Transform{
-        id:transform
+        id:root_transform
         rotation:fromAxisAndAngle(Qt.vector3d(0, 0, 1), -90)
         translation:offsetAugmentation
-//        onTranslationChanged:{
-//                    resetTimer.restart()
-//        }
     }
 
 
@@ -83,60 +44,452 @@ Entity{
     property Material material: isSelected  ? trapz_force_commons.material_for_selection :material_diffuse
 
     property bool isSelected: infobox.current_item===rootEntity
-
-//    onIsSelectedChanged: {
-//        if(!isSelected)
-//            rootEntity.parent.drag_anchor_enabled=false
-//    }
-
+    onIsSelectedChanged: {
+        if(isSelected)
+            rootEntity.parent.disable_beam_selection_for_load=true
+        else
+            rootEntity.parent.disable_beam_selection_for_load=false
+    }
     ObjectPicker {
         id:valid_picker
         hoverEnabled: false
-//        onPressedChanged: if(pressed && settings.beam_dragging_ownership==0){
-//                              if(settings.load_is_selectable && infobox.current_item!=rootEntity)
-//                                  infobox.current_item=rootEntity
-//                              if(settings.load_is_draggable){
-//                                  settings.beam_dragging_ownership=rootEntity
-//                                  rootEntity.parent.drag_anchor_enabled=true;
-//                                  rootEntity.parent.current_anchor_position=transform.translation.minus(offsetAugmentation)
-//                                  resetTimer.restart()
-//                              }
-//                          }
-//                          else if(!pressed && settings.beam_dragging_ownership==rootEntity){
-//                              sceneRoot.mouseEventHasBeenAccepted=true;
-//                              rootEntity.parent.drag_anchor_enabled=false;
-//                              settings.beam_dragging_ownership=0;
-//                              transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
-//                          }
         onClicked: {
             sceneRoot.mouseEventHasBeenAccepted=true;
             if(settings.load_is_selectable && !isSelected){
-                    infobox.current_item=rootEntity
-                    rootEntity.parent.drag_anchor_enabled=Qt.binding(function(){return isSelected});
+                infobox.current_item=rootEntity
             }
-//            if(dragging){
-//                rootEntity.parent.drag_anchor_enabled=false;
-//                settings.beam_dragging_ownership=0
-//                transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
-//            }
         }
     }
 
+    Entity{
+        components: rootEntity.enabled && !isSelected ? [root_transform,customMesh,material,valid_picker]:[root_transform,customMesh,material]
+    }
 
-    components: !isSelected ? [transform,customMesh,material,valid_picker]:[transform,customMesh,material]
+    Entity{
+        Entity{
+            enabled: settings.beam_is_selectable && isSelected
+            property Transform transform: Transform{
+                //rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+                translation:Qt.vector3d(rootEntity.parent.tangibleSection.height/2+beam_commons.drag_mesh.radius,0,0)
+            }
+            property ObjectPicker objectPicker:ObjectPicker{
+                onClicked: {
+                    sceneRoot.mouseEventHasBeenAccepted=true;
+                    root_transform.translation=rootEntity.offsetAugmentation;
+                }
+            }
+            components:  rootEntity.enabled &&  isSelected ? [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,this.objectPicker] : []
+            Entity{
+                enabled: isSelected
+                property Transform transform: Transform{
+                    scale3D:Qt.vector3d(0.5,0.5,0.5)
+                }
+                components:  rootEntity.enabled ? [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]:[]
+
+            }
+        }
+
+    }
+
+    Entity{
+        property int index:1
+        Entity{
+            enabled: settings.beam_is_selectable && isSelected &&
+                     ((-parent.index*50)/rootEntity.parent.length + 0.5)>0 &&
+                     ((-parent.index*50)/rootEntity.parent.length + 0.5)<1
+            property Transform transform: Transform{
+                //rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+                translation:Qt.vector3d(rootEntity.parent.tangibleSection.height/2+beam_commons.drag_mesh.radius,parent.parent.index*50,0)
+            }
+            property ObjectPicker objectPicker:ObjectPicker{
+                onClicked: {
+                    sceneRoot.mouseEventHasBeenAccepted=true;
+                    root_transform.translation=rootEntity.offsetAugmentation.plus(Qt.vector3d(0,parent.parent.index*50,0));
+                }
+            }
+            components:  rootEntity.enabled &&  isSelected ? [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,this.objectPicker] : []
+            Entity{
+                enabled: isSelected
+                property Transform transform: Transform{
+                    scale3D:Qt.vector3d(0.5,0.5,0.5)
+                }
+                components:  rootEntity.enabled ? [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]:[]
+
+            }
+        }
+
+    }
+    Entity{
+        property int index:2
+        Entity{
+            enabled: settings.beam_is_selectable && isSelected &&
+                     ((-parent.index*50)/rootEntity.parent.length + 0.5)>0 &&
+                     ((-parent.index*50)/rootEntity.parent.length + 0.5)<1
+            property Transform transform: Transform{
+                //rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+                translation:Qt.vector3d(rootEntity.parent.tangibleSection.height/2+beam_commons.drag_mesh.radius,parent.parent.index*50,0)
+            }
+            property ObjectPicker objectPicker:ObjectPicker{
+                onClicked: {
+                    sceneRoot.mouseEventHasBeenAccepted=true;
+                    root_transform.translation=rootEntity.offsetAugmentation.plus(Qt.vector3d(0,parent.parent.index*50,0));
+                }
+            }
+            components: rootEntity.enabled &&  isSelected ? [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,this.objectPicker] : []
+            Entity{
+                enabled: isSelected
+                property Transform transform: Transform{
+                    scale3D:Qt.vector3d(0.5,0.5,0.5)
+                }
+                components: rootEntity.enabled ? [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]:[]
+
+            }
+        }
+
+    }
+    Entity{
+        property int index:3
+        Entity{
+            enabled: settings.beam_is_selectable && isSelected &&
+                     ((-parent.index*50)/rootEntity.parent.length + 0.5)>0 &&
+                     ((-parent.index*50)/rootEntity.parent.length + 0.5)<1
+            property Transform transform: Transform{
+                //rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+                translation:Qt.vector3d(rootEntity.parent.tangibleSection.height/2+beam_commons.drag_mesh.radius,parent.parent.index*50,0)
+            }
+            property ObjectPicker objectPicker:ObjectPicker{
+                onClicked: {
+                    sceneRoot.mouseEventHasBeenAccepted=true;
+                    root_transform.translation=rootEntity.offsetAugmentation.plus(Qt.vector3d(0,parent.parent.index*50,0));
+                }
+            }
+            components: rootEntity.enabled &&  isSelected ? [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,this.objectPicker] : []
+            Entity{
+                enabled: isSelected
+                property Transform transform: Transform{
+                    scale3D:Qt.vector3d(0.5,0.5,0.5)
+                }
+                components: rootEntity.enabled ? [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]:[]
+
+            }
+        }
+
+    }
+    Entity{
+        property int index:4
+        Entity{
+            enabled: settings.beam_is_selectable && isSelected &&
+                     ((-parent.index*50)/rootEntity.parent.length + 0.5)>0 &&
+                     ((-parent.index*50)/rootEntity.parent.length + 0.5)<1
+            property Transform transform: Transform{
+                //rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+                translation:Qt.vector3d(rootEntity.parent.tangibleSection.height/2+beam_commons.drag_mesh.radius,parent.parent.index*50,0)
+            }
+            property ObjectPicker objectPicker:ObjectPicker{
+                onClicked: {
+                    sceneRoot.mouseEventHasBeenAccepted=true;
+                    root_transform.translation=rootEntity.offsetAugmentation.plus(Qt.vector3d(0,parent.parent.index*50,0));
+                }
+            }
+            components: rootEntity.enabled &&  isSelected ? [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,this.objectPicker] : []
+            Entity{
+                enabled: isSelected
+                property Transform transform: Transform{
+                    scale3D:Qt.vector3d(0.5,0.5,0.5)
+                }
+                components: rootEntity.enabled ? [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]:[]
+
+            }
+        }
+
+    }
+    Entity{
+        property int index:5
+        Entity{
+            enabled: settings.beam_is_selectable && isSelected &&
+                     ((-parent.index*50)/rootEntity.parent.length + 0.5)>0 &&
+                     ((-parent.index*50)/rootEntity.parent.length + 0.5)<1
+            property Transform transform: Transform{
+                //rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+                translation:Qt.vector3d(rootEntity.parent.tangibleSection.height/2+beam_commons.drag_mesh.radius,parent.parent.index*50,0)
+            }
+            property ObjectPicker objectPicker:ObjectPicker{
+                onClicked: {
+                    sceneRoot.mouseEventHasBeenAccepted=true;
+                    root_transform.translation=rootEntity.offsetAugmentation.plus(Qt.vector3d(0,parent.parent.index*50,0));
+                }
+            }
+            components: rootEntity.enabled &&  isSelected ? [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,this.objectPicker] : []
+            Entity{
+                enabled: isSelected
+                property Transform transform: Transform{
+                    scale3D:Qt.vector3d(0.5,0.5,0.5)
+                }
+                components: rootEntity.enabled ? [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]:[]
+
+            }
+        }
+
+    }
+
+    Entity{
+        property int index:6
+        Entity{
+            enabled: settings.beam_is_selectable && isSelected &&
+                     ((-parent.index*50)/rootEntity.parent.length + 0.5)>0 &&
+                     ((-parent.index*50)/rootEntity.parent.length + 0.5)<1
+            property Transform transform: Transform{
+                //rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+                translation:Qt.vector3d(rootEntity.parent.tangibleSection.height/2+beam_commons.drag_mesh.radius,parent.parent.index*50,0)
+            }
+            property ObjectPicker objectPicker:ObjectPicker{
+                onClicked: {
+                    sceneRoot.mouseEventHasBeenAccepted=true;
+                    root_transform.translation=rootEntity.offsetAugmentation.plus(Qt.vector3d(0,parent.parent.index*50,0));
+                }
+            }
+            components: rootEntity.enabled &&  isSelected ? [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,this.objectPicker] : []
+            Entity{
+                enabled: isSelected
+                property Transform transform: Transform{
+                    scale3D:Qt.vector3d(0.5,0.5,0.5)
+                }
+                components: rootEntity.enabled ? [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]:[]
+
+            }
+        }
+
+    }
+
+    Entity{
+        property int index:7
+        Entity{
+            enabled: settings.beam_is_selectable && isSelected &&
+                     ((-parent.index*50)/rootEntity.parent.length + 0.5)>0 &&
+                     ((-parent.index*50)/rootEntity.parent.length + 0.5)<1
+            property Transform transform: Transform{
+                //rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+                translation:Qt.vector3d(rootEntity.parent.tangibleSection.height/2+beam_commons.drag_mesh.radius,parent.parent.index*50,0)
+            }
+            property ObjectPicker objectPicker:ObjectPicker{
+                onClicked: {
+                    sceneRoot.mouseEventHasBeenAccepted=true;
+                    root_transform.translation=rootEntity.offsetAugmentation.plus(Qt.vector3d(0,parent.parent.index*50,0));
+                }
+            }
+            components: rootEntity.enabled &&  isSelected ? [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,this.objectPicker] : []
+            Entity{
+                enabled: isSelected
+                property Transform transform: Transform{
+                    scale3D:Qt.vector3d(0.5,0.5,0.5)
+                }
+                components: rootEntity.enabled ? [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]:[]
+
+            }
+        }
+
+    }
 
 
-//    QQ2.Timer{
-//        id:resetTimer
-//        interval: 2000
-//        onTriggered: {
-//            if(dragging){
-//                rootEntity.parent.drag_anchor_enabled=false;
-//                settings.beam_dragging_ownership=0
-//                transform.translation=offsetAugmentation.plus(rootEntity.parent.current_anchor_position);
-//            }
-//        }
-//        running: false;
-//    }
+    Entity{
+        property int index:1
+        Entity{
+            enabled: settings.beam_is_selectable && isSelected &&
+                     ((parent.index*50)/rootEntity.parent.length + 0.5)>0 &&
+                     ((parent.index*50)/rootEntity.parent.length + 0.5)<1
+            property Transform transform: Transform{
+                //rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+                translation:Qt.vector3d(rootEntity.parent.tangibleSection.height/2+beam_commons.drag_mesh.radius,-parent.parent.index*50,0)
+            }
+            property ObjectPicker objectPicker:ObjectPicker{
+                onClicked: {
+                    sceneRoot.mouseEventHasBeenAccepted=true;
+                    root_transform.translation=rootEntity.offsetAugmentation.plus(Qt.vector3d(0,-parent.parent.index*50,0));
+                }
+            }
+            components: rootEntity.enabled &&  isSelected ? [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,this.objectPicker] : []
+            Entity{
+                enabled: isSelected
+                property Transform transform: Transform{
+                    scale3D:Qt.vector3d(0.5,0.5,0.5)
+                }
+                components: rootEntity.enabled ? [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]:[]
+
+            }
+        }
+
+    }
+    Entity{
+        property int index:2
+        Entity{
+            enabled: settings.beam_is_selectable && isSelected &&
+                     ((parent.index*50)/rootEntity.parent.length + 0.5)>0 &&
+                     ((parent.index*50)/rootEntity.parent.length + 0.5)<1
+            property Transform transform: Transform{
+                //rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+                translation:Qt.vector3d(rootEntity.parent.tangibleSection.height/2+beam_commons.drag_mesh.radius,-parent.parent.index*50,0)
+            }
+            property ObjectPicker objectPicker:ObjectPicker{
+                onClicked: {
+                    sceneRoot.mouseEventHasBeenAccepted=true;
+                    root_transform.translation=rootEntity.offsetAugmentation.plus(Qt.vector3d(0,-parent.parent.index*50,0));
+                }
+            }
+            components: rootEntity.enabled &&  isSelected ? [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,this.objectPicker] : []
+            Entity{
+                enabled: isSelected
+                property Transform transform: Transform{
+                    scale3D:Qt.vector3d(0.5,0.5,0.5)
+                }
+                components: rootEntity.enabled ? [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]:[]
+
+            }
+        }
+
+    }
+    Entity{
+        property int index:3
+        Entity{
+            enabled: settings.beam_is_selectable && isSelected &&
+                     ((parent.index*50)/rootEntity.parent.length + 0.5)>0 &&
+                     ((parent.index*50)/rootEntity.parent.length + 0.5)<1
+            property Transform transform: Transform{
+                //rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+                translation:Qt.vector3d(rootEntity.parent.tangibleSection.height/2+beam_commons.drag_mesh.radius,-parent.parent.index*50,0)
+            }
+            property ObjectPicker objectPicker:ObjectPicker{
+                onClicked: {
+                    sceneRoot.mouseEventHasBeenAccepted=true;
+                    root_transform.translation=rootEntity.offsetAugmentation.plus(Qt.vector3d(0,-parent.parent.index*50,0));
+                }
+            }
+            components: rootEntity.enabled &&  isSelected ? [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,this.objectPicker] : []
+            Entity{
+                enabled: isSelected
+                property Transform transform: Transform{
+                    scale3D:Qt.vector3d(0.5,0.5,0.5)
+                }
+                components: rootEntity.enabled ? [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]:[]
+
+            }
+        }
+
+    }
+    Entity{
+        property int index:4
+        Entity{
+            enabled: settings.beam_is_selectable && isSelected &&
+                     ((parent.index*50)/rootEntity.parent.length + 0.5)>0 &&
+                     ((parent.index*50)/rootEntity.parent.length + 0.5)<1
+            property Transform transform: Transform{
+                //rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+                translation:Qt.vector3d(rootEntity.parent.tangibleSection.height/2+beam_commons.drag_mesh.radius,-parent.parent.index*50,0)
+            }
+            property ObjectPicker objectPicker:ObjectPicker{
+                onClicked: {
+                    sceneRoot.mouseEventHasBeenAccepted=true;
+                    root_transform.translation=rootEntity.offsetAugmentation.plus(Qt.vector3d(0,-parent.parent.index*50,0));
+                }
+            }
+            components: rootEntity.enabled &&  isSelected ? [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,this.objectPicker] : []
+            Entity{
+                enabled: isSelected
+                property Transform transform: Transform{
+                    scale3D:Qt.vector3d(0.5,0.5,0.5)
+                }
+                components: rootEntity.enabled ? [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]:[]
+
+            }
+        }
+
+    }
+    Entity{
+        property int index:5
+        Entity{
+            enabled: settings.beam_is_selectable && isSelected &&
+                     ((parent.index*50)/rootEntity.parent.length + 0.5)>0 &&
+                     ((parent.index*50)/rootEntity.parent.length + 0.5)<1
+            property Transform transform: Transform{
+                //rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+                translation:Qt.vector3d(rootEntity.parent.tangibleSection.height/2+beam_commons.drag_mesh.radius,-parent.parent.index*50,0)
+            }
+            property ObjectPicker objectPicker:ObjectPicker{
+                onClicked: {
+                    sceneRoot.mouseEventHasBeenAccepted=true;
+                    root_transform.translation=rootEntity.offsetAugmentation.plus(Qt.vector3d(0,-parent.parent.index*50,0));
+                }
+            }
+            components: rootEntity.enabled &&  isSelected ? [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,this.objectPicker] : []
+            Entity{
+                enabled: isSelected
+                property Transform transform: Transform{
+                    scale3D:Qt.vector3d(0.5,0.5,0.5)
+                }
+                components: rootEntity.enabled ? [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]:[]
+
+            }
+        }
+
+    }
+
+    Entity{
+        property int index:6
+        Entity{
+            enabled: settings.beam_is_selectable && isSelected &&
+                     ((parent.index*50)/rootEntity.parent.length + 0.5)>0 &&
+                     ((parent.index*50)/rootEntity.parent.length + 0.5)<1
+            property Transform transform: Transform{
+                //rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+                translation:Qt.vector3d(rootEntity.parent.tangibleSection.height/2+beam_commons.drag_mesh.radius,-parent.parent.index*50,0)
+            }
+            property ObjectPicker objectPicker:ObjectPicker{
+                onClicked: {
+                    sceneRoot.mouseEventHasBeenAccepted=true;
+                    root_transform.translation=rootEntity.offsetAugmentation.plus(Qt.vector3d(0,-parent.parent.index*50,0));
+                }
+            }
+            components: rootEntity.enabled &&  isSelected ? [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,this.objectPicker] : []
+            Entity{
+                enabled: isSelected
+                property Transform transform: Transform{
+                    scale3D:Qt.vector3d(0.5,0.5,0.5)
+                }
+                components: rootEntity.enabled ? [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]:[]
+
+            }
+        }
+
+    }
+
+    Entity{
+        property int index:7
+        Entity{
+            enabled: settings.beam_is_selectable && isSelected &&
+                     ((parent.index*50)/rootEntity.parent.length + 0.5)>0 &&
+                     ((parent.index*50)/rootEntity.parent.length + 0.5)<1
+            property Transform transform: Transform{
+                //rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
+                translation:Qt.vector3d(rootEntity.parent.tangibleSection.height/2+beam_commons.drag_mesh.radius,-parent.parent.index*50,0)
+            }
+            property ObjectPicker objectPicker:ObjectPicker{
+                onClicked: {
+                    sceneRoot.mouseEventHasBeenAccepted=true;
+                    root_transform.translation=rootEntity.offsetAugmentation.plus(Qt.vector3d(0,-parent.parent.index*50,0));
+                }
+            }
+            components: rootEntity.enabled &&  isSelected ? [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,this.objectPicker] : []
+            Entity{
+                enabled: isSelected
+                property Transform transform: Transform{
+                    scale3D:Qt.vector3d(0.5,0.5,0.5)
+                }
+                components: rootEntity.enabled ? [this.transform,beam_commons.drag_mesh,beam_commons.phong_material_green]:[]
+
+            }
+        }
+
+    }
+
+
 
 }

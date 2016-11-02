@@ -1,6 +1,6 @@
 import Qt3D.Core 2.0
 import Qt3D.Render 2.0
-
+import QtQuick 2.5 as QQ2
 Entity{
 
     property quaternion char_mesh_rotation:
@@ -57,4 +57,43 @@ Entity{
     property Mesh empty_mesh:
         Mesh{
     }
+    property PhongAlphaMaterial focus_view_color_centre: PhongAlphaMaterial{
+        property real h: Math.max(1-settings.focus_view_equilibrium_distance,0.5)
+        ambient:Qt.hsla(0.33,h,0.32)
+        diffuse:"grey"
+        specular:"#000000"
+        shininess:0
+        alpha: h
+        QQ2.Behavior on h {
+            QQ2.NumberAnimation{duration: 1000}
+        }
+
+    }
+
+    property PhongMaterial focus_view_color_target:
+        PhongMaterial{
+        property real h:0.33-0.23*settings.focus_view_equilibrium_distance
+        ambient:Qt.hsla(h,1,0.32)
+        diffuse:"grey"
+        specular:"#000000"
+        shininess:0
+        QQ2.Behavior on h {
+            QQ2.NumberAnimation{duration: 1000}
+        }
+
+    }
+
+    property Transform focus_view_target_transform:
+    Transform{
+        translation: settings.focus_view_currentForce.times(settings.focus_view_scaleFactor_focus)
+        QQ2.Behavior on translation{
+            QQ2.Vector3dAnimation{
+                duration: 500
+            }
+        }
+    }
+    property SphereMesh sphere_mesh_r3:SphereMesh{
+        radius: 3
+    }
+
 }

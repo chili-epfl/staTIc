@@ -29,12 +29,22 @@ Item {
 
     property int exagerate_displacement_factor:1
 
-    property string visible_loader:"DESIGNER"; //BEAM,JOINT,DESIGNER,CUSTOM
+    property string visible_loader:"DEFAULT"; //DEFAULT,CUSTOM
+
+    property bool focus_on_joint:false
+
 
     /*Tools*/
-    property bool enable_scaffold: true;
+    property bool enable_scaffold: false;
     property var beam_dragging_ownership:0;
 
+    /*Focus View*/
+    property vector3d focus_view_currentForce: Qt.vector3d(0,0,0)
+    property vector3d focus_view_maxForce: Qt.vector3d(0.0001,0,0)
+
+    property real focus_view_equilibrium_distance: focus_view_maxForce.length()>0.001 ? focus_view_currentForce.length()/focus_view_maxForce.length() : 0;
+
+    property real focus_view_scaleFactor_focus:30/Math.max(Math.abs(focus_view_maxForce.x),Math.abs(focus_view_maxForce.y),Math.abs(focus_view_maxForce.z))
 
 
     function restore_defaults(){
@@ -61,10 +71,10 @@ Item {
         show_filter_bar= true
         show_legend= true
 
-        enable_scaffold= true;
+        enable_scaffold= false;
         show_AR_button= condition=="Hands" ? true : false
-        visible_loader="DESIGNER";
-
+        visible_loader="DEFAULT";
+        focus_on_joint=false;
 
     }
 

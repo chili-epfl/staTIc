@@ -8,9 +8,8 @@ Rectangle {
     property alias lateral_visibility:hideButton.state
     onLateral_visibilityChanged: logger.log("infobox_change_lateral_visibility",{"visibility":lateral_visibility})
     property alias custom_loader: custom_loader
-    property alias loader_beam: loader_beam
-    property alias loader_designer: loader_designer
-    property alias loader_joint: loader_joint
+    property alias default_loader: default_loader
+
     MouseArea{
         anchors.fill: parent
     }
@@ -25,7 +24,7 @@ Rectangle {
     Rectangle{
         //close button
 
-        visible: false//applicationRoot.currentViewFilter!='DESIGNER'
+        visible: false
         z:1
         anchors.right: parent.right
         anchors.top: parent.top
@@ -122,48 +121,20 @@ Rectangle {
                 logger.log("infobox_custom_loader_visibility",{"visible":visible,"item": ""})
         }
     }
+
     Loader{
-        id:loader_designer
+        id:default_loader
         anchors.fill:parent
-        visible: settings.visible_loader=="DESIGNER"
+        visible: settings.visible_loader=="DEFAULT"
         asynchronous: true
         onLoaded: item.current_item=Qt.binding(function(){return current_item})
         source:"qrc:/ui/UI/InfoBoxDesigner.qml"
         onVisibleChanged: {
             if(item && item.current_item)
-                logger.log("infobox_designer_loader_visibility",{"visible":visible,"item": item.current_item.objectName})
+                logger.log("infobox_default_loader_visibility",{"visible":visible,"item": item.current_item.objectName})
             else
-                logger.log("infobox_designer_loader_visibility",{"visible":visible,"item": ""})
+                logger.log("infobox_default_loader_visibility",{"visible":visible,"item": ""})
         }
-    }
-    Loader{
-        id:loader_beam
-        anchors.fill:parent
-        visible: settings.visible_loader=="BEAM"
-        asynchronous: true
-        source:"qrc:/ui/UI/InfoBoxBeam.qml"
-        onLoaded: item.current_item=Qt.binding(function(){return current_item})
-        onVisibleChanged: {
-            if(item && item.current_item)
-                logger.log("infobox_beam_loader_visibility",{"visible":visible,"item": item.current_item.objectName})
-            else
-                logger.log("infobox_beam_loader_visibility",{"visible":visible,"item": ""})
-        }
-    }
-    Loader{
-        id:loader_joint
-        visible: settings.visible_loader=="JOINT"
-        anchors.fill:parent
-        asynchronous: true
-        onLoaded: item.current_item=Qt.binding(function(){return current_item})
-        source:"qrc:/ui/UI/InfoBoxJoint.qml"
-        onVisibleChanged: {
-            if(item && item.current_item)
-                logger.log("infobox_joint_loader_visibility",{"visible":visible,"item": item.current_item.objectName})
-            else
-                logger.log("infobox_joint_loader_visibility",{"visible":visible,"item": ""})
-        }
-
     }
 
 }
