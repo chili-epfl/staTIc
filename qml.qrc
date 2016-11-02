@@ -42,6 +42,7 @@
         <file>Icons/next.png</file>
         <file>Icons/help.png</file>
         <file>Icons/help_pressed.png</file>
+        <file>Icons/TANGIBLE.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>Images/mainbanner.png</file>
@@ -80,6 +81,7 @@
         <file>Element_Views/JointView_Commons.qml</file>
         <file>Element_Views/Runtime_Meshes.qml</file>
         <file>Element_Views/TrapezoidalForce_Commons.qml</file>
+        <file>Element_Views/PickerEntity.qml</file>
     </qresource>
     <qresource prefix="/opengl">
         <file>Opengl/phongalpha.frag</file>
