@@ -2,4 +2,4 @@ thumbnail:preview.png
 main_asset_url:snow.obj
 main_asset_diffuse_map_url:texture.png
 weight:30
-extent:-500,500
+extent:-200,200
