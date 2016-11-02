@@ -43,7 +43,7 @@ class AbstractStaticsModule : public QObject
     Q_PROPERTY(qreal minForce READ minForce NOTIFY minForceChanged)
 
     Q_PROPERTY(MaterialsManager* materialsManager READ materialsManager NOTIFY materialsManagerChanged)
-
+    Q_PROPERTY(qreal modelScale READ modelScale NOTIFY modelScaleChanged)
 public:
 
     enum Status{NOT_LOADED,LOADED,ERROR};
@@ -107,6 +107,7 @@ signals:
     void startingUpdate();
     void materialsManagerChanged();
     void is2DChanged();
+    void modelScaleChanged();
 
 protected:
     virtual bool readStructure(QString path) =0;

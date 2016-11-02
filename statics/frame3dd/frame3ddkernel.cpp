@@ -350,7 +350,7 @@ bool Frame3DDKernel::readStructure(QString path){
     setStatus(Status::LOADED);
     m_is2D=is2d;
     emit is2DChanged();
-
+    emit modelScaleChanged();
     return true;
 }
 
