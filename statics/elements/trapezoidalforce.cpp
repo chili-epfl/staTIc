@@ -77,13 +77,26 @@ void TrapezoidalForce::positionOnBeam(QVector3D &begin, QVector3D &end)
 {
     BeamPtr ptr=m_beam.toStrongRef();
     if(!ptr.isNull()){
-        QVector2D relativeExtent=m_extent/ptr->length();
-        begin=QVector3D(qMax(0.0f,m_relative_position.x()+relativeExtent.x()),
-                        qMax(0.0f,m_relative_position.y()+relativeExtent.x()),
-                        qMax(0.0f,m_relative_position.z()+relativeExtent.x()))*ptr->length();
-        end=QVector3D(qMin(1.0f,m_relative_position.x()+relativeExtent.y()),
-                      qMin(1.0f,m_relative_position.y()+relativeExtent.y()),
-                      qMin(1.0f,m_relative_position.z()+relativeExtent.y()))*ptr->length();
+        qreal actualPosition=m_relative_position.x()*ptr->length();
+        qreal tmp_begin=actualPosition+m_extent.x();
+        qreal tmp_end=actualPosition+m_extent.y();
+
+        qreal surplus_begin=0;
+        if(tmp_begin<0){
+             surplus_begin=-tmp_begin;
+             tmp_begin=0;
+        }
+        qreal surplus_end=0;
+        if(tmp_end>ptr->length()){
+            surplus_end=tmp_end-ptr->length();
+            tmp_end=ptr->length();
+        }
+
+        tmp_begin=qMax(0.0,tmp_begin-surplus_end);
+        tmp_end=qMin(ptr->length(),tmp_end+surplus_begin);
+
+        begin=QVector3D(tmp_begin,tmp_begin,tmp_begin);
+        end=QVector3D(tmp_end,tmp_end,tmp_end);
 
     }
 }
