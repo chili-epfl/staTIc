@@ -6,6 +6,7 @@ import QtQuick 2.3 as QQ2
 import ARToolkit 1.0
 
 Entity {
+    id:root
     property ARToolkitObject extreme1_tag;
     property ARToolkitObject extreme2_tag;
     enabled: settings.enable_scaffold
@@ -81,6 +82,7 @@ Entity {
             }
         }
     }
+
     Entity{
         components: [
             Transform{
@@ -128,6 +130,7 @@ Entity {
     }
 
     QuickScaffold{
+        ignoreEvents:!root.enabled
         vmManager:vmFrame3DDManager
         QQ2.Binding on extreme1 {
             when:extreme1_is_enable

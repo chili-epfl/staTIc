@@ -16,7 +16,7 @@ class Scaffold : public QObject
     Q_PROPERTY(QVector3D localExtreme2Pos READ localExtreme2Pos WRITE setLocalExtreme2Pos NOTIFY localExtreme2PosChanged)
 
     Q_PROPERTY(AbstractVMManager* vmManager READ vmManager WRITE setVMManager)
-
+    Q_PROPERTY(bool ignoreEvents READ ignoreEvents WRITE setIgnoreEvents NOTIFY ignoreEventsChanged)
 public:
     Scaffold(QObject* parent=0);
     Physics::PhysicsBodyInfo* extreme1(){return m_extreme1;}
@@ -31,7 +31,8 @@ public:
 
     AbstractVMManager* vmManager(){return m_VMManager;}
     void setVMManager(AbstractVMManager*);
-
+    void setIgnoreEvents(bool val){if(m_ignoreEvents!=val){m_ignoreEvents=val;emit ignoreEventsChanged();}}
+    bool ignoreEvents(){return m_ignoreEvents;}
 public slots:
     void checkPosition4NewSupport();
 private slots:
@@ -41,11 +42,13 @@ private slots:
     void checkPositionExtremes();
     //void reactivate();
     void reset();
+
 signals:
     void extreme1Changed();
     void extreme2Changed();
     void localExtreme1PosChanged();
     void localExtreme2PosChanged();
+    void ignoreEventsChanged();
 private:
 
     Physics::PhysicsBodyInfo* m_extreme1,*m_extreme2;
@@ -71,6 +74,7 @@ private:
     QTimer* m_refractory_timer;
     /*Active is true when the */
     bool m_active;
+    bool m_ignoreEvents;
 
     JointPtr splitBeam(BeamPtr b, qreal offset);
     //QHash<WeakBeamPtr, WeakBeamPtr> m_child2parent_beams;

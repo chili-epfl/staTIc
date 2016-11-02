@@ -119,6 +119,7 @@ void Scaffold::reset(){
     if(!m_beam_1.isNull()){
         m_beam_1.toStrongRef()->setEnable(true);
         enabled_beams.append(m_beam_1.toStrongRef()->objectName());
+
     }
 
     if(!m_beam_2.isNull()){
@@ -194,7 +195,7 @@ void Scaffold::reset(){
 
 
 void Scaffold::onCollisionExtreme1(Physics::PhysicsCollisionEventPtr e){
-    if(!m_active) return;
+    if(!m_active|| m_ignoreEvents) return;
     if(!m_VMManager) return;
     if(!m_VMManager->staticsModule()) return;
     //if(m_newSupport_possible==1) return;
@@ -263,7 +264,7 @@ void Scaffold::onCollisionExtreme1(Physics::PhysicsCollisionEventPtr e){
 }
 
 void Scaffold::onCollisionExtreme2(Physics::PhysicsCollisionEventPtr e){
-    if(!m_active) return;
+    if(!m_active|| m_ignoreEvents) return;
     if(!m_VMManager) return;
     if(!m_VMManager->staticsModule()) return;
     //if(m_newSupport_possible==2) return;
@@ -434,6 +435,7 @@ void Scaffold::onAnchorsChanged(){
 
 void Scaffold::checkPositionExtremes()
 {
+    if(m_ignoreEvents) return;
     if(m_extreme_pos1.distanceToPoint(m_reference_extreme_pos1)>max_distance
             ||
             m_extreme_pos2.distanceToPoint(m_reference_extreme_pos2)>max_distance ){
@@ -450,7 +452,7 @@ void Scaffold::checkPositionExtremes()
 }
 
 void Scaffold::checkPosition4NewSupport(){
-    if(!m_active) return;
+    if(!m_active || m_ignoreEvents) return;
     if(!m_VMManager) return;
     if(!m_VMManager->staticsModule()) return;
     if(m_extreme1==Q_NULLPTR || m_extreme2==Q_NULLPTR) return;
