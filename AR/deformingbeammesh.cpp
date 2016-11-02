@@ -18,7 +18,8 @@ DeformingBeamMesh::DeformingBeamMesh(Qt3DCore::QNode * parent):
     indexAttribute(0),
     uvtextureAttribute(0)
 {
-
+    m_offset=QVector2D(0,0);
+    m_displacements_step=1.0;
 }
 
 DeformingBeamMesh::~DeformingBeamMesh()
@@ -80,6 +81,24 @@ void DeformingBeamMesh::setExagerate(int val)
         m_exagerate=val;
         update();
         emit exagerateChanged();
+    }
+}
+
+void DeformingBeamMesh::setDisplacements_step(qreal val)
+{
+    if(val>0 && val!=m_displacements_step){
+        m_displacements_step=val;
+        update();
+        emit m_displacements_step;
+    }
+}
+
+void DeformingBeamMesh::setOffset(QVector2D offset)
+{
+    if(offset!=m_offset){
+        m_offset=offset;
+        emit offsetChanged();
+        update();
     }
 }
 
@@ -164,20 +183,33 @@ void DeformingBeamMesh::update(){
 #ifndef ANIMATE
 //No keyframes for android
 void DeformingBeamMesh::generateGeometry(){
+    if(m_displacements.length()*displacements_step()-m_offset.x()<m_length)
+        return;
+
     m_keyFrames=1;
+
+    bool need_reallocation=true;
+
+    if(vertexBufferData.size()==(8+4*(m_segments-1)) * (m_keyFrames) * (4) * sizeof(float))
+        need_reallocation=false;
+
     // 8+4*(m_segments-1) distinct vertices X keyframes
-    vertexBufferData.resize((8+4*(m_segments-1)) * (m_keyFrames) * (4) * sizeof(float));
+    if(need_reallocation)
+        vertexBufferData.resize((8+4*(m_segments-1)) * (m_keyFrames) * (4) * sizeof(float));
     float *rawVertexArray = reinterpret_cast<float *>(vertexBufferData.data());
 
     // 8+4*(m_segments-1) distinct vertices X keyframes
-    normalBufferData.resize((8+4*(m_segments-1)) * (m_keyFrames) * (3) * sizeof(float));
+    if(need_reallocation)
+        normalBufferData.resize((8+4*(m_segments-1)) * (m_keyFrames) * (3) * sizeof(float));
     float *rawNormalArray = reinterpret_cast<float *>(normalBufferData.data());
 
     // 4 faces per segment, each split in 2, + 4 tringles on the externals, X keyframes
-    indexBufferData.resize( (8 * m_segments + 12 )*  (m_keyFrames) * 3 * sizeof(ushort));
+    if(need_reallocation)
+        indexBufferData.resize( (8 * m_segments + 12 )*  (m_keyFrames) * 3 * sizeof(ushort));
     ushort *rawIndexArray = reinterpret_cast<ushort *>(indexBufferData.data());
 
-    uvtextureBufferData.resize((8+4*(m_segments-1)) * (m_keyFrames) * (2) * sizeof(float));
+    if(need_reallocation)
+        uvtextureBufferData.resize((8+4*(m_segments-1)) * (m_keyFrames) * (2) * sizeof(float));
     float *rawUVTextureArray = reinterpret_cast<float *>(uvtextureBufferData.data());
 
     float step=m_length/m_segments;
@@ -240,19 +272,21 @@ void DeformingBeamMesh::generateGeometry(){
     int quads_counter=0;
 
     Q_FOREACH(const QVector3D& v, _initial_vertices){
-        double disp_index=(double)(m_displacements.size()-1)*(quads_counter/4)/(m_segments);
-        int disp_index_floor=floor(disp_index);
-        double dummy;
-        double fract=modf(disp_index,&dummy);
+        double disp_pos=(quads_counter/4)*step+m_offset.x();
+        int disp_index_floor=floor(disp_pos*m_displacements_step);
+        int disp_index_ceil=ceil(disp_pos*m_displacements_step);
+        if(disp_index_floor==m_displacements.size())
+            disp_index_floor--;
+        if(disp_index_ceil==m_displacements.size())
+            disp_index_ceil--;
+        double fract=disp_pos-disp_index_floor;
 
         if(fract < 0.01){
             disp=m_displacements[disp_index_floor];
         }
         else{
-            disp=(1-fract)*m_displacements[disp_index_floor]+(fract)*m_displacements[disp_index_floor+1];
+            disp=(1-fract)*m_displacements[disp_index_floor]+(fract)*m_displacements[disp_index_ceil];
         }
-
-
         //From opengl to Frame3DD
         QVector2D _v(v.y(),-v.z());
         float cos_theta=cos(disp.w());
@@ -456,48 +490,49 @@ void DeformingBeamMesh::generateGeometry(){
         rawNormalArray[idx++] = v.z();
     }
 
+    if(need_reallocation){
+        for(idx=0;idx<2*vertices.size();idx+=2){
+            switch (idx%16) {
+            case 0:
+                rawUVTextureArray[idx]=0.0f;
+                rawUVTextureArray[idx+1]=0.0f;
+                break;
 
-    for(idx=0;idx<2*vertices.size();idx+=2){
-        switch (idx%16) {
-        case 0:
-            rawUVTextureArray[idx]=0.0f;
-            rawUVTextureArray[idx+1]=0.0f;
-            break;
+            case 2:
+                rawUVTextureArray[idx]=0.0f;
+                rawUVTextureArray[idx+1]=1.0f;
+                break;
 
-        case 2:
-            rawUVTextureArray[idx]=0.0f;
-            rawUVTextureArray[idx+1]=1.0f;
-            break;
+            case 4:
+                rawUVTextureArray[idx]=0.0f;
+                rawUVTextureArray[idx+1]=0.0f;
+                break;
 
-        case 4:
-            rawUVTextureArray[idx]=0.0f;
-            rawUVTextureArray[idx+1]=0.0f;
-            break;
+            case 6:
+                rawUVTextureArray[idx]=0.0f;
+                rawUVTextureArray[idx+1]=1.0f;
+                break;
+            case 8:
+                rawUVTextureArray[idx]=1.0f;
+                rawUVTextureArray[idx+1]=0.0f;
+                break;
+            case 10:
+                rawUVTextureArray[idx]=1.0f;
+                rawUVTextureArray[idx+1]=1.0f;
+                break;
+            case 12:
+                rawUVTextureArray[idx]=1.0f;
+                rawUVTextureArray[idx+1]=0.0f;
+                break;
+            case 14:
+                rawUVTextureArray[idx]=1.0f;
+                rawUVTextureArray[idx+1]=1.0f;
+                break;
+            default:
+                break;
+            }
 
-        case 6:
-            rawUVTextureArray[idx]=0.0f;
-            rawUVTextureArray[idx+1]=1.0f;
-            break;
-        case 8:
-            rawUVTextureArray[idx]=1.0f;
-            rawUVTextureArray[idx+1]=0.0f;
-            break;
-        case 10:
-            rawUVTextureArray[idx]=1.0f;
-            rawUVTextureArray[idx+1]=1.0f;
-            break;
-        case 12:
-            rawUVTextureArray[idx]=1.0f;
-            rawUVTextureArray[idx+1]=0.0f;
-            break;
-        case 14:
-            rawUVTextureArray[idx]=1.0f;
-            rawUVTextureArray[idx+1]=1.0f;
-            break;
-        default:
-            break;
         }
-
     }
 
 

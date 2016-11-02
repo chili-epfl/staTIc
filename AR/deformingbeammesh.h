@@ -13,6 +13,9 @@ class DeformingBeamMesh: public Qt3DRender::QGeometryRenderer
     Q_PROPERTY(int keyframes READ keyframes WRITE setKeyframes NOTIFY keyframesChanged)
     Q_PROPERTY(QVariant displacements READ displacements WRITE setDisplacements NOTIFY displacementsChanged)
     Q_PROPERTY(int exagerate READ exagerate WRITE setExagerate NOTIFY exagerateChanged)
+    Q_PROPERTY(qreal displacements_step READ displacements_step WRITE setDisplacements_step NOTIFY displacements_stepChanged)
+    Q_PROPERTY(QVector2D offset READ offset WRITE setOffset NOTIFY offsetChanged)
+
 public:
     DeformingBeamMesh(Qt3DCore::QNode * parent = 0);
     ~DeformingBeamMesh();
@@ -22,6 +25,9 @@ public:
     void setKeyframes(int n_frames);
     void setDisplacements(QVariant displacements);
     void setExagerate(int val);
+    void setDisplacements_step(qreal val);
+    void setOffset(QVector2D offset);
+
 
     qreal length(){return m_length;}
     int segments(){return m_segments;}
@@ -29,7 +35,8 @@ public:
     int keyframes(){return m_keyFrames;}
     QVariant displacements(){return QVariant::fromValue(m_displacements);}
     int exagerate(){return m_exagerate;}
-
+    qreal displacements_step(){return m_displacements_step;}
+    QVector2D offset(){return m_offset;}
 signals:
     void lengthChanged();
     void segmentsChanged();
@@ -37,6 +44,9 @@ signals:
     void keyframesChanged();
     void displacementsChanged();
     void exagerateChanged();
+    void displacements_stepChanged();
+    void offsetChanged();
+
 private:
     void init();
     void update();
@@ -50,7 +60,8 @@ private:
     QSizeF m_size;
     int m_keyFrames;
     int m_exagerate;
-
+    qreal m_displacements_step;
+    QVector2D m_offset;
     QList<QVector4D> m_displacements;
 
     Qt3DRender::QGeometry *customGeometry;
