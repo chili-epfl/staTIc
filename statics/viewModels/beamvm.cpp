@@ -111,7 +111,6 @@ void BeamVM::initView(){
         onExtremeDisplacementChanged();
         m_qqmlcomponent->completeCreate();
         m_component3D->setParent(m_sceneRoot);
-
         append_3D_resources(m_component3D,true);
     }
     else{
@@ -128,8 +127,10 @@ void BeamVM::initView(){
         onTangibleSectionChanged();
         onExtremeDisplacementChanged();
         append_3D_resources(m_component3D,true);
-        m_component3D->setEnabled(true);
+        m_component3D->setEnabled(true);        
     }
+
+
 }
 
 void BeamVM::onParametersChanged(){

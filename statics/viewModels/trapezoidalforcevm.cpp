@@ -16,7 +16,7 @@ TrapezoidalForceVM::TrapezoidalForceVM(TrapezoidalForcePtr force, Qt3DCore::QEnt
     m_trapezoidalForce=force.toWeakRef();
     initView(parentEntity,properties);
     connect(m_trapezoidalForce.data(),SIGNAL(destroyed(QObject*)),this,SLOT(deleteLater()));
-    connect(m_trapezoidalForce.data(),SIGNAL(destroyed(QObject*)),m_component3D,SLOT(deleteLater()));
+    //connect(m_trapezoidalForce.data(),SIGNAL(destroyed(QObject*)),m_component3D,SLOT(deleteLater()));
     connect(m_component3D,SIGNAL(killMe()),this,SLOT(deleteLater()));
     connect(m_component3D,SIGNAL(killMe()),m_trapezoidalForce.data(),SIGNAL(killMe()));
 }
@@ -26,14 +26,13 @@ TrapezoidalForceVM::~TrapezoidalForceVM()
    if(!m_asset_tmp_copy.isEmpty())
         QFile::remove(m_asset_tmp_copy.toLocalFile());
    if(m_component3D){
-       m_component3D->setParent(Q_NODE_NULLPTR);
-       delete m_component3D;
+       m_component3D->setEnabled(false);
+//       delete m_component3D;
    }
-   if(m_qqmlcontext)
-       delete m_qqmlcontext;
-   m_qqmlcontext=Q_NULLPTR;
-   m_component3D=Q_NULLPTR;
-
+//   if(m_qqmlcontext)
+//       delete m_qqmlcontext;
+//   m_qqmlcontext=Q_NULLPTR;
+//   m_component3D=Q_NULLPTR;
 
 }
 
@@ -62,16 +61,17 @@ void TrapezoidalForceVM::setParentEntity(Qt3DCore::QEntity *parentEntity)
     if(parentEntity!=Q_NULLPTR && m_component3D!=Q_NULLPTR){
         QVariantHash properties;
         if(m_component3D){
-            properties["weight"]= m_component3D->property("weight");
-            properties["extent"]= m_component3D->property("extent");
-            properties["main_asset_url"]= m_component3D->property("asset3DMeshURL");
-            properties["main_asset_diffuse_map_url"]= m_component3D->property("asset3DTextureURL");
-            m_component3D->setParent(Q_NODE_NULLPTR);
-            delete m_component3D;
+//            properties["weight"]= m_component3D->property("weight");
+//            properties["extent"]= m_component3D->property("extent");
+//            properties["main_asset_url"]= m_component3D->property("asset3DMeshURL");
+//            properties["main_asset_diffuse_map_url"]= m_component3D->property("asset3DTextureURL");
+//            m_component3D->setParent(Q_NODE_NULLPTR);
+//            delete m_component3D;
+            m_component3D->setEnabled(false);
         }
-        if(m_qqmlcontext)
-            delete m_qqmlcontext;
-        m_qqmlcontext=Q_NULLPTR;
+//        if(m_qqmlcontext)
+//            delete m_qqmlcontext;
+//        m_qqmlcontext=Q_NULLPTR;
         m_component3D=Q_NULLPTR;
         initView(parentEntity,properties);
         connect(m_trapezoidalForce.data(),SIGNAL(destroyed(QObject*)),m_component3D,SLOT(deleteLater()));

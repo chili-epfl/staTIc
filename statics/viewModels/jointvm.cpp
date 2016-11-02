@@ -37,7 +37,7 @@ JointVM::JointVM(JointPtr joint, Qt3DCore::QEntity *entity, QQmlContext *context
     connect(m_joint.data(),SIGNAL(destroyed(QObject*)),this,SLOT(deleteLater()));
     connect(m_joint.data(),SIGNAL(connectedBeamsChanged()),this,SLOT(onConnectedBeamChanged()));
     connect(m_joint.data(),SIGNAL(displacementChanged()),this,SLOT(onDisplacementChanged()));
-    connect(m_joint.data(),SIGNAL(supportChanged()),this,SLOT(onSupportChanged()));    connect(m_component3D,SIGNAL(updateSupportType()),this,SLOT(updateSupportType()));
+    connect(m_joint.data(),SIGNAL(supportChanged()),this,SLOT(onSupportChanged()));
     connect(m_component3D,SIGNAL(updateSupportType(QString)),this,SLOT(updateSupportType(QString)));
 
 }
@@ -181,7 +181,7 @@ void JointVM::initView(){
         m_qqmlcontext->setContextObject(jointView);
         m_component3D=jointView;
         m_component3D->setParent(m_sceneRoot);
-
+//        qmlEngine(m_sceneRoot)->setObjectOwnership(m_component3D,QQmlEngine::JavaScriptOwnership);
     }
     m_component3D->setObjectName(joint_str_ref->objectName());
     m_component3D->setProperty("position",joint_str_ref->scaledPosition());
