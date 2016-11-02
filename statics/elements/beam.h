@@ -70,7 +70,9 @@ public:
     void setEnable(bool enable);
 
     QList<QVector4D> stress_segments(){return m_stress_segments;}
-    void setStressSegment(QList<QVector4D> segments){m_stress_segments=segments;emit segmentsChanged();}
+    void setStressSegment(QList<QVector4D> segments){
+        m_stress_segments=segments;
+        emit segmentsChanged();}
 
     QString materialID(){return m_materialId;}
     void setMaterial(QString uniqueID);
