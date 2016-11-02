@@ -105,14 +105,26 @@ Item{
         },
         {
             "story_type":"Default",
+            "story_picture":"",
+            "structure_url":"qrc:/scripts/Scripts/test.structure",
+            "show_demo":true
+        },
+        {
+            "story_type":"Default",
             "story_picture":"qrc:/scripts/Scripts/Howe/howe.jpg",
             "structure_url":"qrc:/scripts/Scripts/Howe/Howe.structure",
             "show_demo":true
         },
         {
             "story_type":"Default",
-            "story_picture":"",
-            "structure_url":"qrc:/scripts/Scripts/test.structure",
+            "story_picture":"qrc:/scripts/Scripts/Full_Roof/full-roof.jpg",
+            "structure_url":"qrc:/scripts/Scripts/Full_Roof/Full_roof.structure",
+            "show_demo":true
+        },
+        {
+            "story_type":"Default",
+            "story_picture":"qrc:/scripts/Scripts/Vault/vault.png",
+            "structure_url":"qrc:/scripts/Scripts/Vault/Vault.structure",
             "show_demo":true
         }
     ]
