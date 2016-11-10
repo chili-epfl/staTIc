@@ -75,7 +75,7 @@ void DeformingBeamMesh::setDisplacements(QVariant displacements)
     }
 }
 
-void DeformingBeamMesh::setExagerate(int val)
+void DeformingBeamMesh::setExagerate(qreal val)
 {
     if(val>0 && val!=m_exagerate){
         m_exagerate=val;
