@@ -49,7 +49,7 @@ void BeamRemover::onCollision(Physics::PhysicsCollisionEvent* e){
 
     Qt3DCore::QEntity* targetEntity=m_VMManager->getEntity3D(e->target());
     if(targetEntity!=Q_NULLPTR && m_attached_element==Q_NULLPTR){
-        AbstractElementViewModel* targetVM=m_VMManager->getAssociatedVM(targetEntity);
+        AbstractElementViewModel* targetVM=m_VMManager->getAssociatedVM(targetEntity->id());
         if(targetVM->inherits("BeamVM")){
             BeamVM* beamVM=static_cast<BeamVM*>(targetVM);
             m_beam=beamVM->beam();

@@ -9,12 +9,12 @@ class BeamVM : public AbstractElementViewModel
     Q_OBJECT
 
 public:
-    explicit BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent=0);
-    explicit BeamVM(BeamPtr beam,Qt3DCore::QEntity* entity,QQmlContext* context,Qt3DCore::QEntity* sceneRoot, QObject* parent=0);
+    explicit BeamVM(BeamPtr beam,Qt3DEntityPtr sceneRoot,QObject* parent=0);
+    explicit BeamVM(BeamPtr beam,Qt3DEntityPtr entity,QQmlContext* context,Qt3DEntityPtr sceneRoot, QObject* parent=0);
     ~BeamVM();
 
     WeakBeamPtr beam(){return m_beam;}
-    Qt3DCore::QEntity* component3D(){return m_component3D;}
+    Qt3DEntityPtr component3D(){return m_component3D;}
     AbstractElement* element();
 public slots:
 
@@ -36,7 +36,7 @@ public slots:
 private:
     void initView();
     WeakBeamPtr m_beam;
-    Qt3DCore::QEntity* m_component3D;
+    Qt3DEntityPtr m_component3D;
     static QQmlComponent* m_qqmlcomponent;
     QQmlContext* m_qqmlcontext;
 };

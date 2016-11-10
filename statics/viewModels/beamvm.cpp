@@ -10,7 +10,7 @@
 
 QQmlComponent* BeamVM::m_qqmlcomponent=NULL;
 
-BeamVM::BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent):
+BeamVM::BeamVM(BeamPtr beam,Qt3DEntityPtr sceneRoot,QObject* parent):
     AbstractElementViewModel(sceneRoot,parent),
     m_component3D(Q_NULLPTR)
 {
@@ -34,7 +34,7 @@ BeamVM::BeamVM(BeamPtr beam,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     connect(m_component3D,SIGNAL(realBeamSizeChanged()),this,SLOT(onBeamSizeChangedVMSide()));
 }
 
-BeamVM::BeamVM(BeamPtr beam, Qt3DCore::QEntity *entity, QQmlContext *context, Qt3DCore::QEntity* sceneRoot,  QObject *parent)
+BeamVM::BeamVM(BeamPtr beam, Qt3DEntityPtr entity, QQmlContext *context, Qt3DEntityPtr sceneRoot,  QObject *parent)
     :AbstractElementViewModel(sceneRoot,parent)
 {
     m_qqmlcontext=context;
@@ -59,6 +59,7 @@ BeamVM::BeamVM(BeamPtr beam, Qt3DCore::QEntity *entity, QQmlContext *context, Qt
     connect(m_component3D,SIGNAL(realBeamSizeChanged()),this,SLOT(onBeamSizeChangedVMSide()));
 
 }
+
 BeamVM::~BeamVM(){
     if(m_component3D){
         m_component3D->setEnabled(false);
@@ -92,9 +93,8 @@ void BeamVM::initView(){
                 BeamVM::m_qqmlcomponent=NULL;
               });
         }
-        m_qqmlcontext=new QQmlContext(qmlContext(m_sceneRoot));
+        m_qqmlcontext=new QQmlContext(qmlContext(m_sceneRoot),m_component3D);
         Qt3DCore::QEntity* beamView= qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent->beginCreate(m_qqmlcontext));
-        //QQmlEngine::setObjectOwnership(beamView,QQmlEngine::JavaScriptOwnership);
         m_qqmlcontext->setContextObject(beamView);
         m_component3D=beamView;
         m_component3D->setObjectName(beam_str_ref->objectName());

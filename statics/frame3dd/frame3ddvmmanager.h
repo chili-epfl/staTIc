@@ -21,18 +21,18 @@ public:
     BeamVM* createBeamVM(BeamPtr b);
     JointVM* createJointVM(JointPtr j);
 
-    Qt3DCore::QEntity* getEntity3D(Qt3DCore::QNodeId id);
+    Qt3DEntityPtr getEntity3D(Qt3DCore::QNodeId id);
     AbstractElementViewModel* getAssociatedVM(Qt3DCore::QNodeId id);
-    AbstractElementViewModel* getAssociatedVM(Qt3DCore::QEntity*);
-    AbstractElementViewModel*getAssociatedVM(AbstractElement *);
+    AbstractElementViewModel*getAssociatedVM(AbstractElement*);
     Q_INVOKABLE Qt3DCore::QEntity* getEntity3D(QString entity_name);
+
     Q_INVOKABLE QVariantList beamEntities();
     /*Factory methods invoked by the QML side mainly*/
-    Q_INVOKABLE void produceTPZForce(Qt3DCore::QEntity* parentEntity, QVariantHash properties=QVariantHash());
+    Q_INVOKABLE void produceTPZForce(Qt3DCore::QEntity* parentEntity, QVariantHash properties);
     void registerDependentObject(QObject* o);
 
-    void addPoolEntity(QString className, Qt3DCore::QEntity* e, QQmlContext* contex);
-    void tryRetrivePoolEntity(QString className, Qt3DCore::QEntity* &e, QQmlContext* &contex);
+    void addPoolEntity(QString className, Qt3DEntityPtr e, QQmlContext* contex);
+    void tryRetrivePoolEntity(QString className, Qt3DEntityPtr &e, QQmlContext* &contex);
 
     bool ready(){return m_ready;}
 protected slots:
@@ -51,9 +51,8 @@ private slots:
 private:
     bool m_dying;
     Frame3DDKernel* m_staticsModule;
-    QHash<Qt3DCore::QEntity*, AbstractElementViewModel*> m_Entity3D2ViewModel;
-    QHash<Qt3DCore::QNodeId, Qt3DCore::QEntity* > m_entityID2Entity3D;
-    QHash<QString, Qt3DCore::QEntity* > m_entityNameMap;
+    QHash<Qt3DCore::QNodeId, AbstractElementViewModel*> m_entityID2viewModel;
+    QHash<QString, Qt3DCore::QNodeId > m_entityNameMap;
 
     QList<qreal> m_previousStresses;
 
@@ -67,7 +66,7 @@ private:
 };
 
 struct PoolEntity{
-    Qt3DCore::QEntity* entity;
+    Qt3DEntityPtr entity;
     QQmlContext* contex;
     bool operator==(const PoolEntity& a) const
     {

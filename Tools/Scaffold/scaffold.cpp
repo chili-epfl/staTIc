@@ -221,7 +221,7 @@ void Scaffold::onCollisionExtreme1(Physics::PhysicsCollisionEventPtr e){
 
     Qt3DCore::QEntity* targetEntity=m_VMManager->getEntity3D(e->target());
     if(targetEntity!=Q_NULLPTR){
-        AbstractElementViewModel* targetVM=m_VMManager->getAssociatedVM(targetEntity);
+        AbstractElementViewModel* targetVM=m_VMManager->getAssociatedVM(targetEntity->id());
         if(targetVM!=Q_NULLPTR && targetVM->inherits("JointVM")) {
             JointVM* jointVM= static_cast<JointVM*>(targetVM);
             WeakJointPtr joint=jointVM->joint();            
@@ -291,7 +291,7 @@ void Scaffold::onCollisionExtreme2(Physics::PhysicsCollisionEventPtr e){
 
     Qt3DCore::QEntity* targetEntity=m_VMManager->getEntity3D(e->target());
     if(targetEntity!=Q_NULLPTR){
-        AbstractElementViewModel* targetVM=m_VMManager->getAssociatedVM(targetEntity);
+        AbstractElementViewModel* targetVM=m_VMManager->getAssociatedVM(targetEntity->id());
         if(targetVM!=Q_NULLPTR && targetVM->inherits("JointVM")) {
             JointVM* jointVM= static_cast<JointVM*>(targetVM);
             WeakJointPtr joint=jointVM->joint();

@@ -52,7 +52,7 @@ signals:
 private:
 
     Physics::PhysicsBodyInfo* m_extreme1,*m_extreme2;
-    AbstractVMManager* m_VMManager;
+    QPointer<AbstractVMManager> m_VMManager;
 
     /*Anchors*/
     WeakAbstractElementPtr m_anchor_1,m_anchor_2;

@@ -7,7 +7,7 @@
 QQmlComponent* TrapezoidalForceVM::m_qqmlcomponent=NULL;
 
 
-TrapezoidalForceVM::TrapezoidalForceVM(TrapezoidalForcePtr force, Qt3DCore::QEntity *sceneRoot, Qt3DCore::QEntity* parentEntity, QVariantHash properties, QObject *parent)
+TrapezoidalForceVM::TrapezoidalForceVM(TrapezoidalForcePtr force, Qt3DEntityPtr sceneRoot, Qt3DEntityPtr parentEntity, QVariantHash properties, QObject *parent)
     :AbstractElementViewModel(sceneRoot,parent)
 {
     m_qqmlcontext=Q_NULLPTR;
@@ -56,7 +56,7 @@ void TrapezoidalForceVM::setProperties(QVariantHash properties)
     }
 }
 
-void TrapezoidalForceVM::setParentEntity(Qt3DCore::QEntity *parentEntity)
+void TrapezoidalForceVM::setParentEntity(Qt3DEntityPtr parentEntity)
 {
     if(parentEntity!=Q_NULLPTR && m_component3D!=Q_NULLPTR){
         QVariantHash properties;
@@ -119,7 +119,7 @@ void TrapezoidalForceVM::onRelativePositionChanged()
     }
 }
 
-void TrapezoidalForceVM::initView(Qt3DCore::QEntity* parentEntity,QVariantHash properties)
+void TrapezoidalForceVM::initView(Qt3DEntityPtr parentEntity,QVariantHash properties)
 {
     if(m_qqmlcomponent==NULL){
         m_qqmlcomponent=new QQmlComponent(qmlEngine(parentEntity),parentEntity);
@@ -128,7 +128,7 @@ void TrapezoidalForceVM::initView(Qt3DCore::QEntity* parentEntity,QVariantHash p
             TrapezoidalForceVM::m_qqmlcomponent=NULL;
           });
     }
-    m_qqmlcontext=new QQmlContext(qmlContext(parentEntity));
+    m_qqmlcontext=new QQmlContext(qmlContext(parentEntity),parentEntity);
     Qt3DCore::QEntity* forceView= qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent->beginCreate(m_qqmlcontext));
     m_qqmlcontext->setContextObject(forceView);
     m_component3D=forceView;

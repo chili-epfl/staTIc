@@ -11,7 +11,7 @@ const QString classname4beamEntity="Beam4Joint";
 QQmlComponent* JointVM::m_qqmlcomponent=NULL;
 QQmlComponent* JointVM::m_qqmlcomponent_beam_view=NULL;
 
-JointVM::JointVM(JointPtr joint,Qt3DCore::QEntity* sceneRoot,QObject* parent):
+JointVM::JointVM(JointPtr joint,Qt3DEntityPtr sceneRoot,QObject* parent):
     AbstractElementViewModel(sceneRoot,parent),
     m_component3D(Q_NULLPTR)
 {
@@ -26,7 +26,7 @@ JointVM::JointVM(JointPtr joint,Qt3DCore::QEntity* sceneRoot,QObject* parent):
     connect(m_component3D,SIGNAL(updateSupportType(QString)),this,SLOT(updateSupportType(QString)));
 }
 
-JointVM::JointVM(JointPtr joint, Qt3DCore::QEntity *entity, QQmlContext *context, Qt3DCore::QEntity *sceneRoot, QObject *parent)
+JointVM::JointVM(JointPtr joint, Qt3DEntityPtr entity, QQmlContext *context, Qt3DEntityPtr sceneRoot, QObject *parent)
     : AbstractElementViewModel(sceneRoot,parent)
 {
     m_qqmlcontext=context;
@@ -49,12 +49,12 @@ JointVM::~JointVM(){
         Frame3DDVMManager* parent_vm_manager=static_cast<Frame3DDVMManager*>(parent());
         parent_vm_manager->addPoolEntity(metaObject()->className(),m_component3D,m_qqmlcontext);
 
-        Q_FOREACH(Qt3DCore::QEntity* e,m_beamsMap.keys()){
-            auto extras=m_beams_entities_extras[e];
-            parent_vm_manager->addPoolEntity(metaObject()->className()+classname4beamEntity,
-                                             e,extras);
-            e->setEnabled(false);
-            e->setProperty("parent_joint",QVariant());
+        Q_FOREACH(auto e,m_beamEntitiesMap.values()){
+            if(e){
+                parent_vm_manager->addPoolEntity(metaObject()->className()+classname4beamEntity,
+                                                 e,Q_NULLPTR);
+                e->setEnabled(false);
+            }
         }
     }
     m_qqmlcontext=Q_NULLPTR;
@@ -86,33 +86,38 @@ void JointVM::onDisplacementChanged(){
 }
 
 void JointVM::onConnectedBeamChanged(){
-    JointPtr joint_str_ref=m_joint.toStrongRef();
-    QList<WeakBeamPtr> previous_beams=m_beamsMap.values();
+    if(m_component3D){
+        JointPtr joint_str_ref=m_joint.toStrongRef();
+        QList<WeakBeamPtr> previous_beams=m_beamsMap.values();
 
-    Q_FOREACH(WeakBeamPtr b, joint_str_ref->connectedBeams()){
-        if(!previous_beams.contains(b)){
-            createEntityForBeam(b.toStrongRef());
+        Q_FOREACH(WeakBeamPtr b, joint_str_ref->connectedBeams()){
+            if(!previous_beams.contains(b)){
+                createEntityForBeam(b.toStrongRef());
+            }
         }
-    }
 
-    Q_FOREACH(Qt3DCore::QEntity* e,m_beamsMap.keys()){
-        if(m_beamsMap[e].isNull() || !m_beamsMap[e].toStrongRef()->enable()){
-            m_beamsMap.remove(e);
-            auto extras=m_beams_entities_extras[e];
-            Frame3DDVMManager* parent_vm_manager=static_cast<Frame3DDVMManager*>(parent());
-            parent_vm_manager->addPoolEntity(metaObject()->className()+classname4beamEntity,
-                                             e,extras);
-            e->setEnabled(false);
-            e->setProperty("parent_joint",QVariant());
+        Q_FOREACH(auto nodeId,m_beamsMap.keys()){
+            auto b=m_beamsMap[nodeId];
+            if(b.isNull() || !b.toStrongRef()->enable()){
+                auto e= m_beamEntitiesMap[nodeId];
+                m_beamsMap.remove(nodeId);
+                m_beamEntitiesMap.remove(nodeId);
+                Frame3DDVMManager* parent_vm_manager=static_cast<Frame3DDVMManager*>(parent());
+                parent_vm_manager->addPoolEntity(metaObject()->className()+classname4beamEntity,
+                                                 e,Q_NULLPTR);
+                if(e){
+                    e->setEnabled(false);
+                    e->setProperty("parent_joint",QVariant());
+                }
+            }
         }
-    }
-    QVariantList connected_beam;
+        QVariantList connected_beam;
 
-    Q_FOREACH(Qt3DCore::QEntity* e,m_beamsMap.keys()){
-        connected_beam.append(QVariant::fromValue(e));
+        Q_FOREACH(Qt3DEntityPtr e,m_beamEntitiesMap.values()){
+            connected_beam.append(QVariant::fromValue(e.data()));
+        }
+        m_component3D->setProperty("connected_beams",connected_beam);
     }
-   m_component3D->setProperty("connected_beams",connected_beam);
-
 }
 
 void JointVM::onSupportChanged(){
@@ -176,12 +181,11 @@ void JointVM::initView(){
               });
             m_qqmlcomponent->loadUrl(QUrl("qrc:/element_views/Element_Views/JointView.qml"));
         }
-        m_qqmlcontext=new QQmlContext(qmlContext(m_sceneRoot));
+        m_qqmlcontext=new QQmlContext(qmlContext(m_sceneRoot),m_sceneRoot);
         Qt3DCore::QEntity* jointView= qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent->create(m_qqmlcontext));
         m_qqmlcontext->setContextObject(jointView);
         m_component3D=jointView;
         m_component3D->setParent(m_sceneRoot);
-//        qmlEngine(m_sceneRoot)->setObjectOwnership(m_component3D,QQmlEngine::JavaScriptOwnership);
     }
     m_component3D->setObjectName(joint_str_ref->objectName());
     m_component3D->setProperty("position",joint_str_ref->scaledPosition());
@@ -203,16 +207,16 @@ void JointVM::createEntityForBeam(BeamPtr b){
         m_qqmlcomponent_beam_view->loadUrl(QUrl("qrc:/element_views/Element_Views/BeamView4JointView.qml"));
 
     }
-    Qt3DCore::QEntity *beamView;
+    Qt3DEntityPtr beamView;
     QQmlContext* beamContext;
     parent_vm_manager->tryRetrivePoolEntity(metaObject()->className()+classname4beamEntity,beamView,beamContext);
     if(beamView==Q_NULLPTR){
-        beamContext=new QQmlContext(qmlContext(m_sceneRoot));
+        beamContext=new QQmlContext(qmlContext(m_sceneRoot),m_sceneRoot);
         beamView = qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent_beam_view->create(beamContext));
         beamView->setParent(m_sceneRoot);
     }
-    m_beamsMap[beamView]=b.toWeakRef();
-    m_beams_entities_extras[beamView]=beamContext;
+    m_beamsMap[beamView->id()]=b.toWeakRef();
+    m_beamEntitiesMap[beamView->id()]=beamView;
 
     beamView->setObjectName(b->objectName());
     beamView->setProperty("extreme1",joint_str_ref->scaledPosition());
@@ -263,10 +267,11 @@ void JointVM::onConnectedBeamStressChanged(){
     QObject* sender=QObject::sender();
     Beam* beam=qobject_cast<Beam*>(sender);
     if(!beam) return;
-    Qt3DCore::QEntity* component3D=Q_NULLPTR;
-    Q_FOREACH(Qt3DCore::QEntity* e, m_beamsMap.keys()){
-        if(m_beamsMap[e].data()==beam){
-            component3D=e;
+    Qt3DEntityPtr component3D=Q_NULLPTR;
+    Q_FOREACH(auto node_id, m_beamsMap.keys()){
+        auto b=m_beamsMap[node_id];
+        if(b.data()==beam){
+            component3D=m_beamEntitiesMap[node_id];
             break;
         }
     }
@@ -306,8 +311,9 @@ void JointVM::onConnectedBeamStressChanged(){
 
 void JointVM::visibilityChanged()
 {
-    Q_FOREACH(Qt3DCore::QEntity* e, m_beamsMap.keys()){
-        e->setProperty("visible",m_component3D->property("visible"));
+    Q_FOREACH(Qt3DEntityPtr e, m_beamEntitiesMap.values()){
+        if(e)
+            e->setProperty("visible",m_component3D->property("visible"));
     }
 }
 

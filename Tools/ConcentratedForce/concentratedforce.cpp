@@ -94,7 +94,7 @@ void ConcentratedForce::onCollision(Physics::PhysicsCollisionEvent* e){
     }
     else if(targetEntity!=Q_NULLPTR && m_attached_element==Q_NULLPTR){
         //The Object was not attached, and the force should be created
-        AbstractElementViewModel* targetVM=m_VMManager->getAssociatedVM(targetEntity);
+        AbstractElementViewModel* targetVM=m_VMManager->getAssociatedVM(targetEntity->id());
         if(targetVM->inherits("JointVM")) {
             JointVM* jointVM= static_cast<JointVM*>(targetVM);
             WeakJointPtr joint=jointVM->joint();
