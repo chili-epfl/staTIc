@@ -18,9 +18,9 @@ Material {
             {
                 graphicsApiFilter {
                     api: GraphicsApiFilter.OpenGL
-                    profile: GraphicsApiFilter.CoreProfile
-                    majorVersion: 3
-                    minorVersion: 1
+//                    profile: GraphicsApiFilter.CoreProfile
+//                    majorVersion: 3
+//                    minorVersion: 1
                 }
 
                 annotations: [ Annotation { name: "renderingStyle"; value: "forward" } ]
