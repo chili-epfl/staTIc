@@ -9,12 +9,14 @@ Frame3DDVMManager::Frame3DDVMManager(QObject* parent):
 {
     m_ready=false;
     m_dying=false;
+
     m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_1.ogg"));
     m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_2.ogg"));
     m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_3.ogg"));
     m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/creak_low_4.ogg"));
     m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/crash_wood_1.ogg"));
     m_effectList.append(QUrl("qrc:/soundeffects/AR/SoundEffects/crash_wood_2.ogg"));
+
     //connect(&m_player,SIGNAL(stateChanged(QMediaPlayer::State)),this,SLOT(playEffect(QMediaPlayer::State)));
     connect(this,SIGNAL(staticsModuleChanged()),this,SLOT(initViewModels()));
     connect(this,SIGNAL(sceneRootChanged()),this,SLOT(initViewModels()));
@@ -31,10 +33,6 @@ Frame3DDVMManager::~Frame3DDVMManager()
         //delete o;
     }
 
-    Q_FOREACH(PoolEntity e,m_entity_pool.values()){
-        delete e.entity;
-        //delete e.contex;
-    }
 }
 
 void Frame3DDVMManager::setStaticsModule(Frame3DDKernel *staticsModule){
@@ -54,19 +52,6 @@ void Frame3DDVMManager::initViewModels(){
     Q_FOREACH(BeamPtr beam,m_staticsModule->beams()){
         createBeamVM(beam);
     }
-#ifdef ANDROID
-//    /*Create some resources in the pool*/
-//    QList<AbstractElementViewModel*> victims;
-//    if(m_staticsModule->joints().length()>1)
-//        for(int i=0; i<10;i++)
-//           victims.append(createJointVM(m_staticsModule->joints().at(0)));
-//    if(m_staticsModule->beams().length()>1)
-//        for(int i=0; i<10;i++)
-//           victims.append(createBeamVM(m_staticsModule->beams().at(0)));
-//    Q_FOREACH(AbstractElementViewModel* victim,victims){
-//        victim->deleteLater();
-//    }
-#endif
     m_ready=true;
     emit readyChanged();
 }
@@ -74,19 +59,13 @@ void Frame3DDVMManager::initViewModels(){
 BeamVM* Frame3DDVMManager::createBeamVM(BeamPtr b){
     if(!b.isNull()){
         BeamVM* beamVm;
-        const QString classname=BeamVM::staticMetaObject.className();
-        if(m_entity_pool.contains(classname)){
-            PoolEntity _e=m_entity_pool.value(classname);
-            m_entity_pool.remove(classname,_e);
-            beamVm=new BeamVM(b,_e.entity,_e.contex,m_sceneRoot,this);
-        }
-        else
-            beamVm=new BeamVM(b,m_sceneRoot,this);
+        beamVm=new BeamVM(b,m_sceneRoot,this);
         Q_FOREACH(auto e,beamVm->getEntities()){
             m_entityID2viewModel[e]=beamVm;
         }
         if(!beamVm->component3D()->objectName().isEmpty())
             m_entityNameMap[beamVm->component3D()->objectName()]=beamVm->component3D()->id();
+
         connect(beamVm,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDestroyed(QObject*)));
         connect(beamVm,SIGNAL(resourcesUpdated()),this,SLOT(onResourcesUpdate()));
         registerDependentObject(beamVm);
@@ -98,14 +77,7 @@ BeamVM* Frame3DDVMManager::createBeamVM(BeamPtr b){
 JointVM* Frame3DDVMManager::createJointVM(JointPtr j){
     if(!j.isNull()){
         JointVM* jointVm;
-        const QString classname=JointVM::staticMetaObject.className();
-        if(m_entity_pool.contains(classname)){
-            PoolEntity _e=m_entity_pool.value(classname);
-            m_entity_pool.remove(classname,_e);
-            jointVm=new JointVM(j,_e.entity,_e.contex,m_sceneRoot,this);
-        }
-        else
-            jointVm=new JointVM(j,m_sceneRoot,this);
+        jointVm=new JointVM(j,m_sceneRoot,this);
 
         Q_FOREACH(auto e,jointVm->getEntities()){
             m_entityID2viewModel[e]=jointVm;
@@ -145,28 +117,6 @@ void Frame3DDVMManager::produceTPZForce(Qt3DCore::QEntity* parentEntity,QVariant
 void Frame3DDVMManager::registerDependentObject(QObject *o)
 {
     m_dependent_objects.insert(o);
-}
-
-void Frame3DDVMManager::addPoolEntity(QString className, Qt3DEntityPtr e, QQmlContext *contex)
-{
-    if(m_dying) return;
-    PoolEntity poolEntity;
-    poolEntity.entity=e;
-    poolEntity.contex=contex;
-    m_entity_pool.insert(className,poolEntity);
-}
-
-void Frame3DDVMManager::tryRetrivePoolEntity(QString className, Qt3DEntityPtr &e, QQmlContext *&contex)
-{
-    if(m_entity_pool.contains(className)){
-        PoolEntity _e=m_entity_pool.value(className);
-        m_entity_pool.remove(className,_e);
-        e=_e.entity;
-        contex=_e.contex;
-    }else{
-        e=Q_NULLPTR;
-        contex=Q_NULLPTR;
-    }
 }
 
 Qt3DEntityPtr Frame3DDVMManager::getEntity3D(Qt3DCore::QNodeId id){

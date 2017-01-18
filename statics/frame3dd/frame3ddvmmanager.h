@@ -31,10 +31,7 @@ public:
     Q_INVOKABLE void produceTPZForce(Qt3DCore::QEntity* parentEntity, QVariantHash properties);
     void registerDependentObject(QObject* o);
 
-    void addPoolEntity(QString className, Qt3DEntityPtr e, QQmlContext* contex);
-    void tryRetrivePoolEntity(QString className, Qt3DEntityPtr &e, QQmlContext* &contex);
-
-    bool ready(){return m_ready;}
+     bool ready(){return m_ready;}
 protected slots:
     void initViewModels();
 signals:
@@ -60,20 +57,9 @@ private:
     QList<QUrl> m_effectList;
     QTimer m_lazy_player_timer;
 
-    QMultiHash<QString,PoolEntity> m_entity_pool;
     QSet<QObject*> m_dependent_objects;
     bool m_ready;
 };
-
-struct PoolEntity{
-    Qt3DEntityPtr entity;
-    QQmlContext* contex;
-    bool operator==(const PoolEntity& a) const
-    {
-        return (this->entity==a.entity && this->contex==a.contex);
-    }
-};
-
 
 
 #endif // FRAME3DDVMMANAGER_H

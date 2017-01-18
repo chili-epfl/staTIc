@@ -10,7 +10,6 @@ class BeamVM : public AbstractElementViewModel
 
 public:
     explicit BeamVM(BeamPtr beam,Qt3DEntityPtr sceneRoot,QObject* parent=0);
-    explicit BeamVM(BeamPtr beam,Qt3DEntityPtr entity,QQmlContext* context,Qt3DEntityPtr sceneRoot, QObject* parent=0);
     ~BeamVM();
 
     WeakBeamPtr beam(){return m_beam;}

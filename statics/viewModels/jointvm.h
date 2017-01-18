@@ -11,7 +11,6 @@ class JointVM:public AbstractElementViewModel
 
 public:
     explicit JointVM(JointPtr joint,Qt3DEntityPtr sceneRoot,QObject* parent=0);
-    explicit JointVM(JointPtr joint, Qt3DEntityPtr entity, QQmlContext* context, Qt3DEntityPtr sceneRoot, QObject* parent=0);
     ~JointVM();
     WeakJointPtr joint(){return m_joint;}
     AbstractElement* element();

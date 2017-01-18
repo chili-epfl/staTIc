@@ -26,37 +26,10 @@ JointVM::JointVM(JointPtr joint,Qt3DEntityPtr sceneRoot,QObject* parent):
     connect(m_component3D,SIGNAL(updateSupportType(QString)),this,SLOT(updateSupportType(QString)));
 }
 
-JointVM::JointVM(JointPtr joint, Qt3DEntityPtr entity, QQmlContext *context, Qt3DEntityPtr sceneRoot, QObject *parent)
-    : AbstractElementViewModel(sceneRoot,parent)
-{
-    m_qqmlcontext=context;
-    m_component3D=entity;
-    m_joint=joint.toWeakRef();
-    initView();
-    connect(m_joint.data(),SIGNAL(reactionChanged()),this,SLOT(onReactionChanged()));
-    connect(m_joint.data(),SIGNAL(destroyed(QObject*)),this,SLOT(deleteLater()));
-    connect(m_joint.data(),SIGNAL(connectedBeamsChanged()),this,SLOT(onConnectedBeamChanged()));
-    connect(m_joint.data(),SIGNAL(displacementChanged()),this,SLOT(onDisplacementChanged()));
-    connect(m_joint.data(),SIGNAL(supportChanged()),this,SLOT(onSupportChanged()));
-    connect(m_component3D,SIGNAL(updateSupportType(QString)),this,SLOT(updateSupportType(QString)));
-
-}
 
 JointVM::~JointVM(){
-    if(m_component3D){
-        m_component3D->setEnabled(false);
-        m_component3D->setProperty("position",QVector3D(0,0,400));
-        Frame3DDVMManager* parent_vm_manager=static_cast<Frame3DDVMManager*>(parent());
-        parent_vm_manager->addPoolEntity(metaObject()->className(),m_component3D,m_qqmlcontext);
-
-        Q_FOREACH(auto e,m_beamEntitiesMap.values()){
-            if(e){
-                parent_vm_manager->addPoolEntity(metaObject()->className()+classname4beamEntity,
-                                                 e,Q_NULLPTR);
-                e->setEnabled(false);
-            }
-        }
-    }
+    if(m_component3D)
+        m_component3D->deleteLater();
     m_qqmlcontext=Q_NULLPTR;
     m_component3D=Q_NULLPTR;
 }
@@ -102,13 +75,7 @@ void JointVM::onConnectedBeamChanged(){
                 auto e= m_beamEntitiesMap[nodeId];
                 m_beamsMap.remove(nodeId);
                 m_beamEntitiesMap.remove(nodeId);
-                Frame3DDVMManager* parent_vm_manager=static_cast<Frame3DDVMManager*>(parent());
-                parent_vm_manager->addPoolEntity(metaObject()->className()+classname4beamEntity,
-                                                 e,Q_NULLPTR);
-                if(e){
-                    e->setEnabled(false);
-                    e->setProperty("parent_joint",QVariant());
-                }
+                e->deleteLater();
             }
         }
         QVariantList connected_beam;
@@ -173,20 +140,19 @@ void JointVM::updateSupportType(QString type){
 
 void JointVM::initView(){
     JointPtr joint_str_ref=m_joint.toStrongRef();
-    if(m_component3D==Q_NULLPTR){
-        if(m_qqmlcomponent==NULL){
-            m_qqmlcomponent=new QQmlComponent(qmlEngine(m_sceneRoot),m_sceneRoot);
-            connect(m_qqmlcomponent,&QQmlComponent::destroyed,[]() {
-                JointVM::m_qqmlcomponent=NULL;
-              });
-            m_qqmlcomponent->loadUrl(QUrl("qrc:/element_views/Element_Views/JointView.qml"));
-        }
-        m_qqmlcontext=new QQmlContext(qmlContext(m_sceneRoot),m_sceneRoot);
-        Qt3DCore::QEntity* jointView= qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent->create(m_qqmlcontext));
-        m_qqmlcontext->setContextObject(jointView);
-        m_component3D=jointView;
-        m_component3D->setParent(m_sceneRoot);
+    if(m_qqmlcomponent==NULL){
+        m_qqmlcomponent=new QQmlComponent(qmlEngine(m_sceneRoot),m_sceneRoot);
+        connect(m_qqmlcomponent,&QQmlComponent::destroyed,[]() {
+            JointVM::m_qqmlcomponent=NULL;
+        });
+        m_qqmlcomponent->loadUrl(QUrl("qrc:/element_views/Element_Views/JointView.qml"));
     }
+    m_qqmlcontext=new QQmlContext(qmlContext(m_sceneRoot),m_sceneRoot);
+    Qt3DCore::QEntity* jointView= qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent->create(m_qqmlcontext));
+    m_qqmlcontext->setContextObject(jointView);
+    m_component3D=jointView;
+    m_component3D->setParent(m_sceneRoot);
+
     m_component3D->setObjectName(joint_str_ref->objectName());
     m_component3D->setProperty("position",joint_str_ref->scaledPosition());
     onReactionChanged();
@@ -198,23 +164,19 @@ void JointVM::initView(){
 
 void JointVM::createEntityForBeam(BeamPtr b){
     JointPtr joint_str_ref=m_joint.toStrongRef();
-    Frame3DDVMManager* parent_vm_manager=static_cast<Frame3DDVMManager*>(parent());
     if(m_qqmlcomponent_beam_view==NULL){
         m_qqmlcomponent_beam_view=new QQmlComponent(qmlEngine(m_sceneRoot),m_sceneRoot);
         connect(m_qqmlcomponent_beam_view,&QQmlComponent::destroyed,[]() {
             JointVM::m_qqmlcomponent_beam_view=NULL;
-          });
+        });
         m_qqmlcomponent_beam_view->loadUrl(QUrl("qrc:/element_views/Element_Views/BeamView4JointView.qml"));
-
     }
     Qt3DEntityPtr beamView;
     QQmlContext* beamContext;
-    parent_vm_manager->tryRetrivePoolEntity(metaObject()->className()+classname4beamEntity,beamView,beamContext);
-    if(beamView==Q_NULLPTR){
-        beamContext=new QQmlContext(qmlContext(m_sceneRoot),m_sceneRoot);
-        beamView = qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent_beam_view->create(beamContext));
-        beamView->setParent(m_sceneRoot);
-    }
+    beamContext=new QQmlContext(qmlContext(m_sceneRoot),m_sceneRoot);
+    beamView = qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent_beam_view->create(beamContext));
+    beamView->setParent(m_sceneRoot);
+
     m_beamsMap[beamView->id()]=b.toWeakRef();
     m_beamEntitiesMap[beamView->id()]=beamView;
 
