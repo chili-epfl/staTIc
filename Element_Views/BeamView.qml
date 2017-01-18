@@ -1,5 +1,6 @@
 import Qt3D.Core 2.0
 import Qt3D.Render 2.0
+import Qt3D.Extras 2.0
 import Qt3D.Input 2.0
 
 import QtQuick 2.0 as QQ2
@@ -229,7 +230,7 @@ Entity{
            mask: 2;
            group: 1;
        }
-       components: [pBodyMesh,pBody,beam_commons.transparent_material]
+       components: [pBodyMesh,pBody]
 
     }
 
@@ -257,7 +258,7 @@ Entity{
 //            var angle=Math.acos(Qt.vector3d(1,0,0).dotProduct(b));
 //            displacementQuaternion=quaternion_helper.product(displacement_transform.fromAxisAndAngle(axis, angle*180.0/Math.PI),displacementQuaternion)
 //        }
-//        var center=e2.plus(e1).times(0.5);
+//        var center=e2.plus(e1).timebeam_commons.transparent_materials(0.5);
 //        displacementTranslation.x=center.x;
 //        displacementTranslation.y=center.y;
 //        displacementTranslation.z=center.z;

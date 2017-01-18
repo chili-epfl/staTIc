@@ -1,5 +1,6 @@
 import Qt3D.Core 2.0
 import Qt3D.Render 2.0
+import Qt3D.Extras 2.0
 import "qrc:/opengl/Opengl"
 import DeformingBeamMesh 1.0
 

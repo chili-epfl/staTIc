@@ -1,6 +1,7 @@
 
 import Qt3D.Core 2.0
 import Qt3D.Render 2.0
+import Qt3D.Extras 2.0
 
 Material {
     id: alphaMaterial
@@ -23,7 +24,7 @@ Material {
 //                    minorVersion: 1
                 }
 
-                annotations: [ Annotation { name: "renderingStyle"; value: "forward" } ]
+                filterKeys: [FilterKey { name: "renderingStyle"; value: "forward" } ]
                 renderPasses: [
                     RenderPass {
 //                        renderStates: [
@@ -50,7 +51,7 @@ Material {
                     minorVersion: 0
                 }
 
-                annotations: [ Annotation { name: "renderingStyle"; value: "forward" } ]
+                filterKeys: [FilterKey { name: "renderingStyle"; value: "forward" } ]
                 renderPasses: [
                     RenderPass {
                         shaderProgram: alphaPhong
