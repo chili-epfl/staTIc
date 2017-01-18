@@ -874,10 +874,13 @@ Item{
         id:structure_tag
         objectId: "default"
         property vector3d last_sensor_read;
-        onObjectIsVisibleChanged:
-            if(!objectIsVisible)
+        property bool has_appeared:false
+        onObjectIsVisibleChanged:{
+            if(objectIsVisible)
+                has_appeared=true
+            else
                 last_sensor_read=Qt.vector3d(rotationSensor.reading.x,rotationSensor.reading.y,rotationSensor.reading.z)
-
+        }
         Q3D.QuaternionAnimation on rotation{
             type: Q3D.QuaternionAnimation.Nlerp
         }       

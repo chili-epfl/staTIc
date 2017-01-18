@@ -12,6 +12,7 @@ class Frame3DDVMManager: public AbstractVMManager
     Q_OBJECT
     Q_PROPERTY(Frame3DDKernel* staticsModule READ staticsModule WRITE setStaticsModule NOTIFY staticsModuleChanged)
     Q_PROPERTY(bool ready READ ready NOTIFY readyChanged)
+    Q_PROPERTY(QVector3D initialModelPose READ initialModelPose NOTIFY initialModelPoseChanged)
 public:
     Frame3DDVMManager(QObject* parent=0);
     ~Frame3DDVMManager();
@@ -26,8 +27,10 @@ public:
     AbstractElementViewModel*getAssociatedVM(AbstractElement*);
     Q_INVOKABLE Qt3DCore::QEntity* getEntity3D(QString entity_name);
 
+    Q_INVOKABLE QVector3D initialModelPose();
+
     Q_INVOKABLE QVariantList beamEntities();
-    /*Factory methods invoked by the QML side mainly*/
+        /*Factory methods invoked by the QML side mainly*/
     Q_INVOKABLE void produceTPZForce(Qt3DCore::QEntity* parentEntity, QVariantHash properties);
     void registerDependentObject(QObject* o);
 
@@ -38,6 +41,7 @@ signals:
     void staticsModuleChanged();
     void scaleFactorsUpdated();
     void readyChanged();
+    void initialModelPoseChanged();
 private slots:
     void onResourceDestroyed(QObject*);
     void onResourcesUpdate();

@@ -54,6 +54,7 @@ void Frame3DDVMManager::initViewModels(){
     }
     m_ready=true;
     emit readyChanged();
+    emit initialModelPoseChanged();
 }
 
 BeamVM* Frame3DDVMManager::createBeamVM(BeamPtr b){
@@ -150,6 +151,26 @@ Qt3DCore::QEntity* Frame3DDVMManager::getEntity3D(QString entity_name)
         return m_entityID2viewModel[m_entityNameMap[entity_name]]->component3D();
     else
         return Q_NULLPTR;
+}
+
+QVector3D Frame3DDVMManager::initialModelPose()
+{
+    qreal xmin=5000,xmax=0,ymin=5000,ymax=0;
+    if(m_staticsModule!=Q_NULLPTR){
+        Q_FOREACH(JointPtr joint, m_staticsModule->joints()){
+            QVector3D j_pos=joint->scaledPosition();
+            if(j_pos.x()>xmax)
+                xmax=j_pos.x();
+            if(j_pos.x()<xmin)
+                xmin=j_pos.x();
+            if(j_pos.y()>ymax)
+                ymax=j_pos.y();
+            if(j_pos.y()<ymin)
+                ymin=j_pos.y();
+        }
+    }
+    //return QVector3D(0,0,-1000);
+    return QVector3D(-0.5*xmin-0.5*xmax,-0.5*ymin-0.5*ymax,-1000);
 }
 
 QVariantList Frame3DDVMManager::beamEntities()

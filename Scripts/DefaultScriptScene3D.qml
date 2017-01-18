@@ -187,7 +187,8 @@ Entity {
     Entity{
         components:[
             Transform {
-                rotation:  !structure_tag.objectIsVisible ?
+                rotation:  !structure_tag.objectIsVisible ||
+                           (!applicationRoot.firstInit && !camDevice.isRunning) ?
                                quaternion_helper.product(
                                    quaternion_helper.product(
                                        fromAxisAndAngle(0,1,0,-(rotationSensor.reading.z-
@@ -217,8 +218,7 @@ Entity {
                 //            QuaternionAnimation on rotation{
                 //            }
                 // translation:settings.focus_on_joint ? Qt.vector3d(0,0,-300) : structure_tag.translation
-                translation: structure_tag.translation
-
+                translation: structure_tag.has_appeared ? structure_tag.translation : vmManager.initialModelPose
                 QQ2.Component.onCompleted:
                     //structure_tag.appendQuaternion(fromAxisAndAngle(1,1,1,120))
                     structure_tag.appendQuaternion(fromAxisAndAngle(1,0,0,90))
