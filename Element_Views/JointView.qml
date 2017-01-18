@@ -147,6 +147,7 @@ Entity{
             }
         }
     }
+
     //Displacement entity
     Entity{
         enabled: visible && settings.show_joint && settings.show_displacement
@@ -169,6 +170,7 @@ Entity{
     Entity{
         enabled: reactionMagnitude > 0.01
         AnimationUnitDx{
+            enabled: parent.enabled
             unitId: 0
             unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
@@ -181,6 +183,7 @@ Entity{
         }
 
         AnimationUnitDx{
+            enabled: parent.enabled
             unitId: 1
             unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
@@ -235,6 +238,7 @@ Entity{
         components: [joint_commons.focus_view_color_centre,joint_commons.sphere_mesh]
 
         Entity{
+            enabled: parent.enabled
             components: [joint_commons.sphere_mesh_r3,joint_commons.focus_view_target_transform,joint_commons.focus_view_color_target]
         }
 

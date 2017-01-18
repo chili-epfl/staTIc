@@ -59,7 +59,7 @@ Entity{
     }
     property PhongAlphaMaterial transparent_material:
         PhongAlphaMaterial{
-        alpha:0.0
+        alpha:0.5
     }
 
     property SphereMesh drag_mesh:

@@ -717,7 +717,12 @@ Rectangle {
                         updateModel()
                     }
                 }
-
+                Connections{
+                    target: applicationRoot.staticsModule
+                    onUpdated: {
+                        updateModel()
+                    }
+                }
 
                 function updateModel(){
                     forceListModel.clear()

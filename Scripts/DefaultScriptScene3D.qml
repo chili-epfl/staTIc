@@ -107,6 +107,8 @@ Entity {
 
     components: [
         RenderSettings {
+            pickingSettings.pickMethod: PickingSettings.TrianglePicking
+
             activeFrameGraph:TechniqueFilter {
                 objectName : "techniqueFilter"
 
@@ -171,16 +173,16 @@ Entity {
     }
 
 
-    Entity{
+//    Entity{
 
-        components: [Transform{
-                translation:Qt.vector3d(0,0,-1000)
-            },
-            CuboidMesh{xExtent: 100;yExtent: 100;zExtent: 100},
-            PhongMaterial{}
-        ]
+//        components: [Transform{
+//                translation:Qt.vector3d(0,0,-1000)
+//            },
+//            CuboidMesh{xExtent: 100;yExtent: 100;zExtent: 100},
+//            PhongMaterial{}
+//        ]
 
-    }
+//    }
 
     Entity{
         components:[

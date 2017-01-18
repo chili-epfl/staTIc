@@ -86,7 +86,9 @@ Entity{
 
     property Transform focus_view_target_transform:
     Transform{
-        translation: settings.focus_view_currentForce.times(settings.focus_view_scaleFactor_focus)
+        translation: settings.focus_view_currentForce.length()>0.001 ?
+                         settings.focus_view_currentForce.times(settings.focus_view_scaleFactor_focus):
+                         Qt.vector3d(0,0,0)
         QQ2.Behavior on translation{
             QQ2.Vector3dAnimation{
                 duration: 500

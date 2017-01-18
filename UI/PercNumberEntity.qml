@@ -4,7 +4,7 @@ import Qt3D.Extras 2.0
 import QtQuick 2.0 as QQ2
 
 Entity{
-   property real number:0;
+   property real number:0;    
    onNumberChanged: {
        var d1=Math.floor(number)
        var d2=Math.floor(number*10-d1*10)
@@ -22,39 +22,39 @@ Entity{
                 first_digit.enabled=false;
                 break;
             case 1:
-                first_digit.enabled=true;
+                first_digit.enabled=Qt.binding(function(){return enabled});
                 first_digit.mesh=char_meshes.char_1
                 break;
             case 2:
-                first_digit.enabled=true;
+                first_digit.enabled=Qt.binding(function(){return enabled});
                 first_digit.mesh=char_meshes.char_2
                 break;
             case 3:
-                first_digit.enabled=true;
+                first_digit.enabled=Qt.binding(function(){return enabled});
                 first_digit.mesh=char_meshes.char_3
                 break;
             case 4:
-                first_digit.enabled=true;
+                first_digit.enabled=Qt.binding(function(){return enabled});
                 first_digit.mesh=char_meshes.char_4
                 break;
             case 5:
-                first_digit.enabled=true;
+                first_digit.enabled=Qt.binding(function(){return enabled});
                 first_digit.mesh=char_meshes.char_5
                 break;
             case 6:
-                first_digit.enabled=true;
+                first_digit.enabled=Qt.binding(function(){return enabled});
                 first_digit.mesh=char_meshes.char_6
                 break;
             case 7:
-                first_digit.enabled=true;
+                first_digit.enabled=Qt.binding(function(){return enabled});
                 first_digit.mesh=char_meshes.char_7
                 break;
             case 8:
-                first_digit.enabled=true;
+                first_digit.enabled=Qt.binding(function(){return enabled});
                 first_digit.mesh=char_meshes.char_8
                 break;
             case 9:
-                first_digit.enabled=true;
+                first_digit.enabled=Qt.binding(function(){return enabled});
                 first_digit.mesh=char_meshes.char_9
                 break;
        }
@@ -63,86 +63,86 @@ Entity{
                 if(d1==0)
                     second_digit.enabled=false;
                 else{
-                    second_digit.enabled=true;
+                    second_digit.enabled=Qt.binding(function(){return enabled});
                     second_digit.mesh=char_meshes.char_0
                 }
                 break;
             case 1:
-                second_digit.enabled=true;
+                second_digit.enabled=Qt.binding(function(){return enabled});
                 second_digit.mesh=char_meshes.char_1
                 break;
             case 2:
-                second_digit.enabled=true;
+                second_digit.enabled=Qt.binding(function(){return enabled});
                 second_digit.mesh=char_meshes.char_2
                 break;
             case 3:
-                second_digit.enabled=true;
+                second_digit.enabled=Qt.binding(function(){return enabled});
                 second_digit.mesh=char_meshes.char_3
                 break;
             case 4:
-                second_digit.enabled=true;
+                second_digit.enabled=Qt.binding(function(){return enabled});
                 second_digit.mesh=char_meshes.char_4
                 break;
             case 5:
-                second_digit.enabled=true;
+                second_digit.enabled=Qt.binding(function(){return enabled});
                 second_digit.mesh=char_meshes.char_5
                 break;
             case 6:
-                second_digit.enabled=true;
+                second_digit.enabled=Qt.binding(function(){return enabled});
                 second_digit.mesh=char_meshes.char_6
                 break;
             case 7:
-                second_digit.enabled=true;
+                second_digit.enabled=Qt.binding(function(){return enabled});
                 second_digit.mesh=char_meshes.char_7
                 break;
             case 8:
-                second_digit.enabled=true;
+                second_digit.enabled=Qt.binding(function(){return enabled});
                 second_digit.mesh=char_meshes.char_8
                 break;
             case 9:
-                second_digit.enabled=true;
+                second_digit.enabled=Qt.binding(function(){return enabled});
                 second_digit.mesh=char_meshes.char_9
                 break;
        }
        switch (d3){
             case 0:
-                first_decimal_digit.enabled=true;
+                first_decimal_digit.enabled=Qt.binding(function(){return enabled});
                 first_decimal_digit.mesh=char_meshes.char_0
                 break;
             case 1:
-                first_decimal_digit.enabled=true;
+                first_decimal_digit.enabled=Qt.binding(function(){return enabled});
                 first_decimal_digit.mesh=char_meshes.char_1
                 break;
             case 2:
-                first_decimal_digit.enabled=true;
+                first_decimal_digit.enabled=Qt.binding(function(){return enabled});
                 first_decimal_digit.mesh=char_meshes.char_2
                 break;
             case 3:
-                first_decimal_digit.enabled=true;
+                first_decimal_digit.enabled=Qt.binding(function(){return enabled});
                 first_decimal_digit.mesh=char_meshes.char_3
                 break;
             case 4:
-                first_decimal_digit.enabled=true;
+                first_decimal_digit.enabled=Qt.binding(function(){return enabled});
                 first_decimal_digit.mesh=char_meshes.char_4
                 break;
             case 5:
-                first_decimal_digit.enabled=true;
+                first_decimal_digit.enabled=Qt.binding(function(){return enabled});
                 first_decimal_digit.mesh=char_meshes.char_5
                 break;
             case 6:
-                first_decimal_digit.enabled=true;
+                first_decimal_digit.enabled=Qt.binding(function(){return enabled});
                 first_decimal_digit.mesh=char_meshes.char_6
                 break;
             case 7:
-                first_decimal_digit.enabled=true;
+                first_decimal_digit.enabled=Qt.binding(function(){return enabled});
                 first_decimal_digit.mesh=char_meshes.char_7
                 break;
             case 8:
-                first_decimal_digit.enabled=true;
+                first_decimal_digit.enabled=Qt.binding(function(){return enabled});
                 first_decimal_digit.mesh=char_meshes.char_8
                 break;
             case 9:
-                first_decimal_digit.enabled=true;
+                first_decimal_digit.enabled=Qt.binding(function(){return enabled});
                 first_decimal_digit.mesh=char_meshes.char_9
                 break;
        }
@@ -192,9 +192,9 @@ Entity{
 
    property Material color;
 
-
    Entity{
         id:first_digit
+        enabled: parent.enabled
         property Mesh mesh
         property Transform offset:Transform{
             rotation:quaternion_helper.product(fromAxisAndAngle(1,0,0,90),fromAxisAndAngle(0,1,0,-90))
@@ -204,6 +204,7 @@ Entity{
    }
    Entity{
         id:second_digit
+        enabled: parent.enabled
         property Mesh mesh:Mesh{
         }
         property Transform offset:Transform{
@@ -226,6 +227,7 @@ Entity{
 
    Entity{
         id:first_decimal_digit
+        enabled: parent.enabled
         property Mesh mesh
         property Transform offset:Transform{
             rotation:quaternion_helper.product(fromAxisAndAngle(1,0,0,90),fromAxisAndAngle(0,1,0,-90))
@@ -235,6 +237,7 @@ Entity{
    }
    Entity{
         id:second_decimal_digit
+        enabled: parent.enabled
         property Mesh mesh
         property Transform offset:Transform{
             rotation:quaternion_helper.product(fromAxisAndAngle(1,0,0,90),fromAxisAndAngle(0,1,0,-90))

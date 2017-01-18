@@ -77,6 +77,7 @@ Entity{
     Entity{
         enabled: settings.show_stress
         PercNumberEntity{
+            enabled: parent.enabled
             id:number_entity
             number:relativeAxialStress
             QQ2.Behavior on number{
@@ -149,6 +150,7 @@ Entity{
     property real main_mesh_lenght: settings.show_beam_axial_loads ? Math.max(rootEntity.length/2-50,5) : Math.max(rootEntity.length/2-25,5)
 
     Entity{
+        //Left rod
         enabled: settings.show_beam && !settings.show_displacement && !enable_deformation
         property Transform transform: Transform{
                 scale3D:  Qt.vector3d(1,main_mesh_lenght/beam_commons.main_mesh_cylinder.length,1)
@@ -159,6 +161,7 @@ Entity{
         components: [beam_commons.main_mesh_cylinder,this.transform,main_mesh_material]
     }
     Entity{
+        //Right rod
         enabled: settings.show_beam && !settings.show_displacement&& !enable_deformation// && length > (2*main_mesh_lenght + 30)
         property Transform transform: Transform{
                 scale3D:  Qt.vector3d(1,main_mesh_lenght/beam_commons.main_mesh_cylinder.length,1)
@@ -168,6 +171,7 @@ Entity{
     }
 
     Entity{
+        //Skybox effect
         enabled: !settings.show_displacement && !enable_deformation
         property Transform transform: Transform{
                 scale3D:  Qt.vector3d(rootEntity.tangibleSection.height/2,rootEntity.length/2-10,rootEntity.tangibleSection.width/2)
@@ -176,17 +180,16 @@ Entity{
     }
 
     Entity{
+        //Sphere mesh
         enabled: settings.show_beam_sphere && !enable_deformation
         components: [
-            beam_commons.sphere_mesh
-            ,
+            beam_commons.sphere_mesh,
             main_mesh_material
         ]
     }
 
-
-
     Entity{
+        //Spring mesh
         enabled: settings.show_beam_spring && !settings.show_displacement && !enable_deformation
         property Transform transform:Transform{
             //z:width,x:height,y:lenght
@@ -315,7 +318,6 @@ Entity{
                         [deforming_mesh,deforming_transform,main_mesh_material]
                       :
                         [deforming_mesh,deforming_transform,beam_commons.deformingMeshMaterial]
-
     }
 
 
@@ -329,10 +331,11 @@ Entity{
     Entity{
         enabled: settings.beam_is_selectable && infobox.current_item!=rootEntity
         property Transform transform: Transform{
-            rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
-            scale3D: Qt.vector3d(1,1,1)
+            scale3D:  Qt.vector3d(2,2*main_mesh_lenght/beam_commons.main_mesh_cylinder.length,2)
+
         }
         property ObjectPicker objectPicker:ObjectPicker{
+
             onClicked: {
                 sceneRoot.mouseEventHasBeenAccepted=true;
                 if(parent.enabled && infobox.current_item!=rootEntity && !disable_beam_selection_for_load){
@@ -340,13 +343,14 @@ Entity{
                 }
             }
         }
+        property CylinderMesh clicking_mesh: CylinderMesh{
+            radius: 5
+            length: rootEntity.length-20
+        }
         components: infobox.current_item!==rootEntity && !disable_beam_selection_for_load ?
-                        [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform,objectPicker]:
-                        [beam_commons.drag_mesh,beam_commons.transparent_material,this.transform]
+                        [beam_commons.main_mesh_cylinder,this.transform,objectPicker]:
+                        [beam_commons.main_mesh_cylinder,this.transform]
     }
-
-    property int pickersCount:0;
-    function updatePickerCount(){pickersCount=(length-40)/(4*(beam_commons.drag_mesh.radius+2))-1;}
 
 //    NodeInstantiator {
 //        model:
