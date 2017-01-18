@@ -167,8 +167,8 @@ void DeformingBeamMesh::init(){
     customGeometry->addAttribute(uvtextureAttribute);
 
     this->setInstanceCount(1);
-    this->setBaseVertex(0);
-    this->setBaseInstance(0);
+    this->setIndexOffset(0);
+    this->setFirstInstance(0);
     this->setPrimitiveType(Qt3DRender::QGeometryRenderer::Triangles);
 
     m_init=true;
@@ -547,7 +547,7 @@ void DeformingBeamMesh::generateGeometry(){
     uvtextureAttribute->setCount(vertices.size());
 
 //    4 faces, 2 trigles per face, 3 indices per triangle
-    this->setPrimitiveCount(indices.size());
+    this->setVertexCount(indices.size());
 
     this->setGeometry(customGeometry);
 
