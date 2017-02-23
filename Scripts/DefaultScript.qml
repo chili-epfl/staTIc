@@ -864,10 +864,10 @@ Item{
         defaultMarkerSize: 50
         Component.onCompleted: {
             loadSingleMarkersConfigFile("qrc:/AR/single_markers.json")
-            if(!use_custom_board)
+            if(applicationWindow.board_path=="")
                 loadMultiMarkersConfigFile("default","qrc:/AR/board_configuration.dat")
             else
-                loadMultiMarkersConfigFile("default",custom_board_url)
+                loadMultiMarkersConfigFile("default","file:"+applicationWindow.board_path)
         }
      }
      ARToolkitObject{

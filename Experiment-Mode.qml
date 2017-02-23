@@ -9,13 +9,14 @@ import QtSensors 5.3
 import "qrc:/ui"
 import "qrc:/scripts/Scripts"
 import "qrc:/ui/UI/Help"
+import "qrc:/ui/UI/"
 Item {
 
     property bool enable_eye_tracking_tags: true
     property int tag_dim: 15
     property string condition: "Hands"     //Hands or Fixed
     property string participantID:""
-
+    property string board_path: boardSelection_box.boardPath
 
     function pt2px(pt){return pt*0.3759*Screen.pixelDensity}
     function mm2px(mm){return mm*Screen.pixelDensity}
@@ -33,7 +34,6 @@ Item {
 //        active: true
 //    }
 
-    property bool use_custom_board: Platform=="ANDROID" ? true : false
 
     focus:true
     Keys.onReleased: {
@@ -186,23 +186,11 @@ Item {
                     onClicked: synch_dialog_box.visible=true
                 }
             }
-            Rectangle{
+            Button{
                 anchors.left: synch_img.right
                 anchors.bottom:  parent.bottom
-                id:custom_board_enable_rect
-                width: 100
-                height: 100
-                color: use_custom_board ? "green" : "red"
-                Text {
-                    anchors.fill: parent
-                    fontSizeMode: Text.Fit
-                    wrapMode: Text.Wrap
-                    text: "Use Custom Board"
-                }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked: use_custom_board=!use_custom_board
-                }
+                text:"Select Board"
+                onClicked: boardSelection_box.visible=true
             }
             Image{
                 width: 100
@@ -257,6 +245,11 @@ Item {
     }
     MaterialDesigner{
         id:materialDesigner
+    }
+
+    BoardSelection{
+        id:boardSelection_box
+        visible:false
     }
 
     Rectangle{

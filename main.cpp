@@ -88,6 +88,17 @@ int main(int argc, char *argv[])
 #else
     view.rootContext()->setContextProperty("Platform","UNIX");
 #endif
+
+#ifdef ANDROID
+    view.rootContext()->setContextProperty("Platform","ANDROID");
+    QString conf_folder="file:"+QString(getenv("EXTERNAL_STORAGE"))+"/staTIc/";
+    view.rootContext()->setContextProperty("Conf_folder",conf_folder);
+#else
+    view.rootContext()->setContextProperty("Platform","UNIX");
+    QString conf_folder="file:"+QString(getenv("HOME"));
+    view.rootContext()->setContextProperty("Conf_folder",conf_folder);
+#endif
+
     view.rootContext()->setContextProperty("logger",&logger);
 
     view.resize(2560, 1600);

@@ -133,6 +133,7 @@
         <file>UI/half_sphere.obj</file>
         <file>UI/InfoBoxDesigner.qml</file>
         <file>SynchDialogBox.qml</file>
+        <file>UI/BoardSelection.qml</file>
         <file>MaterialDesigner.qml</file>
         <file>UI/PercNumberEntity.qml</file>
         <file>UI/CustomSwitchStyle.qml</file>
