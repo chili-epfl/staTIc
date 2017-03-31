@@ -33,9 +33,6 @@ Entity {
     Char_Meshes{
         id:char_meshes
     }
-    Runtime_Meshes{
-        id:runtime_meshes
-    }
     TrapezoidalForce_Commons{
         id:trapz_force_commons
     }
@@ -108,40 +105,41 @@ Entity {
     components: [
         RenderSettings {
             pickingSettings.pickMethod: PickingSettings.TrianglePicking
-
-            activeFrameGraph:TechniqueFilter {
-                objectName : "techniqueFilter"
-
-                // Select the forward rendering Technique of any used Effect
-                matchAll: [ FilterKey { name: "renderingStyle"; value: "forward" } ]
+            activeFrameGraph:
                 RenderSurfaceSelector {
-                    // Use the whole viewport
-                    Viewport {
-                        id: viewport
-                        objectName : "viewport"
-                        normalizedRect: Qt.rect(0.0, 0.0, 1.0, 1.0)
-                        // Use the specified camera
-                        CameraSelector {
-                            id : cameraSelector
-                            objectName : "cameraSelector"
-                            camera: scene_camera
-                            ClearBuffers {
-                                buffers : ClearBuffers.ColorDepthBuffer
+                Viewport {
+                    id: viewport
+                    objectName : "viewport"
+                    normalizedRect: Qt.rect(0.0, 0.0, 1.0, 1.0)
+                    // Use the specified camera
+                    CameraSelector {
+                        id : cameraSelector
+                        objectName : "cameraSelector"
+                        camera: scene_camera
+                        SortPolicy {
+                            sortTypes: [
+                                SortPolicy.BackToFront
+                            ]
+                            ClearBuffers{
+//                                buffers: ClearBuffers.DepthStencilBuffer
+//                                clearStencilValue: 255
+                                buffers: ClearBuffers.DepthBuffer
+                                TechniqueFilter {
+                                    matchAll: [ FilterKey { name: "renderingStyle"; value: "ar" } ]
+                                }
+
+                            }
+                            ClearBuffers{
+                                buffers : ClearBuffers.ColorBuffer
                                 clearColor: "transparent"
-//                                SortPolicy {
-//                                    sortTypes: [
-////                                        SortPolicy.BackToFront,
-//                                        SortPolicy.StateChangeCost,
-//                                        SortPolicy.Material
-//                                    ]
-//                                }
+                                TechniqueFilter {
+                                    matchAll: [ FilterKey { name: "renderingStyle"; value: "forward" }]
+                                }
                             }
                         }
                     }
                 }
-            }
-
-        },
+            }},
         PhysicsWorldInfo{
             gravity: Qt.vector3d(0,0,0);
             scaleFactor: 1
@@ -173,16 +171,16 @@ Entity {
     }
 
 
-//    Entity{
+    //    Entity{
 
-//        components: [Transform{
-//                translation:Qt.vector3d(0,0,-1000)
-//            },
-//            CuboidMesh{xExtent: 100;yExtent: 100;zExtent: 100},
-//            PhongMaterial{}
-//        ]
+    //        components: [Transform{
+    //                translation:Qt.vector3d(0,0,-1000)
+    //            },
+    //            CuboidMesh{xExtent: 100;yExtent: 100;zExtent: 100},
+    //            PhongMaterial{}
+    //        ]
 
-//    }
+    //    }
 
     Entity{
         components:[
@@ -218,7 +216,7 @@ Entity {
                 //            QuaternionAnimation on rotation{
                 //            }
                 // translation:settings.focus_on_joint ? Qt.vector3d(0,0,-300) : structure_tag.translation
-                translation: structure_tag.has_appeared ? structure_tag.translation : vmManager.initialModelPose
+                translation: structure_tag.has_appeared ? structure_tag.translation : staticsModule.initialPose
                 QQ2.Component.onCompleted:
                     //structure_tag.appendQuaternion(fromAxisAndAngle(1,1,1,120))
                     structure_tag.appendQuaternion(fromAxisAndAngle(1,0,0,90))
@@ -228,6 +226,14 @@ Entity {
 
             Entity {
                 id:structureEntity
+
+                function findEntityByName(name){
+                    for(var child_index=0;child_index<childNodes.length;child_index++){
+                        if(childNodes[child_index])
+                            if(childNodes[child_index].objectName==name)
+                                return childNodes[child_index];
+                    }
+                }
 
                 components: [
                     Transform{
@@ -262,16 +268,16 @@ Entity {
 
                 }
 
-                Scaffold{
-                    extreme1_tag: ARToolkitObject{
-                        objectId: "Mat_240"
-                        QQ2.Component.onCompleted: marker_detector.registerObserver(this)
-                    }
-                    extreme2_tag: ARToolkitObject{
-                        objectId: "Mat_241"
-                        QQ2.Component.onCompleted: marker_detector.registerObserver(this)
-                    }
-                }
+                //                Scaffold{
+                //                    extreme1_tag: ARToolkitObject{
+                //                        objectId: "Mat_240"
+                //                        QQ2.Component.onCompleted: marker_detector.registerObserver(this)
+                //                    }
+                //                    extreme2_tag: ARToolkitObject{
+                //                        objectId: "Mat_241"
+                //                        QQ2.Component.onCompleted: marker_detector.registerObserver(this)
+                //                    }
+                //                }
 
                 //        Scaffold{
                 //            extreme1_tag: ArucoObject{

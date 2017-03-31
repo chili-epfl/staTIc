@@ -1,0 +1,41 @@
+#Scale factor between tangible model and real model(real models are in the order of meters)(affect only the position of the joints)
+0.1
+
+#Number of nodes
+7
+
+#Node id,x,y,z,dim(always 0)
+A,0,300,0,0
+B,450,300,0,0
+C,900,300,0,0
+D,1350,300,0,0
+
+E,123,663,0,0
+F,675,820,0,0
+G,1220,663,0,0
+
+
+#Number of reaction
+7
+
+#Node Id,x,y,z,Mx,My,Mz
+0,1,1,1,1,1,0
+1,0,0,1,1,1,0
+2,0,0,1,1,1,0
+3,0,1,1,1,1,0
+4,0,0,1,1,1,0
+5,0,0,1,1,1,0
+6,0,0,1,1,1,0
+
+#Number of beams
+7
+
+#Beam name,node 1,node 2,width,height,MaterialID,tangibleWidth,tangibleHeight
+AB,0,1,60,40,material1,25,25
+BC,1,2,60,40,material1,25,25
+CD,2,3,60,40,material1,25,25
+
+AE,0,4,60,40,material1,25,25
+EF,4,5,60,40,material1,25,25
+FG,5,6,60,40,material1,25,25
+GD,6,3,60,40,material1,25,25

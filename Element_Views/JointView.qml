@@ -6,17 +6,17 @@ import QtQuick 2.3 as QQ2
 Entity{
     id:root
     readonly property string type: "joint"
-    property string supportType:"none"
+    property string supportType:backend_entity.supportType
+    property var backend_entity
+    objectName: backend_entity.objectName
+
 
     function setSupportType(type){
         if(supportType!=type){
-            supportType=type
-            logger.log("joint_change_support_type",{"Joint":root.objectName,"Support":supportType})
-            updateSupportType(type)
+            backend_entity.supportType=type
+            logger.log("joint_change_support_type",{"Joint":root.objectName,"Support":type})
         }
-
     }
-    signal updateSupportType(string type);
 
     onEnabledChanged: {
         if(infobox.current_item == root)
@@ -25,12 +25,25 @@ Entity{
 
     //type of BeamView4JointView
     property var connected_beams: []
+    property alias connected_beams_instatiator: connected_beams_instatiator
+
+    NodeInstantiator{
+        id:connected_beams_instatiator
+        model: backend_entity.connectedBeams.length
+        delegate: BeamView4JointView{
+                      backend_entity: root.backend_entity.connectedBeams[index];
+                      extreme1: root.position
+                  }
+
+    }
+
+
 
     property bool visible:  true
 
-    property vector3d position
-    property vector3d reaction
-    property vector3d displacement
+    property vector3d position:backend_entity.scaledPosition
+    property vector3d reaction:backend_entity.reaction
+    property vector3d displacement:backend_entity.displacement
 
     property real displacementLimit: Math.max( 1 , position.y/500)
     property int displacementStatus: 0
@@ -63,7 +76,7 @@ Entity{
     property matrix4x4 poseMatrix
 
     property int animationValue: globalNumericAnimation
-    property int step: 10
+    property int step: 5
 
     property int distanceFromJoint: 10
 
@@ -153,7 +166,7 @@ Entity{
         enabled: visible && settings.show_joint && settings.show_displacement
         Transform{
             id:displacement_transform;
-            translation:displacement.times(settings.exagerate_displacement_factor)
+            translation:displacement.times(settings.exagerate_displacement_factor*staticsModule.modelScale)
         }
         property Material displacement_material: {
             var disp=displacement.times(settings.exagerate_displacement_factor)
@@ -181,7 +194,6 @@ Entity{
             rotate: false
             isReaction: true
         }
-
         AnimationUnitDx{
             enabled: parent.enabled
             unitId: 1

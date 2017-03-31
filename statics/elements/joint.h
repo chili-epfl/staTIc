@@ -4,6 +4,8 @@
 #include <QString>
 #include <QList>
 #include <QVector3D>
+#include <QQmlComponent>
+
 #include "statics/elements/abstractelement.h"
 
 class Beam;
@@ -13,7 +15,12 @@ typedef QWeakPointer<Beam> WeakBeamPtr;
 class Joint:public AbstractElement
 {
     Q_OBJECT
-  public:
+    Q_PROPERTY(QVector3D reaction READ reaction NOTIFY reactionChanged)
+    Q_PROPERTY(QVector3D displacement READ displacement NOTIFY displacementChanged)
+    Q_PROPERTY(QVector3D scaledPosition READ scaledPosition  NOTIFY scaledPositionChanged)
+    Q_PROPERTY(QString supportType READ supportType WRITE setSupportType NOTIFY supportChanged)
+    Q_PROPERTY(QVariantList connectedBeams READ connectedBeamsAsVariant NOTIFY connectedBeamsChanged)
+public:
     Joint(QVector3D position, QString name=QString(),QObject* parent=0);
 
     void setSupport(bool  support_X,bool support_Y,bool support_Z, bool support_XX,bool support_YY,bool support_ZZ);
@@ -35,8 +42,14 @@ class Joint:public AbstractElement
     QVector3D displacementRot(){return m_displacement_rot;}
 
     QList<WeakBeamPtr> connectedBeams();
+    QVariantList connectedBeamsAsVariant();
+
     void addConnectedBeam(BeamPtr b);
 
+    void createQmlEntity(QVariantMap aesthetics=QVariantMap());
+
+    QString supportType();
+    void setSupportType(QString type);
 public slots:
     void onBeamDestroyed();
 
@@ -46,7 +59,7 @@ signals:
     void connectedBeamsChanged();
     void displacementChanged();
     void displacementRotChanged();
-
+    void scaledPositionChanged();
 private:
 
     QVector3D m_pos;
@@ -59,11 +72,16 @@ private:
 
     bool  m_support_X,m_support_Y,m_support_Z,m_support_XX,m_support_YY,m_support_ZZ;
 
+    Qt3DEntityPtr m_component3D;
+
+    static QQmlComponent* m_qqmlcomponent;
+
+
 };
 
 typedef QSharedPointer<Joint> JointPtr;
 typedef QWeakPointer<Joint> WeakJointPtr;
-
+Q_DECLARE_METATYPE(Joint*)
 
 
 

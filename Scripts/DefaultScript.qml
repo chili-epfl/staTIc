@@ -7,7 +7,6 @@ import ARToolkit 1.0
 import QuaternionHelper 1.0
 import Qt3D.Core 2.0 as Q3D
 import Frame3DDKernel 1.0
-import Frame3DDVMManager 1.0
 import "qrc:/ui/UI/"
 import "qrc:/"
 import Warehouse3D 1.0
@@ -21,11 +20,10 @@ Item{
 
     property alias suggestion_box: suggestion_box
     property alias materialsManager: staticsmodule.materialsManager
-    property alias vmManager: vmFrame3DDManager
     property alias staticsModule: staticsmodule
     property alias warehouse: warehouse3d
     property alias tutorial:tutorial
-
+    property alias sceneRoot: scene3D.structureEntity
 
     property alias maxForce : staticsmodule.maxForce
     property alias minForce : staticsmodule.minForce
@@ -60,11 +58,6 @@ Item{
                 target: loadingAnimation_text
                 text:"Loading Camera"
             }
-            PropertyChanges {
-                restoreEntryValues:false
-                target: loadingAnimation_progressbar
-                value:0.10
-            }
         },
         State {
             name: "LoadingStaticsModel"
@@ -74,51 +67,6 @@ Item{
                 restoreEntryValues:false
                 target: loadingAnimation_text
                 text:"Loading 3D structure"
-            }
-            PropertyChanges {
-                restoreEntryValues:false
-                target: loadingAnimation_progressbar
-                value:0.30
-            }
-        },
-        State {
-            name: "Loading3DModel"
-            when: firstInit && staticsmodule.status==Frame3DDKernel.LOADED &&
-                  !scene3D.structureLoaded
-            PropertyChanges {
-                restoreEntryValues:false
-                target: loadingAnimation_text
-                text:"Loading Scenario"
-            }
-            PropertyChanges {
-                restoreEntryValues:false
-                target: loadingAnimation_progressbar
-                value:0.50
-            }
-
-        },
-        State {
-            name: "LoadingVMManager"
-            when: firstInit && scene3D.structureLoaded
-            PropertyChanges {
-                restoreEntryValues:false
-                target: loadingAnimation_text
-                text:"Loading 3D Entities"
-            }
-            PropertyChanges {
-                restoreEntryValues:false
-                target: loadingAnimation_progressbar
-                value:0.75
-            }
-            PropertyChanges {
-                restoreEntryValues:false
-                target: vmFrame3DDManager
-                staticsModule:staticsmodule
-            }
-            PropertyChanges {
-                restoreEntryValues:false
-                target: vmFrame3DDManager
-                sceneRoot:scene3D.structureEntity
             }
         },
 
@@ -134,87 +82,6 @@ Item{
             }
         }
     ]
-
-//    Item{
-//        states: [
-//            State{
-//                name:""
-//                PropertyChanges{
-//                    target:settings
-//                    show_info_box: false
-//                }
-//            },
-//            State{
-//                name:"analysis_suggestion"
-//                when:!firstInit && settings.show_filter_bar && currentViewFilter=='ANALYSIS' &&
-//                     infobox.current_item==0 && applicationRoot.state==""
-//                StateChangeScript{
-//                    script: suggestion_box.show_message("Select either a joint or a beam to analyse it");
-//                }
-//                PropertyChanges{
-//                    target:settings
-//                    show_info_box: false
-//                }
-//            },
-//            State {
-//                name: "joint"
-//                when: !firstInit &&  settings.show_filter_bar && currentViewFilter=='ANALYSIS' &&
-//                      infobox.current_item!=0 && infobox.current_item.type==="joint"
-//                      && applicationRoot.state==""
-////                PropertyChanges {
-////                    target: infobox.loader
-////                    source:"qrc:/ui/UI/InfoBoxJoint.qml"
-////                    restoreEntryValues: false
-////                }
-//                PropertyChanges {
-//                    target: infobox
-//                    lateral_visibility:"Visible"
-//                }
-//                PropertyChanges {
-//                    target:settings
-//                    show_spatial_references: true
-//                    show_info_box: true
-//                    load_is_selectable:false
-//                    visible_loader:"JOINT"
-//                }
-//                PropertyChanges {
-//                    target: scene3D.scene_camera
-//                    position:Qt.vector3d(0,0,300)
-//                    viewCenter: Qt.vector3d(0,0,299)
-//                    explicit: true
-//                }
-//                PropertyChanges {
-//                    target: settings
-//                    use_device_orientation:true
-//                }
-
-//            },
-//            State {
-//                name: "designer"
-//                when: !firstInit && settings.show_filter_bar && currentViewFilter=='DESIGNER'
-//                      && applicationRoot.state==""
-////                PropertyChanges {
-////                    target: infobox.loader
-////                    source:"qrc:/ui/UI/InfoBoxDesigner.qml"
-////                    restoreEntryValues: false
-////                }
-//                PropertyChanges {
-//                    target: infobox
-//                    lateral_visibility:"Visible"
-//                }
-//                PropertyChanges {
-//                    target: settings
-//                    show_spatial_references: false
-//                    show_info_box:true
-//                    load_is_selectable:true
-//                    visible_loader:"DESIGNER"
-
-//                }
-//            }
-//        ]
-
-
-//    }
 
 
     Timer{
@@ -240,6 +107,7 @@ Item{
                            else  {
                                camDevice.deviceId=QtMultimedia.availableCameras[1].deviceId
                            }
+
 
     /*Loading animation*/
     Rectangle{
@@ -267,17 +135,19 @@ Item{
             anchors.margins: 10
             anchors.horizontalCenter: loadingAnimation.horizontalCenter
             anchors.top: loadingAnimation_text.bottom
+            indeterminate: true
         }
     }
     /************/
 
     Frame3DDKernel{
         id:staticsmodule
+        sceneRoot: scene3D.structureEntity
         gravity:Qt.vector3d(0,0,0)
         onStatusChanged: {
             if(firstInit && status==Frame3DDKernel.LOADED){
-                loadingAnimation_text.text="Loading Scenario";
-                scene3D.structureLoaderURL=structure3DAsset;
+                loadingAnimation_text.text="Enjoy :)"
+                closeLoadingAnimation.start()
             }
             else if(status==Frame3DDKernel.ERROR){
                 loadingAnimation_text.text="Error";
@@ -298,15 +168,6 @@ Item{
             logger.log("Static_module_update",{"stability":stability})
         }
 
-    }
-
-    Frame3DDVMManager{
-        id:vmFrame3DDManager
-        onReadyChanged: if(ready){
-                            loadingAnimation_text.text="Enjoy :)"
-                            loadingAnimation_progressbar.value=1
-                            closeLoadingAnimation.start()
-                        }
     }
 
     Warehouse3D{
@@ -349,18 +210,6 @@ Item{
          }
      }
 
-//     Timer{
-//         running: true
-//         interval: 1000
-//         onTriggered: {
-//             if( gyro.reading.x>1.0){
-//                 console.log("di")
-//                 camDevice.unlock();
-//                 camDevice.searchAndLock()
-//             }
-//         }
-//         repeat: true
-//     }
      Image {
          id: stillImage
          visible: camDevice.isRunning && camDevice.cameraStatus==Camera.ActiveStatus ? false:true

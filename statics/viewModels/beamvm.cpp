@@ -66,21 +66,22 @@ void BeamVM::initView(){
     Qt3DCore::QEntity* beamView= qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent->beginCreate(m_qqmlcontext));
     m_qqmlcontext->setContextObject(beamView);
     m_component3D=beamView;
-    m_component3D->setObjectName(beam_str_ref->objectName());
-    WeakJointPtr extreme1,extreme2;
-    beam_str_ref->extremes(extreme1,extreme2);
-    m_component3D->setProperty("extreme1",extreme1.toStrongRef()->scaledPosition());
-    m_component3D->setProperty("extreme2",extreme2.toStrongRef()->scaledPosition());
-    m_component3D->setProperty("extreme1_name",extreme1.toStrongRef()->objectName());
-    m_component3D->setProperty("extreme2_name",extreme2.toStrongRef()->objectName());
-    onParametersChanged();
-    onBeamAxialStressChanged();
-    onSegmentsChanged();
-    onTangibleSectionChanged();
-    onExtremeDisplacementChanged();
+//    m_component3D->setObjectName(beam_str_ref->objectName());
+//    WeakJointPtr extreme1,extreme2;
+//    beam_str_ref->extremes(extreme1,extreme2);
+//    m_component3D->setProperty("extreme1",extreme1.toStrongRef()->scaledPosition());
+//    m_component3D->setProperty("extreme2",extreme2.toStrongRef()->scaledPosition());
+//    m_component3D->setProperty("extreme1_name",extreme1.toStrongRef()->objectName());
+//    m_component3D->setProperty("extreme2_name",extreme2.toStrongRef()->objectName());
+//    onParametersChanged();
+//    onBeamAxialStressChanged();
+//    onSegmentsChanged();
+//    onTangibleSectionChanged();
+//    onExtremeDisplacementChanged();
+    m_component3D->setProperty("backend_entity",QVariant::fromValue(beam_str_ref.data()));
     m_qqmlcomponent->completeCreate();
     m_component3D->setParent(m_sceneRoot);
-    append_3D_resources(m_component3D,true);
+    //append_3D_resources(m_component3D,true);
 
 
 }
@@ -101,6 +102,7 @@ void BeamVM::onTangibleSectionChanged()
         m_component3D->setProperty("tangibleSection",beam_str_ref->tangibleSection());
     }
 }
+
 void BeamVM::onExtremeDisplacementChanged(){
     BeamPtr beam_str_ref=m_beam.toStrongRef();
     if(m_component3D){
@@ -111,6 +113,7 @@ void BeamVM::onExtremeDisplacementChanged(){
         m_component3D->setProperty("extreme2Displacement",ex2Disp*AbstractStaticsModule::modelScale());
     }
 }
+
 void BeamVM::onBeamAxialStressChanged(){
     BeamPtr beam_str_ref=m_beam.toStrongRef();
     if(m_component3D){

@@ -72,25 +72,28 @@
         <file>Element_Views/BeamView.qml</file>
         <file>Element_Views/BeamView4JointView.qml</file>
         <file>Element_Views/JointView.qml</file>
-        <file>Element_Views/tiny_arrow.mtl</file>
-        <file>Element_Views/tiny_arrow.obj</file>
         <file>Element_Views/AnimationUnitDx.qml</file>
         <file>Element_Views/TrapezoidalForce.qml</file>
         <file>Element_Views/AnimationUnitDxCommons.qml</file>
         <file>Element_Views/BeamView_Commons.qml</file>
         <file>Element_Views/JointView_Commons.qml</file>
-        <file>Element_Views/Runtime_Meshes.qml</file>
         <file>Element_Views/TrapezoidalForce_Commons.qml</file>
+        <file>Element_Views/NodeForce.qml</file>
+        <file>Element_Views/UniformForce.qml</file>
     </qresource>
     <qresource prefix="/opengl">
-        <file>Opengl/phongalpha.frag</file>
-        <file>Opengl/phongalpha.vert</file>
         <file>Opengl/TransparentMaterial.qml</file>
         <file>Opengl/robustwireframe.frag</file>
         <file>Opengl/robustwireframe.geom</file>
         <file>Opengl/robustwireframe.vert</file>
         <file>Opengl/WireframeEffect.qml</file>
         <file>Opengl/WireframeMaterial.qml</file>
+        <file>Opengl/TrivialGL3.vert</file>
+        <file>Opengl/TrivialGL3.frag</file>
+        <file>Opengl/TrivialES2.vert</file>
+        <file>Opengl/TrivialES2.frag</file>
+        <file>Opengl/phong.vert</file>
+        <file>Opengl/phong.frag</file>
     </qresource>
     <qresource prefix="/scripts">
         <file>Scripts/DefaultScript.qml</file>
@@ -117,6 +120,7 @@
         <file>Scripts/Howe/howe.jpg</file>
         <file>Scripts/Demo.structure</file>
         <file>Scripts/test.structure</file>
+        <file>Scripts/test_copy.structure</file>
     </qresource>
     <qresource prefix="/ui">
         <file>UI/ViewFilterBar.qml</file>
@@ -230,6 +234,8 @@
         <file>3DObjects/S1.obj</file>
         <file>3DObjects/cube_inv_normals.obj</file>
         <file>3DObjects/fix support.obj</file>
+        <file>3DObjects/tiny_arrow.obj</file>
+        <file>3DObjects/tiny_arrow.mtl</file>
     </qresource>
     <qresource prefix="/resources">
         <file>Resources/Assets3D/solar_pannel/Solar.png</file>

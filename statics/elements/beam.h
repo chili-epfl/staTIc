@@ -4,6 +4,9 @@
 #include<QString>
 #include<QSizeF>
 #include<QVector4D>
+#include<QVector3D>
+#include <QQmlComponent>
+
 #include "statics/elements/abstractelement.h"
 #include "materialsmanager.h"
 #include <QDebug>
@@ -15,20 +18,57 @@ typedef QWeakPointer<Joint> WeakJointPtr;
 class Beam : public AbstractElement
 {
     Q_OBJECT
+    Q_PROPERTY(QVector3D scaledPositionE1 READ scaledPositionE1 NOTIFY scaledPositionE1Changed)
+    Q_PROPERTY(QVector3D scaledPositionE2 READ scaledPositionE2 NOTIFY scaledPositionE2Changed)
+    Q_PROPERTY(QVector3D scaledDisplacementE1 READ scaledDisplacementE1 NOTIFY extremeDisplacementsChanged)
+    Q_PROPERTY(QVector3D scaledDisplacementE2 READ scaledDisplacementE2 NOTIFY extremeDisplacementsChanged)
+    Q_PROPERTY(QString e1Name READ e1Name NOTIFY e1NameChanged)
+    Q_PROPERTY(QString e2Name READ e2Name NOTIFY e2NameChanged)
+    Q_PROPERTY(QSizeF scaledSize READ scaledSize NOTIFY parametersChanged)
+    Q_PROPERTY(QSizeF size READ size WRITE setSize NOTIFY parametersChanged)
+    Q_PROPERTY(QString materialID READ materialID WRITE setMaterial NOTIFY parametersChanged)
+    Q_PROPERTY(QSizeF tangibleSection READ tangibleSection NOTIFY tangibleSectionChanged)
+    Q_PROPERTY(QVariant segments READ segments NOTIFY segmentsChanged)
+    Q_PROPERTY(QVector4D peakDisplacement READ peakDisplacement NOTIFY stressChanged)
+    Q_PROPERTY(QVector4D relativePeakDisplacement READ relativePeakDisplacement NOTIFY stressChanged)
+    Q_PROPERTY(int axialForceType READ axialForceType NOTIFY stressChanged)
+    Q_PROPERTY(QVector3D peakForces READ peakForces NOTIFY stressChanged)
+    Q_PROPERTY(qreal relativeAxialStress READ relativeAxialStress NOTIFY stressChanged)
+    Q_PROPERTY(QVector3D forceE1 READ forceE1 NOTIFY stressChanged)
+    Q_PROPERTY(QVector3D forceE2 READ forceE2 NOTIFY stressChanged)
+    //Q_PROPERTY(int customID READ customID NOTIFY customIDChanged)
 public:
     enum DirtyFlag {
             Clean = 0,
             ParametersChanged = 1 ,
             StressChanged = 2
     };
+
     Q_DECLARE_FLAGS(DirtyFlags, DirtyFlag)
 
     Beam(JointPtr extreme1, JointPtr extreme2,MaterialsManager* mm,QString name=QString(),QObject* parent=0);
+//    ~Beam();
+    virtual void createQmlEntity(QVariantMap aesthetics=QVariantMap());
 
     void extremes(WeakJointPtr& e1,WeakJointPtr& e2);
+    QVector3D scaledPositionE1();
+    QVector3D scaledPositionE2();
+    QVector3D scaledDisplacementE1();
+    QVector3D scaledDisplacementE2();
+    QString e1Name();
+    QString e2Name();
+    QVector4D peakDisplacement();
+    QVector3D relativePeakDisplacement();
+    int axialForceType();
+    QVector3D peakForces();
+    qreal relativeAxialStress();
+    QVector3D forceE1();
+    QVector3D forceE2();
+    QVariant segments();
+
+    //int customID(){return m_customID;}
 
     void parameters(qreal& Ax, qreal& Asy, qreal& Asz, qreal& Jx, qreal& Iy, qreal& Iz, qreal& E, qreal& G, qreal& p, qreal& d);
-
     void setForcesAndMoments(int axial_type, qreal Nx, qreal Vy, qreal Vz,
                              qreal Tx,qreal My,qreal Mz,int extreme);
 
@@ -109,6 +149,12 @@ signals:
     void enableChanged(bool);
     void hasBeenSplit();
     void hasBeenUnified();
+    void scaledPositionE1Changed();
+    void scaledPositionE2Changed();
+    void e2NameChanged();
+    void e1NameChanged();
+
+    //void customIDChanged();
 private:
 
 
@@ -201,15 +247,17 @@ private:
 
     MaterialsManager* m_materialsManager;
     QString m_materialId;
-
-
-
+    static QQmlComponent* m_qqmlcomponent;
+    Qt3DEntityPtr m_component3D;
+//    static QSet<int> m_IDSet;
+//    int m_customID;
 
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(Beam::DirtyFlags)
 
 typedef QSharedPointer<Beam> BeamPtr;
 typedef QWeakPointer<Beam> WeakBeamPtr;
+Q_DECLARE_METATYPE(Beam*)
 
 #endif // BEAM_H
 

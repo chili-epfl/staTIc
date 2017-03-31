@@ -2,6 +2,21 @@
 #include "statics/elements/joint.h"
 #include "statics/abstractstaticsmodule.h"
 #include <QDebug>
+#include <QQmlContext>
+#include <QQmlComponent>
+#include <QQmlEngine>
+
+QQmlComponent* Beam::m_qqmlcomponent=NULL;
+//static QSet<int> generateIDs(){
+//    QSet<int> set;
+//    for(int i=1;i<254;i++){
+//        set.insert(i);
+//    }
+//    return set;
+//}
+
+//QSet<int> Beam::m_IDSet=generateIDs();
+
 Beam::Beam(JointPtr extreme1, JointPtr extreme2,MaterialsManager* mm,QString name,QObject* parent):
     AbstractElement(name,parent),
     m_enable(true),
@@ -33,8 +48,16 @@ Beam::Beam(JointPtr extreme1, JointPtr extreme2,MaterialsManager* mm,QString nam
     m_Sy(0),
     m_Sz(0),
     m_C(0),
-    m_materialId()
+    m_materialId(),
+    m_component3D()
 {
+//    if(m_IDSet.size()>0){
+//        m_customID=*(m_IDSet.begin());
+//        m_IDSet.erase(m_IDSet.begin());
+//    }else{
+//        m_customID=0;
+//        qDebug()<<"No more beam  ids!!!!";
+//    }
     m_peak_axial_force=0;
     m_peak_shear_y=0;
     m_peak_shear_z=0;
@@ -59,8 +82,39 @@ Beam::Beam(JointPtr extreme1, JointPtr extreme2,MaterialsManager* mm,QString nam
     connect(m_extreme2.data(),SIGNAL(destroyed(QObject*)),this,SIGNAL(killMe()));
     connect(m_extreme1.data(),SIGNAL(displacementChanged()),this,SIGNAL(extremeDisplacementsChanged()));
     connect(m_extreme2.data(),SIGNAL(displacementChanged()),this,SIGNAL(extremeDisplacementsChanged()));
+    connect(m_extreme1.data(),SIGNAL(objectNameChanged(QString)),this,SIGNAL(e1NameChanged()));
+    connect(m_extreme2.data(),SIGNAL(objectNameChanged(QString)),this,SIGNAL(e2NameChanged()));
+
     m_lazy_signal_emitter.setInterval(200);
     connect(&m_lazy_signal_emitter,SIGNAL(timeout()),this,SLOT(lazy_update()));
+}
+
+//Beam::~Beam()
+//{
+//    m_IDSet.insert(m_customID);
+//}
+
+void Beam::createQmlEntity(QVariantMap aesthetics)
+{
+    if(!m_sceneRoot.isNull()){
+        if(m_qqmlcomponent==NULL){
+            m_qqmlcomponent=new QQmlComponent(qmlEngine(m_sceneRoot),m_sceneRoot);
+            m_qqmlcomponent->loadUrl(QUrl("qrc:/element_views/Element_Views/BeamView.qml"));
+            connect(m_qqmlcomponent,&QQmlComponent::destroyed,[]() {
+                Beam::m_qqmlcomponent=NULL;
+            });
+        }
+        QQmlContext* m_qqmlcontext=new QQmlContext(qmlContext(m_sceneRoot),m_component3D);
+        Qt3DCore::QEntity* beamView= qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent->beginCreate(m_qqmlcontext));
+        m_qqmlcontext->setContextObject(beamView);
+        m_component3D=beamView;
+        m_component3D->setProperty("backend_entity",QVariant::fromValue(this));
+        m_qqmlcomponent->completeCreate();
+        m_component3D->setParent(m_sceneRoot);
+        connect(this,SIGNAL(destroyed(QObject*)),m_component3D.data(),SLOT(deleteLater()));
+    }else{
+        qDebug()<<"Sceneroot is null";
+    }
 }
 
 void Beam::lazy_update(){
@@ -74,6 +128,107 @@ void Beam::lazy_update(){
 void Beam::extremes(WeakJointPtr& e1,WeakJointPtr& e2){
     e1=m_extreme1;
     e2=m_extreme2;
+}
+
+QVector3D Beam::scaledPositionE1()
+{
+    if(!m_extreme1.isNull()){
+        return m_extreme1.toStrongRef()->scaledPosition();
+    }
+    return QVector3D();
+}
+
+QVector3D Beam::scaledPositionE2()
+{
+    if(!m_extreme2.isNull()){
+        return m_extreme2.toStrongRef()->scaledPosition();
+    }
+    return QVector3D();
+}
+
+QVector3D Beam::scaledDisplacementE1()
+{
+    if(!m_extreme1.isNull()){
+        return (AbstractStaticsModule::modelScale()*m_extreme1.toStrongRef()->displacement());
+    }
+    return QVector3D();
+}
+
+QVector3D Beam::scaledDisplacementE2()
+{
+    if(!m_extreme2.isNull()){
+        return (AbstractStaticsModule::modelScale()*m_extreme2.toStrongRef()->displacement());
+    }
+    return QVector3D();
+}
+
+QString Beam::e1Name()
+{
+    if(!m_extreme1.isNull()){
+        return m_extreme1.toStrongRef()->objectName();
+    }
+    return QString();
+}
+
+QString Beam::e2Name()
+{
+    if(!m_extreme2.isNull()){
+        return m_extreme2.toStrongRef()->objectName();
+    }
+    return QString();
+}
+
+QVector4D Beam::peakDisplacement()
+{
+    return QVector4D(
+                qMax(fabs(m_min_disp.x()),fabs(m_max_disp.x())),
+                qMax(fabs(m_min_disp.y()),fabs(m_max_disp.y())),
+                qMax(fabs(m_min_disp.z()),fabs(m_max_disp.z())),
+                qMax(fabs(m_min_disp.w()),fabs(m_max_disp.w()))
+                );
+}
+
+QVector3D Beam::relativePeakDisplacement()
+{
+    return QVector3D(peakDisplacement()*250/m_length);
+}
+
+int Beam::axialForceType()
+{
+    return m_peak_axial_type;
+}
+
+QVector3D Beam::peakForces()
+{
+    return QVector3D(m_peak_axial_force,m_peak_shear_y,m_peak_shear_z);
+}
+
+qreal Beam::relativeAxialStress()
+{
+    qreal axial_stress,dummy;
+    stressRatio(axial_stress,dummy,3);
+    return axial_stress;
+}
+
+QVector3D Beam::forceE1()
+{
+    return QVector3D(m_axial_force_extreme_1,m_shear_y_extreme_1,m_shear_z_extreme_1);
+}
+
+QVector3D Beam::forceE2()
+{
+    return QVector3D(m_axial_force_extreme_2,m_shear_y_extreme_2,m_shear_z_extreme_2);
+}
+
+QVariant Beam::segments()
+{
+//    QVariantList _list;
+//    _list.reserve(m_stress_segments.size());
+//    Q_FOREACH(QVector4D v, m_stress_segments){
+//        _list.append(QVariant::fromValue(v));
+//    }
+//    return _list;
+    return QVariant::fromValue(m_stress_segments);
 }
 
 void Beam::parameters(qreal& Ax, qreal& Asy, qreal& Asz,
@@ -263,7 +418,7 @@ void Beam::setForcesAndMoments(int axial_type,qreal Nx, qreal Vy, qreal Vz,
         m_lazy_signal_emitter.start();
     }
 
-//    qDebug()<<"Beam:"<<objectName();
+//   qDebug()<<"Beam:"<<objectName();
 //    qDebug()<<"Axial stress extreme 1:"<<m_axial_stress_extreme1;
 //    qDebug()<<"Shear stress extreme 1:"<<m_shear_stress_y_extreme1;
 //    qDebug()<<"Shear stress extreme 1:"<<m_shear_stress_z_extreme1;
@@ -286,7 +441,7 @@ void Beam::setForcesAndMoments(int axial_type,qreal Nx, qreal Vy, qreal Vz,
 //    qDebug()<<"Torque extreme 2:"<<m_axial_moment_extreme_2;
 //    qDebug()<<"Momentum y extreme 2:"<<m_y_moment_extreme_2;
 //    qDebug()<<"Momentum z extreme 2:"<<m_z_moment_extreme_2;
-//    qDebug()<<m_Sy<<" "<<m_Sz;
+////    qDebug()<<m_Sy<<" "<<m_Sz;
 
 //    qDebug()<<"Peak axial stress"<<m_peak_axial_stress;
 //    qDebug()<<"Peak bending stress"<<m_peak_bending_stress;
@@ -411,8 +566,10 @@ void Beam::setPeakDisplacements(QVector4D min, QVector4D max)
     if(m_min_disp!=min || m_max_disp!=max){
         m_min_disp=min;
         m_max_disp=max;
+        m_dirty.operator |=( DirtyFlag::StressChanged);
         m_lazy_signal_emitter.start();
     }
+    qDebug()<<this->objectName()<<max<<min;
 }
 
 void Beam::peakDisplacements(QVector4D &min, QVector4D &max)
@@ -454,7 +611,6 @@ QSizeF Beam::scaledSize()
 {
     return m_size*AbstractStaticsModule::modelScale();
 }
-
 
 void Beam::setYoungModulus(qreal E)
 {

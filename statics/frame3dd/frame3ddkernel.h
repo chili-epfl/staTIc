@@ -15,9 +15,12 @@ class Frame3DDKernel : public AbstractStaticsModule
     /*Positions are in opengl coordinate system*/
     Q_OBJECT
     Q_PROPERTY(QVector3D gravity READ gravity WRITE setGravity NOTIFY gravityChanged)
+    Q_PROPERTY(QVector3D initialPose READ initialPose NOTIFY initialPoseChanged)
 public:
+
     Frame3DDKernel(QObject* parent=0);
     ~Frame3DDKernel();
+
     virtual qreal maxForce(){return m_maxForce;}
     virtual qreal minForce(){return m_minForce;}
 
@@ -51,8 +54,14 @@ public:
 
     QVector3D gravity(){return m_gravity;}
     void setGravity(QVector3D v);
+    Q_INVOKABLE void createTPZLoad(Beam *beam, QVariantMap aesthetic=QVariantMap());
+    Q_INVOKABLE void createNodeLoad(Joint *joint, QVariantMap aesthetic=QVariantMap());
+    Q_INVOKABLE void createUDLoad(Beam *beam, QVariantMap aesthetic=QVariantMap());
+
+    QVector3D initialPose();
 signals:
     void gravityChanged();
+    void initialPoseChanged();
 protected slots:
     virtual bool readStructure(QString path) ;
     virtual void update();
@@ -83,6 +92,7 @@ private:
                         int *J1, int *J2, double *F, double *D,
                         double *R, int *r, double **Q, double err,
                          int ok, QVector<BeamPtr> active_beams);
+
     void write_internal_forces(int lc, int nL, float dx, vec3 *xyz,
                                double **Q, int nN, int nE, double *L, int *J1,
                                int *J2, float *Ax, float *Asy, float *Asz, float *Jx,
@@ -90,6 +100,8 @@ private:
                                float *d, float gX, float gY, float gZ, int nU,
                                float **U, int nW, float **W, int nP, float **P,
                                double *D, int shear, double error, QVector<BeamPtr> active_beams);
+    void truss_solve();
+
 
     QVector<JointPtr> m_joints;
     QVector<BeamPtr> m_beams;
@@ -111,7 +123,6 @@ private:
     qreal m_relative_equilibrium_error;
     QTimer m_lazyupdateTimer;
     Logger m_logger;
-    void truss_solve();
 };
 
 #endif // FRAME3DDKERNEL_H

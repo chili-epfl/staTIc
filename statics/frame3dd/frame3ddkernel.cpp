@@ -59,7 +59,7 @@ QString readLine(QTextStream* inputStream){
 Frame3DDKernel::Frame3DDKernel(QObject* parent):
     AbstractStaticsModule(parent),
     m_gravity(0,-9800,0),
-    m_shear(0),
+    m_shear(1),
     m_geom(1)
 {
     connect(&m_lazyupdateTimer, SIGNAL(timeout()), this, SLOT(solve()));
@@ -153,6 +153,7 @@ bool Frame3DDKernel::readStructure(QString path){
         tmp_nodes.append(QVector3D(x,y,z));
         tmp_nodes_names.append(line_parts[0]);
     }
+    m_is2D=is2d;
 
     for(int i=0;i<tmp_nodes.size();i++){
         if(is2d){
@@ -348,9 +349,9 @@ bool Frame3DDKernel::readStructure(QString path){
     }
     solve();
     setStatus(Status::LOADED);
-    m_is2D=is2d;
     emit is2DChanged();
     emit modelScaleChanged();
+    emit initialPoseChanged();
     return true;
 }
 
@@ -557,8 +558,8 @@ void Frame3DDKernel::solve(){
             xyz[i+1].z=static_cast<double>(joint->position().z());
         }
         else{
-//            xyz[i+1].z=joint->position().y();
-//            xyz[i+1].y=-joint->position().z();
+            //            xyz[i+1].z=joint->position().y();
+            //            xyz[i+1].y=-joint->position().z();
             xyz[i+1].y=static_cast<double>(joint->position().y());
             xyz[i+1].z=-static_cast<double>(joint->position().z());
         }
@@ -603,31 +604,31 @@ void Frame3DDKernel::solve(){
             nR++;
             r[i*6+1]=static_cast<int>(X);
             r[i*6+4]=static_cast<int>(XX);
-//            if(m_is2D){
+            //            if(m_is2D){
             r[i*6+2]=static_cast<int>(Y);
             r[i*6+3]=static_cast<int>(Z);
             r[i*6+5]=static_cast<int>(YY);
             r[i*6+6]=static_cast<int>(ZZ);
-//            }else{
-////                r[i*6+2]=Z;
-////                r[i*6+3]=Y;
-////                r[i*6+5]=ZZ;
-////                r[i*6+6]=YY;
-//                r[i*6+2]=(int)Y;
-//                r[i*6+3]=(int)Z;
-//                r[i*6+5]=(int)YY;
-//                r[i*6+6]=(int)ZZ;
-//            }
+            //            }else{
+            ////                r[i*6+2]=Z;
+            ////                r[i*6+3]=Y;
+            ////                r[i*6+5]=ZZ;
+            ////                r[i*6+6]=YY;
+            //                r[i*6+2]=(int)Y;
+            //                r[i*6+3]=(int)Z;
+            //                r[i*6+5]=(int)YY;
+            //                r[i*6+6]=(int)ZZ;
+            //            }
         }
     }
 #ifdef JOINT_MODELLING
-    for(i=m_joints.size();i<nN;i++){        
-            r[i*6+1]=0;
-            r[i*6+2]=0;
-            r[i*6+3]=1;
-            r[i*6+4]=1;
-            r[i*6+5]=1;
-            r[i*6+6]=0;
+    for(i=m_joints.size();i<nN;i++){
+        r[i*6+1]=0;
+        r[i*6+2]=0;
+        r[i*6+3]=1;
+        r[i*6+4]=1;
+        r[i*6+5]=1;
+        r[i*6+6]=0;
     }
 #endif
 
@@ -639,9 +640,9 @@ void Frame3DDKernel::solve(){
             q[i] = 1;
 
     nE=active_beams.size()
-#ifdef JOINT_MODELLING
+        #ifdef JOINT_MODELLING
             *3
-#endif
+        #endif
             ;
     /* allocate memory for frame elements ... */
     L   = dvector(1,nE);	/* length of each element		*/
@@ -667,12 +668,12 @@ void Frame3DDKernel::solve(){
         BeamPtr beam=active_beams.at(i);
         L[i+1]=static_cast<double>(beam->length())
         #ifdef JOINT_MODELLING
-            -200
+                -200
         #endif
                 ;
         Le[i+1]=static_cast<double>(beam->length())
         #ifdef JOINT_MODELLING
-            -200
+                -200
         #endif
                 ;
         WeakJointPtr e1,e2;
@@ -715,7 +716,11 @@ void Frame3DDKernel::solve(){
         G[i+1]=static_cast<float>(beam_G);
         p[i+1]=static_cast<float>(beam_p);
         d[i+1]=static_cast<float>(beam_d);
-
+        //        if(beam->objectName()=="CD"){
+        //           Jx[i+1]=Jx[i+1]*0.0001;
+        //           Iy[i+1]=Iy[i+1]*0.0001;
+        //           Iz[i+1]=Iz[i+1]*0.0001;
+        //        }
 #ifdef JOINT_MODELLING
         //Virtual beam 1
         L[2*i+1+active_beams.length()]=100.0;
@@ -1057,10 +1062,10 @@ void Frame3DDKernel::truss_solve(){
 
     float** B=(float**)malloc(sizeof(float*)*n_eq+1);
     for(int i=1;i<=n_eq;i++){
-       B[i]=(float*)malloc(sizeof(float)+1);
+        B[i]=(float*)malloc(sizeof(float)+1);
     }
     for(int i=1;i<=n_eq;i++)
-            B[i][1]=0.0f;
+        B[i][1]=0.0f;
 
     /*i moves on joints; j on active beams and reactions*/
     JointPtr e1,e2,current_joint;
@@ -1158,17 +1163,17 @@ void Frame3DDKernel::truss_solve(){
 
     gaussj(A,n_eq,B,1);
 
-//    QString line="";
-//    for(int i=1;i<=n_eq;i++){
-//        line="";
-//        for (int j = 1; j <= n_eq; j++)
-//            line+=", "+QString::number(A[i][j]);
-//        qDebug()<<line;
-//    }
+    //    QString line="";
+    //    for(int i=1;i<=n_eq;i++){
+    //        line="";
+    //        for (int j = 1; j <= n_eq; j++)
+    //            line+=", "+QString::number(A[i][j]);
+    //        qDebug()<<line;
+    //    }
 
-//    for(int i=1;i<=n_eq;i++){
-//        qDebug()<<B[i][1];
-//    }
+    //    for(int i=1;i<=n_eq;i++){
+    //        qDebug()<<B[i][1];
+    //    }
 
     QList<QVector4D> segments;
     segments.push_back(QVector4D());
@@ -1586,15 +1591,15 @@ void Frame3DDKernel::write_internal_forces (
             qWarning("Internal axial forces are not coherent");
         }
         active_beams[m-1]->setForcesAndMoments(type,qMax(fabs(maxNx),fabs(minNx)),
-                                          qMax(fabs(maxVy),fabs(minVy)),
-                                          qMax(fabs(maxVz),fabs(minVz)),
-                                          qMax(fabs(maxTx),fabs(minTx)),
-                                          qMax(fabs(maxMy),fabs(minMy)),
-                                          qMax(fabs(maxMz),fabs(minMz)),
-                                          3);
+                                               qMax(fabs(maxVy),fabs(minVy)),
+                                               qMax(fabs(maxVz),fabs(minVz)),
+                                               qMax(fabs(maxTx),fabs(minTx)),
+                                               qMax(fabs(maxMy),fabs(minMy)),
+                                               qMax(fabs(maxMz),fabs(minMz)),
+                                               3);
 
         if(m_is2D)
-             active_beams[m-1]->setPeakDisplacements(QVector4D(minDx,minDy,minDz,minRx),QVector4D(maxDx,maxDy,maxDz,maxRx));
+            active_beams[m-1]->setPeakDisplacements(QVector4D(minDx,minDy,minDz,minRx),QVector4D(maxDx,maxDy,maxDz,maxRx));
         else
             active_beams[m-1]->setPeakDisplacements(QVector4D(minDx,minDy,-minDz,minRx),QVector4D(maxDx,maxDy,-maxDz,maxRx));
 
@@ -1668,8 +1673,8 @@ void Frame3DDKernel::assemble_loads (
         gY[1]=(float)m_gravity.y();
         gZ[1]=(float)m_gravity.z();
     }else{
-//        gY[1]=-m_gravity.z();
-//        gZ[1]=m_gravity.y();
+        //        gY[1]=-m_gravity.z();
+        //        gZ[1]=m_gravity.y();
         gY[1]=(float)m_gravity.y();
         gZ[1]=-(float)m_gravity.z();
     }
@@ -1707,7 +1712,7 @@ void Frame3DDKernel::assemble_loads (
     /* node point loads -------------------------------------------- */
     nF[1]=m_node_loads.size();
 
-    Q_FOREACH(NodeLoadPtr nodeload, m_node_loads){
+    Q_FOREACH(NodeLoadPtr nodeload, m_node_loads){           
         int application_joint_index=m_joints.indexOf(nodeload->joint().toStrongRef());
         F_mech[1][6*application_joint_index+1]+=nodeload->force().x();//I added a plus...
         F_mech[1][6*application_joint_index+4]+=nodeload->momentum().x();
@@ -1718,10 +1723,10 @@ void Frame3DDKernel::assemble_loads (
             F_mech[1][6*application_joint_index+6]+=nodeload->momentum().z();
         }
         else{
-//            F_mech[1][6*application_joint_index+2]-=nodeload->force().z();
-//            F_mech[1][6*application_joint_index+3]+=nodeload->force().y();
-//            F_mech[1][6*application_joint_index+5]-=nodeload->momentum().z();
-//            F_mech[1][6*application_joint_index+6]+=nodeload->momentum().y();
+            //            F_mech[1][6*application_joint_index+2]-=nodeload->force().z();
+            //            F_mech[1][6*application_joint_index+3]+=nodeload->force().y();
+            //            F_mech[1][6*application_joint_index+5]-=nodeload->momentum().z();
+            //            F_mech[1][6*application_joint_index+6]+=nodeload->momentum().y();
             F_mech[1][6*application_joint_index+2]+=nodeload->force().y();
             F_mech[1][6*application_joint_index+3]-=nodeload->force().z();
             F_mech[1][6*application_joint_index+5]+=nodeload->momentum().y();
@@ -1748,8 +1753,8 @@ void Frame3DDKernel::assemble_loads (
             U[1][i][3] = UDLoad->forceLocal().y();
             U[1][i][4] = UDLoad->forceLocal().z();
         }else{
-//            U[1][i][3] = -UDLoad->forceLocal().z();
-//            U[1][i][4] = UDLoad->forceLocal().y();
+            //            U[1][i][3] = -UDLoad->forceLocal().z();
+            //            U[1][i][4] = UDLoad->forceLocal().y();
             U[1][i][3] = UDLoad->forceLocal().y();
             U[1][i][4] = -UDLoad->forceLocal().z();
         }
@@ -1820,14 +1825,14 @@ void Frame3DDKernel::assemble_loads (
             W[1][i][13]=localForce.z();
         }else{
 
-//            W[1][i][6]=begin.z();
-//            W[1][i][7]=end.z();
-//            W[1][i][8]=-trz_load->forceLocal().z();
-//            W[1][i][9]=-trz_load->forceLocal().z();
-//            W[1][i][10]=begin.y();
-//            W[1][i][11]=end.y();
-//            W[1][i][12]=trz_load->forceLocal().y();
-//            W[1][i][13]=trz_load->forceLocal().y();
+            //            W[1][i][6]=begin.z();
+            //            W[1][i][7]=end.z();
+            //            W[1][i][8]=-trz_load->forceLocal().z();
+            //            W[1][i][9]=-trz_load->forceLocal().z();
+            //            W[1][i][10]=begin.y();
+            //            W[1][i][11]=end.y();
+            //            W[1][i][12]=trz_load->forceLocal().y();
+            //            W[1][i][13]=trz_load->forceLocal().y();
             W[1][i][6]=floor(begin.y());
             W[1][i][7]=floor(end.y());
             W[1][i][8]=localForce.y();
@@ -2011,8 +2016,8 @@ void Frame3DDKernel::assemble_loads (
             P[1][i][4] = ipl->forceLocal().z();
         }
         else{
-//            P[1][i][3] = -ipl->forceLocal().z();
-//            P[1][i][4] = ipl->forceLocal().y();
+            //            P[1][i][3] = -ipl->forceLocal().z();
+            //            P[1][i][4] = ipl->forceLocal().y();
             P[1][i][3] = ipl->forceLocal().y();
             P[1][i][4] = -ipl->forceLocal().z();
         }
@@ -2201,8 +2206,8 @@ void Frame3DDKernel::update_statics(
                 joint->setDisplacement(QVector3D(D[6*j-5],D[6*j-4],D[6*j-3]));
                 joint->setDisplacementRot(QVector3D(D[6*j-2],D[6*j-1],D[6*j]));
             }else{
-//                joint->setDisplacement(QVector3D(D[6*j-5],D[6*j-3],-D[6*j-4]));
-//                joint->setDisplacementRot(QVector3D(D[6*j-2],D[6*j],D[6*j-1]));
+                //                joint->setDisplacement(QVector3D(D[6*j-5],D[6*j-3],-D[6*j-4]));
+                //                joint->setDisplacementRot(QVector3D(D[6*j-2],D[6*j],D[6*j-1]));
                 joint->setDisplacement(QVector3D(D[6*j-5],D[6*j-4],-D[6*j-3]));
                 joint->setDisplacementRot(QVector3D(D[6*j-2],D[6*j-1],-D[6*j]));
             }
@@ -2226,7 +2231,7 @@ void Frame3DDKernel::update_statics(
         if(m_is2D)
             beam->setForcesAndMoments(axial_type,Q[n][1],Q[n][2],Q[n][3],Q[n][4],Q[n][5],Q[n][6],1);
         else
-//            beam->setForcesAndMoments(axial_type,Q[n][1],Q[n][3],-Q[n][2],Q[n][4],Q[n][6],-Q[n][5],1);
+            //            beam->setForcesAndMoments(axial_type,Q[n][1],Q[n][3],-Q[n][2],Q[n][4],Q[n][6],-Q[n][5],1);
             beam->setForcesAndMoments(axial_type,Q[n][1],Q[n][2],-Q[n][3],Q[n][4],Q[n][5],-Q[n][6],1);
         if (fabs(Q[n][7]) < 0.0001)
             axial_type=0;
@@ -2235,7 +2240,7 @@ void Frame3DDKernel::update_statics(
         if(m_is2D)
             beam->setForcesAndMoments(axial_type,Q[n][7],Q[n][8],Q[n][9],Q[n][10],Q[n][11],Q[n][12],2);
         else
-//            beam->setForcesAndMoments(axial_type,Q[n][7],Q[n][9],-Q[n][8],Q[n][10],Q[n][12],-Q[n][11],2);
+            //            beam->setForcesAndMoments(axial_type,Q[n][7],Q[n][9],-Q[n][8],Q[n][10],Q[n][12],-Q[n][11],2);
             beam->setForcesAndMoments(axial_type,Q[n][7],Q[n][8],-Q[n][9],Q[n][10],Q[n][11],-Q[n][12],2);
 
 
@@ -2258,8 +2263,8 @@ void Frame3DDKernel::update_statics(
                 joint->setReaction(QVector3D(R[6*j-5],R[6*j-4],R[6*j-3]));
                 joint->setReactionMomentum(QVector3D(R[6*j-2],R[6*j-1],R[6*j]));
             }else{
-//                joint->setReaction(QVector3D(R[6*j-5],R[6*j-3],-R[6*j-4]));
-//                joint->setReactionMomentum(QVector3D(R[6*j-2],R[6*j],-R[6*j-1]));
+                //                joint->setReaction(QVector3D(R[6*j-5],R[6*j-3],-R[6*j-4]));
+                //                joint->setReactionMomentum(QVector3D(R[6*j-2],R[6*j],-R[6*j-1]));
                 joint->setReaction(QVector3D(R[6*j-5],R[6*j-4],-R[6*j-3]));
                 joint->setReactionMomentum(QVector3D(R[6*j-2],R[6*j-1],-R[6*j]));
             }
@@ -2295,6 +2300,10 @@ BeamPtr Frame3DDKernel::createBeam(JointPtr extreme1,JointPtr extreme2,QSizeF si
         m_beams.append(beam);
         connect(beam.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
         connect(beam.data(),SIGNAL(parametersChanged()),this,SLOT(update()));
+        if(m_sceneRoot){
+            beam->setSceneRoot(m_sceneRoot);
+            //beam->createQmlEntity();
+        }
         update();
         return beam;
     }
@@ -2364,6 +2373,10 @@ BeamPtr Frame3DDKernel::createBeam(JointPtr extreme1, JointPtr extreme2, QSizeF 
         m_beams.append(beam);
         connect(beam.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
         connect(beam.data(),SIGNAL(parametersChanged()),this,SLOT(update()));
+        if(m_sceneRoot){
+            beam->setSceneRoot(m_sceneRoot);
+            beam->createQmlEntity();
+        }
         update();
         return beam;
     }
@@ -2379,7 +2392,12 @@ JointPtr Frame3DDKernel::createJoint(QVector3D position, QString name,
     connect(joint.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
     connect(joint.data(),SIGNAL(supportChanged()),this,SLOT(update()));
     connect(joint.data(),SIGNAL(connectedBeamsChanged()),this,SLOT(update()));//suspicious....
+    if(m_sceneRoot){
+        joint->setSceneRoot(m_sceneRoot);
+        joint->createQmlEntity();
+    }
     update();
+
     return joint;
 }
 
@@ -2391,6 +2409,10 @@ NodeLoadPtr Frame3DDKernel::createNodeLoad(QVector3D force, JointPtr joint,QStri
         connect(nodeLoad.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
         connect(nodeLoad.data(),SIGNAL(forceChanged()),this,SLOT(update()));
         connect(nodeLoad.data(),SIGNAL(momentumChanged()),this,SLOT(update()));
+        if(m_sceneRoot){
+            nodeLoad->setSceneRoot(m_sceneRoot);
+            nodeLoad->createQmlEntity();
+        }
         update();
         return nodeLoad;
 
@@ -2405,6 +2427,10 @@ UniformlyDistributedLoadPtr Frame3DDKernel::createUDLoad(QVector3D force, BeamPt
         m_uniformly_distributed_loads.append(udLoad);
         connect(udLoad.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
         connect(udLoad.data(),SIGNAL(forceChanged()),this,SLOT(update()));
+        if(m_sceneRoot){
+            udLoad->setSceneRoot(m_sceneRoot);
+            udLoad->createQmlEntity();
+        }
         update();
         return udLoad;
     }
@@ -2422,13 +2448,20 @@ InteriorPointLoadPtr Frame3DDKernel::createIPLoad(QVector3D force, BeamPtr beam,
         connect(ipLoad.data(),SIGNAL(forceChanged()),this,SLOT(update()));
         connect(ipLoad.data(),SIGNAL(distanceChanged()),this,SLOT(update()));
         connect(ipLoad.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
+        if(m_sceneRoot){
+            ipLoad->setSceneRoot(m_sceneRoot);
+            ipLoad->createQmlEntity();
+        }
         update();
         return ipLoad;
     }
     return InteriorPointLoadPtr();
 }
 
-TrapezoidalForcePtr Frame3DDKernel::createTPZLoad(QVector3D force, BeamPtr beam, QVector3D localPosition, QVector2D extent, QString name)
+TrapezoidalForcePtr Frame3DDKernel::createTPZLoad(QVector3D force,
+                                                  BeamPtr beam,
+                                                  QVector3D localPosition,
+                                                  QVector2D extent, QString name)
 {
     if(!force.isNull() && !beam.isNull()){
         TrapezoidalForcePtr tpzLoad(new TrapezoidalForce(beam,name,this));
@@ -2438,12 +2471,100 @@ TrapezoidalForcePtr Frame3DDKernel::createTPZLoad(QVector3D force, BeamPtr beam,
         connect(tpzLoad.data(),SIGNAL(forceChanged()),this,SLOT(update()));
         connect(tpzLoad.data(),SIGNAL(relativePositionChanged()),this,SLOT(update()));
         connect(tpzLoad.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
+        if(m_sceneRoot){
+            tpzLoad->setSceneRoot(m_sceneRoot);
+            tpzLoad->createQmlEntity();
+        }
         update();
         return tpzLoad;
     }
     return TrapezoidalForcePtr();
 }
 
+void Frame3DDKernel::createTPZLoad(Beam* beam,QVariantMap aesthetic)
+{
+    BeamPtr beamptr;
+    Q_FOREACH(BeamPtr b,m_beams)
+        if(b==beam){
+            beamptr=b;
+            break;
+        }
+    if(!beamptr.isNull()){
+        TrapezoidalForcePtr tpzLoad(new TrapezoidalForce(beamptr,"",this));
+        m_trapezoidal_loads.append(tpzLoad);
+        connect(tpzLoad.data(),SIGNAL(forceChanged()),this,SLOT(update()));
+        connect(tpzLoad.data(),SIGNAL(relativePositionChanged()),this,SLOT(update()));
+        connect(tpzLoad.data(),SIGNAL(extentChanged()),this,SLOT(update()));
+        connect(tpzLoad.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
+        if(m_sceneRoot){
+            tpzLoad->setSceneRoot(m_sceneRoot);
+            tpzLoad->createQmlEntity(aesthetic);
+        }
+        update();
+    }
+}
+
+void Frame3DDKernel::createNodeLoad(Joint *joint, QVariantMap aesthetic)
+{
+    JointPtr jointptr;
+    Q_FOREACH(JointPtr j,m_joints)
+        if(j==joint){
+            jointptr=j;
+            break;
+        }
+    if(!jointptr.isNull()){
+        NodeLoadPtr nodeLoad(new NodeLoad(jointptr,"",this));
+        m_node_loads.append(nodeLoad);
+        connect(nodeLoad.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
+        connect(nodeLoad.data(),SIGNAL(forceChanged()),this,SLOT(update()));
+        connect(nodeLoad.data(),SIGNAL(momentumChanged()),this,SLOT(update()));
+        if(m_sceneRoot){
+            nodeLoad->setSceneRoot(m_sceneRoot);
+            nodeLoad->createQmlEntity(aesthetic);
+        }
+        update();
+    }
+}
+
+void Frame3DDKernel::createUDLoad(Beam *beam, QVariantMap aesthetic)
+{
+    BeamPtr beamptr;
+    Q_FOREACH(BeamPtr b,m_beams)
+        if(b==beam){
+            beamptr=b;
+            break;
+        }
+    if(!beamptr.isNull()){
+        UniformlyDistributedLoadPtr udLoad(new UniformlyDistributedLoad(beamptr,"",this));
+        m_uniformly_distributed_loads.append(udLoad);
+        connect(udLoad.data(),SIGNAL(forceChanged()),this,SLOT(update()));
+        connect(udLoad.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
+        if(m_sceneRoot){
+            udLoad->setSceneRoot(m_sceneRoot);
+            udLoad->createQmlEntity(aesthetic);
+        }
+        update();
+    }
+}
+
+QVector3D Frame3DDKernel::initialPose()
+{
+    qreal xmin=5000,xmax=0,ymin=5000,ymax=0;
+    Q_FOREACH(JointPtr joint, m_joints){
+        QVector3D j_pos=joint->scaledPosition();
+        if(j_pos.x()>xmax)
+            xmax=j_pos.x();
+        if(j_pos.x()<xmin)
+            xmin=j_pos.x();
+        if(j_pos.y()>ymax)
+            ymax=j_pos.y();
+        if(j_pos.y()<ymin)
+            ymin=j_pos.y();
+    }
+    //return QVector3D(0,0,-1000);
+    return QVector3D(-0.5*xmin-0.5*xmax,-0.5*ymin-0.5*ymax,-1000);
+
+}
 bool Frame3DDKernel::splitBeam(BeamPtr beam, qreal offset,JointPtr &new_joint){
     if(!beam.isNull() && offset>0 && offset<=beam->length()){
         qDebug()<<"Splitting";
@@ -2497,6 +2618,7 @@ bool Frame3DDKernel::unifyBeam(BeamPtr beam){
     }
     return false;
 }
+
 
 void Frame3DDKernel::setGravity(QVector3D v)
 {
@@ -2625,12 +2747,10 @@ void Frame3DDKernel::removeBeam(BeamPtr item){
     update();
 }
 
-
 void Frame3DDKernel::removeJoint(JointPtr item){
     m_joints.removeAll(item);
     update();
 }
-
 
 void Frame3DDKernel::removeIPLoad(InteriorPointLoadPtr item){
     m_interior_point_loads.removeAll(item);
@@ -2643,12 +2763,10 @@ void Frame3DDKernel::removeTPZLoad(TrapezoidalForcePtr item)
     update();
 }
 
-
 void Frame3DDKernel::removeNodeLoad(NodeLoadPtr item){
     m_node_loads.removeAll(item);
     update();
 }
-
 
 void Frame3DDKernel::removeUDLoad(UniformlyDistributedLoadPtr item){
     m_uniformly_distributed_loads.removeAll(item);

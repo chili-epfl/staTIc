@@ -1,10 +1,11 @@
 #ifndef ABSTRACTSTATICSMODULE_H
 #define ABSTRACTSTATICSMODULE_H
 
-#include <QObject>
 #include <QVector3D>
 #include <QVector2D>
+#include <Qt3DCore>
 #include <QUrl>
+
 #include "elements/abstractelement.h"
 #include "materialsmanager.h"
 
@@ -44,6 +45,9 @@ class AbstractStaticsModule : public QObject
 
     Q_PROPERTY(MaterialsManager* materialsManager READ materialsManager NOTIFY materialsManagerChanged)
     Q_PROPERTY(qreal modelScale READ modelScale NOTIFY modelScaleChanged)
+
+    Q_PROPERTY(Qt3DCore::QEntity* sceneRoot READ sceneRoot WRITE setSceneRoot NOTIFY sceneRootChanged)
+
 public:
 
     enum Status{NOT_LOADED,LOADED,ERROR};
@@ -54,6 +58,7 @@ public:
 
     AbstractStaticsModule(QObject *parent = 0);
     ~AbstractStaticsModule();
+
     void setSourceUrl(QUrl sourceUrl){
         if(sourceUrl.scheme()=="file")
             readStructure(sourceUrl.toLocalFile());
@@ -68,15 +73,19 @@ public:
     Status status(){return m_status;}
     Stability stability(){return m_stability;}
     bool is2D(){return m_is2D;}
+
     virtual qreal maxForce()=0;
     virtual qreal minForce()=0;
 
     virtual BeamPtr createBeam(JointPtr extreme1,JointPtr extreme2,QSizeF size,qreal E,
                                qreal G, qreal d,QString name=QString())=0;
+
     virtual BeamPtr createBeam(JointPtr extreme1,JointPtr extreme2,QSizeF size,QString materialID,QString name=QString())=0;
+
     virtual JointPtr createJoint(QVector3D position,QString name=QString(),
                                bool  support_X=false,bool support_Y=false,bool support_Z=false,
                                bool support_XX=false,bool support_YY=false,bool support_ZZ=false )=0;
+
     virtual NodeLoadPtr createNodeLoad(QVector3D force, JointPtr joint,QString name=QString())=0;
     virtual UniformlyDistributedLoadPtr createUDLoad(QVector3D force, BeamPtr beam,QString name=QString())=0;
     virtual InteriorPointLoadPtr createIPLoad(QVector3D force, BeamPtr beam,qreal distance=-1,QString name=QString())=0;
@@ -98,6 +107,9 @@ public:
     virtual QVector<BeamPtr> beams()=0;
     virtual QVector<TrapezoidalForcePtr> TPLoads()=0;
 
+    Qt3DCore::QEntity* sceneRoot(){return m_sceneRoot;}
+    virtual void setSceneRoot(Qt3DCore::QEntity* sceneRoot);
+
 signals:
     void statusChanged();
     void stabilityChanged();
@@ -108,6 +120,7 @@ signals:
     void materialsManagerChanged();
     void is2DChanged();
     void modelScaleChanged();
+    void sceneRootChanged();
 
 protected:
     virtual bool readStructure(QString path) =0;
@@ -120,6 +133,8 @@ protected:
     static qreal m_modelScale;
     MaterialsManager* m_materialsManager;
     bool m_is2D;
+
+    Qt3DCore::QEntity* m_sceneRoot;
 
 };
 

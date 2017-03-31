@@ -5,24 +5,48 @@ import QtQuick 2.3 as QQ2
 Entity{
     id:rootEntity
     readonly property string type: "trapezoidalForce"
+    property var backend_entity
+    property int warehouse_index: 0
     property vector3d globalForce: Qt.vector3d(0,-weight*9.8,0);
 
-    property url asset3DMeshURL;
-    property url asset3DTextureURL;
-    property real weight
-    property vector2d extent
+    QQ2.Binding{
+        when: backend_entity
+        target: backend_entity
+        property: "force"
+        value:globalForce
+    }
+    QQ2.Binding{
+        when: backend_entity
+        target: backend_entity
+        property: "relativePosition"
+        value:relativeLocalPosition
+    }
+    QQ2.Binding{
+        when: backend_entity
+        target: backend_entity
+        property: "extent"
+        value:extent
+    }
+
+    property url asset3DMeshURL:warehouse3d.get(warehouse_index,"properties")["main_asset_url"];
+    property url asset3DTextureURL:warehouse3d.get(warehouse_index,"properties")["main_asset_diffuse_map_url"];
+    property real weight:warehouse3d.get(warehouse_index,"properties")["weight"];
+    property vector2d extent:warehouse3d.get(warehouse_index,"properties")["extent"];
 
     signal killMe();
+    onKillMe: backend_entity.killMe()
+
     onEnabledChanged: rootEntity.parent.disable_beam_selection_for_load=false
 
 
     property vector3d relativeLocalPosition:rootEntity.parent?
                                                 Qt.vector3d(-root_transform.translation.y/rootEntity.parent.length + 0.5,-root_transform.translation.y/rootEntity.parent.length + 0.5,-root_transform.translation.y/rootEntity.parent.length + 0.5):
                                                 Qt.vector3d(0,0,0);
+
     onRelativeLocalPositionChanged: {
         if(isSelected){
             var pos_text="("+relativeLocalPosition.x+","+relativeLocalPosition.y+","+relativeLocalPosition.z+")"
-            logger.log("Trapezoidal_force_move", {"relative_position":pos_text,"beam":parent.objectName})
+            logger.log("Trapezoidal_force_move", {"relative_position":pos_text,"beam":parent.objectName})        
         }
     }
 
@@ -39,9 +63,14 @@ Entity{
     }
 
 
-    property Mesh customMesh: runtime_meshes.getMesh(asset3DMeshURL)
-    property DiffuseMapMaterial material_diffuse: runtime_meshes.getTexture(asset3DTextureURL)
-
+    property Mesh customMesh: Mesh{
+        source: asset3DMeshURL
+    }
+    property DiffuseMapMaterial material_diffuse: DiffuseMapMaterial{
+        ambient: Qt.rgba( 0.2, 0.2, 0.2, 1.0 )
+        shininess: 2.0
+        diffuse: asset3DTextureURL
+    }
     property Material material: isSelected  ? trapz_force_commons.material_for_selection :material_diffuse
 
     property bool isSelected: infobox.current_item===rootEntity

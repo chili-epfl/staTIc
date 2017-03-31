@@ -35,54 +35,57 @@ Item {
         onFirstInitChanged:
             if(!firstInit){
                 default_script.infobox.custom_loader.source="qrc:/ui/UI/InfoBoxFindAxialForce.qml"
+
                 for(var i=0;i<question_beams.length;i++){
                     var beam_name=question_beams[i];
-                    var beam=vmManager.getEntity3D(beam_name);
+                    var beam=default_script.sceneRoot.findEntityByName(beam_name);
+
                     if(beam){
                         question_beams_model.append({"beam":beam, "answer":0,"correctness":0})
                     }
                     else{
                        console.log("Problem with getting the beam:",beam_name)
                     }
-                    var e1=vmManager.getEntity3D(beam_name[0])
-                    var e2=vmManager.getEntity3D(beam_name[1])
+
+                    var e1=default_script.sceneRoot.findEntityByName(beam_name[0])
+                    var e2=default_script.sceneRoot.findEntityByName(beam_name[1])
                     if(e1){
-                        for(var j=0;j<e1.connected_beams.length;j++){
-                            var b=e1.connected_beams[j]
+                        for(var j=0;j<e1.connected_beams_instatiator.count;j++){
+                            var b=e1.connected_beams_instatiator.objectAt(j)
                             if(b.extreme2_name==e2.objectName){
                                 b.non_default_visibility=false;
                                 elements_to_restore.push(b);
                             }
-                        }}
+                        }
+                    }
                     if(e2){
-                        for(j=0;j<e2.connected_beams.length;j++){
-                            var b=e2.connected_beams[j]
+                        for(j=0;j<e2.connected_beams_instatiator.count;j++){
+                            var b=e2.connected_beams_instatiator.objectAt(j)
                             if(b.extreme2_name==e1.objectName){
                                 b.non_default_visibility=false;
                                 elements_to_restore.push(b);
                             }
-                        }}
+                        }
+                    }
                 }
 
                 for( i=0;i<hidden_beams.length;i++){
-                    beam_name=hidden_beams[i];
-                    beam=vmManager.getEntity3D(beam_name);
+                    beam_name=default_script.sceneRoot.findEntityByName(hidden_beams[i]);
                     if(!beam)
                         console.log("Problem with getting the beam:",beam_name)
-
-                    e1=vmManager.getEntity3D(beam_name[0])
-                    e2=vmManager.getEntity3D(beam_name[1])
+                    e1=default_script.sceneRoot.findEntityByName(beam_name[0])
+                    e2=default_script.sceneRoot.findEntityByName(beam_name[1])
                     if(e1){
-                        for(j=0;j<e1.connected_beams.length;j++){
-                            b=e1.connected_beams[j]
+                        for(j=0;j<e1.connected_beams_instatiator.count;j++){
+                            b=e1.connected_beams_instatiator.objectAt(j)
                             if(b.extreme2_name==e2.objectName){
                                 b.non_default_visibility=false;
                                 elements_to_restore.push(b);
                             }
                         }}
                     if(e2){
-                        for(j=0;j<e2.connected_beams.length;j++){
-                            b=e2.connected_beams[j]
+                        for(j=0;j<e2.connected_beams_instatiator.count;j++){
+                            b=e2.connected_beams_instatiator.objectAt(j)
                             if(b.extreme2_name==e1.objectName){
                                 b.non_default_visibility=false;
                                 elements_to_restore.push(b);
@@ -93,11 +96,9 @@ Item {
 
                 for(i=0;i<loadsOnBeams.length;i++){
                     var load=loadsOnBeams[i];
-                    beam=default_script.vmManager.getEntity3D(load.beamName);
+                    beam=default_script.sceneRoot.findEntityByName(load.beamName);
                     if(beam){
-                        default_script.vmManager.produceTPZForce(beam,
-                                                             default_script.warehouse.get(
-                                                                    load.warehouseIndex,"properties"));
+                        default_script.staticsModule.createTPZLoad(beam.backend_entity,{"parent_entity":beam,"warehouse_index":load.warehouseIndex});
                     }
                 }
                 next_button.visible=true

@@ -14,6 +14,11 @@ InteriorPointLoad::InteriorPointLoad(BeamPtr beam,qreal distance,
     connect(m_beam.data(),SIGNAL(destroyed(QObject*)),this, SIGNAL(killMe()));
 }
 
+void InteriorPointLoad::createQmlEntity(QVariantMap aesthetics)
+{
+
+}
+
 WeakBeamPtr InteriorPointLoad::beam(){
     return m_beam;
 }

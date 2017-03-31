@@ -5,6 +5,7 @@
 #include "statics/elements/trapezoidalforce.h"
 #include <QVariantHash>
 #include <QQmlComponent>
+
 class TrapezoidalForceVM: public AbstractElementViewModel
 {
     Q_OBJECT

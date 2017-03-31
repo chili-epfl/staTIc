@@ -4,17 +4,65 @@
 
 #include <QVector3D>
 #include <QVector2D>
-
+#include <QQmlContext>
+#include <QQmlComponent>
+#include <QQmlEngine>
 #include <QMatrix4x4>
+
+QQmlComponent* TrapezoidalForce::m_qqmlcomponent=NULL;
+
 TrapezoidalForce::TrapezoidalForce(BeamPtr beam, QString name, QObject *parent)
     :AbstractElement(name,parent),
     m_force(1,0,0),
     m_relative_position(0,0,0),
-    m_extent(0,1)
+    m_extent(0,1),
+    m_component3D()
 {
     m_beam=beam.toWeakRef();
     connect(m_beam.data(),SIGNAL(destroyed(QObject*)),this, SIGNAL(killMe()));
 
+}
+
+void TrapezoidalForce::createQmlEntity(QVariantMap aesthetics)
+{
+    if(!m_sceneRoot.isNull()){
+        if(!aesthetics.contains("parent_entity")) return;
+        Qt3DCore::QEntity* parentEntity= qvariant_cast<Qt3DCore::QEntity*>(aesthetics["parent_entity"]);
+        if(parentEntity==Q_NULLPTR) return;
+        if(m_qqmlcomponent==NULL){
+            m_qqmlcomponent=new QQmlComponent(qmlEngine(parentEntity),parentEntity);
+            m_qqmlcomponent->loadUrl(QUrl("qrc:/element_views/Element_Views/TrapezoidalForce.qml"));
+            connect(m_qqmlcomponent,&QQmlComponent::destroyed,[]() {
+                TrapezoidalForce::m_qqmlcomponent=NULL;
+              });
+        }
+        QQmlContext* m_qqmlcontext=new QQmlContext(qmlContext(parentEntity),parentEntity);
+        Qt3DCore::QEntity* forceView= qobject_cast<Qt3DCore::QEntity*>(m_qqmlcomponent->beginCreate(m_qqmlcontext));
+        m_qqmlcontext->setContextObject(forceView);
+        m_component3D=forceView;
+        m_component3D->setProperty("backend_entity",QVariant::fromValue(this));
+        if(aesthetics.contains("warehouse_index"))
+            m_component3D->setProperty("warehouse_index",aesthetics["warehouse_index"]);
+        m_qqmlcomponent->completeCreate();
+        m_component3D->setParent(parentEntity);
+        connect(this,SIGNAL(destroyed(QObject*)),m_component3D.data(),SLOT(deleteLater()));
+    }
+}
+
+void TrapezoidalForce::setRelativePosition(QVector3D relativePosition)
+{
+    if(relativePosition!=m_relative_position){
+        m_relative_position=relativePosition;
+        emit relativePositionChanged();
+    }
+}
+
+void TrapezoidalForce::setExtent(QVector2D extent){
+    if(m_extent!=extent){
+        m_extent=extent;
+        emit extentChanged();
+
+    }
 }
 
 QVector3D TrapezoidalForce::forceLocal()

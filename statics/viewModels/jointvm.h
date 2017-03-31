@@ -24,6 +24,7 @@ public slots:
     void visibilityChanged();
     void onDisplacementChanged();
     void onSupportChanged();
+
     /*---------*/
     void updateSupportType(QString type);
 

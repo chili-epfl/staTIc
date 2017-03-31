@@ -11,6 +11,7 @@ class InteriorPointLoad : public AbstractElement
     Q_OBJECT
 public:
     InteriorPointLoad(BeamPtr beam,qreal distance,QString name=QString(),QObject *parent=0);
+    void createQmlEntity(QVariantMap aesthetics=QVariantMap());
 
     WeakBeamPtr beam();
 

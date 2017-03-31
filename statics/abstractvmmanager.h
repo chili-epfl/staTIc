@@ -2,7 +2,6 @@
 #define ABSTRACTVMMANAGER_H
 
 #include <QObject>
-#include <Qt3DCore>
 #include "abstractstaticsmodule.h"
 #include "statics/viewModels/abstractelementviewmodel.h"
 

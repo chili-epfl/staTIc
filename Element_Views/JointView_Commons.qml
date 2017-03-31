@@ -9,6 +9,10 @@ Entity{
             structureLoaderTransform.fromEulerAngles(structureLoaderTransform.euler_angles.x,0,structureLoaderTransform.euler_angles.z),
                                   structureLoaderTransform.inv_rotation)
 
+    DepthTest{
+        id:depthTest
+        depthFunction: DepthTest.Always
+    }
     property SphereMesh sphere_mesh:SphereMesh{
         radius: 2
     }
@@ -20,17 +24,25 @@ Entity{
         PhongMaterial{
     }
     property Mesh tiny_arrow_mesh:     Mesh{
-        source:"qrc:/element_views/Element_Views/tiny_arrow.obj"
+        source:"qrc:/UIMesh/3DObjects/tiny_arrow.obj"
     }
 
     property PhongMaterial label_material:
         PhongMaterial{
+        id:label_material
         ambient:"#2C3539"
+        QQ2.Component.onCompleted: {
+            for(var i=0;i<label_material.effect.techniques.length;i++){
+                var effect=label_material.effect.techniques[i]
+                effect.renderPasses[0].renderStates=depthTest
+            }
+        }
     }
 
     property PhongMaterial phong_material_red:
         PhongMaterial{
         ambient:"red"
+
     }
 
     property PhongMaterial phong_material_yellow:
@@ -41,6 +53,13 @@ Entity{
     property PhongMaterial phong_material_green:
         PhongMaterial{
         ambient:"green"
+        id:phong_material_green
+        QQ2.Component.onCompleted: {
+            for(var i=0;i<phong_material_green.effect.techniques.length;i++){
+                var effect=phong_material_green.effect.techniques[i]
+                effect.renderPasses[0].renderStates=depthTest
+            }
+        }
     }
     property Mesh pinned_support_mesh:
         Mesh{
@@ -73,6 +92,7 @@ Entity{
 
     property PhongMaterial focus_view_color_target:
         PhongMaterial{
+        id:focus_view_color_target
         property real h:0.33-0.23*settings.focus_view_equilibrium_distance
         ambient:Qt.hsla(h,1,0.32)
         diffuse:"grey"
@@ -80,6 +100,12 @@ Entity{
         shininess:0
         QQ2.Behavior on h {
             QQ2.NumberAnimation{duration: 1000}
+        }
+        QQ2.Component.onCompleted: {
+            for(var i=0;i<focus_view_color_target.effect.techniques.length;i++){
+                var effect=focus_view_color_target.effect.techniques[i]
+                effect.renderPasses[0].renderStates=depthTest
+            }
         }
 
     }

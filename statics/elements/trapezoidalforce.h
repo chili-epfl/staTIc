@@ -4,6 +4,8 @@
 #include "abstractelement.h"
 #include <QVector3D>
 #include <QVector2D>
+#include <QQmlComponent>
+
 class Beam;
 typedef QSharedPointer<Beam> BeamPtr;
 typedef QWeakPointer<Beam> WeakBeamPtr;
@@ -11,10 +13,19 @@ typedef QWeakPointer<Beam> WeakBeamPtr;
 class TrapezoidalForce: public AbstractElement
 {
     Q_OBJECT
+    Q_PROPERTY(QVector3D relativePosition READ relativePosition WRITE setRelativePosition NOTIFY relativePositionChanged)
+    Q_PROPERTY(QVector2D extent READ extent WRITE setExtent NOTIFY extentChanged)
+    Q_PROPERTY(QVector3D force READ force WRITE setForce NOTIFY forceChanged)
 public:
     TrapezoidalForce(BeamPtr beam,QString name,QObject* parent=0);
+    void createQmlEntity(QVariantMap aesthetics=QVariantMap());
 
     WeakBeamPtr beam(){return m_beam;}
+    QVector3D relativePosition(){return m_relative_position;}
+    QVector2D extent(){return m_extent;}
+    void setRelativePosition(QVector3D relativePosition);
+    void setExtent(QVector2D extent);
+
     QVector3D force(){return m_force;}
     QVector3D forceLocal();
     void setForce(QVector3D force);
@@ -26,6 +37,7 @@ public:
 signals:
     void forceChanged();
     void relativePositionChanged();
+    void extentChanged();
 private:
     WeakBeamPtr m_beam;
     QVector3D m_force;
@@ -34,6 +46,9 @@ private:
     QVector3D m_relative_position;
     //Extent---real size
     QVector2D m_extent;
+    static QQmlComponent* m_qqmlcomponent;
+    Qt3DEntityPtr m_component3D;
+
 };
 
 typedef QSharedPointer<TrapezoidalForce> TrapezoidalForcePtr;

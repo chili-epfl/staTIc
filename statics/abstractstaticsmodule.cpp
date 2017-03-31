@@ -1,5 +1,4 @@
 #include "abstractstaticsmodule.h"
-#include "abstractvmmanager.h"
 
 qreal AbstractStaticsModule::m_modelScale=1;
 
@@ -7,6 +6,7 @@ AbstractStaticsModule::AbstractStaticsModule(QObject* parent ):
     QObject(parent)
 {
     m_status=NOT_LOADED;
+    m_sceneRoot=Q_NULLPTR;
     m_materialsManager=new MaterialsManager();
     emit materialsManagerChanged();
 }
@@ -14,6 +14,14 @@ AbstractStaticsModule::AbstractStaticsModule(QObject* parent ):
 AbstractStaticsModule::~AbstractStaticsModule()
 {
     delete m_materialsManager;
+}
+
+void AbstractStaticsModule::setSceneRoot(Qt3DCore::QEntity *sceneRoot)
+{
+    if(m_sceneRoot!=sceneRoot){
+        m_sceneRoot=sceneRoot;
+        emit sceneRootChanged();
+    }
 }
 
 void AbstractStaticsModule::setStability(AbstractStaticsModule::Stability val)

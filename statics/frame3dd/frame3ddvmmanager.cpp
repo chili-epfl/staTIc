@@ -45,12 +45,11 @@ void Frame3DDVMManager::setStaticsModule(Frame3DDKernel *staticsModule){
 
 void Frame3DDVMManager::initViewModels(){
     if(m_sceneRoot==Q_NULLPTR || m_staticsModule==Q_NULLPTR) return;
-
     Q_FOREACH(JointPtr joint,m_staticsModule->joints()){
-        createJointVM(joint);
+        //createJointVM(joint);
     }
     Q_FOREACH(BeamPtr beam,m_staticsModule->beams()){
-        createBeamVM(beam);
+       //createBeamVM(beam);
     }
     m_ready=true;
     emit readyChanged();
@@ -61,15 +60,15 @@ BeamVM* Frame3DDVMManager::createBeamVM(BeamPtr b){
     if(!b.isNull()){
         BeamVM* beamVm;
         beamVm=new BeamVM(b,m_sceneRoot,this);
-        Q_FOREACH(auto e,beamVm->getEntities()){
-            m_entityID2viewModel[e]=beamVm;
-        }
-        if(!beamVm->component3D()->objectName().isEmpty())
-            m_entityNameMap[beamVm->component3D()->objectName()]=beamVm->component3D()->id();
+//        Q_FOREACH(auto e,beamVm->getEntities()){
+//            m_entityID2viewModel[e]=beamVm;
+//        }
+//        if(!beamVm->component3D()->objectName().isEmpty())
+//            m_entityNameMap[beamVm->component3D()->objectName()]=beamVm->component3D()->id();
 
-        connect(beamVm,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDestroyed(QObject*)));
-        connect(beamVm,SIGNAL(resourcesUpdated()),this,SLOT(onResourcesUpdate()));
-        registerDependentObject(beamVm);
+//        connect(beamVm,SIGNAL(destroyed(QObject*)),this,SLOT(onResourceDestroyed(QObject*)));
+//        connect(beamVm,SIGNAL(resourcesUpdated()),this,SLOT(onResourcesUpdate()));
+//        registerDependentObject(beamVm);
         return beamVm;
     }
     return Q_NULLPTR;

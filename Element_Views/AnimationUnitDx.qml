@@ -23,13 +23,14 @@ Entity{
     property bool rotate:false
     property real scaleFactor: 1
     property bool isReaction: false
-    property int offset: isReaction ? -2:6
+    property int offset: isReaction ? -10:25
     Transform{
         id:transform
         matrix: {
             var m = Qt.matrix4x4();
-            m.translate(Qt.vector3d((((unitId)*step+animationValue)%module+offset)*direction
-                                    , 0, 0));
+//            m.translate(Qt.vector3d((((unitId)*step+animationValue)%module+offset)*direction
+//                                    , 0, 0));
+            m.translate(Qt.vector3d((unitId*step+offset)*direction,0, 0));
             if(rotate)
                 m.rotate(90, Qt.vector3d(0, 0, 1))
             else

@@ -197,6 +197,15 @@ Rectangle {
                                             logger.log("infobox_designer_remove_load",{"beam":current_item.parent.objectName,"load":current_item.objectName})
                                             current_item.killMe();
                                             infobox.current_item=0;
+                                        }else if(current_item.type==="nodeForce"){
+                                            logger.log("infobox_designer_remove_load",{"joint":current_item.parent.objectName,"load":current_item.objectName})
+                                            current_item.killMe();
+                                            infobox.current_item=0;
+                                        }
+                                        else if(current_item.type==="uniformForce"){
+                                            logger.log("infobox_designer_remove_load",{"beam":current_item.parent.objectName,"load":current_item.objectName})
+                                            current_item.killMe();
+                                            infobox.current_item=0;
                                         }
                                         else{
                                             suggestion_box.show_message("You need to select a load first")
@@ -216,10 +225,21 @@ Rectangle {
                                     anchors.fill: parent
                                     onClicked:{
                                         if(current_item.type=="beam"){
-                                            logger.log("infobox_designer_add_load",{"beam":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight")})
-                                            vmFrame3DDManager.produceTPZForce(current_item,warehouse3d.get(catalog_grid.currentIndex,"properties"))
-                                            //current_item=instantiator.createEntity(current_item,"qrc:/element_views/Element_Views/TrapezoidalForce.qml")
+                                            if(warehouse3d.get(catalog_grid.currentIndex,"type")!="uniform"){
+                                                logger.log("infobox_designer_add_load",{"beam":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight")})
+                                                staticsModule.createTPZLoad(current_item.backend_entity,{"parent_entity":current_item,"warehouse_index":catalog_grid.currentIndex})
+                                            }else{
+                                                logger.log("infobox_designer_add_load",{"beam":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight")})
+                                                staticsModule.createUDLoad(current_item.backend_entity,{"parent_entity":current_item,"warehouse_index":catalog_grid.currentIndex})
+                                            }
                                         }
+
+                                        else if(current_item.type=="joint"){
+                                            if(warehouse3d.get(catalog_grid.currentIndex,"type")!="uniform"){
+                                                logger.log("infobox_designer_add_load",{"joint":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight")})
+                                                staticsModule.createNodeLoad(current_item.backend_entity,{"parent_entity":current_item,"warehouse_index":catalog_grid.currentIndex})
+                                            }
+                                         }
                                         else if(current_item.type=="trapezoidalForceTangible"){
                                             current_item.weight=warehouse3d.get(catalog_grid.currentIndex,"weight")
                                             current_item.extent=warehouse3d.get(catalog_grid.currentIndex,"extent")
@@ -354,7 +374,7 @@ Rectangle {
                                                 onClicked:{
                                                     if(current_item!=0 && current_item.type=="beam"){
                                                             feedback_animation_material.start();
-                                                            current_item.materialID=materialsManager.get(index,"UniqueID")
+                                                            current_item.setMaterialID(materialsManager.get(index,"UniqueID"))
                                                             logger.log("infobox_designer_change_material",{"beam":current_item.objectName,"materialID":current_item.materialID})
                                                     }
                                                 }
@@ -468,7 +488,7 @@ Rectangle {
                                     onClicked:{
                                         if(current_item!=0 && current_item.type=="beam"){
                                             feedback_animation_size.start();
-                                            current_item.realBeamSize=Qt.size(w.text,h.text);
+                                            current_item.setBeamSize(Qt.size(w.text,h.text));
                                             logger.log("infobox_designer_change_section",{"beam":current_item.objectName,"section": current_item.realBeamSize})
                                         }
                                     }
@@ -728,9 +748,9 @@ Rectangle {
                     forceListModel.clear()
                     hasReaction=false;
                     if(current_item != 0 && current_item.type=="joint"){
-                        for(var i=0;i<current_item.connected_beams.length;i++){
+                        for(var i=0;i<current_item.connected_beams_instatiator.count;i++){
                             forceListModel.append({isAdded:false,
-                                                      beam:current_item.connected_beams[i],
+                                                      beam:current_item.connected_beams_instatiator.objectAt(i),
                                                   })
                         }
                         //Important that this stays at the end!
@@ -750,16 +770,16 @@ Rectangle {
                     var sum=Qt.vector3d(0,0,0)
                     var max=computeMaxForce(0);
                     var logging_fields={};
-                    for(var i=0;i<current_item.connected_beams.length;i++){
+                    for(var i=0;i<current_item.connected_beams_instatiator.count;i++){
                         sum=sum.plus(forceListModel.get(i).beam.globalForceExtreme1.times(forceListModel.get(i).isAdded))
                         logging_fields[forceListModel.get(i).beam.objectName]=forceListModel.get(i).isAdded;
                     };
                     if(hasReaction){
-                        sum=sum.plus(forceListModel.get(current_item.connected_beams.length).joint.reaction.times(forceListModel.get(current_item.connected_beams.length).isAdded));
-                        max=max.length() > max.plus(forceListModel.get(current_item.connected_beams.length).joint.reaction).length() ?
-                                    max:max.plus(forceListModel.get(current_item.connected_beams.length).joint.reaction)
+                        sum=sum.plus(forceListModel.get(current_item.connected_beams_instatiator.count).joint.reaction.times(forceListModel.get(current_item.connected_beams_instatiator.count).isAdded));
+                        max=max.length() > max.plus(forceListModel.get(current_item.connected_beams_instatiator.count).joint.reaction).length() ?
+                                    max:max.plus(forceListModel.get(current_item.connected_beams_instatiator.count).joint.reaction)
 
-                        logging_fields[forceListModel.get(current_item.connected_beams.length).joint.objectName]=forceListModel.get(current_item.connected_beams.length).isAdded;
+                        logging_fields[forceListModel.get(current_item.connected_beams_instatiator.count).joint.objectName]=forceListModel.get(current_item.connected_beams_instatiator.count).isAdded;
 
                     }
                     settings.focus_view_currentForce=sum
@@ -767,7 +787,7 @@ Rectangle {
                 }
 
                 function computeMaxForce(index){
-                    if (index==current_item.connected_beams.length) return Qt.vector3d(0,0,0);
+                    if (index==current_item.connected_beams_instatiator.count) return Qt.vector3d(0,0,0);
                     var next=computeMaxForce(index+1);
                     if(next.length() > next.plus(forceListModel.get(index).beam.globalForceExtreme1).length())
                         return next;

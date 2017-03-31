@@ -18,7 +18,7 @@ private:
     struct Object{
         QString name;
         QUrl decoration_img;
-        QVariantHash properties;
+        QVariantMap properties;
     };
 
     QList<Object> m_objectsIndexes;

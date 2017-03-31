@@ -106,7 +106,7 @@ Item{
         {
             "story_type":"Default",
             "story_picture":"",
-            "structure_url":"qrc:/scripts/Scripts/test.structure",
+            "structure_url":"qrc:/scripts/Scripts/test_copy.structure",
             "show_demo":true
         },
         {

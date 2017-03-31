@@ -5,31 +5,50 @@ import QtQuick 2.0 as QQ2
 
 Entity{
     id:root
+    property var backend_entity
+    objectName: backend_entity ? backend_entity.objectName: ""
     property bool visible:  true
     property vector3d position;
 
     property bool non_default_visibility: true
 
     property vector3d extreme1 //Always the joint extreme
-    property vector3d extreme2
-    property string extreme2_name;
+    property vector3d extreme2: backend_entity!==undefined ?(flip_extremes ?
+                                   backend_entity.scaledPositionE1 :
+                                   backend_entity.scaledPositionE2): Qt.vector3d(0,0,0)
+    property string extreme2_name:backend_entity!==undefined ? (flip_extremes ? backend_entity.e1Name : backend_entity.e2Name): "";
     /*Coarse representation */
-    property int axialForceType: 0 //-1 compression,0 nul, 1 tension
-    property real axialForce : 0
+    property int axialForceType: backend_entity!==undefined ? backend_entity.axialForceType:0 //-1 compression,0 nul, 1 tension
+    property real axialForce : backend_entity!==undefined ? backend_entity.peakForces.x:0
 
     /*Fine one. Remeber these are in local reference system*/
-    property real axialForce_extreme1
-    property real shearYForce_extreme1
-    property real shearZForce_extreme1
+    property real axialForce_extreme1: backend_entity!==undefined ? (flip_extremes ?
+                                                                         backend_entity.forceE2.x :
+                                                                         backend_entity.forceE1.x):0
+    property real shearYForce_extreme1:backend_entity!==undefined ? (flip_extremes ?
+                                                                         backend_entity.forceE2.y :
+                                                                         backend_entity.forceE1.y):0
+    property real shearZForce_extreme1:backend_entity!==undefined ? (flip_extremes ?
+                                                                         backend_entity.forceE2.z :
+                                                                         backend_entity.forceE1.z):0
 
     onAxialForce_extreme1Changed: lazyUpdate.start()
     onShearYForce_extreme1Changed: lazyUpdate.start()
     onShearZForce_extreme1Changed: lazyUpdate.start()
 
-    property real axialForce_extreme2
-    property real shearYForce_extreme2
-    property real shearZForce_extreme2
-    property bool flip_extremes: false
+    property real axialForce_extreme2: backend_entity!==undefined ? (!flip_extremes ?
+                                                                         backend_entity.forceE2.x :
+                                                                         backend_entity.forceE1.x):0
+    property real shearYForce_extreme2:backend_entity!==undefined ? (!flip_extremes ?
+                                                                         backend_entity.forceE2.y :
+                                                                         backend_entity.forceE1.y):0
+    property real shearZForce_extreme2:backend_entity!==undefined ? (!flip_extremes ?
+                                                                         backend_entity.forceE2.z :
+                                                                         backend_entity.forceE1.z):0
+
+    property bool flip_extremes: backend_entity!==undefined ? (backend_entity.scaledPositionE1==extreme1 ?
+                                     false :
+                                     true) :false
 
     property vector3d globalForceExtreme1
 
@@ -74,6 +93,7 @@ Entity{
             }
 
             globalForceExtreme1=ab.plus(shearY).plus(shearZ);
+
     }
 
     property real scaleFactor: Math.min(2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 2,4)
@@ -81,7 +101,7 @@ Entity{
     property int nModels: 5
     property matrix4x4 poseMatrix: Qt.matrix4x4()
     property int animationValue: axialForceType<0 ? (50-globalNumericAnimation) : globalNumericAnimation
-    property int step: 10
+    property int step: 5
 
 
 //    QQ2.NumberAnimation on animationValue{
@@ -126,6 +146,43 @@ Entity{
                                 0   ,   0, 0, 1)
         return matrix;
     }
+
+//    PhongMaterial{
+//        id:material_unitDX
+//        shininess:0
+////        StencilTest{
+////            id:stencilTest
+////            front.stencilFunction: StencilTestArguments.Equal
+////            front.referenceValue: 255
+////            front.comparisonMask: backend_entity!==undefined ? backend_entity.customID :0
+////            back.stencilFunction: StencilTestArguments.Equal
+////            back.referenceValue:  255
+////            back.comparisonMask:  backend_entity!==undefined ? backend_entity.customID :0
+////        }
+//        DepthTest{
+//            id:depthTest
+//            depthFunction: DepthTest.LessOrEqual
+
+//        }
+//        QQ2.Component.onCompleted: {
+//            if(backend_entity!==undefined){
+//                for(var i=0;i<material_unitDX.effect.techniques.length;i++){
+//                    var effect=material_unitDX.effect.techniques[i]
+//                    effect.renderPasses[0].renderStates= depthTest
+//                }
+//            }
+//        }
+//        QQ2.Connections{
+//            target: root
+//            onBackend_entityChanged: if(backend_entity!==undefined){
+//                                         for(var i=0;i<material_unitDX.effect.techniques.length;i++){
+//                                             var effect=material_unitDX.effect.techniques[i]
+//                                             effect.renderPasses[0].renderStates= depthTest
+//                                         }
+//                                     }
+//        }
+//    }
+
 
     Entity{
         enabled: root.axialForceType!==0

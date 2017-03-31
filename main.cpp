@@ -8,13 +8,12 @@
 #include "warehouse3d.h"
 
 #include "statics/frame3dd/frame3ddkernel.h"
-#include "statics/frame3dd/frame3ddvmmanager.h"
 
-#include "Tools/ConcentratedForce/concentratedforce.h"
-#include "Tools/Scaffold/scaffold.h"
-#include "Tools/BeamRemover/beamremover.h"
-#include "Tools/TangibleTrapzLoad/tangibletrapzload.h"
-#include "Tools/Snow/snow.h"
+//#include "Tools/ConcentratedForce/concentratedforce.h"
+//#include "Tools/Scaffold/scaffold.h"
+//#include "Tools/BeamRemover/beamremover.h"
+//#include "Tools/TangibleTrapzLoad/tangibletrapzload.h"
+//#include "Tools/Snow/snow.h"
 
 #include "AR/deformingbeammesh.h"
 
@@ -23,7 +22,7 @@
 
 #include "AR/quaternionhelper.h"
 #include "logger.h"
-
+#include <Qt3DExtras/QSkyboxEntity>
 int main(int argc, char *argv[])
 {
 //    QApplication app(argc, argv);
@@ -67,18 +66,15 @@ int main(int argc, char *argv[])
     qmlRegisterType<ResourcesFetcher>("ResourcesFetcher", 1, 0, "ResourcesFetcher");
 
     qmlRegisterType<Frame3DDKernel>("Frame3DDKernel",1,0,"Frame3DDKernel");
-    qmlRegisterType<Frame3DDVMManager>("Frame3DDVMManager",1,0,"Frame3DDVMManager");
 
     qmlRegisterType<QuaternionHelper>("QuaternionHelper",1,0,"QuaternionHelper");
 
     /*Tools*/
-    qmlRegisterType<ConcentratedForce>("QuickConcentratedForce", 1, 0, "QuickConcentratedForce");
-    qmlRegisterType<Scaffold>("QuickScaffold", 1, 0, "QuickScaffold");
-    qmlRegisterType<BeamRemover>("QuickBeamRemover", 1, 0, "QuickBeamRemover");
-    qmlRegisterType<TangibleTrapzLoad>("QuickTangibleTPZLoad", 1, 0, "QuickTangibleTPZLoad");
-    qmlRegisterType<Snow>("QuickSnow", 1, 0, "QuickSnow");
-
-
+//    qmlRegisterType<ConcentratedForce>("QuickConcentratedForce", 1, 0, "QuickConcentratedForce");
+//    qmlRegisterType<Scaffold>("QuickScaffold", 1, 0, "QuickScaffold");
+//    qmlRegisterType<BeamRemover>("QuickBeamRemover", 1, 0, "QuickBeamRemover");
+//    qmlRegisterType<TangibleTrapzLoad>("QuickTangibleTPZLoad", 1, 0, "QuickTangibleTPZLoad");
+//    qmlRegisterType<Snow>("QuickSnow", 1, 0, "QuickSnow");
     qmlRegisterType<DeformingBeamMesh>("DeformingBeamMesh", 1, 0, "DeformingBeamMesh");
 
     Logger logger(&view);
