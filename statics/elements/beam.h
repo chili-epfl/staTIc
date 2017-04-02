@@ -18,13 +18,12 @@ typedef QWeakPointer<Joint> WeakJointPtr;
 class Beam : public AbstractElement
 {
     Q_OBJECT
-    Q_PROPERTY(QVector3D scaledPositionE1 READ scaledPositionE1 NOTIFY scaledPositionE1Changed)
-    Q_PROPERTY(QVector3D scaledPositionE2 READ scaledPositionE2 NOTIFY scaledPositionE2Changed)
-    Q_PROPERTY(QVector3D scaledDisplacementE1 READ scaledDisplacementE1 NOTIFY extremeDisplacementsChanged)
-    Q_PROPERTY(QVector3D scaledDisplacementE2 READ scaledDisplacementE2 NOTIFY extremeDisplacementsChanged)
+    Q_PROPERTY(QVector3D positionE1 READ positionE1 NOTIFY positionE1Changed)
+    Q_PROPERTY(QVector3D positionE2 READ positionE2 NOTIFY positionE2Changed)
+    Q_PROPERTY(QVector3D displacementE1 READ displacementE1 NOTIFY extremeDisplacementsChanged)
+    Q_PROPERTY(QVector3D displacementE2 READ displacementE2 NOTIFY extremeDisplacementsChanged)
     Q_PROPERTY(QString e1Name READ e1Name NOTIFY e1NameChanged)
     Q_PROPERTY(QString e2Name READ e2Name NOTIFY e2NameChanged)
-    Q_PROPERTY(QSizeF scaledSize READ scaledSize NOTIFY parametersChanged)
     Q_PROPERTY(QSizeF size READ size WRITE setSize NOTIFY parametersChanged)
     Q_PROPERTY(QString materialID READ materialID WRITE setMaterial NOTIFY parametersChanged)
     Q_PROPERTY(QSizeF tangibleSection READ tangibleSection NOTIFY tangibleSectionChanged)
@@ -51,10 +50,10 @@ public:
     virtual void createQmlEntity(QVariantMap aesthetics=QVariantMap());
 
     void extremes(WeakJointPtr& e1,WeakJointPtr& e2);
-    QVector3D scaledPositionE1();
-    QVector3D scaledPositionE2();
-    QVector3D scaledDisplacementE1();
-    QVector3D scaledDisplacementE2();
+    QVector3D positionE1();
+    QVector3D positionE2();
+    QVector3D displacementE1();
+    QVector3D displacementE2();
     QString e1Name();
     QString e2Name();
     QVector4D peakDisplacement();
@@ -88,7 +87,6 @@ public:
 
     void setSize(QSizeF size);
     QSizeF size(){return m_size;}
-    QSizeF scaledSize();
 
     //Getter in parameters(.....)
     void setYoungModulus(qreal E);
@@ -96,7 +94,6 @@ public:
     void setDensity(qreal d);
 
     qreal length(){return m_length;}
-    qreal scaledLength();
 
     QSizeF tangibleSection(){return m_tangibleSection;}
     void setTangibleSection(QSizeF val);
@@ -149,8 +146,8 @@ signals:
     void enableChanged(bool);
     void hasBeenSplit();
     void hasBeenUnified();
-    void scaledPositionE1Changed();
-    void scaledPositionE2Changed();
+    void positionE1Changed();
+    void positionE2Changed();
     void e2NameChanged();
     void e1NameChanged();
 

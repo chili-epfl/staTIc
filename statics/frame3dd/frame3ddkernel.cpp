@@ -2551,7 +2551,7 @@ QVector3D Frame3DDKernel::initialPose()
 {
     qreal xmin=5000,xmax=0,ymin=5000,ymax=0;
     Q_FOREACH(JointPtr joint, m_joints){
-        QVector3D j_pos=joint->scaledPosition();
+        QVector3D j_pos=joint->position()*m_modelScale;
         if(j_pos.x()>xmax)
             xmax=j_pos.x();
         if(j_pos.x()<xmin)

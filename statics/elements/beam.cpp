@@ -130,34 +130,34 @@ void Beam::extremes(WeakJointPtr& e1,WeakJointPtr& e2){
     e2=m_extreme2;
 }
 
-QVector3D Beam::scaledPositionE1()
+QVector3D Beam::positionE1()
 {
     if(!m_extreme1.isNull()){
-        return m_extreme1.toStrongRef()->scaledPosition();
+        return m_extreme1.toStrongRef()->position();
     }
     return QVector3D();
 }
 
-QVector3D Beam::scaledPositionE2()
+QVector3D Beam::positionE2()
 {
     if(!m_extreme2.isNull()){
-        return m_extreme2.toStrongRef()->scaledPosition();
+        return m_extreme2.toStrongRef()->position();
     }
     return QVector3D();
 }
 
-QVector3D Beam::scaledDisplacementE1()
+QVector3D Beam::displacementE1()
 {
     if(!m_extreme1.isNull()){
-        return (AbstractStaticsModule::modelScale()*m_extreme1.toStrongRef()->displacement());
+        return (m_extreme1.toStrongRef()->displacement());
     }
     return QVector3D();
 }
 
-QVector3D Beam::scaledDisplacementE2()
+QVector3D Beam::displacementE2()
 {
     if(!m_extreme2.isNull()){
-        return (AbstractStaticsModule::modelScale()*m_extreme2.toStrongRef()->displacement());
+        return (m_extreme2.toStrongRef()->displacement());
     }
     return QVector3D();
 }
@@ -607,11 +607,6 @@ void Beam::setSize(QSizeF size){
     }
 }
 
-QSizeF Beam::scaledSize()
-{
-    return m_size*AbstractStaticsModule::modelScale();
-}
-
 void Beam::setYoungModulus(qreal E)
 {
     if(m_E!=E){
@@ -637,10 +632,6 @@ void Beam::setDensity(qreal d)
         m_lazy_signal_emitter.start();    }
 }
 
-qreal Beam::scaledLength()
-{
-    return m_length*AbstractStaticsModule::modelScale();
-}
 
 void Beam::setTangibleSection(QSizeF val)
 {

@@ -17,7 +17,7 @@ class Joint:public AbstractElement
     Q_OBJECT
     Q_PROPERTY(QVector3D reaction READ reaction NOTIFY reactionChanged)
     Q_PROPERTY(QVector3D displacement READ displacement NOTIFY displacementChanged)
-    Q_PROPERTY(QVector3D scaledPosition READ scaledPosition  NOTIFY scaledPositionChanged)
+    Q_PROPERTY(QVector3D position READ position  NOTIFY positionChanged)
     Q_PROPERTY(QString supportType READ supportType WRITE setSupportType NOTIFY supportChanged)
     Q_PROPERTY(QVariantList connectedBeams READ connectedBeamsAsVariant NOTIFY connectedBeamsChanged)
 public:
@@ -27,7 +27,6 @@ public:
     void support(bool  &support_X,bool &support_Y,bool &support_Z, bool &support_XX,bool &support_YY,bool &support_ZZ);
 
     QVector3D position(){return m_pos;}
-    QVector3D scaledPosition();
 
     void setReaction(QVector3D reaction);
     QVector3D reaction(){return m_reaction;}
@@ -59,7 +58,7 @@ signals:
     void connectedBeamsChanged();
     void displacementChanged();
     void displacementRotChanged();
-    void scaledPositionChanged();
+    void positionChanged();
 private:
 
     QVector3D m_pos;

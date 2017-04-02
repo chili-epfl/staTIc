@@ -19,6 +19,7 @@ Joint::Joint(QVector3D position,QString name,QObject* parent):
     m_support_ZZ(0),
     m_component3D()
 {
+
 }
 
 void Joint::addConnectedBeam(BeamPtr b){
@@ -143,10 +144,7 @@ void Joint::support(bool  &support_X,bool &support_Y,bool &support_Z,
 
 }
 
-QVector3D Joint::scaledPosition()
-{
-    return m_pos*AbstractStaticsModule::modelScale();
-}
+
 
 
 void Joint::setDisplacement(QVector3D displacement){

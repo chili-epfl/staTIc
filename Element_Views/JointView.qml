@@ -41,7 +41,7 @@ Entity{
 
     property bool visible:  true
 
-    property vector3d position:backend_entity.scaledPosition
+    property vector3d position:backend_entity.position.times(staticsModule.modelScale)
     property vector3d reaction:backend_entity.reaction
     property vector3d displacement:backend_entity.displacement
 

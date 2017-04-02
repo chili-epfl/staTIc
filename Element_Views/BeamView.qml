@@ -41,8 +41,8 @@ Entity{
 
     onMaterialIDChanged: apply_animation.start()
 
-    property vector3d extreme1:backend_entity.scaledPositionE1
-    property vector3d extreme2:backend_entity.scaledPositionE2
+    property vector3d extreme1:backend_entity.positionE1.times(staticsModule.modelScale)
+    property vector3d extreme2:backend_entity.positionE2.times(staticsModule.modelScale)
 
     property string extreme1_name:backend_entity.e1Name;
     property string extreme2_name:backend_entity.e2Name;
@@ -56,7 +56,7 @@ Entity{
     /*The segments for the deforming beam*/
     property var segments:backend_entity.segments
 
-    property size beamSize:backend_entity.scaledSize
+    property size beamSize:Qt.size(backend_entity.size.width*staticsModule.modelScale,backend_entity.size.height*staticsModule.modelScale)
     onBeamSizeChanged: {apply_animation.start();}
 
     property size realBeamSize:backend_entity.size
@@ -85,8 +85,8 @@ Entity{
     property real relativeDisplacementY:backend_entity.relativePeakDisplacement.y
     property real relativeDisplacementZ:backend_entity.relativePeakDisplacement.z
 
-    property vector3d extreme1Displacement:backend_entity.scaledDisplacementE1;
-    property vector3d extreme2Displacement:backend_entity.scaledDisplacementE2;
+    property vector3d extreme1Displacement:backend_entity.displacementE1.times(staticsModule.modelScale);
+    property vector3d extreme2Displacement:backend_entity.displacementE2.times(staticsModule.modelScale);
 
 
 //    onExtreme1DisplacementChanged: computeTransform4Displacement();

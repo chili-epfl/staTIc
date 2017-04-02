@@ -14,8 +14,8 @@ Entity{
 
     property vector3d extreme1 //Always the joint extreme
     property vector3d extreme2: backend_entity!==undefined ?(flip_extremes ?
-                                   backend_entity.scaledPositionE1 :
-                                   backend_entity.scaledPositionE2): Qt.vector3d(0,0,0)
+                                   backend_entity.positionE1.times(staticsModule.modelScale) :
+                                   backend_entity.positionE2.times(staticsModule.modelScale)): Qt.vector3d(0,0,0)
     property string extreme2_name:backend_entity!==undefined ? (flip_extremes ? backend_entity.e1Name : backend_entity.e2Name): "";
     /*Coarse representation */
     property int axialForceType: backend_entity!==undefined ? backend_entity.axialForceType:0 //-1 compression,0 nul, 1 tension
@@ -46,7 +46,7 @@ Entity{
                                                                          backend_entity.forceE2.z :
                                                                          backend_entity.forceE1.z):0
 
-    property bool flip_extremes: backend_entity!==undefined ? (backend_entity.scaledPositionE1==extreme1 ?
+    property bool flip_extremes: backend_entity!==undefined ? (extreme1.fuzzyEquals(backend_entity.positionE1.times(staticsModule.modelScale)) ?
                                      false :
                                      true) :false
 
