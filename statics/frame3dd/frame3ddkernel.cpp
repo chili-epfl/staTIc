@@ -1192,7 +1192,7 @@ void Frame3DDKernel::truss_solve(){
         if(i-1<active_beams.size()){
             BeamPtr b=active_beams[i-1];
             int axial_type=0;
-            if(qFuzzyCompare(B[i][1],0.0))
+            if(!qFuzzyCompare(B[i][1],0.0))
                 if(B[i][1]>0.0)
                     axial_type=1;
                 else if(B[i][1]<0.0)
@@ -1582,14 +1582,33 @@ void Frame3DDKernel::write_internal_forces (
             //                        Dx[i], Dy[i], Dz[i], Rx[i] );
         }
         active_beams[m-1]->setStressSegment(segments);
-        int type=0;
-        if(maxNx>0 && minNx>0)
-            type=1;
-        else if(maxNx<0 && minNx<0)
-            type=-1;
-        else if( maxNx>0 && minNx<0){
-            qWarning("Internal axial forces are not coherent");
+        int typeMax=0;
+        int typeMin=0;
+        if(!qFuzzyCompare(maxNx,0.0)){
+            if(maxNx>0)
+                typeMax=1;
+            else typeMax=-1;
         }
+        if(!qFuzzyCompare(minNx,0.0)){
+            if(minNx>0)
+                typeMin=1;
+            else typeMin=-1;
+        }
+        int type=0;
+        if(typeMax!=0 && typeMin!=0 && typeMax==typeMin)
+            type=typeMax;
+        else if(typeMax!=0 && typeMin!=0 && typeMax!=typeMin){
+            qWarning("Internal axial forces are not coherent");
+            if(fabs(maxNx)>fabs(minNx))
+                type=typeMax;
+            else
+                type=typeMin;
+        }
+        else if(typeMax!=0 && typeMin==0)
+            type=typeMax;
+        else if(typeMin!=0 && typeMax==0)
+            type=typeMin;
+
         active_beams[m-1]->setForcesAndMoments(type,qMax(fabs(maxNx),fabs(minNx)),
                                                qMax(fabs(maxVy),fabs(minVy)),
                                                qMax(fabs(maxVz),fabs(minVz)),
@@ -2819,10 +2838,11 @@ void Frame3DDKernel::log(){
                             dummy,dummy,dummy,2);
         element["Axial_force_type_extreme_2"]=QString::number(force_type);
 
-        qreal stress_axial,stress_shear;
-        b->stressRatio(stress_axial,stress_shear,3);
+        qreal stress_axial,stress_shear,stress_bending;
+        b->stressRatio(stress_axial,stress_bending,stress_shear,3);
         element["Stress_ratio_axial"]=QString::number(stress_axial);
         element["Stress_ratio_shear"]=QString::number(stress_shear);
+        element["Stress_ratio_beanding"]=QString::number(stress_bending);
         element_list.append(element);
 
     }

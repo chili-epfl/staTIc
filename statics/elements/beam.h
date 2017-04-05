@@ -32,7 +32,7 @@ class Beam : public AbstractElement
     Q_PROPERTY(QVector4D relativePeakDisplacement READ relativePeakDisplacement NOTIFY stressChanged)
     Q_PROPERTY(int axialForceType READ axialForceType NOTIFY stressChanged)
     Q_PROPERTY(QVector3D peakForces READ peakForces NOTIFY stressChanged)
-    Q_PROPERTY(qreal relativeAxialStress READ relativeAxialStress NOTIFY stressChanged)
+    Q_PROPERTY(QVector3D relativeStresses READ relativeStresses NOTIFY stressChanged)
     Q_PROPERTY(QVector3D forceE1 READ forceE1 NOTIFY stressChanged)
     Q_PROPERTY(QVector3D forceE2 READ forceE2 NOTIFY stressChanged)
     //Q_PROPERTY(int customID READ customID NOTIFY customIDChanged)
@@ -60,7 +60,7 @@ public:
     QVector3D relativePeakDisplacement();
     int axialForceType();
     QVector3D peakForces();
-    qreal relativeAxialStress();
+    QVector3D relativeStresses();
     QVector3D forceE1();
     QVector3D forceE2();
     QVariant segments();
@@ -77,7 +77,7 @@ public:
     void stress(qreal& axial, qreal &bending, qreal& shearY, qreal& shearZ, qreal& torsion, int extreme);
 
     /*The proportion between the stress and the material limit values*/
-    void stressRatio(qreal& axialComponent, qreal& shearComponent,int extreme);
+    void stressRatio(qreal& axialComponent, qreal &bendingComponent, qreal& shearComponent,int extreme);
 
     void setPeakDisplacements(QVector4D min, QVector4D max);
     void peakDisplacements(QVector4D& min, QVector4D& max);

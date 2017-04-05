@@ -71,11 +71,15 @@ Entity{
 
     /*The stress relative to the size and material.
      *If it's 1 or more, it is above the limits*/
-    property real relativeAxialStress: backend_entity.relativeAxialStress
-    onRelativeAxialStressChanged:{
-            if(relativeAxialStress>=0.8)
+    property real relativeAxialStress: backend_entity.relativeStresses.x
+    property real relativeBendingStress: backend_entity.relativeStresses.y
+    property real relativeShearStress: backend_entity.relativeStresses.z
+    property real maxRelativeStress: Math.max(relativeBendingStress,relativeAxialStress,relativeShearStress)
+
+    onMaxRelativeStressChanged: {
+            if(maxRelativeStress>=0.8  && settings.blink_stress<23)
                 settings.blink_stress=2;
-            else if(relativeAxialStress>=0.5)
+            else if(maxRelativeStress>=0.5 && settings.blink_stress<1)
                 settings.blink_stress=1;
     }
 
@@ -103,7 +107,7 @@ Entity{
         PercNumberEntity{
             enabled: parent.enabled
             id:number_entity
-            number:relativeAxialStress
+            number:maxRelativeStress
             QQ2.Behavior on number{
                 QQ2.NumberAnimation{
                     duration:2000

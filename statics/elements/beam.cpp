@@ -1,4 +1,4 @@
-#include "beam.h"
+﻿#include "beam.h"
 #include "statics/elements/joint.h"
 #include "statics/abstractstaticsmodule.h"
 #include <QDebug>
@@ -203,11 +203,11 @@ QVector3D Beam::peakForces()
     return QVector3D(m_peak_axial_force,m_peak_shear_y,m_peak_shear_z);
 }
 
-qreal Beam::relativeAxialStress()
+QVector3D Beam::relativeStresses()
 {
-    qreal axial_stress,dummy;
-    stressRatio(axial_stress,dummy,3);
-    return axial_stress;
+    qreal axial_stress,bending_stress,shear_stress;
+    stressRatio(axial_stress,bending_stress,shear_stress,3);
+    return QVector3D(axial_stress,bending_stress,shear_stress);
 }
 
 QVector3D Beam::forceE1()
@@ -513,48 +513,49 @@ void Beam::stress(qreal &axial,qreal &bending, qreal &shearY, qreal &shearZ, qre
     }
 }
 
-void Beam::stressRatio(qreal& axialComponent, qreal& shearComponent, int extreme)
+void Beam::stressRatio(qreal& axialComponent, qreal& bendingComponent, qreal& shearComponent, int extreme)
 {
     axialComponent=0;
     shearComponent=0;
+    bendingComponent=0;
     if(extreme==1){
         if(m_axial_type_extreme_1>0){//tension
-            axialComponent+= m_axial_stress_extreme1/m_materialsManager->get(m_materialId,"ft0").toDouble();
+            axialComponent= m_axial_stress_extreme1/m_materialsManager->get(m_materialId,"ft0").toDouble();
         }
         else{
-            axialComponent+= m_axial_stress_extreme1/m_materialsManager->get(m_materialId,"fc0").toDouble();
+            axialComponent= m_axial_stress_extreme1/m_materialsManager->get(m_materialId,"fc0").toDouble();
         }
-        axialComponent+=fabs(m_bending_stress_extreme1)/(m_materialsManager->get(m_materialId,"fmk").toDouble());
         axialComponent=fabs(axialComponent);
-        shearComponent+=fabs(m_shear_stress_y_extreme1)/m_materialsManager->get(m_materialId,"fvk").toDouble();
-        shearComponent+=fabs(m_shear_stress_z_extreme1)/m_materialsManager->get(m_materialId,"fvk").toDouble();
-        shearComponent+=fabs(m_torsional_stess_extreme1)/m_materialsManager->get(m_materialId,"fvk").toDouble();
+        bendingComponent=fabs(m_bending_stress_extreme1)/(m_materialsManager->get(m_materialId,"fmk").toDouble());
+        shearComponent=qMax(qMax(fabs(m_shear_stress_y_extreme1)/m_materialsManager->get(m_materialId,"fvk").toDouble(),
+                            fabs(m_shear_stress_z_extreme1)/m_materialsManager->get(m_materialId,"fvk").toDouble()),
+                            fabs(m_torsional_stess_extreme1)/m_materialsManager->get(m_materialId,"fvk").toDouble());
     }
     else if(extreme==2){
         if(m_axial_type_extreme_2>0){//Tension
-            axialComponent+= m_axial_stress_extreme2/m_materialsManager->get(m_materialId,"ft0").toDouble();
+            axialComponent= m_axial_stress_extreme2/m_materialsManager->get(m_materialId,"ft0").toDouble();
         }
         else{
-            axialComponent+= m_axial_stress_extreme2/m_materialsManager->get(m_materialId,"fc0").toDouble();
+            axialComponent= m_axial_stress_extreme2/m_materialsManager->get(m_materialId,"fc0").toDouble();
         }
-        axialComponent+=fabs(m_bending_stress_extreme2)/(m_materialsManager->get(m_materialId,"fmk").toDouble());
         axialComponent=fabs(axialComponent);
-        shearComponent+=fabs(m_shear_stress_y_extreme2)/m_materialsManager->get(m_materialId,"fvk").toDouble();
-        shearComponent+=fabs(m_shear_stress_z_extreme2)/m_materialsManager->get(m_materialId,"fvk").toDouble();
-        shearComponent+=fabs(m_torsional_stess_extreme2)/m_materialsManager->get(m_materialId,"fvk").toDouble();
+        bendingComponent=fabs(m_bending_stress_extreme2)/(m_materialsManager->get(m_materialId,"fmk").toDouble());
+        shearComponent=qMax(qMax(fabs(m_shear_stress_y_extreme2)/m_materialsManager->get(m_materialId,"fvk").toDouble(),
+                            fabs(m_shear_stress_z_extreme2)/m_materialsManager->get(m_materialId,"fvk").toDouble()),
+                            fabs(m_torsional_stess_extreme2)/m_materialsManager->get(m_materialId,"fvk").toDouble());
     }
     else if(extreme==3){
         if(m_peak_axial_type>0){//Tension
-            axialComponent+= m_peak_axial_stress/m_materialsManager->get(m_materialId,"ft0").toDouble();
+            axialComponent= m_peak_axial_stress/m_materialsManager->get(m_materialId,"ft0").toDouble();
         }
         else{
-            axialComponent+= m_peak_axial_stress/m_materialsManager->get(m_materialId,"fc0").toDouble();
+            axialComponent= m_peak_axial_stress/m_materialsManager->get(m_materialId,"fc0").toDouble();
         }
-        axialComponent+=fabs(m_peak_bending_stress)/(m_materialsManager->get(m_materialId,"fmk").toDouble());
         axialComponent=fabs(axialComponent);
-        shearComponent+=fabs(m_peak_shear_y_stress)/m_materialsManager->get(m_materialId,"fvk").toDouble();
-        shearComponent+=fabs(m_peak_shear_z_stress)/m_materialsManager->get(m_materialId,"fvk").toDouble();
-        shearComponent+=fabs(m_peak_torsional_stress)/m_materialsManager->get(m_materialId,"fvk").toDouble();
+        bendingComponent=fabs(m_peak_bending_stress)/(m_materialsManager->get(m_materialId,"fmk").toDouble());
+        shearComponent=qMax(qMax(fabs(m_peak_shear_y_stress)/m_materialsManager->get(m_materialId,"fvk").toDouble(),
+                            fabs(m_peak_shear_z_stress)/m_materialsManager->get(m_materialId,"fvk").toDouble()),
+                            fabs(m_peak_torsional_stress)/m_materialsManager->get(m_materialId,"fvk").toDouble());
     }
     else{
         qCritical("Wrong extreme value");
