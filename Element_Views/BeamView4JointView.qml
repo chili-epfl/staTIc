@@ -95,7 +95,7 @@ Entity{
 
     }
 
-    property real scaleFactor:maxForce==0 ? 0:Math.min(2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 2,4)
+    property real scaleFactor:maxForce==0 ? 0:Math.min(3.5*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 0.5,4)
     property int nModels: 5
     property matrix4x4 poseMatrix: Qt.matrix4x4()
     property int animationValue: axialForceType<0 ? (50-globalNumericAnimation) : globalNumericAnimation
