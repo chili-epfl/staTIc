@@ -198,6 +198,7 @@
         <file>AR/SoundEffects/creak_low_4.ogg</file>
         <file>AR/SoundEffects/crash_wood_2.wav</file>
         <file>AR/SoundEffects/clapping.wav</file>
+        <file>AR/SoundEffects/creak_low_2.wav</file>
     </qresource>
     <qresource prefix="/UIMesh">
         <file>3DObjects/8.obj</file>

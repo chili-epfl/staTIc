@@ -27,6 +27,8 @@ Item {
     property bool show_filter_bar: true
     property bool show_legend: true
 
+    property bool enable_sounds:true
+
     property int exagerate_displacement_factor:1
 
     property string visible_loader:"DEFAULT"; //DEFAULT,CUSTOM

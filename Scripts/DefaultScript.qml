@@ -170,6 +170,26 @@ Item{
 
     }
 
+
+    SoundEffect {
+        id: crashSound
+
+        source: settings.enable_sounds ? "qrc:/soundeffects/AR/SoundEffects/crash_wood_2.wav" : ""
+    }
+    Connections{
+        target: settings
+        onBlink_stressChanged: if(settings.blink_stress==2 && !crashSound.playing){
+                                   creekSound.stop()
+                                   crashSound.play()
+                               }
+    }
+    SoundEffect {
+        id: creekSound
+        source: settings.enable_sounds ? "qrc:/soundeffects/AR/SoundEffects/creak_low_2.wav" : ""
+
+    }
+
+
     Warehouse3D{
         id:warehouse3d
     }

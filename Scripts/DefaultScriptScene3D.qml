@@ -146,6 +146,9 @@ Entity {
         },
         InputSettings {}
     ]
+    MouseDevice {
+        id: mouseDevice
+    }
 
     Entity{
         id:deselection_guard
@@ -160,14 +163,14 @@ Entity {
                 deselection_guard.eventHasBeenAccepted=false;
             }
         }
-        //       MouseInput{
-        //           id:mouseInput
-        //           controller: mouseController
-        //           onReleased: {
-        //               guard_delay.restart();
-        //           }
-        //       }
-        //       components:[mouseInput]
+        MouseHandler{
+            id:mouseInput
+            sourceDevice: mouseDevice
+            onReleased: {
+                guard_delay.restart();
+            }
+        }
+        components:[mouseInput]
     }
 
 

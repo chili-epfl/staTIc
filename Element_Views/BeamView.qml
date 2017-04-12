@@ -14,6 +14,9 @@ Entity{
     property var backend_entity
     objectName: backend_entity.objectName
     property bool disable_beam_selection_for_load: false
+
+
+
 //    property int stencilValue: backend_entity.customID
 
 //    StencilTest{
@@ -77,7 +80,7 @@ Entity{
     property real maxRelativeStress: Math.max(relativeBendingStress,relativeAxialStress,relativeShearStress)
 
     onMaxRelativeStressChanged: {
-            if(maxRelativeStress>=0.8  && settings.blink_stress<23)
+            if(maxRelativeStress>=0.8  && settings.blink_stress<2)
                 settings.blink_stress=2;
             else if(maxRelativeStress>=0.5 && settings.blink_stress<1)
                 settings.blink_stress=1;
@@ -380,9 +383,9 @@ Entity{
 
         }
         property ObjectPicker objectPicker:ObjectPicker{
-
             onClicked: {
                 sceneRoot.mouseEventHasBeenAccepted=true;
+                console.log(backend_entity.relativeStresses)
                 if(parent.enabled && infobox.current_item!=rootEntity && !disable_beam_selection_for_load){
                     infobox.current_item=rootEntity
                 }

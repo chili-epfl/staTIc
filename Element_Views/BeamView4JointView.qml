@@ -20,7 +20,6 @@ Entity{
     /*Coarse representation */
     property int axialForceType: backend_entity!==undefined ? backend_entity.axialForceType:0 //-1 compression,0 nul, 1 tension
     property real axialForce : backend_entity!==undefined ? backend_entity.peakForces.x:0
-
     /*Fine one. Remeber these are in local reference system*/
     property real axialForce_extreme1: backend_entity!==undefined ? (flip_extremes ?
                                                                          backend_entity.forceE2.x :
@@ -96,8 +95,7 @@ Entity{
 
     }
 
-    property real scaleFactor: Math.min(2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 2,4)
-
+    property real scaleFactor:maxForce==0 ? 0:Math.min(2*(Math.abs(axialForce)-minForce)/(maxForce-minForce) + 2,4)
     property int nModels: 5
     property matrix4x4 poseMatrix: Qt.matrix4x4()
     property int animationValue: axialForceType<0 ? (50-globalNumericAnimation) : globalNumericAnimation
@@ -187,7 +185,7 @@ Entity{
     Entity{
         enabled: root.axialForceType!==0
         AnimationUnitDx{
-            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement && non_default_visibility
+            enabled: parent.enabled && visible && settings.show_beam_axial_loads && !settings.show_displacement && non_default_visibility
             unitId: 0
             unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
@@ -199,7 +197,7 @@ Entity{
         }
 
         AnimationUnitDx{
-            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement && non_default_visibility
+            enabled: parent.enabled && visible && settings.show_beam_axial_loads && !settings.show_displacement && non_default_visibility
             unitId: 1
             unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
@@ -210,7 +208,7 @@ Entity{
             rotate: root.axialForceType < 0
         }
         AnimationUnitDx{
-            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement && non_default_visibility
+            enabled: parent.enabled && visible && settings.show_beam_axial_loads && !settings.show_displacement && non_default_visibility
             unitId: 2
             unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
@@ -221,7 +219,7 @@ Entity{
             rotate: root.axialForceType < 0
         }
         AnimationUnitDx{
-            enabled: visible && settings.show_beam_axial_loads && !settings.show_displacement && non_default_visibility
+            enabled: parent.enabled && visible && settings.show_beam_axial_loads && !settings.show_displacement && non_default_visibility
             unitId: 3
             unitMesh: joint_commons.tiny_arrow_mesh
             step: root.step
