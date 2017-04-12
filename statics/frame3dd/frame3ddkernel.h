@@ -21,8 +21,8 @@ public:
     Frame3DDKernel(QObject* parent=0);
     ~Frame3DDKernel();
 
-    virtual qreal maxForce(){return m_maxForce;}
-    virtual qreal minForce(){return m_minForce;}
+    virtual qreal maxForce();//{return m_maxForce;}
+    virtual qreal minForce();//{return m_minForce;}
 
     //virtual Force* createForce(QVector3D applicationPoint, QVector3D force_vector, AbstractElement* applicationElement=Q_NULLPTR);
     /*TODO: REMOVE*/
@@ -86,12 +86,12 @@ private:
                                 double **Q,
                                 double **F_temp, double **F_mech, double *Fo,
                                 float ***U, float ***W, float ***P, float ***T, float **Dp,
-                                double ***eqF_mech, double ***eqF_temp,QVector<BeamPtr> active_beams);
+                                double ***eqF_mech, double ***eqF_temp, QVector<JointPtr> active_joints, QVector<BeamPtr> active_beams);
 
-    void update_statics( int nN, int nE, int nL, int lc, int DoF,
+    void update_statics(int nN, int nE, int nL, int lc, int DoF,
                         int *J1, int *J2, double *F, double *D,
                         double *R, int *r, double **Q, double err,
-                         int ok, QVector<BeamPtr> active_beams);
+                         int ok, QVector<JointPtr> active_joints, QVector<BeamPtr> active_beams);
 
     void write_internal_forces(int lc, int nL, float dx, vec3 *xyz,
                                double **Q, int nN, int nE, double *L, int *J1,
@@ -117,8 +117,12 @@ private:
     int m_exagg_static;
     int m_dx;
 
-    float m_maxForce;
+    float m_maxForce,m_maxForce2;
     float m_minForce;
+
+    QQueue<qreal> m_minForce_queue;
+    QQueue<qreal> m_maxForce_queue;
+
 
     qreal m_relative_equilibrium_error;
     QTimer m_lazyupdateTimer;

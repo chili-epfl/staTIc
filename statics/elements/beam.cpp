@@ -19,7 +19,7 @@ QQmlComponent* Beam::m_qqmlcomponent=NULL;
 
 Beam::Beam(JointPtr extreme1, JointPtr extreme2,MaterialsManager* mm,QString name,QObject* parent):
     AbstractElement(name,parent),
-    m_enable(true),
+    m_enabled(true),
     m_axial_force_extreme_1(0),
     m_axial_type_extreme_1(0),
     m_axial_force_extreme_2(0),
@@ -246,10 +246,10 @@ void Beam::parameters(qreal& Ax, qreal& Asy, qreal& Asz,
     d=m_d;
 }
 
-void Beam::setEnable(bool enable){
-    if(m_enable!=enable){
-        m_enable=enable;
-        emit enableChanged(m_enable);
+void Beam::setEnabled(bool enabled){
+    if(m_enabled!=enabled){
+        m_enabled=enabled;
+        emit enabledChanged(m_enabled);
     }
 }
 
@@ -418,12 +418,12 @@ void Beam::setForcesAndMoments(int axial_type,qreal Nx, qreal Vy, qreal Vz,
         m_lazy_signal_emitter.start();
     }
 
-//   qDebug()<<"Beam:"<<objectName();
+   qDebug()<<"Beam:"<<objectName();
 //    qDebug()<<"Axial stress extreme 1:"<<m_axial_stress_extreme1;
 //    qDebug()<<"Shear stress extreme 1:"<<m_shear_stress_y_extreme1;
 //    qDebug()<<"Shear stress extreme 1:"<<m_shear_stress_z_extreme1;
 //    qDebug()<<"Bending Stress extreme 1:"<<m_bending_stress_extreme1;
-//    qDebug()<<"Axial force extreme 1:"<<m_axial_force_extreme_1;
+    qDebug()<<"Axial force extreme 1:"<<m_axial_force_extreme_1;
 //    qDebug()<<"Axial shear y extreme 1:"<<m_shear_y_extreme_1;
 //    qDebug()<<"Axial shear z extreme 1:"<<m_shear_z_extreme_1;
 //    qDebug()<<"Torque extreme 1:"<<m_axial_moment_extreme_1;
@@ -443,6 +443,7 @@ void Beam::setForcesAndMoments(int axial_type,qreal Nx, qreal Vy, qreal Vz,
 //    qDebug()<<"Momentum z extreme 2:"<<m_z_moment_extreme_2;
 ////    qDebug()<<m_Sy<<" "<<m_Sz;
 
+    qDebug()<<"Peak axial force"<<m_peak_axial_force;
 //    qDebug()<<"Peak axial stress"<<m_peak_axial_stress;
 //    qDebug()<<"Peak bending stress"<<m_peak_bending_stress;
 
@@ -570,7 +571,7 @@ void Beam::setPeakDisplacements(QVector4D min, QVector4D max)
         m_dirty.operator |=( DirtyFlag::StressChanged);
         m_lazy_signal_emitter.start();
     }
-    qDebug()<<this->objectName()<<max<<min;
+    //qDebug()<<this->objectName()<<max<<min;
 }
 
 void Beam::peakDisplacements(QVector4D &min, QVector4D &max)
@@ -661,13 +662,13 @@ void Beam::cloneProperties(BeamPtr beam){
     m_lazy_signal_emitter.start();}
 
 void Beam::split(){
-    setEnable(false);
+    setEnabled(false);
     emit hasBeenSplit();
 }
 
 void Beam::unify(){
     m_sub_parts.clear();
-    setEnable(true);
+    setEnabled(true);
     emit hasBeenUnified();
 }
 

@@ -59,8 +59,8 @@ QString readLine(QTextStream* inputStream){
 Frame3DDKernel::Frame3DDKernel(QObject* parent):
     AbstractStaticsModule(parent),
     m_gravity(0,-9800,0),
-    m_shear(1),
-    m_geom(1)
+    m_shear(0),
+    m_geom(0)
 {
     connect(&m_lazyupdateTimer, SIGNAL(timeout()), this, SLOT(solve()));
     m_lazyupdateTimer.setSingleShot(true);
@@ -78,6 +78,16 @@ Frame3DDKernel::~Frame3DDKernel()
     m_trapezoidal_loads.clear();
     m_beams.clear();
     m_joints.clear();
+}
+
+qreal Frame3DDKernel::maxForce()
+{
+    return m_maxForce;
+}
+
+qreal Frame3DDKernel::minForce()
+{
+    return 0;
 }
 
 
@@ -364,6 +374,8 @@ void Frame3DDKernel::setStatus(Status status){
 
 void Frame3DDKernel::update(){
     emit startingUpdate();
+    m_maxForce=0;
+    emit maxForceChanged();
     m_lazyupdateTimer.start();
 }
 /**/
@@ -525,14 +537,20 @@ void Frame3DDKernel::solve(){
         fprintf(stdout,"\n");
     }
 */
+    QVector<JointPtr> active_joints;
+    Q_FOREACH(JointPtr joint,m_joints){
+        if(joint->connectedBeams().size()>0){
+            active_joints.append(joint);
+        }
+    }
     QVector<BeamPtr> active_beams;
     Q_FOREACH(BeamPtr beam,m_beams){
-        if(beam->enable()){
+        if(beam->enabled()){
             active_beams.append(beam);
         }
     }
 
-    nN=m_joints.size()
+    nN=active_joints.size()
         #ifdef JOINT_MODELLING
             +2*active_beams.length()
         #endif
@@ -550,8 +568,8 @@ void Frame3DDKernel::solve(){
     xyz = (vec3 *)malloc(sizeof(vec3)*(1+nN));	/* node coordinates */
 
     /*Set node data*/
-    for(i=0; i<m_joints.size();i++){
-        JointPtr joint=m_joints.at(i);
+    for(i=0; i<active_joints.size();i++){
+        JointPtr joint=active_joints.at(i);
         xyz[i+1].x=static_cast<double>(joint->position().x());
         if(m_is2D){
             xyz[i+1].y=static_cast<double>(joint->position().y());
@@ -596,8 +614,8 @@ void Frame3DDKernel::solve(){
     /*Set reaction data*/
     for (i=1; i<=DoF; i++)	r[i] = 0;
     nR=0;
-    for(i=0;i<m_joints.size();i++){
-        JointPtr joint=m_joints.at(i);
+    for(i=0;i<active_joints.size();i++){
+        JointPtr joint=active_joints.at(i);
         bool X,Y,Z,XX,YY,ZZ;
         joint->support(X,Y,Z,XX,YY,ZZ);
         if(X || Y || Z || XX || YY || ZZ){
@@ -696,11 +714,11 @@ void Frame3DDKernel::solve(){
         }
 #else
         if(need_swap){
-            N1[i+1]=m_joints.indexOf(e2.toStrongRef())+1;
-            N2[i+1]=m_joints.indexOf(e1.toStrongRef())+1;
+            N1[i+1]=active_joints.indexOf(e2.toStrongRef())+1;
+            N2[i+1]=active_joints.indexOf(e1.toStrongRef())+1;
         }else{
-            N1[i+1]=m_joints.indexOf(e1.toStrongRef())+1;
-            N2[i+1]=m_joints.indexOf(e2.toStrongRef())+1;
+            N1[i+1]=active_joints.indexOf(e1.toStrongRef())+1;
+            N2[i+1]=active_joints.indexOf(e2.toStrongRef())+1;
         }
 
 #endif
@@ -725,7 +743,6 @@ void Frame3DDKernel::solve(){
         //Virtual beam 1
         L[2*i+1+active_beams.length()]=100.0;
         Le[2*i+1+active_beams.length()]=100.0;
-
         N1[2*i+1+active_beams.length()]=m_joints.indexOf(e1.toStrongRef())+1;
         N2[2*i+1+active_beams.length()]=m_joints.length()+i*2+1;
 
@@ -836,7 +853,7 @@ void Frame3DDKernel::solve(){
                     d, gX, gY, gZ, r, shear,
                     nF, nU, nW, nP, nT, nD,
                     Q, F_temp, F_mech, F, U, W, P, T,
-                    Dp, eqF_mech, eqF_temp,active_beams );
+                    Dp, eqF_mech, eqF_temp,active_joints,active_beams );
 
     total_mass = struct_mass = 0.0;
     nM=0;
@@ -951,7 +968,7 @@ void Frame3DDKernel::solve(){
         if ( geom )	compute_reaction_forces( R,F,K, D, DoF, r );
 
         update_statics( nN,nE,nL, lc, DoF, N1,N2,
-                        F,D,R, r,Q, rms_resid, ok,active_beams);
+                        F,D,R, r,Q, rms_resid, ok,active_joints,active_beams);
 
         /*  dealocate Broyden secant stiffness matrix, Ks */
         // if ( geom )	free_dmatrix(Ks, 1, DoF, 1, DoF );
@@ -1009,7 +1026,7 @@ void Frame3DDKernel::truss_solve(){
 
     QVector<BeamPtr> active_beams;
     Q_FOREACH(BeamPtr beam,m_beams){
-        if(beam->enable()){
+        if(beam->enabled()){
             active_beams.append(beam);
         }
     }
@@ -1125,7 +1142,7 @@ void Frame3DDKernel::truss_solve(){
 
     Q_FOREACH(TrapezoidalForcePtr load,m_trapezoidal_loads){
         BeamPtr b=load->beam().toStrongRef();
-        if(b->enable()){
+        if(b->enabled()){
             WeakJointPtr w_e1,w_e2;
             JointPtr e1,e2;
             b->extremes(w_e1,w_e2);
@@ -1563,6 +1580,7 @@ void Frame3DDKernel::write_internal_forces (
             minSz = (Sz[i] < minSz) ? Sz[i] : minSz;
         }
 
+
         // write results to the internal frame element force output data file
         QList<QVector4D> segments;
         //        fprintf(fpif,"#.x                \tNx        \tVy        \tVz        \tTx       \tMy        \tMz        \tDx        \tDy        \tDz        \tRx\t~\n");
@@ -1658,7 +1676,7 @@ void Frame3DDKernel::assemble_loads (
         float ***U, float ***W, float ***P, float ***T, float **Dp,
         double ***eqF_mech, // equivalent mech loads, global coord
         double ***eqF_temp, // equivalent temp loads, global coord
-        QVector<BeamPtr> active_beams
+        QVector<JointPtr> active_joints,QVector<BeamPtr> active_beams
         ){
     float	hy, hz;			/* section dimensions in local coords */
 
@@ -1731,8 +1749,9 @@ void Frame3DDKernel::assemble_loads (
     /* node point loads -------------------------------------------- */
     nF[1]=m_node_loads.size();
 
-    Q_FOREACH(NodeLoadPtr nodeload, m_node_loads){           
-        int application_joint_index=m_joints.indexOf(nodeload->joint().toStrongRef());
+    Q_FOREACH(NodeLoadPtr nodeload, m_node_loads){
+        int application_joint_index=active_joints.indexOf(nodeload->joint().toStrongRef());
+        if(application_joint_index<0) continue;
         F_mech[1][6*application_joint_index+1]+=nodeload->force().x();//I added a plus...
         F_mech[1][6*application_joint_index+4]+=nodeload->momentum().x();
         if(m_is2D){
@@ -2197,7 +2216,7 @@ void Frame3DDKernel::update_statics(
         int nN, int nE, int nL, int lc, int DoF,
         int *J1, int *J2,
         double *F, double *D, double *R, int *r, double **Q,
-        double err, int ok,QVector<BeamPtr> active_beams
+        double err, int ok,QVector<JointPtr> active_joints,QVector<BeamPtr> active_beams
         ){
     double	disp;
     int	i,j,n;
@@ -2216,10 +2235,10 @@ void Frame3DDKernel::update_statics(
     * j node index, starting from 1.
     * X-dsp       Y-dsp       Z-dsp X-rot       Y-rot       Z-rot*/
     for (j=1; j<= nN; j++) {
-        if(j>m_joints.length()) break;
+        if(j>active_joints.length()) break;
         disp = 0.0;
         for ( i=5; i>=0; i-- ) disp += fabs( D[6*j-i] );
-        JointPtr joint=m_joints.at(j-1);
+        JointPtr joint=active_joints.at(j-1);
         if ( disp > 0.0 ) {
             if(m_is2D){
                 joint->setDisplacement(QVector3D(D[6*j-5],D[6*j-4],D[6*j-3]));
@@ -2273,8 +2292,8 @@ void Frame3DDKernel::update_statics(
 
     /*Reactions Fx          Fy          Fz  Mxx         Myy         Mzz*/
     for (j=1; j<=nN; j++) {
-        if(j>m_joints.length()) break;
-        JointPtr joint=m_joints.at(j-1);
+        if(j>active_joints.length()) break;
+        JointPtr joint=active_joints.at(j-1);
         i = 6*(j-1);
         if ( r[i+1] || r[i+2] || r[i+3] ||
              r[i+4] || r[i+5] || r[i+6] ) {
@@ -2295,11 +2314,9 @@ void Frame3DDKernel::update_statics(
             minF=joint->reaction().length();
         }
     }
-
     m_maxForce=maxF;
-    m_minForce=minF;
     emit maxForceChanged();
-    emit minForceChanged();
+
     m_relative_equilibrium_error=err;
     emit updated();
     QtConcurrent::run(this,&Frame3DDKernel::log);
@@ -2822,7 +2839,7 @@ void Frame3DDKernel::log(){
     Q_FOREACH(BeamPtr b, m_beams){
         element.clear();
         element["Name"]=b->objectName();
-        element["Enabled"]=b->enable();
+        element["Enabled"]=b->enabled();
         WeakJointPtr e1,e2;
         b->extremes(e1,e2);
         element["Extreme_1"]=e1.toStrongRef()->objectName();

@@ -494,6 +494,19 @@ Rectangle {
                                     }
                                 }
                             }
+                            Button{
+                                anchors.bottom: parent.bottom
+                                anchors.left: parent.left
+                                height: 50
+                                text: "Disable"
+                                onClicked:{
+                                    if(current_item!=0 && current_item.type=="beam"){
+                                        current_item.backend_entity.enabled=!current_item.backend_entity.enabled;
+                                        //logger.log("infobox_designer_change_section",{"beam":current_item.objectName,"section": current_item.realBeamSize})
+                                    }
+                                }
+
+                            }
                         }
 
                     }

@@ -35,6 +35,7 @@ class Beam : public AbstractElement
     Q_PROPERTY(QVector3D relativeStresses READ relativeStresses NOTIFY stressChanged)
     Q_PROPERTY(QVector3D forceE1 READ forceE1 NOTIFY stressChanged)
     Q_PROPERTY(QVector3D forceE2 READ forceE2 NOTIFY stressChanged)
+    Q_PROPERTY(bool  enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
     //Q_PROPERTY(int customID READ customID NOTIFY customIDChanged)
 public:
     enum DirtyFlag {
@@ -103,8 +104,8 @@ public:
     void split();
     void unify();
 
-    bool enable() {return m_enable;}
-    void setEnable(bool enable);
+    bool enabled() {return m_enabled;}
+    void setEnabled(bool enabled);
 
     QList<QVector4D> stress_segments(){return m_stress_segments;}
     void setStressSegment(QList<QVector4D> segments){
@@ -143,7 +144,7 @@ signals:
 
     void segmentsChanged();
     void materialChanged();
-    void enableChanged(bool);
+    void enabledChanged(bool);
     void hasBeenSplit();
     void hasBeenUnified();
     void positionE1Changed();
@@ -159,7 +160,7 @@ private:
     DirtyFlags m_dirty;
 
 
-    bool m_enable;
+    bool m_enabled;
 
     qreal m_axial_force_extreme_1;
     int m_axial_type_extreme_1;//-1 compression, 0 nul,1 tension

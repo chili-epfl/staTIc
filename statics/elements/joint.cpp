@@ -25,7 +25,7 @@ Joint::Joint(QVector3D position,QString name,QObject* parent):
 void Joint::addConnectedBeam(BeamPtr b){
     m_connected_beams.append(b.toWeakRef());
     connect(b.data(),SIGNAL(destroyed(QObject*)),this,SLOT(onBeamDestroyed()));
-    connect(b.data(),SIGNAL(enableChanged(bool)),this,SLOT(onBeamDestroyed()));
+    connect(b.data(),SIGNAL(enabledChanged(bool)),this,SLOT(onBeamDestroyed()));
     emit connectedBeamsChanged();
 }
 
@@ -166,7 +166,7 @@ QList<WeakBeamPtr> Joint::connectedBeams()
     QList<WeakBeamPtr> _list;
     _list.reserve(m_connected_beams.size());
     Q_FOREACH(WeakBeamPtr b,m_connected_beams){
-        if(b.toStrongRef()->enable()){
+        if(b.toStrongRef()->enabled()){
             _list.append(b);
         }
     }
@@ -180,7 +180,7 @@ QVariantList Joint::connectedBeamsAsVariant()
     QVariantList _list;
     _list.reserve(m_connected_beams.size());
     Q_FOREACH(WeakBeamPtr b,m_connected_beams){
-        if(b.toStrongRef()->enable()){
+        if(b.toStrongRef()->enabled()){
             _list.append(QVariant::fromValue(b.data()));
         }
     }
