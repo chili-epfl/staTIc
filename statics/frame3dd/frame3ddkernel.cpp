@@ -1751,7 +1751,10 @@ void Frame3DDKernel::assemble_loads (
 
     Q_FOREACH(NodeLoadPtr nodeload, m_node_loads){
         int application_joint_index=active_joints.indexOf(nodeload->joint().toStrongRef());
-        if(application_joint_index<0) continue;
+        if(application_joint_index<0) {
+            nF[1]=nF[1]-1;
+            continue;
+        }
         F_mech[1][6*application_joint_index+1]+=nodeload->force().x();//I added a plus...
         F_mech[1][6*application_joint_index+4]+=nodeload->momentum().x();
         if(m_is2D){
@@ -1783,7 +1786,8 @@ void Frame3DDKernel::assemble_loads (
         int application_beam_index=active_beams.indexOf(UDLoad->beam().toStrongRef())+1;
         if(application_beam_index<=0){
             qDebug("UDLoad on disabled beam");
-            return ;
+            nU[1]=nU[1]-1;
+            continue ;
         }
         U[1][i][1] = (double) application_beam_index;
         U[1][i][2] = UDLoad->forceLocal().x();
@@ -1841,8 +1845,9 @@ void Frame3DDKernel::assemble_loads (
         //n is the idnex of the beam the force is applied on
         n=active_beams.indexOf(trz_load->beam().toStrongRef())+1;
         if(n<=0){
-            qDebug("UDLoad on disabled beam");
-            return ;
+            qDebug("TFPLoad on disabled beam");
+            nW[1]=nW[1]-1;
+            continue ;
         }
         QVector3D begin,end;
         trz_load->positionOnBeam(begin,end);

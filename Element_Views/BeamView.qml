@@ -106,7 +106,7 @@ Entity{
     property bool enable_deformation:settings.show_displacement
 
     Entity{
-        enabled: settings.show_stress
+        enabled: settings.show_stress && backend_entity.enabled
         PercNumberEntity{
             enabled: parent.enabled
             id:number_entity
@@ -223,7 +223,7 @@ Entity{
 
     Entity{
         //Sphere mesh
-        enabled: settings.show_beam_sphere && !enable_deformation
+        enabled: settings.show_beam_sphere && !enable_deformation && backend_entity.enabled
         components: [
             beam_commons.sphere_mesh,
             main_mesh_material
@@ -233,7 +233,7 @@ Entity{
     Entity{
         //Spring mesh
         id:spring_entity
-        enabled: settings.show_beam_spring && !settings.show_displacement && !enable_deformation
+        enabled: settings.show_beam_spring && !settings.show_displacement && !enable_deformation && backend_entity.enabled
         property real scaleFactor:Math.min(0.75,tangibleSection.width/22,tangibleSection.height/22,33*available_length/space_from_spring_and_arrows)
         property Transform transform:Transform{
             //z:width,x:height,y:lenght
@@ -344,7 +344,7 @@ Entity{
 
     Entity{
         id:deforming_entity
-        enabled: enable_deformation
+        enabled: enable_deformation && backend_entity.enabled
         property real deforming_length:Math.max(10,rootEntity.length-60)
         Transform{
             id:deforming_transform
@@ -385,7 +385,6 @@ Entity{
         property ObjectPicker objectPicker:ObjectPicker{
             onClicked: {
                 sceneRoot.mouseEventHasBeenAccepted=true;
-                console.log(backend_entity.relativeStresses)
                 if(parent.enabled && infobox.current_item!=rootEntity && !disable_beam_selection_for_load){
                     infobox.current_item=rootEntity
                 }

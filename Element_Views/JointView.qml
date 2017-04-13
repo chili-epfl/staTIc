@@ -37,13 +37,11 @@ Entity{
 
     }
 
-
-
     property bool visible:  true
 
     property vector3d position:backend_entity.position.times(staticsModule.modelScale)
     property vector3d reaction:backend_entity.reaction
-    property vector3d displacement:backend_entity.displacement
+    property vector3d displacement:backend_entity.connectedBeams.length>0 ? backend_entity.displacement: Qt.vector3d(0,0,0)
 
     property real displacementLimit: Math.max( 1 , position.y/500)
     property int displacementStatus: 0

@@ -3,7 +3,7 @@ import QtQuick.Controls 1.2
 import QtQuick.Layouts 1.1
 import QtQuick.Controls.Styles 1.4
 import QtGraphicalEffects 1.0
-
+import QtQuick.Window 2.0
 Rectangle {
     id:root
     property var current_item: 0
@@ -68,9 +68,9 @@ Rectangle {
             }
             tab:Item{
                 implicitWidth: styleData.selected ?
-                                  styleData.availableWidth/2
+                                   styleData.availableWidth/2
                                  :
-                                  0.5*styleData.availableWidth/tab_view.count
+                                   0.5*styleData.availableWidth/tab_view.count
 
                 implicitHeight: pt2px(14)+30
                 Rectangle {
@@ -93,12 +93,12 @@ Rectangle {
                         height: parent.height-8
                         text: styleData.title
                         color: "#F0F0F0"
-//                        fontSizeMode: Text.Fit
+                        //                        fontSizeMode: Text.Fit
                         //wrapMode: Text.WordWrap
                         verticalAlignment: Text.AlignVCenter
                         elide: Text.ElideRight
                         font.pointSize: 14
-//                        minimumPointSize: 10
+                        //                        minimumPointSize: 10
 
                     }
                 }
@@ -239,7 +239,7 @@ Rectangle {
                                                 logger.log("infobox_designer_add_load",{"joint":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight")})
                                                 staticsModule.createNodeLoad(current_item.backend_entity,{"parent_entity":current_item,"warehouse_index":catalog_grid.currentIndex})
                                             }
-                                         }
+                                        }
                                         else if(current_item.type=="trapezoidalForceTangible"){
                                             current_item.weight=warehouse3d.get(catalog_grid.currentIndex,"weight")
                                             current_item.extent=warehouse3d.get(catalog_grid.currentIndex,"extent")
@@ -264,7 +264,7 @@ Rectangle {
         Tab{
             id:material_tab
             title:"Beam Materials"
-            Rectangle{                
+            Rectangle{
                 id:materialItem
                 property alias currentIndex: materials_list.currentIndex
                 anchors.fill:parent
@@ -278,7 +278,7 @@ Rectangle {
                         visible: materials_list.count > 0
                         width: parent.width
                         //Min between the max allowed and the numeber of materials available
-                        height: Math.min(2*parent.height/3, materials_list.count*(materialItem.width+20)/3)
+                        height: Math.min(2*parent.height/3 - 100, materials_list.count*(materialItem.width+20)/3)
                         anchors.margins: 10
                         color:"transparent"
                         radius: 1
@@ -373,9 +373,9 @@ Rectangle {
                                                 anchors.fill: parent
                                                 onClicked:{
                                                     if(current_item!=0 && current_item.type=="beam"){
-                                                            feedback_animation_material.start();
-                                                            current_item.setMaterialID(materialsManager.get(index,"UniqueID"))
-                                                            logger.log("infobox_designer_change_material",{"beam":current_item.objectName,"materialID":current_item.materialID})
+                                                        feedback_animation_material.start();
+                                                        current_item.setMaterialID(materialsManager.get(index,"UniqueID"))
+                                                        logger.log("infobox_designer_change_material",{"beam":current_item.objectName,"materialID":current_item.materialID})
                                                     }
                                                 }
                                             }
@@ -433,7 +433,7 @@ Rectangle {
                                       current_item.type =="beam" ? current_item.realBeamSize.width:100
                                 maximumLength: 5
                                 validator: DoubleValidator {bottom: 1; top: 50000;}
-                                width: parent.width/2-50
+                                width: parent.width/2-100
 
                             }
                             Text{
@@ -453,7 +453,7 @@ Rectangle {
                                 anchors.verticalCenter: x.verticalCenter
                                 anchors.left: x.right
                                 anchors.leftMargin: 25
-                                width: parent.width/2-50
+                                width: parent.width/2-100
                                 text:current_item!=0 &&
                                      current_item.type=="beam"?current_item.realBeamSize.height:100
                                 validator: DoubleValidator {bottom: 1; top: 50000;}
@@ -494,21 +494,42 @@ Rectangle {
                                     }
                                 }
                             }
-                            Button{
-                                anchors.bottom: parent.bottom
+
+                        }
+                    }
+                    Rectangle{
+                        border.color: "#F0F0F0"
+                        border.width: 5
+                        width: parent.width
+                        height: 100
+                        anchors.margins: 10
+                        color: "transparent"
+                        Rectangle{
+                            color:"#2f3439";
+                            anchors.margins: 10
+                            anchors.fill: parent
+                            CheckBox {
+                                id:beam_enable_check
+                                enabled: current_item!=0 && current_item.type=="beam"
+                                onClicked:  current_item.backend_entity.enabled = checked
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.margins: 10
                                 anchors.left: parent.left
-                                height: 50
-                                text: "Disable"
-                                onClicked:{
-                                    if(current_item!=0 && current_item.type=="beam"){
-                                        current_item.backend_entity.enabled=!current_item.backend_entity.enabled;
-                                        //logger.log("infobox_designer_change_section",{"beam":current_item.objectName,"section": current_item.realBeamSize})
+                                text:"Enable/Disable"
+                                Connections{
+                                    target:root
+                                    onCurrent_itemChanged: if(current_item!=0 && current_item.type=="beam")
+                                                               beam_enable_check.checked=current_item.backend_entity.enabled
+                                }
+                                Connections {
+                                    target: current_item.backend_entity
+                                    onEnabledChanged: {
+                                        beam_enable_check.checked = current_item.backend_entity.enabled
+                                        logger.log("infobox_designer_enable_beam",{"beam":current_item.objectName,"enabled": beam_enable_check.checked})
                                     }
                                 }
-
                             }
                         }
-
                     }
                 }
 
@@ -609,12 +630,12 @@ Rectangle {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked: {
-                                            if(support_designer_rect.selection=="Fixed")
-                                               support_designer_rect.selection="none"
-                                           else
-                                               support_designer_rect.selection="Fixed"
-                                           if(current_item!=0 && current_item.type==="joint")
-                                               current_item.setSupportType(support_designer_rect.selection)
+                                    if(support_designer_rect.selection=="Fixed")
+                                        support_designer_rect.selection="none"
+                                    else
+                                        support_designer_rect.selection="Fixed"
+                                    if(current_item!=0 && current_item.type==="joint")
+                                        current_item.setSupportType(support_designer_rect.selection)
                                 }
                             }
                         }
@@ -657,12 +678,12 @@ Rectangle {
                             MouseArea{
                                 anchors.fill: parent
                                 onClicked:  {
-                                            if(support_designer_rect.selection=="Pinned")
-                                               support_designer_rect.selection="none"
-                                            else
-                                               support_designer_rect.selection="Pinned"
-                                            if(current_item!=0 && current_item.type==="joint")
-                                                current_item.setSupportType(support_designer_rect.selection)
+                                    if(support_designer_rect.selection=="Pinned")
+                                        support_designer_rect.selection="none"
+                                    else
+                                        support_designer_rect.selection="Pinned"
+                                    if(current_item!=0 && current_item.type==="joint")
+                                        current_item.setSupportType(support_designer_rect.selection)
                                 }
                             }
                         }
@@ -880,7 +901,7 @@ Rectangle {
                                     if(hasReaction){
                                         logging_fields[forceListModel.get(current_item.connected_beams.length).joint.objectName]=forceListModel.get(current_item.connected_beams.length).isAdded;
                                     }
-                                   logger.log("infobox_joint_change_force_list",logging_fields);
+                                    logger.log("infobox_joint_change_force_list",logging_fields);
                                 }
                             }
                         }
