@@ -15,6 +15,9 @@ Entity{
     objectName: backend_entity.objectName
     property bool disable_beam_selection_for_load: false
 
+    property bool non_default_visibility:true
+
+    property bool highlighted: false
 
 
 //    property int stencilValue: backend_entity.customID
@@ -138,7 +141,7 @@ Entity{
             quaternionTest=quaternion_helper.product(transform.fromAxisAndAngle(axis, angle*180.0/Math.PI),quaternionTest)
         }
         var center=extreme1.plus(extreme2).times(0.5);
-        translationTest.x=center.x;
+        translationTest.x=center.x;non_default_visibility
         translationTest.y=center.y;
         translationTest.z=center.z;
     }
@@ -162,20 +165,34 @@ Entity{
         running: false
     }
 
+    property Material main_mesh_material: backend_entity.enabled ? main_mesh_material_beam_enabled:main_mesh_material_beam_disabled
+
     PhongMaterial{
-        id:main_mesh_material
+        id: main_mesh_material_beam_enabled
+        ambient: infobox.current_item == rootEntity ? "green" : highlighted ? "yellow" : "grey"
+        diffuse:"grey"
+        specular:"black"
+        //        QQ2.Component.onCompleted: {
+        //            for(var i=0;i<main_mesh_material.effect.techniques.length;i++){
+        //                var effect=main_mesh_material.effect.techniques[i]
+        //                effect.renderPasses[0].renderStates=stencilTest
+        //            }
+        //        }
+        //alpha:0.75
+    }
+    PhongAlphaMaterial{
+        id: main_mesh_material_beam_disabled
         ambient: infobox.current_item == rootEntity ? "green" : "grey"
         diffuse:"grey"
         specular:"black"
-//        QQ2.Component.onCompleted: {
-//            for(var i=0;i<main_mesh_material.effect.techniques.length;i++){
-//                var effect=main_mesh_material.effect.techniques[i]
-//                effect.renderPasses[0].renderStates=stencilTest
-//            }
-//        }
-        //alpha:0.75
+        //        QQ2.Component.onCompleted: {
+        //            for(var i=0;i<main_mesh_material.effect.techniques.length;i++){
+        //                var effect=main_mesh_material.effect.techniques[i]
+        //                effect.renderPasses[0].renderStates=stencilTest
+        //            }
+        //        }
+        alpha:0.50
     }
-
     Transform{
         id:transform
         rotation:quaternionTest
@@ -223,23 +240,37 @@ Entity{
 
     Entity{
         //Sphere mesh
-        enabled: settings.show_beam_sphere && !enable_deformation && backend_entity.enabled
+        enabled: (settings.show_beam_sphere && !enable_deformation) || !backend_entity.enabled || !non_default_visibility
+        property Transform transform:Transform{
+            scale3D: Qt.vector3d(1,6,1)
+        }
         components: [
-            beam_commons.sphere_mesh,
-            main_mesh_material
+            beam_commons.main_mesh_cylinder,
+            //beam_commons.sphere_mesh,
+            main_mesh_material,
+            this.transform
         ]
+
     }
 
     Entity{
         //Spring mesh
         id:spring_entity
-        enabled: settings.show_beam_spring && !settings.show_displacement && !enable_deformation && backend_entity.enabled
+        enabled: settings.show_beam_spring && !settings.show_displacement && !enable_deformation && backend_entity.enabled && non_default_visibility
         property real scaleFactor:Math.min(0.75,tangibleSection.width/22,tangibleSection.height/22,33*available_length/space_from_spring_and_arrows)
+        property real shrinking_factor: (maxForce-minForce-0.00001)>0 ? (Math.abs(backend_entity.peakForces.x)-minForce)/(maxForce-minForce) : 0
         property Transform transform:Transform{
             //z:width,x:height,y:lenght
             //scale3D:Qt.vector3d(17/9,1,35/9)
             //22 is the size of the spring
-            scale3D: axialForceType > 0 ? Qt.vector3d(spring_entity.scaleFactor,spring_entity.scaleFactor + Math.min(relativeAxialStress,1),spring_entity.scaleFactor) : Qt.vector3d(spring_entity.scaleFactor,spring_entity.scaleFactor -0.55* Math.min(relativeAxialStress,1),spring_entity.scaleFactor)
+            scale3D: axialForceType > 0 ? Qt.vector3d(spring_entity.scaleFactor,
+                                                      //spring_entity.scaleFactor + Math.min(relativeAxialStress,1),
+                                                      spring_entity.scaleFactor + spring_entity.shrinking_factor,
+                                                      spring_entity.scaleFactor) :
+                                          Qt.vector3d(spring_entity.scaleFactor,
+                                                      //spring_entity.scaleFactor -0.55* Math.min(relativeAxialStress,1),
+                                                      spring_entity.scaleFactor -0.25*spring_entity.shrinking_factor,
+                                                      spring_entity.scaleFactor)
             QQ2.Behavior on scale3D{
                 QQ2.Vector3dAnimation{
                     duration: 500

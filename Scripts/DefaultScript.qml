@@ -103,6 +103,7 @@ Item{
                                            0, 1.0352696831776980e+03 , 4.8550000000000000e+02,0,
                                            0,0,1,0,
                                            0,0,0,1)
+                               rotationSensor.start();
                            }
                            else  {
                                camDevice.deviceId=QtMultimedia.availableCameras[1].deviceId
@@ -436,7 +437,7 @@ Item{
                     anchors.margins: 10
                     spacing: 10
                     Image {
-                        visible: settings.show_AR_button
+                        visible: settings.show_tangible_button
                         Layout.preferredWidth:  100
                         Layout.preferredHeight: 100
                         source:"qrc:/icons/Icons/TANGIBLE.png"
@@ -464,6 +465,8 @@ Item{
                             anchors.fill: parent
                             onClicked: {
                                 camDevice.isRunning = !camDevice.isRunning
+                                if(camDevice.isRunning) rotationSensor.start();
+                                else rotationSensor.stop();
                                 logger.log("AR_Button_Click",{"running":camDevice.isRunning})
                             }
                         }
@@ -668,7 +671,7 @@ Item{
                 }
 
                 Image{
-                    visible: !tutorial.visible
+                    visible: !tutorial.visible && settings.show_help_button
                     anchors.horizontalCenter: parent.horizontalCenter
                     anchors.top: parent.bottom
                     anchors.margins: 10
@@ -756,6 +759,7 @@ Item{
 
         Component.onCompleted: {
             marker_detector.registerObserver(structure_tag)
+            last_sensor_read=Qt.vector3d(rotationSensor.reading.x,rotationSensor.reading.y,rotationSensor.reading.z)
         }
 
      }

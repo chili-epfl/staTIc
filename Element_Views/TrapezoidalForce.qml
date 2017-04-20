@@ -101,15 +101,17 @@ Entity{
 
     NodeInstantiator{
         id:picker_instantiator
-        model: Math.floor((rootEntity.parent.length-20)/50)+1
+        model: rootEntity.parent ? Math.floor((rootEntity.parent.length-20)/50)+1 :0
         property int central_index:model%2==0 ? 0.5*model+0.5 : Math.floor(0.5*model)
         delegate: Entity{
             enabled: settings.beam_is_selectable && isSelected
             property Transform transform: Transform{
                 //rotation: fromAxisAndAngle(Qt.vector3d(0, 0, 1), 90)
-                translation:Qt.vector3d(rootEntity.parent.tangibleSection.height/2+beam_commons.drag_mesh.radius,
+                translation:rootEntity.parent?
+                                Qt.vector3d(rootEntity.parent.tangibleSection.height/2+beam_commons.drag_mesh.radius,
                                         (index-picker_instantiator.central_index)*50,
-                                        0)
+                                        0):
+                                Qt.vector3d(0,0,0)
             }
             property ObjectPicker objectPicker:ObjectPicker{
                 onClicked: {

@@ -7,15 +7,15 @@ Item {
     property int blink_displacement:0
     property bool show_stress: false
     property bool show_displacement:false
-    property bool show_stress_button: true
-    property bool show_AR_button: condition=="Hands" ? true : false
+    property bool show_stress_button: false
+    property bool show_AR_button: true
     property bool show_displacement_button:true
-
+    property bool show_help_button:false
     property bool beam_is_selectable: true
     property bool joint_is_selectable: true
     property bool load_is_selectable: true
     property bool load_is_draggable: true
-
+    property bool show_tangible_button:false
     property bool show_beam: true
     property bool show_beam_spring: true
     property bool show_beam_sphere: false
@@ -53,7 +53,7 @@ Item {
 
         show_stress= false
         show_displacement=false
-        show_stress_button= true
+        show_stress_button= false
         show_displacement_button=true
         show_info_box=true
 
@@ -74,9 +74,11 @@ Item {
         show_legend= true
 
         enable_scaffold= false;
-        show_AR_button= condition=="Hands" ? true : false
+        show_AR_button= true
         visible_loader="DEFAULT";
         focus_on_joint=false;
+        show_help_button=false
+        show_tangible_button=false
 
     }
 

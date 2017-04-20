@@ -47,6 +47,7 @@ Entity{
         PhongMaterial{
         ambient: "#333333"
     }
+
     property SphereMesh sphere_mesh_reference:
         SphereMesh{
         radius: 5

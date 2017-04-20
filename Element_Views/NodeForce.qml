@@ -24,7 +24,7 @@ Entity{
     onKillMe: backend_entity.killMe()
 
 
-    property vector3d offsetAugmentation: rootEntity.parent? Qt.vector3d(10,0,
+    property vector3d offsetAugmentation: rootEntity.parent? Qt.vector3d(0,0,
                                                                          0)://-rootEntity.parent.tangibleSection.width/2):
                                                              Qt.vector3d(0,0,0)
 
