@@ -15,8 +15,8 @@ Rectangle{
     height: parent.height/3
     anchors.centerIn: parent
     anchors.margins: 10
-    Component.onCompleted: file_view.currentIndex=-1
-    property string boardPath:file_view.currentIndex>-1 ?
+
+    property string boardPath: file_view.currentIndex>-1 ?
                                   folderModel.get(file_view.currentIndex,"filePath"):
                                   ""
     Rectangle{
@@ -48,6 +48,7 @@ Rectangle{
                         showDirs: false
                         folder: Conf_folder
                         nameFilters: ["*.data"]
+                        onCountChanged: folderModel.count>0 ? file_view.currentIndex=0 : file_view.currentIndex=-1
                     }
 
                     Component {
