@@ -60,7 +60,7 @@ Frame3DDKernel::Frame3DDKernel(QObject* parent):
     AbstractStaticsModule(parent),
     m_gravity(0,-9800,0),
     m_shear(0),
-    m_geom(0)
+    m_geom(1)
 {
     connect(&m_lazyupdateTimer, SIGNAL(timeout()), this, SLOT(solve()));
     m_lazyupdateTimer.setSingleShot(true);

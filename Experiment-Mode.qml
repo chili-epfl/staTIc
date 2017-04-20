@@ -12,9 +12,9 @@ import "qrc:/ui/UI/Help"
 import "qrc:/ui/UI/"
 Item {
 
-    property bool enable_eye_tracking_tags: true
+    property bool enable_eye_tracking_tags: false
     property int tag_dim: 15
-    property string condition: "Hands"     //Hands or Fixed
+    property string condition: "Arrows"
     property string participantID:""
     property string board_path: boardSelection_box.boardPath
 
@@ -26,8 +26,7 @@ Item {
 
     RotationSensor{
         id: rotationSensor
-        active: true
-
+        active:  true
     }
 //    Accelerometer{
 //        id:accelormeter
@@ -83,6 +82,8 @@ Item {
                 item.hidden_beams=stories.list[gridview.currentIndex].hidden_beams;
                 item.question_beams=stories.list[gridview.currentIndex].question_beams
                 item.exerciseID=stories.list[gridview.currentIndex].exerciseID
+                item.init_state=stories.list[gridview.currentIndex].init_state
+
             }
             if(stories.list[gridview.currentIndex].story_type=="Default" && stories.list[gridview.currentIndex].show_demo){
                 item.tutorial.interactive=true;
@@ -213,7 +214,7 @@ Item {
                                         logger.log("Exercise_CableEx_Start",{"Story":gridview.currentIndex,"ParticipantID":participantID})
                                     }
                                     else if(stories.list[gridview.currentIndex].story_type=="FindAxialEx"){
-                                        scriptLoader.source="qrc:/scripts/Scripts/FindAxialForceExercise.qml";
+                                        scriptLoader.source="qrc:/scripts/Scripts/FindAxialForceExercise_v2.qml";
                                         logger.log("Exercise_FindAxialForce_Start",{"Story":gridview.currentIndex,"ParticipantID":participantID,"Condition":condition,"ExerciseID":stories.list[gridview.currentIndex].exerciseID})
                                     }
                                     else if(stories.list[gridview.currentIndex].story_type=="Default"){
@@ -307,20 +308,20 @@ Item {
                     }
                     RadioButton{
                         exclusiveGroup: condition_ex_group
-                        text: "Hands"
-                        onCheckedChanged: if(checked) condition="Hands"
+                        text: "Arrows"
+                        onCheckedChanged: if(checked) condition="Arrows"
                         checked: true
                     }
                     RadioButton{
                         exclusiveGroup: condition_ex_group
-                        text: "Fixed"
-                        onCheckedChanged: if(checked) condition="Fixed"
+                        text: "Springs"
+                        onCheckedChanged: if(checked) condition="Springs"
                     }
                 }
                 CheckBox{
                     text: "Enable Eye Tracking"
                     onCheckedChanged: enable_eye_tracking_tags=checked
-                    checked: true
+                    checked: false
                 }
                 CheckBox{
                     text: "Enable Logging"

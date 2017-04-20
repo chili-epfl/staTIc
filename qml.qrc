@@ -43,6 +43,8 @@
         <file>Icons/help.png</file>
         <file>Icons/help_pressed.png</file>
         <file>Icons/TANGIBLE.png</file>
+        <file>Icons/apply_all_pressed.png</file>
+        <file>Icons/apply_all.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>Images/mainbanner.png</file>
@@ -121,6 +123,7 @@
         <file>Scripts/Demo.structure</file>
         <file>Scripts/test.structure</file>
         <file>Scripts/test_copy.structure</file>
+        <file>Scripts/FindAxialForceExercise_v2.qml</file>
     </qresource>
     <qresource prefix="/ui">
         <file>UI/ViewFilterBar.qml</file>
@@ -172,6 +175,7 @@
         <file>UI/Eye_tracking_tags/007.png</file>
         <file>UI/Eye_tracking_tags/008.png</file>
         <file>UI/Eye_tracking_tags/009.png</file>
+        <file>UI/InfoBoxFindAxialForce_v2.qml</file>
     </qresource>
     <qresource prefix="/tools">
         <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>

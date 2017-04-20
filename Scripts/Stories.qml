@@ -62,6 +62,7 @@ Item{
              "question_beams":["BC","DE","CE"],
              "hidden_beams":["FG","EG","GH","AC"],
              "loadsOnBeams":[{"beamName":"BD", "warehouseIndex":0}, {"beamName":"FH", "warehouseIndex":0}]
+            ,"init_state":"SOLVING"
         },
         {
             "story_type":"FindAxialEx",
@@ -76,6 +77,7 @@ Item{
              "hidden_beams":["CD","CE","AC"],
              "loadsOnBeams":[{"beamName":"AB", "warehouseIndex":0}, {"beamName":"DE", "warehouseIndex":0}
                 , {"beamName":"EF", "warehouseIndex":0}, {"beamName":"FH", "warehouseIndex":0}]
+            ,"init_state":"SOLVING"
         },
         {
             "story_type":"FindAxialEx",
@@ -89,6 +91,8 @@ Item{
              "question_beams":["AC","BC","FN"],
              "hidden_beams":["GI","HI","CE","IM"],
              "loadsOnBeams":[{"beamName":"DL", "warehouseIndex":0}, {"beamName":"AL", "warehouseIndex":0}, {"beamName":"DN", "warehouseIndex":0}]
+            ,"init_state":"SOLVING"
+
         },
         {
             "story_type":"FindAxialEx",
@@ -102,6 +106,7 @@ Item{
              "question_beams":["GI","HO","AG"],
              "hidden_beams":["IM","GO","HL"],
              "loadsOnBeams":[{"beamName":"HL", "warehouseIndex":0}, {"beamName":"LN", "warehouseIndex":0}, {"beamName":"OL", "warehouseIndex":0}]
+            ,"init_state":"SOLVING"
         },
         {
             "story_type":"Default",
