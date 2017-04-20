@@ -16,7 +16,18 @@ Warehouse3D::Warehouse3D(QObject *parent): QAbstractListModel(parent)
     solar_pannel.properties["main_asset_url"]="qrc:/resources/Resources/Assets3D/solar_pannel/Solar.obj";
     solar_pannel.properties["main_asset_diffuse_map_url"]="qrc:/resources/Resources/Assets3D/solar_pannel/Solar.png";
     solar_pannel.properties["weight"]=25;
-    solar_pannel.properties["extent"]=QVector2D(-500,500);
+    solar_pannel.properties["extent"]=QVector2D(-250,250);
+
+    m_objectsIndexes.append(solar_pannel);
+
+    solar_pannel.decoration_img="qrc:/resources/Resources/Assets3D/solar_pannel/preview.png";
+    solar_pannel.properties["thumbnail"]=solar_pannel.decoration_img;
+    solar_pannel.properties["main_asset_url"]="qrc:/resources/Resources/Assets3D/solar_pannel/Solar.obj";
+    solar_pannel.properties["main_asset_diffuse_map_url"]="qrc:/resources/Resources/Assets3D/solar_pannel/Solar.png";
+    solar_pannel.properties["weight"]=0.05;
+    solar_pannel.properties["extent"]=QVector2D(-250,250);
+    solar_pannel.properties["type"]="uniform";
+
     m_objectsIndexes.append(solar_pannel);
     /*.........*/
     QDirIterator it(assets3DPath);
@@ -96,6 +107,12 @@ QVariant Warehouse3D::data(const QModelIndex &index, int role) const
     case Qt::DisplayRole:
         return m_objectsIndexes[index.row()+index.column()].name;
         break;
+    case Qt::WhatsThisRole:
+        if(m_objectsIndexes[index.row()+index.column()].properties.contains("type"))
+            return m_objectsIndexes[index.row()+index.column()].properties["type"];
+        else
+            return QVariant();
+        break;
     default:
         return QVariant();
         break;
@@ -129,6 +146,12 @@ QVariant Warehouse3D::get(int index, QString info) const
     if(info.compare("extent",Qt::CaseInsensitive)==0){
         if(m_objectsIndexes[index].properties.contains("extent"))
             return m_objectsIndexes[index].properties["extent"];
+        else
+            return QVariant();
+    }
+    if(info.compare("type",Qt::CaseInsensitive)==0){
+        if(m_objectsIndexes[index].properties.contains("type"))
+            return m_objectsIndexes[index].properties["type"];
         else
             return QVariant();
     }

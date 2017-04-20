@@ -19,7 +19,8 @@ Entity{
     property url asset3DMeshURL:warehouse3d.get(warehouse_index,"properties")["main_asset_url"];
     property url asset3DTextureURL:warehouse3d.get(warehouse_index,"properties")["main_asset_diffuse_map_url"];
     property real weight:warehouse3d.get(warehouse_index,"properties")["weight"];
-
+    property vector2d extent:warehouse3d.get(warehouse_index,"properties")["extent"];
+    property real mesh_length: (rootEntity.extent.y-rootEntity.extent.x)*staticsModule.modelScale
     signal killMe();
     onKillMe: backend_entity.killMe()
 
@@ -66,6 +67,19 @@ Entity{
         components: rootEntity.enabled && !isSelected ?
                         [root_transform,customMesh,material,valid_picker]:
                         [root_transform,customMesh,material]
+    }
+
+    NodeInstantiator{
+        id:node_instantiator
+        model:rootEntity.parent? Math.floor((rootEntity.parent.length-20)/mesh_length) : 0
+        delegate: Entity{
+            property real offset: -(0.5*(rootEntity.parent.length-20)-mesh_length*(index+0.5))
+            property Transform transform:Transform{
+                rotation:fromAxisAndAngle(Qt.vector3d(0, 0, 1), -90)
+                translation:offsetAugmentation.plus(Qt.vector3d(0,parent.offset,0))
+            }
+            components: [transform,customMesh,material]
+        }
     }
 
 }

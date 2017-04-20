@@ -237,7 +237,15 @@ Entity {
                                 return childNodes[child_index];
                     }
                 }
-
+                function findBeams(){
+                    var beams=[]
+                    for(var child_index=0;child_index<childNodes.length;child_index++){
+                        if(childNodes[child_index])
+                            if(childNodes[child_index].type=="beam")
+                                beams.push(childNodes[child_index]);
+                    }
+                    return beams;
+                }
                 components: [
                     Transform{
                         //                    translation:settings.focus_on_joint ?

@@ -10,8 +10,9 @@ Rectangle {
     onCurrent_itemChanged: {
         if(current_item!=0 &&
                 current_item.type==="beam"){
-            if(tab_view.currentIndex===1)
+            if(tab_view.currentIndex===1){
                 tab_view.getTab(1).item.currentIndex=materialsManager.get(current_item.materialID ,"Index")
+            }
             settings.focus_on_joint=false;
         }
         else if(current_item!=0 &&
@@ -156,7 +157,7 @@ Rectangle {
                                         anchors.centerIn: parent
                                         height: parent.height
                                         color: "#F0F0F0"
-                                        text:"Weight:"+warehouse3d.get(index,"weight")+"Kg"
+                                        text:whatsThis!="uniform"? "Weight:"+warehouse3d.get(index,"weight")+"Kg" :  "Load:"+warehouse3d.get(index,"weight")+"Kg/mm"
                                         fontSizeMode: Text.Fit
                                         verticalAlignment: Text.AlignVCenter
                                         horizontalAlignment: Text.AlignHCenter
@@ -269,6 +270,7 @@ Rectangle {
                 property alias currentIndex: materials_list.currentIndex
                 anchors.fill:parent
                 color: "transparent"
+
                 Column{
                     anchors.fill: parent
                     spacing: 10
@@ -377,6 +379,28 @@ Rectangle {
                                                         current_item.setMaterialID(materialsManager.get(index,"UniqueID"))
                                                         logger.log("infobox_designer_change_material",{"beam":current_item.objectName,"materialID":current_item.materialID})
                                                     }
+                                                }
+                                            }
+
+                                        }
+                                        Image{
+                                            visible: materials_list.currentIndex==index
+                                            anchors.top: parent.top
+                                            anchors.right: parent.right
+                                            height: 50
+                                            width: 50
+                                            source: material_apply_all_button.pressed ? "qrc:/icons/Icons/apply_all_pressed.png":"qrc:/icons/Icons/apply_all.png"
+                                            MouseArea{
+                                                id:material_apply_all_button
+                                                anchors.fill: parent
+                                                onClicked:{
+                                                    var beams=sceneRoot.findBeams()
+                                                    for(var beam_index=0;beam_index<beams.length;beam_index++){
+                                                        beams[beam_index].setMaterialID(materialsManager.get(index,"UniqueID"))
+                                                    }
+                                                    feedback_animation_material.start();
+                                                    logger.log("infobox_designer_change_material_global",{"materialID":current_item.materialID})
+
                                                 }
                                             }
 
@@ -494,6 +518,27 @@ Rectangle {
                                     }
                                 }
                             }
+                            Image{
+                                anchors.top: parent.top
+                                anchors.right: parent.right
+                                height: 50
+                                width: 50
+                                source: size_apply_button.pressed ? "qrc:/icons/Icons/apply_all_pressed.png":"qrc:/icons/Icons/apply_all.png"
+                                MouseArea{
+                                    id:size_apply_all_button
+                                    anchors.fill: parent
+                                    onClicked:{
+                                        var beams=sceneRoot.findBeams()
+                                        for(var beam_index=0;beam_index<beams.length;beam_index++){
+                                            beams[beam_index].setBeamSize(Qt.size(w.text,h.text));
+                                        }
+                                        feedback_animation_size.start();
+                                        logger.log("infobox_designer_change_section_all",{"section": current_item.realBeamSize})
+
+                                    }
+                                }
+
+                            }
 
                         }
                     }
@@ -516,13 +561,18 @@ Rectangle {
                                 anchors.margins: 10
                                 anchors.left: parent.left
                                 text:"Enable/Disable"
+                                Component.onCompleted:{
+                                    beam_enable_check.checked= enabled && current_item.backend_entity.enabled
+                                }
                                 Connections{
                                     target:root
+                                    ignoreUnknownSignals: true
                                     onCurrent_itemChanged: if(current_item!=0 && current_item.type=="beam")
                                                                beam_enable_check.checked=current_item.backend_entity.enabled
                                 }
                                 Connections {
-                                    target: current_item.backend_entity
+                                    target: current_item!=0 ? current_item.backend_entity : null
+                                    ignoreUnknownSignals: true
                                     onEnabledChanged: {
                                         beam_enable_check.checked = current_item.backend_entity.enabled
                                         logger.log("infobox_designer_enable_beam",{"beam":current_item.objectName,"enabled": beam_enable_check.checked})
