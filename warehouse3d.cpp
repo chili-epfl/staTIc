@@ -10,16 +10,18 @@ QSet<QString> Warehouse3D::m_image_extensions=QSet<QString>()<< "jpg"<<"jpeg"<<"
 Warehouse3D::Warehouse3D(QObject *parent): QAbstractListModel(parent)
 {
     /*Default models*/
+    Object snow;
+    snow.decoration_img="qrc:/resources/Resources/Assets3D/snow/preview.png";
+    snow.properties["thumbnail"]=snow.decoration_img;
+    snow.properties["main_asset_url"]="qrc:/resources/Resources/Assets3D/snow/snow.obj";
+    snow.properties["main_asset_diffuse_map_url"]="qrc:/resources/Resources/Assets3D/snow/texture.png";
+    snow.properties["weight"]=0.03;
+    snow.properties["extent"]=QVector2D(-150,150);
+    snow.properties["type"]="uniform";
+
+    m_objectsIndexes.append(snow);
+
     Object solar_pannel;
-    solar_pannel.decoration_img="qrc:/resources/Resources/Assets3D/solar_pannel/preview.png";
-    solar_pannel.properties["thumbnail"]=solar_pannel.decoration_img;
-    solar_pannel.properties["main_asset_url"]="qrc:/resources/Resources/Assets3D/solar_pannel/Solar.obj";
-    solar_pannel.properties["main_asset_diffuse_map_url"]="qrc:/resources/Resources/Assets3D/solar_pannel/Solar.png";
-    solar_pannel.properties["weight"]=25;
-    solar_pannel.properties["extent"]=QVector2D(-250,250);
-
-    m_objectsIndexes.append(solar_pannel);
-
     solar_pannel.decoration_img="qrc:/resources/Resources/Assets3D/solar_pannel/preview.png";
     solar_pannel.properties["thumbnail"]=solar_pannel.decoration_img;
     solar_pannel.properties["main_asset_url"]="qrc:/resources/Resources/Assets3D/solar_pannel/Solar.obj";

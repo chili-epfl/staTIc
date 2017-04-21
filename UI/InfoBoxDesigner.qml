@@ -230,7 +230,7 @@ Rectangle {
                                                 logger.log("infobox_designer_add_load",{"beam":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight")})
                                                 staticsModule.createTPZLoad(current_item.backend_entity,{"parent_entity":current_item,"warehouse_index":catalog_grid.currentIndex})
                                             }else{
-                                                logger.log("infobox_designer_add_load",{"beam":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight")})
+                                                logger.log("infobox_designer_add_load",{"beam":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight"),"type":"uniform"})
                                                 staticsModule.createUDLoad(current_item.backend_entity,{"parent_entity":current_item,"warehouse_index":catalog_grid.currentIndex})
                                             }
                                         }

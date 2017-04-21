@@ -105,7 +105,7 @@ Item {
                     var load=loadsOnBeams[i];
                     beam=default_script.sceneRoot.findEntityByName(load.beamName);
                     if(beam){
-                        default_script.staticsModule.createTPZLoad(beam.backend_entity,{"parent_entity":beam,"warehouse_index":load.warehouseIndex});
+                        default_script.staticsModule.createUDLoad(beam.backend_entity,{"parent_entity":beam,"warehouse_index":load.warehouseIndex});
                     }
                 }
 

@@ -246,5 +246,8 @@
         <file>Resources/Assets3D/solar_pannel/Solar.png</file>
         <file>Resources/Assets3D/solar_pannel/Solar.obj</file>
         <file>Resources/Assets3D/solar_pannel/preview.png</file>
+        <file>Resources/Assets3D/snow/texture.png</file>
+        <file>Resources/Assets3D/snow/preview.png</file>
+        <file>Resources/Assets3D/snow/snow.obj</file>
     </qresource>
 </RCC>
