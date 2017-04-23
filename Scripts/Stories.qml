@@ -53,6 +53,20 @@ Item{
         {
             "story_type":"FindAxialEx",
             "exerciseID":1,
+            "story_picture":"qrc:/scripts/Scripts/Gazebo/gazebo.jpg",
+            "story_description":"
+             <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
+             <p>For each beams you can choose either <b><i>Compression</i></b> or <b><i>Tension</i></b>. If you don't know just do not check any box</p>
+             <p>Are you ready?</p>",
+             "structure_url":"qrc:/scripts/Scripts/Gazebo/Gazebo.structure",
+             "question_beams":["GI","HO","AG"],
+             "hidden_beams":["IM","GO","HL"],
+             "loadsOnBeams":[{"beamName":"HL", "warehouseIndex":1}, {"beamName":"LN", "warehouseIndex":1}, {"beamName":"OL", "warehouseIndex":1}]
+            ,"init_state":"SOLVING"
+        },
+        {
+            "story_type":"FindAxialEx",
+            "exerciseID":2,
             "story_picture":"qrc:/scripts/Scripts/Howe/howe.jpg",
             "story_description":"
              <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
@@ -66,7 +80,7 @@ Item{
         },
         {
             "story_type":"FindAxialEx",
-            "exerciseID":2,
+            "exerciseID":3,
             "story_picture":"qrc:/scripts/Scripts/Vault/vault.png",
             "story_description":"
              <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
@@ -81,7 +95,7 @@ Item{
         },
         {
             "story_type":"FindAxialEx",
-            "exerciseID":3,
+            "exerciseID":4,
             "story_picture":"qrc:/scripts/Scripts/Full_Roof/full-roof.jpg",
             "story_description":"
              <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
@@ -96,7 +110,7 @@ Item{
         },
         {
             "story_type":"FindAxialEx",
-            "exerciseID":4,
+            "exerciseID":5,
             "story_picture":"qrc:/scripts/Scripts/Gazebo/gazebo.jpg",
             "story_description":"
              <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
@@ -106,11 +120,11 @@ Item{
              "question_beams":["GI","HO","AG"],
              "hidden_beams":["IM","GO","HL"],
              "loadsOnBeams":[{"beamName":"HL", "warehouseIndex":1}, {"beamName":"LN", "warehouseIndex":1}, {"beamName":"OL", "warehouseIndex":1}]
-            ,"init_state":"SOLVING"
+            ,"init_state":"EXPLORING"
         },
         {
             "story_type":"FindAxialEx",
-            "exerciseID":1,
+            "exerciseID":6,
             "story_picture":"qrc:/scripts/Scripts/Howe/howe.jpg",
             "story_description":"
              <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
@@ -124,7 +138,7 @@ Item{
         },
         {
             "story_type":"FindAxialEx",
-            "exerciseID":2,
+            "exerciseID":7,
             "story_picture":"qrc:/scripts/Scripts/Vault/vault.png",
             "story_description":"
              <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
@@ -139,7 +153,7 @@ Item{
         },
         {
             "story_type":"FindAxialEx",
-            "exerciseID":3,
+            "exerciseID":8,
             "story_picture":"qrc:/scripts/Scripts/Full_Roof/full-roof.jpg",
             "story_description":"
              <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
@@ -154,41 +168,57 @@ Item{
         },
         {
             "story_type":"FindAxialEx",
-            "exerciseID":4,
-            "story_picture":"qrc:/scripts/Scripts/Gazebo/gazebo.jpg",
+            "exerciseID":9,
+            "story_picture":"qrc:/scripts/Scripts/Howe/howe.jpg",
             "story_description":"
              <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
              <p>For each beams you can choose either <b><i>Compression</i></b> or <b><i>Tension</i></b>. If you don't know just do not check any box</p>
              <p>Are you ready?</p>",
-             "structure_url":"qrc:/scripts/Scripts/Gazebo/Gazebo.structure",
-             "question_beams":["GI","HO","AG"],
-             "hidden_beams":["IM","GO","HL"],
-             "loadsOnBeams":[{"beamName":"HL", "warehouseIndex":1}, {"beamName":"LN", "warehouseIndex":1}, {"beamName":"OL", "warehouseIndex":1}]
+             "structure_url":"qrc:/scripts/Scripts/Howe/Howe.structure",
+             "question_beams":["BC","DE","EF"],
+             "hidden_beams":["FG","BE","EG","BD"],
+             "loadsOnBeams":[{"beamName":"AB", "warehouseIndex":0},{"beamName":"BD", "warehouseIndex":0},{"beamName":"DF", "warehouseIndex":0}, {"beamName":"FH", "warehouseIndex":0}]
             ,"init_state":"EXPLORING"
         },
+        {
+            "story_type":"FindAxialEx",
+            "exerciseID":10,
+            "story_picture":"qrc:/scripts/Scripts/Vault/vault.png",
+            "story_description":"
+             <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
+             <p>For each beams you can choose either <b><i>Compression</i></b> or <b><i>Tension</i></b>. If you don't know just do not check any box</p>
+             <p>Are you ready?</p>",
+            "structure_url":"qrc:/scripts/Scripts/Vault/Vault.structure",
+             "question_beams":["FG","CD","CG"],
+             "hidden_beams":["BD","FH"],
+             "loadsOnBeams":[{"beamName":"AB", "warehouseIndex":1}, {"beamName":"BD", "warehouseIndex":1}
+                , {"beamName":"DE", "warehouseIndex":1}]
+            ,"init_state":"EXPLORING"
+        }
+
 //        {
 //            "story_type":"Default",
 //            "story_picture":"",
 //            "structure_url":"qrc:/scripts/Scripts/test_copy.structure",
 //            "show_demo":false
 //        },
-        {
-            "story_type":"Default",
-            "story_picture":"qrc:/scripts/Scripts/Howe/howe.jpg",
-            "structure_url":"qrc:/scripts/Scripts/Howe/Howe.structure",
-            "show_demo":false
-        },
+//        {
+//            "story_type":"Default",
+//            "story_picture":"qrc:/scripts/Scripts/Howe/howe.jpg",
+//            "structure_url":"qrc:/scripts/Scripts/Howe/Howe.structure",
+//            "show_demo":false
+//        },
 //        {
 //            "story_type":"Default",
 //            "story_picture":"qrc:/scripts/Scripts/Full_Roof/full-roof.jpg",
 //            "structure_url":"qrc:/scripts/Scripts/Full_Roof/Full_roof.structure",
 //            "show_demo":false
 //        },
-        {
-            "story_type":"Default",
-            "story_picture":"qrc:/scripts/Scripts/Vault/vault.png",
-            "structure_url":"qrc:/scripts/Scripts/Vault/Vault.structure",
-            "show_demo":false
-        }
+//        {
+//            "story_type":"Default",
+//            "story_picture":"qrc:/scripts/Scripts/Vault/vault.png",
+//            "structure_url":"qrc:/scripts/Scripts/Vault/Vault.structure",
+//            "show_demo":false
+//        }
     ]
 }

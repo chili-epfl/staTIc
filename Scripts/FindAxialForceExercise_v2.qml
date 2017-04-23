@@ -145,7 +145,7 @@ Item {
             show_displacement_button:false
             show_beam_axial_loads:condition=="Springs" ? false:true
             enable_scaffold:false
-            show_legend: condition=="Springs" ? false:true
+            show_legend: true
             show_filter_bar:false
             visible_loader:"CUSTOM"
             restoreEntryValues: false

@@ -277,10 +277,13 @@ Entity{
                 }
             }
         }
-
-        components: available_length<=space_from_spring_and_arrows && infobox.current_item == rootEntity ?
+        property Material material: shrinking_factor<0.05 ? beam_commons.phong_grey :
+                                                            axialForceType>0 ?
+                                                                audx_commons.material_0_360 :
+                                                                audx_commons.material_240_360
+        components: infobox.current_item == rootEntity ?
                         [beam_commons.spring_mesh, this.transform, main_mesh_material] :
-                        [beam_commons.spring_mesh, this.transform, beam_commons.phong_grey]
+                        [beam_commons.spring_mesh, this.transform, this.material]
     }
 
     Entity{
