@@ -7,7 +7,8 @@ Item {
     property int blink_displacement:0
     property bool show_stress: false
     property bool show_displacement:false
-    property bool show_stress_button: false
+    property bool show_stress_button: true
+    property int stress_type:1 //1=Axial, 2=Bedning, 3=Shear
     property bool show_AR_button: true
     property bool show_displacement_button:true
     property bool show_help_button:false
@@ -53,7 +54,7 @@ Item {
 
         show_stress= false
         show_displacement=false
-        show_stress_button= false
+        show_stress_button= true
         show_displacement_button=true
         show_info_box=true
 

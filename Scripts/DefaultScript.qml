@@ -47,7 +47,7 @@ Item{
     }
 
     state: "LoadingCamera"
-//    onStateChanged: console.log("State:"+state)
+    //    onStateChanged: console.log("State:"+state)
     states: [
         //....Init states....
         State {
@@ -124,12 +124,12 @@ Item{
             source:"qrc:/icons/Icons/LOADING.png"
         }
         Text{
-           id:loadingAnimation_text
-           anchors.horizontalCenter: loadingAnimation.horizontalCenter
-           anchors.top: loadingLogo.bottom
-           text: "Loading Camera"
-           color: "white"
-           font.pointSize: 15
+            id:loadingAnimation_text
+            anchors.horizontalCenter: loadingAnimation.horizontalCenter
+            anchors.top: loadingLogo.bottom
+            text: "Loading Camera"
+            color: "white"
+            font.pointSize: 15
         }
         ProgressBar{
             id:loadingAnimation_progressbar
@@ -195,32 +195,32 @@ Item{
         id:warehouse3d
     }
 
-     /*3D Rendering*/
-     Camera{
-         id:camDevice
-         viewfinder.resolution: "640x480"
-         onCameraStatusChanged: {
-             if(firstInit && camDevice.cameraStatus==Camera.ActiveStatus ){
-                 loadingAnimation_text.text="Loading 3D structure";
-                 staticsmodule.sourceUrl=structureUrl;
-             }
-         }
-         imageProcessing.whiteBalanceMode: CameraImageProcessing.WhiteBalanceAuto
-         focus.focusMode: CameraFocus.FocusContinuous
-         captureMode: Camera.CaptureViewfinder
-         exposure.exposureMode: CameraExposure.ExposureModeVendor
-         exposure.meteringMode: CameraExposure.MeteringMatrix
-         imageProcessing.colorFilter: CameraImageProcessing.ColorFilterVendor
-         imageProcessing.denoisingLevel: 1
-         imageProcessing.sharpeningLevel: 1
-         //exposure.exposureCompensation:-0.5
-         imageCapture {
-             onImageCaptured: {
-                 stillImage.source = preview
-             }
-         }
-         property bool isRunning: true
-         onIsRunningChanged: {
+    /*3D Rendering*/
+    Camera{
+        id:camDevice
+        viewfinder.resolution: "640x480"
+        onCameraStatusChanged: {
+            if(firstInit && camDevice.cameraStatus==Camera.ActiveStatus ){
+                loadingAnimation_text.text="Loading 3D structure";
+                staticsmodule.sourceUrl=structureUrl;
+            }
+        }
+        imageProcessing.whiteBalanceMode: CameraImageProcessing.WhiteBalanceAuto
+        focus.focusMode: CameraFocus.FocusContinuous
+        captureMode: Camera.CaptureViewfinder
+        exposure.exposureMode: CameraExposure.ExposureModeVendor
+        exposure.meteringMode: CameraExposure.MeteringMatrix
+        imageProcessing.colorFilter: CameraImageProcessing.ColorFilterVendor
+        imageProcessing.denoisingLevel: 1
+        imageProcessing.sharpeningLevel: 1
+        //exposure.exposureCompensation:-0.5
+        imageCapture {
+            onImageCaptured: {
+                stillImage.source = preview
+            }
+        }
+        property bool isRunning: true
+        onIsRunningChanged: {
             if(isRunning){
                 camDevice.start();
             }
@@ -228,62 +228,62 @@ Item{
                 camDevice.imageCapture.capture();
                 camDevice.stop();
             }
-         }
-     }
+        }
+    }
 
-     Image {
-         id: stillImage
-         visible: camDevice.isRunning && camDevice.cameraStatus==Camera.ActiveStatus ? false:true
-         anchors.fill: parent
-         fillMode: Image.PreserveAspectCrop
-     }
+    Image {
+        id: stillImage
+        visible: camDevice.isRunning && camDevice.cameraStatus==Camera.ActiveStatus ? false:true
+        anchors.fill: parent
+        fillMode: Image.PreserveAspectCrop
+    }
 
-     VideoOutput{
-         z: 0
-         id:viewFinder
-         anchors.centerIn: parent
-         anchors.fill: parent
-         source: camDevice
-         filters:[marker_detector]
-         fillMode:VideoOutput.PreserveAspectCrop
-         onContentRectChanged: if(camDevice.isRunning){
-                                    scene3D.view_finder_width=viewFinder.contentRect.width
-                                    scene3D.view_finder_height=viewFinder.contentRect.height
-                               }
-         Rectangle{
-             anchors.fill: parent
-             color:"#00000000"
-             border.width: 0.125*(2*(parent.width+parent.height)-
-                           Math.sqrt(4*(parent.width+parent.height)*(parent.width+parent.height)
-                                     -16*(1-0.8)*(parent.width*parent.height))) //80% of screen
-             border.color: "#80000000"
+    VideoOutput{
+        z: 0
+        id:viewFinder
+        anchors.centerIn: parent
+        anchors.fill: parent
+        source: camDevice
+        filters:[marker_detector]
+        fillMode:VideoOutput.PreserveAspectCrop
+        onContentRectChanged: if(camDevice.isRunning){
+                                  scene3D.view_finder_width=viewFinder.contentRect.width
+                                  scene3D.view_finder_height=viewFinder.contentRect.height
+                              }
+        Rectangle{
+            anchors.fill: parent
+            color:"#00000000"
+            border.width: 0.125*(2*(parent.width+parent.height)-
+                                 Math.sqrt(4*(parent.width+parent.height)*(parent.width+parent.height)
+                                           -16*(1-0.8)*(parent.width*parent.height))) //80% of screen
+            border.color: "#80000000"
 
 
-             Scene3D {
-                 id:scene3DContainer
-                 anchors.fill: parent
-                 focus: true
-                 aspects: ["input","physics"]
-                 // aspects:["input"]
-                 multisample:true
-                 DefaultScriptScene3D {
+            Scene3D {
+                id:scene3DContainer
+                anchors.fill: parent
+                focus: true
+                aspects: ["input","physics"]
+                // aspects:["input"]
+                multisample:true
+                DefaultScriptScene3D {
                     id:scene3D
-                     property real view_finder_width;
-                     property real view_finder_height;
-                     cameraScaleX: view_finder_height/scene3DContainer.height
-                     cameraScaleY: view_finder_width/scene3DContainer.width
-                 }
-             }
-//             FastBlur{
-//                 anchors.fill: parent
-//                 source: scene3DContainer
-//                 radius: structure_tag.objectIsVisible ? 0:64
-//                 NumberAnimation on radius {
-//                    duration: 3000
+                    property real view_finder_width;
+                    property real view_finder_height;
+                    cameraScaleX: view_finder_height/scene3DContainer.height
+                    cameraScaleY: view_finder_width/scene3DContainer.width
+                }
+            }
+            //             FastBlur{
+            //                 anchors.fill: parent
+            //                 source: scene3DContainer
+            //                 radius: structure_tag.objectIsVisible ? 0:64
+            //                 NumberAnimation on radius {
+            //                    duration: 3000
 
-//                 }
-//             }
-                /*Item {
+            //                 }
+            //             }
+            /*Item {
                     // Public properties.
                     property Item scene: scene3DContainer
                     property MouseArea area: null
@@ -338,7 +338,7 @@ Item{
                 }*/
 
 
-             Rectangle{
+            Rectangle{
                 anchors.centerIn: parent
                 width: parent.width -2*parent.border.width
                 height:parent.height -2*parent.border.width
@@ -357,78 +357,78 @@ Item{
                     anchors.bottom: parent.top
                     width: parent.width
                     height: parent.parent.border.width
-                        Text{
-                            width: parent.width/2
-                            text:"Axial Forces:"
-                            font.family: "Arial"
-                            font.bold: true
-                            color:"white"
-                            font.pixelSize: legend_item.height/2
-                            fontSizeMode: Text.Fit;
-                            anchors.right: parent.horizontalCenter
-                            anchors.verticalCenter: parent.verticalCenter
-                            horizontalAlignment: Image.AlignRight
-                            anchors.rightMargin: 5
-                        }
-                        Image{
-                            id:compression_image
-                            anchors.left: parent.horizontalCenter
-                            anchors.verticalCenter: parent.verticalCenter
-                            height: legend_item.height/3
-                            fillMode: Image.PreserveAspectFit
-                            source:"qrc:/images/Images/compression.png"
-                            anchors.leftMargin: 20
-                        }
-                        Text{
-                            id:compression_label
-                            anchors.left: compression_image.right
-                            anchors.verticalCenter: parent.verticalCenter
-                            text:"Compression"
-                            font.family: "Arial"
-                            color:"white"
-                            font.pixelSize: legend_item.height/3
-                            fontSizeMode: Text.Fit;
-                            anchors.leftMargin: 2
-                        }
-                        Image{
-                            id:tension_image
-                            anchors.left: compression_label.right
-                            anchors.verticalCenter: parent.verticalCenter
-                            height:  legend_item.height/3
-                            fillMode: Image.PreserveAspectFit
-                            source:"qrc:/images/Images/tension.png"
-                            anchors.leftMargin: 10
-                        }
-                        Text{
-                            id:tension_label
-                            anchors.left: tension_image.right
-                            anchors.verticalCenter: parent.verticalCenter
-                            text:"Tension"
-                            font.family: "Arial"
-                            color:"white"
-                            font.pixelSize: legend_item.height/3
-                            fontSizeMode: Text.Fit;
-                            anchors.leftMargin: 2
-                        }
-                        Image{
-                            id:support_image
-                            anchors.left: tension_label.right
-                            anchors.verticalCenter: parent.verticalCenter
-                            height:  legend_item.height/3
-                            fillMode: Image.PreserveAspectFit
-                            source:"qrc:/images/Images/support.png"
-                            anchors.leftMargin: 10
-                        }
-                        Text{
-                            anchors.left: support_image.right
-                            anchors.verticalCenter: parent.verticalCenter
-                            text:"Support"
-                            font.family: "Arial"
-                            color:"white"
-                            font.pixelSize: legend_item.height/3
-                            fontSizeMode: Text.Fit;
-                            anchors.leftMargin: 2
-                        }
+                    Text{
+                        width: parent.width/2
+                        text:"Axial Forces:"
+                        font.family: "Arial"
+                        font.bold: true
+                        color:"white"
+                        font.pixelSize: legend_item.height/2
+                        fontSizeMode: Text.Fit;
+                        anchors.right: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
+                        horizontalAlignment: Image.AlignRight
+                        anchors.rightMargin: 5
+                    }
+                    Image{
+                        id:compression_image
+                        anchors.left: parent.horizontalCenter
+                        anchors.verticalCenter: parent.verticalCenter
+                        height: legend_item.height/3
+                        fillMode: Image.PreserveAspectFit
+                        source:"qrc:/images/Images/compression.png"
+                        anchors.leftMargin: 20
+                    }
+                    Text{
+                        id:compression_label
+                        anchors.left: compression_image.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        text:"Compression"
+                        font.family: "Arial"
+                        color:"white"
+                        font.pixelSize: legend_item.height/3
+                        fontSizeMode: Text.Fit;
+                        anchors.leftMargin: 2
+                    }
+                    Image{
+                        id:tension_image
+                        anchors.left: compression_label.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        height:  legend_item.height/3
+                        fillMode: Image.PreserveAspectFit
+                        source:"qrc:/images/Images/tension.png"
+                        anchors.leftMargin: 10
+                    }
+                    Text{
+                        id:tension_label
+                        anchors.left: tension_image.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        text:"Tension"
+                        font.family: "Arial"
+                        color:"white"
+                        font.pixelSize: legend_item.height/3
+                        fontSizeMode: Text.Fit;
+                        anchors.leftMargin: 2
+                    }
+                    Image{
+                        id:support_image
+                        anchors.left: tension_label.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        height:  legend_item.height/3
+                        fillMode: Image.PreserveAspectFit
+                        source:"qrc:/images/Images/support.png"
+                        anchors.leftMargin: 10
+                    }
+                    Text{
+                        anchors.left: support_image.right
+                        anchors.verticalCenter: parent.verticalCenter
+                        text:"Support"
+                        font.family: "Arial"
+                        color:"white"
+                        font.pixelSize: legend_item.height/3
+                        fontSizeMode: Text.Fit;
+                        anchors.leftMargin: 2
+                    }
                 }
 
                 RowLayout{
@@ -474,153 +474,185 @@ Item{
 
 
 
-                Image {
-                    id:ghostMode_button
-                    visible: false
-                    Layout.preferredWidth:  100
-                    Layout.preferredHeight: 100
-                    source: scene3D.ghostMode?
-                            "qrc:/icons/Icons/ghost_Mode_on.png" :
-                            "qrc:/icons/Icons/ghost_Mode_OFF.png"
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: scene3D.ghostMode = !scene3D.ghostMode
-                    }
-                }
-
-                Image {
-                    id:show_stress_button
-                    visible: settings.show_stress_button
-                    Layout.preferredWidth:  100
-                    Layout.preferredHeight: 100
-                    source: settings.show_stress?
-                                "qrc:/icons/Icons/show_stress_on.png" :
-                                "qrc:/icons/Icons/show_stress_off.png"
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {
-                            settings.show_stress = !settings.show_stress
-//                            if(settings.show_displacement && settings.show_stress)
-//                                settings.show_displacement=false;
-                            settings.blink_stress=0;
-                            logger.log("Show_Stress_Click",{"visible":settings.show_stress})
+                    Image {
+                        id:ghostMode_button
+                        visible: false
+                        Layout.preferredWidth:  100
+                        Layout.preferredHeight: 100
+                        source: scene3D.ghostMode?
+                                    "qrc:/icons/Icons/ghost_Mode_on.png" :
+                                    "qrc:/icons/Icons/ghost_Mode_OFF.png"
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: scene3D.ghostMode = !scene3D.ghostMode
                         }
                     }
-                    Rectangle{
-                        visible: settings.blink_stress>0
-                        width: parent.width
-                        height: parent.height
-                        radius: width/2
-                        color: "transparent"
-                        SequentialAnimation on color{
-                            running: settings.blink_stress>0
-                            loops: -1
-                            ColorAnimation {
-                                to: settings.blink_stress==1 ? Qt.rgba(1,0.64,0,0.8) : Qt.rgba(1,0,0,0.8)
-                                duration: 1000
-                            }
-                            ColorAnimation {
-                                to: settings.blink_stress==1 ? Qt.rgba(1,0.64,0,0.2) : Qt.rgba(1,0,0,0.2)
-                                duration: 1000
-                            }
-                        }
-                   }
 
-                }
-
-                Image {
-                    visible: settings.show_displacement_button
-                    Layout.preferredWidth:  100
-                    Layout.preferredHeight: 100
-                    source: settings.show_displacement?
-                                "qrc:/icons/Icons/show_displacement_on.png" :
-                                "qrc:/icons/Icons/show_displacement_off.png"
-                    MouseArea{
-                        id:show_disp_button
-                        anchors.fill: parent
-                        onClicked: {
-                            settings.show_displacement = !settings.show_displacement
-//                            if(settings.show_displacement && settings.show_stress)
-//                                settings.show_stress=false
-                            settings.blink_displacement=0;
-                            if(settings.show_displacement)
-                                exagerate_disp_slider.visible=true
-                            else
-                                exagerate_disp_slider.visible=false
-                            logger.log("Show_Displacement_Click",{"visible":settings.show_displacement,"exagerate":exagerate_disp_slider.value})
-                        }
-                        hoverEnabled: true
-                        onHoveredChanged:if(settings.show_displacement)
-                                             exagerate_disp_slider.visible=true
-                    }
-                    Rectangle{
-                        visible: settings.blink_displacement>0
-                        width: parent.width
-                        height: parent.height
-                        radius: width/2
-                        color: "transparent"
-                        SequentialAnimation on color{
-                            running: settings.blink_displacement>0
-                            loops: -1
-                            ColorAnimation {
-                                to: settings.blink_displacement==1 ? Qt.rgba(1,0.64,0,0.8) : Qt.rgba(1,0,0,0.8)
-                                duration: 1000
-                            }
-                            ColorAnimation {
-                                to: settings.blink_displacement==1 ? Qt.rgba(1,0.64,0,0.2) : Qt.rgba(1,0,0,0.2)
-                                duration: 1000
+                    Image {
+                        id:show_stress_button
+                        visible: settings.show_stress_button
+                        Layout.preferredWidth:  100
+                        Layout.preferredHeight: 100
+                        source: settings.show_stress?
+                                    "qrc:/icons/Icons/show_stress_on.png" :
+                                    "qrc:/icons/Icons/show_stress_off.png"
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                settings.show_stress = !settings.show_stress
+                                //                            if(settings.show_displacement && settings.show_stress)
+                                //                                settings.show_displacement=false;
+                                settings.blink_stress=0;
+                                logger.log("Show_Stress_Click",{"visible":settings.show_stress})
                             }
                         }
-                   }
-                    Slider{
-                        id:exagerate_disp_slider
-                        visible:false
-//                        Timer{
-//                            running:!show_disp_button.pressed && !exagerate_disp_slider.hovered && exagerate_disp_slider.visible
-//                            onTriggered: exagerate_disp_slider.visible=false
-//                            interval: 5000
-//                        }
-                        width: parent.width*2
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        anchors.bottom: parent.top
-                        anchors.margins: 10
-                        stepSize: 1
-                        minimumValue: 1
-                        tickmarksEnabled: true
-                        maximumValue: 25
-                        value: 1
-                        onValueChanged: {
-                            logger.log("Show_Displacement_Click",{"visible":settings.show_displacement,"exagerate":exagerate_disp_slider.value})
-                        }
-                        Binding{
-                            target:settings
-                            property: "exagerate_displacement_factor"
-                            value: if(exagerate_disp_slider.value<10){
-                                       return exagerate_disp_slider.value;
-                                   }
-                                   else if(exagerate_disp_slider.value<20){
-                                       return (exagerate_disp_slider.value-9)*10
-                                   }
-                                   else {
-                                       return 100+(exagerate_disp_slider.value%20)*50;
-                                   }
 
+                        Rectangle{
+                            visible: settings.show_stress
+                            anchors.bottom: parent.top
+                            anchors.horizontalCenter: parent.horizontalCenter
+                            width: stress_col.implicitWidth+10
+                            height: stress_col.implicitHeight+10
+                            border.width: 2
+                            radius:2
+                        Column{
+                            id:stress_col
+                            anchors.centerIn: parent
+                            ExclusiveGroup { id: stressGroup }
+                            RadioButton {
+                                text: "Axial"
+                                checked: true
+                                onCheckedChanged: if(checked) settings.stress_type=1
+                                exclusiveGroup: stressGroup
+                            }
+                            RadioButton {
+                                text: "Bending"
+                                onCheckedChanged: if(checked) settings.stress_type=2
+                                exclusiveGroup: stressGroup
+                            }
+                            RadioButton {
+                                text: "Shear"
+                                onCheckedChanged: if(checked) settings.stress_type=3
+                                exclusiveGroup: stressGroup
+                            }
+                        }
 
                         }
-                        Text{
-                            text:"Exagerate: "+settings.exagerate_displacement_factor+"x"
-                            fontSizeMode: Text.Fit
-                            horizontalAlignment: Text.AlignHCenter
-                            color: "#F8F8F8"
-                            font.pointSize: 14
+                        Rectangle{
+                            visible: settings.blink_stress>0
                             width: parent.width
+                            height: parent.height
+                            radius: width/2
+                            color: "transparent"
+                            SequentialAnimation on color{
+                                running: settings.blink_stress>0
+                                loops: -1
+                                ColorAnimation {
+                                    to: settings.blink_stress==1 ? Qt.rgba(1,0.64,0,0.8) : Qt.rgba(1,0,0,0.8)
+                                    duration: 1000
+                                }
+                                ColorAnimation {
+                                    to: settings.blink_stress==1 ? Qt.rgba(1,0.64,0,0.2) : Qt.rgba(1,0,0,0.2)
+                                    duration: 1000
+                                }
+                            }
+                        }
+
+                    }
+
+                    Image {
+                        visible: settings.show_displacement_button
+                        Layout.preferredWidth:  100
+                        Layout.preferredHeight: 100
+                        source: settings.show_displacement?
+                                    "qrc:/icons/Icons/show_displacement_on.png" :
+                                    "qrc:/icons/Icons/show_displacement_off.png"
+                        MouseArea{
+                            id:show_disp_button
+                            anchors.fill: parent
+                            onClicked: {
+                                settings.show_displacement = !settings.show_displacement
+                                //                            if(settings.show_displacement && settings.show_stress)
+                                //                                settings.show_stress=false
+                                settings.blink_displacement=0;
+                                if(settings.show_displacement)
+                                    exagerate_disp_slider.visible=true
+                                else
+                                    exagerate_disp_slider.visible=false
+                                logger.log("Show_Displacement_Click",{"visible":settings.show_displacement,"exagerate":exagerate_disp_slider.value})
+                            }
+                            hoverEnabled: true
+                            onHoveredChanged:if(settings.show_displacement)
+                                                 exagerate_disp_slider.visible=true
+                        }
+                        Rectangle{
+                            visible: settings.blink_displacement>0
+                            width: parent.width
+                            height: parent.height
+                            radius: width/2
+                            color: "transparent"
+                            SequentialAnimation on color{
+                                running: settings.blink_displacement>0
+                                loops: -1
+                                ColorAnimation {
+                                    to: settings.blink_displacement==1 ? Qt.rgba(1,0.64,0,0.8) : Qt.rgba(1,0,0,0.8)
+                                    duration: 1000
+                                }
+                                ColorAnimation {
+                                    to: settings.blink_displacement==1 ? Qt.rgba(1,0.64,0,0.2) : Qt.rgba(1,0,0,0.2)
+                                    duration: 1000
+                                }
+                            }
+                        }
+                        Slider{
+                            id:exagerate_disp_slider
+                            visible:false
+                            //                        Timer{
+                            //                            running:!show_disp_button.pressed && !exagerate_disp_slider.hovered && exagerate_disp_slider.visible
+                            //                            onTriggered: exagerate_disp_slider.visible=false
+                            //                            interval: 5000
+                            //                        }
+                            width: parent.width*2
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.bottom: parent.top
+                            anchors.margins: 10
+                            stepSize: 1
+                            minimumValue: 1
+                            tickmarksEnabled: true
+                            maximumValue: 25
+                            value: 1
+                            onValueChanged: {
+                                logger.log("Show_Displacement_Click",{"visible":settings.show_displacement,"exagerate":exagerate_disp_slider.value})
+                            }
+                            Binding{
+                                target:settings
+                                property: "exagerate_displacement_factor"
+                                value: if(exagerate_disp_slider.value<10){
+                                           return exagerate_disp_slider.value;
+                                       }
+                                       else if(exagerate_disp_slider.value<20){
+                                           return (exagerate_disp_slider.value-9)*10
+                                       }
+                                       else {
+                                           return 100+(exagerate_disp_slider.value%20)*50;
+                                       }
+
+
+                            }
+                            Text{
+                                text:"Exagerate: "+settings.exagerate_displacement_factor+"x"
+                                fontSizeMode: Text.Fit
+                                horizontalAlignment: Text.AlignHCenter
+                                color: "#F8F8F8"
+                                font.pointSize: 14
+                                width: parent.width
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.bottom: parent.top
+                            }
+
                         }
 
                     }
-
-                }
                 }
 
 
@@ -717,17 +749,17 @@ Item{
 
                     }
                 }
-             }
+            }
 
-             Rectangle{
+            Rectangle{
                 visible: staticsmodule.stability==Frame3DDKernel.UNSTABLE
                 anchors.fill: parent
                 color: Qt.rgba(1,0,0,0.3)
-             }
-         }
-     }
+            }
+        }
+    }
 
-     ARToolkit{
+    ARToolkit{
         id:marker_detector
         filter_sample_rate:sample_rate_slider.value
         filter_cutoff_freq:sample_rate_slider.value/2
@@ -741,8 +773,8 @@ Item{
             else
                 loadMultiMarkersConfigFile("default","file:"+applicationWindow.board_path)
         }
-     }
-     ARToolkitObject{
+    }
+    ARToolkitObject{
         id:structure_tag
         objectId: "default"
         property vector3d last_sensor_read;
@@ -755,20 +787,20 @@ Item{
         }
         Q3D.QuaternionAnimation on rotation{
             type: Q3D.QuaternionAnimation.Nlerp
-        }       
+        }
 
         Component.onCompleted: {
             marker_detector.registerObserver(structure_tag)
             last_sensor_read=Qt.vector3d(rotationSensor.reading.x,rotationSensor.reading.y,rotationSensor.reading.z)
         }
 
-     }
+    }
 
-     Tutorial{
-         id:tutorial
-         interactive:false
-         visible:false
-     }
+    Tutorial{
+        id:tutorial
+        interactive:false
+        visible:false
+    }
 
 
 }

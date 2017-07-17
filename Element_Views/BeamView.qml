@@ -113,7 +113,9 @@ Entity{
         PercNumberEntity{
             enabled: parent.enabled
             id:number_entity
-            number:maxRelativeStress
+            number: settings.stress_type==1? relativeAxialStress:
+                    settings.stress_type==2? relativeBendingStress:
+                    settings.stress_type==3? relativeShearStress : 0
             QQ2.Behavior on number{
                 QQ2.NumberAnimation{
                     duration:2000
