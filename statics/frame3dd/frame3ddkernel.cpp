@@ -2588,6 +2588,34 @@ void Frame3DDKernel::createUDLoad(Beam *beam, QVariantMap aesthetic)
     }
 }
 
+void Frame3DDKernel::createTPZLoadTangible(Beam *beam, Qt3DCore::QEntity* beam_entity, QObject *tangible_entity)
+{
+    BeamPtr beamptr;
+    Q_FOREACH(BeamPtr b,m_beams)
+        if(b==beam){
+            beamptr=b;
+            break;
+        }
+    if(!beamptr.isNull()){
+        TrapezoidalForcePtr tpzLoad(new TrapezoidalForce(beamptr,"",this));
+        m_trapezoidal_loads.append(tpzLoad);
+        connect(tpzLoad.data(),SIGNAL(forceChanged()),this,SLOT(update()));
+        connect(tpzLoad.data(),SIGNAL(relativePositionChanged()),this,SLOT(update()));
+        connect(tpzLoad.data(),SIGNAL(extentChanged()),this,SLOT(update()));
+        connect(tpzLoad.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
+
+        QVariantMap aesthetic;
+        aesthetic["parent_entity"]=QVariant::fromValue(beam_entity);
+        aesthetic["warehouse_index"]=0;
+
+        if(m_sceneRoot){
+            tpzLoad->setSceneRoot(m_sceneRoot);
+            tpzLoad->createQmlEntity(aesthetic);
+        }
+        tangible_entity->setProperty("backend_entity",QVariant::fromValue(tpzLoad->component3D().data()));
+    }
+}
+
 QVector3D Frame3DDKernel::initialPose()
 {
     qreal xmin=5000,xmax=0,ymin=5000,ymax=0;

@@ -58,6 +58,8 @@ public:
     Q_INVOKABLE void createNodeLoad(Joint *joint, QVariantMap aesthetic=QVariantMap());
     Q_INVOKABLE void createUDLoad(Beam *beam, QVariantMap aesthetic=QVariantMap());
 
+    Q_INVOKABLE void createTPZLoadTangible(Beam *beam, Qt3DCore::QEntity* beam_entity, QObject* tangible_entity);
+
     QVector3D initialPose();
 signals:
     void gravityChanged();

@@ -9,6 +9,12 @@ Entity{
     property int warehouse_index: 0
     property vector3d globalForce: Qt.vector3d(0,-weight*9.8,0);
 
+    property bool tangible_controlled:false
+    property real controlled_y
+
+    onControlled_yChanged:
+        root_transform.translation=rootEntity.offsetAugmentation.plus(Qt.vector3d(0,controlled_y,0));
+
     QQ2.Binding{
         when: backend_entity
         target: backend_entity
@@ -86,7 +92,7 @@ Entity{
         hoverEnabled: false
         onClicked: {
             sceneRoot.mouseEventHasBeenAccepted=true;
-            if(settings.load_is_selectable && !isSelected){
+            if(settings.load_is_selectable && !isSelected && !tangible_controlled){
                 infobox.current_item=rootEntity
             }
         }

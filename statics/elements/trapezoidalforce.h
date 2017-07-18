@@ -33,7 +33,7 @@ public:
     void relativePosition(QVector3D& relativePosition, QVector2D &extent);
     void positionOnBeam(QVector3D& begin, QVector3D& end);
     void setBeam(BeamPtr beam);
-
+    Qt3DEntityPtr component3D(){return m_component3D;}
 signals:
     void forceChanged();
     void relativePositionChanged();

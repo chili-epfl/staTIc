@@ -53,20 +53,6 @@ Item{
         {
             "story_type":"FindAxialEx",
             "exerciseID":1,
-            "story_picture":"qrc:/scripts/Scripts/Gazebo/gazebo.jpg",
-            "story_description":"
-             <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
-             <p>For each beams you can choose either <b><i>Compression</i></b> or <b><i>Tension</i></b>. If you don't know just do not check any box</p>
-             <p>Are you ready?</p>",
-             "structure_url":"qrc:/scripts/Scripts/Gazebo/Gazebo.structure",
-             "question_beams":["GI","HO","AG"],
-             "hidden_beams":["IM","GO","HL"],
-             "loadsOnBeams":[{"beamName":"HL", "warehouseIndex":1}, {"beamName":"LN", "warehouseIndex":1}, {"beamName":"OL", "warehouseIndex":1}]
-            ,"init_state":"SOLVING"
-        },
-        {
-            "story_type":"FindAxialEx",
-            "exerciseID":2,
             "story_picture":"qrc:/scripts/Scripts/Howe/howe.jpg",
             "story_description":"
              <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
@@ -76,6 +62,20 @@ Item{
              "question_beams":["BC","DE","EF"],
              "hidden_beams":["FG","BE","EG","BD"],
              "loadsOnBeams":[{"beamName":"AB", "warehouseIndex":0},{"beamName":"BD", "warehouseIndex":0},{"beamName":"DF", "warehouseIndex":0}, {"beamName":"FH", "warehouseIndex":0}]
+            ,"init_state":"SOLVING"
+        },
+        {
+            "story_type":"FindAxialEx",
+            "exerciseID":2,
+            "story_picture":"qrc:/scripts/Scripts/Gazebo/gazebo.jpg",
+            "story_description":"
+             <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
+             <p>For each beams you can choose either <b><i>Compression</i></b> or <b><i>Tension</i></b>. If you don't know just do not check any box</p>
+             <p>Are you ready?</p>",
+             "structure_url":"qrc:/scripts/Scripts/Gazebo/Gazebo.structure",
+             "question_beams":["GI","HO","AG"],
+             "hidden_beams":["IM","GO","HL"],
+             "loadsOnBeams":[{"beamName":"HL", "warehouseIndex":1}, {"beamName":"LN", "warehouseIndex":1}, {"beamName":"OL", "warehouseIndex":1}]
             ,"init_state":"SOLVING"
         },
         {
@@ -108,23 +108,10 @@ Item{
             ,"init_state":"SOLVING"
 
         },
+
         {
             "story_type":"FindAxialEx",
             "exerciseID":5,
-            "story_picture":"qrc:/scripts/Scripts/Gazebo/gazebo.jpg",
-            "story_description":"
-             <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
-             <p>For each beams you can choose either <b><i>Compression</i></b> or <b><i>Tension</i></b>. If you don't know just do not check any box</p>
-             <p>Are you ready?</p>",
-             "structure_url":"qrc:/scripts/Scripts/Gazebo/Gazebo.structure",
-             "question_beams":["GI","HO","AG"],
-             "hidden_beams":["IM","GO","HL"],
-             "loadsOnBeams":[{"beamName":"HL", "warehouseIndex":1}, {"beamName":"LN", "warehouseIndex":1}, {"beamName":"OL", "warehouseIndex":1}]
-            ,"init_state":"EXPLORING"
-        },
-        {
-            "story_type":"FindAxialEx",
-            "exerciseID":6,
             "story_picture":"qrc:/scripts/Scripts/Howe/howe.jpg",
             "story_description":"
              <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
@@ -134,6 +121,20 @@ Item{
              "question_beams":["BC","DE","EF"],
              "hidden_beams":["FG","BE","EG","BD"],
              "loadsOnBeams":[{"beamName":"AB", "warehouseIndex":0},{"beamName":"BD", "warehouseIndex":0},{"beamName":"DF", "warehouseIndex":0}, {"beamName":"FH", "warehouseIndex":0}]
+            ,"init_state":"EXPLORING"
+        },
+        {
+            "story_type":"FindAxialEx",
+            "exerciseID":6,
+            "story_picture":"qrc:/scripts/Scripts/Gazebo/gazebo.jpg",
+            "story_description":"
+             <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
+             <p>For each beams you can choose either <b><i>Compression</i></b> or <b><i>Tension</i></b>. If you don't know just do not check any box</p>
+             <p>Are you ready?</p>",
+             "structure_url":"qrc:/scripts/Scripts/Gazebo/Gazebo.structure",
+             "question_beams":["GI","HO","AG"],
+             "hidden_beams":["IM","GO","HL"],
+             "loadsOnBeams":[{"beamName":"HL", "warehouseIndex":1}, {"beamName":"LN", "warehouseIndex":1}, {"beamName":"OL", "warehouseIndex":1}]
             ,"init_state":"EXPLORING"
         },
         {
@@ -174,7 +175,7 @@ Item{
              <p>In this exercise you are asked to identify which kind of axial forces are acting on some elements of the structure.</p>
              <p>For each beams you can choose either <b><i>Compression</i></b> or <b><i>Tension</i></b>. If you don't know just do not check any box</p>
              <p>Are you ready?</p>",
-             "structure_url":"qrc:/scripts/Scripts/Howe/Howe.structure",
+             "structure_url":"qrc:/scripts/Scripts/Demo.structure",
              "question_beams":["BC","DE","EF"],
              "hidden_beams":["FG","BE","EG","BD"],
              "loadsOnBeams":[{"beamName":"AB", "warehouseIndex":0},{"beamName":"BD", "warehouseIndex":0},{"beamName":"DF", "warehouseIndex":0}, {"beamName":"FH", "warehouseIndex":0}]

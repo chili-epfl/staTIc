@@ -112,6 +112,9 @@ void Beam::createQmlEntity(QVariantMap aesthetics)
         m_qqmlcomponent->completeCreate();
         m_component3D->setParent(m_sceneRoot);
         connect(this,SIGNAL(destroyed(QObject*)),m_component3D.data(),SLOT(deleteLater()));
+        //Exposing physics entity id
+        Qt3DCore::QEntity* physicBody=qvariant_cast<Qt3DCore::QEntity*>(beamView->property("physicBody"));
+        m_component3D->setProperty("physic_body_id",QVariant::fromValue(physicBody->id()));
     }else{
         qDebug()<<"Sceneroot is null";
     }

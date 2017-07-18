@@ -19,6 +19,8 @@ Entity{
 
     property bool highlighted: false
 
+    property alias physicBody:physicBody
+    property var physic_body_id
 
 //    property int stencilValue: backend_entity.customID
 

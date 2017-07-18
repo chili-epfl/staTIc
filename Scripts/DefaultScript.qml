@@ -446,9 +446,13 @@ Item{
                             onPressedChanged: {
                                 if(pressed){
                                     settings.enable_scaffold=true;
+                                    settings.enable_tangible_load=true;
+
                                 }
-                                else
+                                else{
+                                    settings.enable_tangible_load=false;
                                     settings.enable_scaffold=false;
+                                }
                             }
                         }
                     }
@@ -509,11 +513,13 @@ Item{
 
                         Rectangle{
                             visible: settings.show_stress
+                            color: "#2f3439"
                             anchors.bottom: parent.top
                             anchors.horizontalCenter: parent.horizontalCenter
                             width: stress_col.implicitWidth+10
                             height: stress_col.implicitHeight+10
                             border.width: 2
+                            border.color: "white"
                             radius:2
                         Column{
                             id:stress_col

@@ -237,6 +237,15 @@ Entity {
                                 return childNodes[child_index];
                     }
                 }
+                function findEntityByPhysicsID(node_id){
+                    for(var child_index=0;child_index<childNodes.length;child_index++){
+                        if(childNodes[child_index])
+                            if(childNodes[child_index].physic_body_id){
+                            if(childNodes[child_index].physic_body_id===node_id)
+                                return childNodes[child_index];
+                            }
+                    }
+                }
                 function findBeams(){
                     var beams=[]
                     for(var child_index=0;child_index<childNodes.length;child_index++){
@@ -322,6 +331,12 @@ Entity {
 
     //    }
 
+//    ConcentratedForce{
+//        tag: ARToolkitObject{
+//            objectId: "Mat_240"
 
+//            QQ2.Component.onCompleted: marker_detector.registerObserver(this)
+//        }
+//    }
 
 }

@@ -16,7 +16,7 @@ Item {
     property bool joint_is_selectable: true
     property bool load_is_selectable: true
     property bool load_is_draggable: true
-    property bool show_tangible_button:false
+    property bool show_tangible_button:true
     property bool show_beam: true
     property bool show_beam_spring: true
     property bool show_beam_sphere: false
@@ -39,6 +39,8 @@ Item {
 
     /*Tools*/
     property bool enable_scaffold: false;
+    property bool enable_tangible_load: false;
+
     property var beam_dragging_ownership:0;
 
     /*Focus View*/
@@ -79,7 +81,7 @@ Item {
         visible_loader="DEFAULT";
         focus_on_joint=false;
         show_help_button=false
-        show_tangible_button=false
+        show_tangible_button=true
 
     }
 
