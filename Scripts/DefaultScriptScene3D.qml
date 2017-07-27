@@ -121,8 +121,8 @@ Entity {
                                 SortPolicy.BackToFront
                             ]
                             ClearBuffers{
-//                                buffers: ClearBuffers.DepthStencilBuffer
-//                                clearStencilValue: 255
+                                //                                buffers: ClearBuffers.DepthStencilBuffer
+                                //                                clearStencilValue: 255
                                 buffers: ClearBuffers.DepthBuffer
                                 TechniqueFilter {
                                     matchAll: [ FilterKey { name: "renderingStyle"; value: "ar" } ]
@@ -169,6 +169,9 @@ Entity {
             onReleased: {
                 guard_delay.restart();
             }
+            onPressed: {
+
+            }
         }
         components:[mouseInput]
     }
@@ -184,7 +187,32 @@ Entity {
     //        ]
 
     //    }
+    Entity{
+        id:alignement_entity
+        property vector3d offset
+        property quaternion custom_rot
 
+        property PlaneMesh mesh: PlaneMesh{
+            height: 100
+            width: 100
+        }
+        property PhongAlphaMaterial material: PhongAlphaMaterial{
+            alpha: 0.5
+        }
+        property Transform transform: Transform{
+            translation: structureLoaderTransform.translation
+            rotationX: 90
+        }
+        property ObjectPicker picker: ObjectPicker{
+            dragEnabled: true
+            onPressed: alignement_entity.offset=pick.worldIntersection.minus(alignement_entity.transform.translation)
+            onMoved: settings.custom_align_trans=settings.custom_align_trans.plus(pick.worldIntersection.minus(alignement_entity.offset).minus(alignement_entity.transform.translation))
+        }
+        components:[
+            alignement_entity.mesh,alignement_entity.material,alignement_entity.transform,alignement_entity.picker
+        ]
+
+    }
     Entity{
         components:[
             Transform {
@@ -207,7 +235,7 @@ Entity {
             Transform {
                 id: structureLoaderTransform
                 //            translation:Qt.vector3d(0,-100,-1000)
-                rotation: structure_tag.rotationQuaternion
+                rotation: quaternion_helper.product(structure_tag.rotationQuaternion,fromEulerAngles(settings.custom_align_rot.x,settings.custom_align_rot.y,settings.custom_align_rot.z))
                 property quaternion inv_rotation: quaternion_helper.invert(rotation)
                 property vector3d euler_angles: quaternion_helper.eulerAngles(rotation)
                 QQ2.Timer{
@@ -219,7 +247,8 @@ Entity {
                 //            QuaternionAnimation on rotation{
                 //            }
                 // translation:settings.focus_on_joint ? Qt.vector3d(0,0,-300) : structure_tag.translation
-                translation: structure_tag.has_appeared ? structure_tag.translation : staticsModule.initialPose
+                translation: structure_tag.has_appeared ? structure_tag.translation.plus(settings.custom_align_trans)
+                                                        : staticsModule.initialPose
                 QQ2.Component.onCompleted:
                     //structure_tag.appendQuaternion(fromAxisAndAngle(1,1,1,120))
                     structure_tag.appendQuaternion(fromAxisAndAngle(1,0,0,90))
@@ -241,8 +270,8 @@ Entity {
                     for(var child_index=0;child_index<childNodes.length;child_index++){
                         if(childNodes[child_index])
                             if(childNodes[child_index].physic_body_id){
-                            if(childNodes[child_index].physic_body_id===node_id)
-                                return childNodes[child_index];
+                                if(childNodes[child_index].physic_body_id===node_id)
+                                    return childNodes[child_index];
                             }
                     }
                 }
@@ -331,12 +360,12 @@ Entity {
 
     //    }
 
-//    ConcentratedForce{
-//        tag: ARToolkitObject{
-//            objectId: "Mat_240"
+    //    ConcentratedForce{
+    //        tag: ARToolkitObject{
+    //            objectId: "Mat_240"
 
-//            QQ2.Component.onCompleted: marker_detector.registerObserver(this)
-//        }
-//    }
+    //            QQ2.Component.onCompleted: marker_detector.registerObserver(this)
+    //        }
+    //    }
 
 }

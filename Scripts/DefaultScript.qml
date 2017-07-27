@@ -263,8 +263,8 @@ Item{
                 id:scene3DContainer
                 anchors.fill: parent
                 focus: true
-                aspects: ["input","physics"]
-                // aspects:["input"]
+                //aspects: ["input","physics"]
+                aspects:["input"]
                 multisample:true
                 DefaultScriptScene3D {
                     id:scene3D
@@ -755,8 +755,200 @@ Item{
 
                     }
                 }
-            }
 
+            }
+            Rectangle{
+                anchors.centerIn: parent
+                width: parent.width -2*parent.border.width
+                height:parent.height -2*parent.border.width
+                color: "transparent"
+                border.color: "#F0F0F0"
+                radius:5
+
+                Rectangle{
+                    anchors.right: parent.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width/3
+                    height: 3/4*parent.height
+                    radius: 5
+                    color:"#80000000"
+                    ColumnLayout{
+                        anchors.fill: parent
+                        anchors.margins:  20
+                        RowLayout{
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Item{
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+                                Text{
+                                    text:"X:"
+                                    color:"white"
+                                    anchors.right: parent.horizontalCenter
+                                    anchors.left: parent.left
+                                    anchors.margins: 10
+                                    anchors.bottom: parent.bottom
+                                }
+                                TextField{
+                                    id:x
+                                    text: Math.round(settings.custom_align_trans.x*100)/100
+                                    onEditingFinished: settings.custom_align_trans.x=text
+                                    validator: DoubleValidator{}
+                                    inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                    anchors.left: parent.horizontalCenter
+                                    anchors.right: parent.right
+                                    anchors.margins: 10
+                                    anchors.bottom: parent.bottom
+                                }
+                            }
+                            Item{
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+                                Text{
+                                    text:"Y:"
+                                    color:"white"
+                                    anchors.right: parent.horizontalCenter
+                                    anchors.left: parent.left
+                                    anchors.margins: 10
+                                    anchors.bottom: parent.bottom
+                                }
+                                TextField{
+                                    id:y
+                                    text: Math.round(settings.custom_align_trans.y*100)/100
+                                    onEditingFinished: settings.custom_align_trans.y=text
+                                    validator: DoubleValidator{}
+                                    inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                    anchors.left: parent.horizontalCenter
+                                    anchors.right: parent.right
+                                    anchors.margins: 10
+                                    anchors.bottom: parent.bottom
+                                }
+                            }
+                            Item{
+                                Layout.fillHeight: true
+                                Layout.fillWidth: true
+                                Text{
+                                    text:"Z:"
+                                    color:"white"
+                                    anchors.right: parent.horizontalCenter
+                                    anchors.left: parent.left
+                                    anchors.margins: 10
+                                    anchors.bottom: parent.bottom
+                                }
+                                TextField{
+                                    id:z
+                                    text: Math.round(settings.custom_align_trans.z*100)/100
+                                    onEditingFinished: settings.custom_align_trans.z=text
+                                    validator: DoubleValidator{}
+                                    inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                    anchors.left: parent.horizontalCenter
+                                    anchors.right: parent.right
+                                    anchors.margins: 10
+                                    anchors.bottom: parent.bottom
+                                }
+                            }
+                        }
+                        Item{
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Text{
+                                text:"Rotation X:"
+                                color:"white"
+                                anchors.right: parent.horizontalCenter
+                                anchors.left: parent.left
+                                anchors.margins: 10
+                                anchors.bottom: parent.verticalCenter
+                            }
+                            TextField{
+                                id:rot_x
+                                text: Math.round(settings.custom_align_rot.x*100)/100
+                                onEditingFinished: settings.custom_align_rot.x=text
+                                validator: DoubleValidator{bottom: -180; top:180}
+                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                anchors.left: parent.horizontalCenter
+                                anchors.right: parent.right
+                                anchors.margins: 10
+                                anchors.bottom: parent.verticalCenter
+                            }
+                            Slider{
+                                value: settings.custom_align_rot.x
+                                onValueChanged: settings.custom_align_rot.x=value
+                                maximumValue: 180
+                                minimumValue: -180
+                                stepSize: 1
+                                anchors.top:parent.verticalCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.margins: 10
+                            }
+                        }
+                        Item{
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Text{
+                                text:"Rotation Y:"
+                                color:"white"
+                                anchors.right: parent.horizontalCenter
+                                anchors.left: parent.left
+                                anchors.margins: 10
+                                anchors.bottom: parent.verticalCenter
+                            }
+                            TextField{
+                                id:rot_y
+                                text: Math.round(settings.custom_align_rot.y*100)/100
+                                onEditingFinished: settings.custom_align_rot.y=text
+                                validator: DoubleValidator{bottom: -180; top:180}
+                                anchors.left: parent.horizontalCenter
+                                anchors.right: parent.right
+                                anchors.margins: 10
+                                anchors.bottom: parent.verticalCenter
+                            }
+                            Slider{
+                                value: settings.custom_align_rot.y
+                                onValueChanged: settings.custom_align_rot.y=value
+                                maximumValue: 180
+                                minimumValue: -180
+                                stepSize: 1
+                                anchors.top:parent.verticalCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.margins: 10
+                            }
+                        }
+                        Item{
+                            Layout.fillWidth: true
+                            Layout.fillHeight: true
+                            Text{
+                                text:"Rotation Z:"
+                                color:"white"
+                                anchors.right: parent.horizontalCenter
+                                anchors.left: parent.left
+                                anchors.margins: 10
+                                anchors.bottom: parent.verticalCenter
+                            }
+                            TextField{
+                                id:rot_z
+                                text: Math.round(settings.custom_align_rot.z*100)/100
+                                onEditingFinished: settings.custom_align_rot.z=text
+                                validator: DoubleValidator{bottom: -180; top:180}
+                                anchors.left: parent.horizontalCenter
+                                anchors.right: parent.right
+                                anchors.margins: 10
+                                anchors.bottom: parent.verticalCenter
+                            }
+                            Slider{
+                                value: settings.custom_align_rot.z
+                                onValueChanged: settings.custom_align_rot.z=value
+                                maximumValue: 180
+                                minimumValue: -180
+                                stepSize: 1
+                                anchors.top:parent.verticalCenter
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.margins: 10
+                            }
+                        }
+                    }
+                }
+
+            }
             Rectangle{
                 visible: staticsmodule.stability==Frame3DDKernel.UNSTABLE
                 anchors.fill: parent
