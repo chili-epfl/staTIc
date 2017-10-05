@@ -263,8 +263,8 @@ Item{
                 id:scene3DContainer
                 anchors.fill: parent
                 focus: true
-                aspects: ["input","physics"]
-                // aspects:["input"]
+                //aspects: ["input","physics"]
+                aspects:["input"]
                 multisample:true
                 DefaultScriptScene3D {
                     id:scene3D
@@ -515,6 +515,8 @@ Item{
                             height: stress_col.implicitHeight+10
                             border.width: 2
                             radius:2
+                            border.color: Platform=="ANDROID" ? "white" :"black"
+                            color: Platform=="ANDROID" ? "#2f3439" : "white"
                         Column{
                             id:stress_col
                             anchors.centerIn: parent
