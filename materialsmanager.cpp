@@ -3,6 +3,9 @@
 #include <QDirIterator>
 #include <QTextStream>
 #include <QDebug>
+#include <QNetworkInterface>
+#include <QDateTime>
+#include <QImage>
 MaterialsManager::MaterialsManager(QObject *parent):
     QAbstractListModel(parent)
 {
@@ -233,6 +236,72 @@ QVariant MaterialsManager::get(QString uniqueID, QString info) const
 
 }
 
+bool MaterialsManager::createFile(QUrl imageUrl, QString name, QString density, QString price, QString Young, QString G,
+                          QString fc0,QString fc90,
+                          QString fmk,QString ft0,
+                          QString ft90, QString fvk)
+{
+    if(name.isEmpty() ||  density.isEmpty() || price.isEmpty() || Young.isEmpty() || G.isEmpty()){
+        //emit error("All fields should be filled");
+        return false;
+    }
 
+    auto netInterfaces=QNetworkInterface::allInterfaces();
+
+    if(netInterfaces.size()==0){
+        return false;
+    }
+
+    QString mac;
+    for(ushort interfaceID=0;interfaceID<netInterfaces.size();interfaceID++){
+        mac=netInterfaces[interfaceID].hardwareAddress();
+        if(mac!="00:00:00:00:00:00")
+            break;
+    }
+    if(mac=="00:00:00:00:00:00")
+        return false;
+    mac.remove(':');
+    QString uniqueStr=mac+"-"+QDateTime::currentDateTime().toString(QString("dMMMyyhms"));
+    QString path=materialsPath+"/"+uniqueStr+"/";
+    QDir dir;
+    if(dir.exists(path)){
+        //emit error("Directoy exists");
+        return false;
+    }
+    if(!dir.mkdir(path)){
+        //emit error("Can't create dir");
+        return false;
+    }
+
+    QFile file(path+uniqueStr+".material");
+    file.open(QFile::WriteOnly);
+    QImage image(imageUrl.toLocalFile());
+
+    if(file.isOpen() && !image.isNull()){
+        QTextStream out(&file);
+        out<< "UniqueID:"<<uniqueStr<<";\n"
+        <<"Name:"<<name<<";\n"
+        <<"Density:"<<density<<"e-9"<<";\n"
+        <<"Price:"<<price<<";\n"
+        <<"Young:"<<Young<<";\n"
+        <<"G:"<<G<<";\n"
+        <<"fc0:"<<fc0<<";\n"
+        <<"fc90:"<<fc90<<";\n"
+        <<"ft0:"<<ft0<<";\n"
+        <<"ft90:"<<ft90<<";\n"
+        <<"fmk:"<<fmk<<";\n"
+        <<"fvk:"<<fvk<<";\n"
+        <<"TextureImage:"<<uniqueStr<<".png;";
+        file.close();
+        image.save(path+uniqueStr+".png");
+        return true;
+    }
+    else{
+        file.remove();
+        //emit error("Can't create file or read image");
+        return false;
+    }
+
+}
 
 

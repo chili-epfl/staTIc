@@ -12,6 +12,7 @@ public:
     QVariant data(const QModelIndex &index, int role)const;
     Q_INVOKABLE QVariant get(int index, QString info) const;
     Q_INVOKABLE QVariant get(QString uniqueID, QString info) const;
+    Q_INVOKABLE bool createFile(QUrl imageUrl, QString name, QString density, QString price, QString Young, QString G, QString fc0, QString fc90, QString fmk, QString ft0, QString ft90, QString fvk);
 private:
     struct Material{
         QString uniqueID;

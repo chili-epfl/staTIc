@@ -5,6 +5,7 @@
 #include <QNetworkAccessManager>
 #include <QUrl>
 #include <QNetworkReply>
+
 class QFile;
 class ResourcesFetcher : public QObject
 {

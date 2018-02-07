@@ -141,7 +141,7 @@
         <file>UI/InfoBoxDesigner.qml</file>
         <file>SynchDialogBox.qml</file>
         <file>UI/BoardSelection.qml</file>
-        <file>MaterialDesigner.qml</file>
+        <file>UI/MaterialDesigner/MaterialDesigner.qml</file>
         <file>UI/PercNumberEntity.qml</file>
         <file>UI/CustomSwitchStyle.qml</file>
         <file>UI/NumberEntity.qml</file>
@@ -176,6 +176,17 @@
         <file>UI/Eye_tracking_tags/008.png</file>
         <file>UI/Eye_tracking_tags/009.png</file>
         <file>UI/InfoBoxFindAxialForce_v2.qml</file>
+        <file>UI/MaterialDesigner/TakePicture.qml</file>
+        <file>UI/MaterialDesigner/TakeFromFile.qml</file>
+        <file>UI/MaterialDesigner/assets/shutter-icon.png</file>
+        <file>UI/MaterialDesigner/assets/sdcard_transparent.png</file>
+        <file>UI/MaterialDesigner/assets/sdcard.png</file>
+        <file>UI/MaterialDesigner/assets/realto_logo.png</file>
+        <file>UI/MaterialDesigner/assets/image_placeholder.xcf</file>
+        <file>UI/MaterialDesigner/assets/image_placeholder.png</file>
+        <file>UI/MaterialDesigner/assets/camera_icon_trasparent.png</file>
+        <file>UI/MaterialDesigner/assets/camera_icon.png</file>
+        <file>UI/MaterialDesigner/assets/backgroud.jpg</file>
     </qresource>
     <qresource prefix="/soundeffects">
         <file>AR/SoundEffects/crash_wood_1.mp3</file>

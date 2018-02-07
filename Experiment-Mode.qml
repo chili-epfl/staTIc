@@ -10,6 +10,8 @@ import "qrc:/ui"
 import "qrc:/scripts/Scripts"
 import "qrc:/ui/UI/Help"
 import "qrc:/ui/UI/"
+import "qrc:/ui/UI/MaterialDesigner"
+
 Item {
 
     property bool enable_eye_tracking_tags: false
@@ -173,13 +175,15 @@ Item {
             Layout.preferredWidth: parent.width
             Layout.preferredHeight: parent.height*0.1
 
+            Row{
+                anchors.bottom:  parent.bottom
             Image{
                 id:synch_img
                 width: 100
                 height: 100
                 source: synch_mouse_area.pressed ? "qrc:/icons/Icons/synch_pressed.png" : "qrc:/icons/Icons/synch_ON.png"
-                anchors.bottom:  parent.bottom
-                anchors.rightMargin: 10
+//                anchors.bottom:  parent.bottom
+//                anchors.rightMargin: 10
 
                 MouseArea{
                     id:synch_mouse_area
@@ -187,12 +191,26 @@ Item {
                     onClicked: synch_dialog_box.visible=true
                 }
             }
+            Image{
+                width: 100
+                height: 100
+                source: "qrc:/icons/Icons/material_design.png"
+//                anchors.right: parent.right
+//                anchors.bottom:  parent.bottom
+//                anchors.rightMargin: 10
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: aux_loader.source="qrc:/ui/UI/MaterialDesigner/MaterialDesigner.qml"
+                }
+            }
             Button{
-                anchors.left: synch_img.right
-                anchors.bottom:  parent.bottom
+//                anchors.left: synch_img.right
+//                anchors.bottom:  parent.bottom
                 text:"Select Board"
                 onClicked: boardSelection_box.visible=true
             }
+            }
+
             Image{
                 width: 100
                 height: 100
@@ -240,13 +258,28 @@ Item {
             }
         }
     }
+
+    Loader{
+        property bool valid: item !== null
+        id:aux_loader
+        anchors.fill: parent
+
+    }
+    Connections {
+        ignoreUnknownSignals: true
+        target: aux_loader.valid ? aux_loader.item : null
+        onTargetChanged: console.log(target)
+        onPageExit: {
+            console.log("d")
+            aux_loader.source=""
+        }
+    }
+
     SynchDialogBox{
         id:synch_dialog_box
         resourcesFetcher: resourcesFetcher
     }
-    MaterialDesigner{
-        id:materialDesigner
-    }
+
 
     BoardSelection{
         id:boardSelection_box
