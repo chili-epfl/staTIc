@@ -177,16 +177,6 @@
         <file>UI/Eye_tracking_tags/009.png</file>
         <file>UI/InfoBoxFindAxialForce_v2.qml</file>
     </qresource>
-    <qresource prefix="/tools">
-        <file>Tools/ConcentratedForce/ConcentratedForce.qml</file>
-        <file>Tools/Scaffold/Scaffold.qml</file>
-        <file>Tools/BeamRemover/BeamRemover.qml</file>
-        <file>Tools/TangibleTrapzLoad/TangibleTrapzLoad.qml</file>
-        <file>Tools/TangibleTrapzLoad/TangibleTrapzLoad_InjectedEntity.qml</file>
-        <file>Tools/TangibleTrapzLoad/texture.png</file>
-        <file>Tools/TangibleTrapzLoad/tonweight.obj</file>
-        <file>Tools/Snow/Snow.qml</file>
-    </qresource>
     <qresource prefix="/soundeffects">
         <file>AR/SoundEffects/crash_wood_1.mp3</file>
         <file>AR/SoundEffects/crash_wood_2.mp3</file>

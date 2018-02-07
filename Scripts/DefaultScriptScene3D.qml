@@ -4,14 +4,8 @@ import Qt3D.Extras 2.0
 import Qt3D.Input 2.0
 
 import QtQuick 2.3 as QQ2
-import QtPhysics.unofficial 1.0
 import ARToolkit 1.0
 import "qrc:/"
-
-import "qrc:/tools/Tools/ConcentratedForce"
-import "qrc:/tools/Tools/Scaffold"
-import "qrc:/tools/Tools/TangibleTrapzLoad"
-import "qrc:/tools/Tools/Snow"
 
 import "qrc:/ui/UI/"
 import "qrc:/ui"
@@ -140,10 +134,6 @@ Entity {
                     }
                 }
             }},
-        PhysicsWorldInfo{
-            gravity: Qt.vector3d(0,0,0);
-            scaleFactor: 1
-        },
         InputSettings {}
     ]
     MouseDevice {
@@ -278,49 +268,9 @@ Entity {
 
 
                 }
-
-                //                Scaffold{
-                //                    extreme1_tag: ARToolkitObject{
-                //                        objectId: "Mat_240"
-                //                        QQ2.Component.onCompleted: marker_detector.registerObserver(this)
-                //                    }
-                //                    extreme2_tag: ARToolkitObject{
-                //                        objectId: "Mat_241"
-                //                        QQ2.Component.onCompleted: marker_detector.registerObserver(this)
-                //                    }
-                //                }
-
-                //        Scaffold{
-                //            extreme1_tag: ArucoObject{
-                //                objectId: "242"
-                //                QQ2.Component.onCompleted: aruco.registerObserver(this)
-                //            }
-                //            extreme2_tag: ArucoObject{
-                //                objectId: "243"
-                //                QQ2.Component.onCompleted: aruco.registerObserver(this)
-                //            }
-                //        }
-                /*Tools*/
-
-                //        ConcentratedForce{
-
-                //        }
-
-                /*Scaffold{
-
-        }*/
-                //        Snow{
-                //        }
-
             }
         }
     }
-
-
-
-    //    TangibleTrapzLoad{
-
-    //    }
 
 
 

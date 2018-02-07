@@ -88,8 +88,6 @@ HEADERS += \
 
 RESOURCES += qml.qrc
 
-INCLUDEPATH+= $$[QT_INSTALL_HEADERS]/QtPhysicsUnofficial
-
 # Additional import path used to resolve QML modules in Qt Creator's code model
 QML_IMPORT_PATH =
 
@@ -97,28 +95,15 @@ QML_IMPORT_PATH =
 include(deployment.pri)
 
 LIBS += -lquazip -lz
-#-lopencv_highgui -lopencv_imgproc
-#-lopencv_video -lopencv_calib3d
-LIBS += -lLinearMath -lBulletDynamics -lBulletCollision -lBulletSoftBody
-LIBS += -lQtPhysicsUnofficial
+
 
 android {
     #INCLUDEPATH += $(ANDROID_STANDALONE_TOOLCHAIN)/sysroot/usr/include
-    INCLUDEPATH += /home/chili/opencv/android-build/install/sdk/native/jni/include
-    INCLUDEPATH += /home/chili/bullet3-2.83.5/build_android/install/include
-    INCLUDEPATH += /home/chili/bullet3-2.83.5/build_android/install/include/bullet
-
     LIBS += -L/home/chili/ARToolKit5-bin-5.3.2-Android/android/libs/armeabi-v7a
-    LIBS += -L/home/chili/bullet3-2.83.5/build_android/install/lib
 
     ANDROID_EXTRA_LIBS = \
-        /home/chili/bullet3-2.83.5/build_android/install/lib/libLinearMath.so \
-        /home/chili/bullet3-2.83.5/build_android/install/lib/libBulletCollision.so \
-        /home/chili/bullet3-2.83.5/build_android/install/lib/libBulletDynamics.so \
-        /home/chili/bullet3-2.83.5/build_android/install/lib/libBulletSoftBody.so \
         /home/chili/ARToolKit5-bin-5.3.2-Android/android/libs/armeabi-v7a/libc++_shared.so\
-        /home/chili/ARToolKit5-bin-5.3.2-Android/android/libs/armeabi-v7a/libARWrapper.so\
-        $$[QT_INSTALL_PLUGINS]/physicsfactories/libbullet.so
+        /home/chili/ARToolKit5-bin-5.3.2-Android/android/libs/armeabi-v7a/libARWrapper.so
 
     ANDROID_PERMISSIONS += \
         android.permission.CAMERA
@@ -127,7 +112,6 @@ android {
         android.hardware.camera
 }
 !android{
-    LIBS += -L/home/chili/bullet3-2.83.5/build_linux/install/lib
     LIBS += -L/home/chili/ARToolKit5-bin-5.3.2r1-Linux-x86_64/lib
     LIBS+= -lAR -lARICP -lARMulti -lAR2
 

@@ -263,7 +263,6 @@ Item{
                 id:scene3DContainer
                 anchors.fill: parent
                 focus: true
-                //aspects: ["input","physics"]
                 aspects:["input"]
                 multisample:true
                 DefaultScriptScene3D {

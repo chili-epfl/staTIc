@@ -4,7 +4,6 @@ import Qt3D.Extras 2.0
 import Qt3D.Input 2.0
 
 import QtQuick 2.0 as QQ2
-import QtPhysics.unofficial 1.0
 import DeformingBeamMesh 1.0
 
 import "qrc:/ui/UI"
@@ -294,31 +293,6 @@ Entity{
             translation:Qt.vector3d(20,0,0)
         }
         components: [beam_commons.sphere_mesh_reference,beam_commons.phong_blue_reference,this.transform ]
-    }
-
-
-    /*-----Physical body----*/
-    Entity{
-       id:physicBody
-       objectName: rootEntity.objectName
-       CuboidMesh{
-           enabled: true
-           id:pBodyMesh
-           xExtent: 17
-           zExtent: 30
-           yExtent: rootEntity.length
-       }
-       PhysicsBodyInfo{
-           id:pBody
-           kinematic:true
-           mass: 10
-           friction: 500
-           restitution: 0
-           mask: 2;
-           group: 1;
-       }
-       components: [pBodyMesh,pBody]
-
     }
 
 
