@@ -47,7 +47,7 @@ Page {
             FolderListModel {
                 id:folder_list_model
                 showDirs: false
-                folder: scenariosPath
+                folder: "file:"+scenariosPath
                 nameFilters: ["*.json"]
             }
             delegate:Rectangle{
@@ -59,7 +59,7 @@ Page {
                     id:json_sketch
                 }
                 Component.onCompleted: {
-                    json_sketch.loadSketch(fileName,this)
+                    json_sketch.loadSketch(filePath,this)
                 }
                 MouseArea{
                     anchors.fill: parent

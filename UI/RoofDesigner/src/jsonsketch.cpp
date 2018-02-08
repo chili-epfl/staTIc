@@ -99,7 +99,7 @@ QString JSONSketch::read(const QJsonObject json, QObject* sketch)
 
 void JSONSketch::generateSketch(QObject* sketch) {
     QQmlComponent point_component(qmlEngine(sketch),sketch);
-    point_component.loadUrl(QUrl("qrc:/Point.qml"));
+    point_component.loadUrl(QUrl("qrc:/ui/UI/RoofDesigner/Point.qml"));
 
     QMap<int, QObject*> qPoints;
 
@@ -124,7 +124,7 @@ void JSONSketch::generateSketch(QObject* sketch) {
     }
 
     QQmlComponent line_component(qmlEngine(sketch),sketch);
-    line_component.loadUrl(QUrl("qrc:/Line.qml"));
+    line_component.loadUrl(QUrl("qrc:/ui/UI/RoofDesigner/Line.qml"));
 
     QMap<int, QObject*> qLines;
 
@@ -145,7 +145,7 @@ void JSONSketch::generateSketch(QObject* sketch) {
     }
 
     QQmlComponent const_component(qmlEngine(sketch),sketch);
-    const_component.loadUrl(QUrl("qrc:/Constraint.qml"));
+    const_component.loadUrl(QUrl("qrc:/ui/UI/RoofDesigner/Constraint.qml"));
 
     foreach (int cid, constraints.keys()) {
         QQmlContext* const_context = new QQmlContext(qmlContext(sketch),sketch);

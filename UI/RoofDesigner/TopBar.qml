@@ -37,8 +37,8 @@ ToolBar {
                 onClicked: {
                     //Add code to save
                     title_field.text.trim().length>0 ?
-                                json_sketch.exportJSONSketch(title_field.text.trim()+".json", sketch, 0):
-                                json_sketch.exportJSONSketch(title_field.default_title+".json", sketch, 0)
+                                json_sketch.exportJSONSketch(scenariosPath+title_field.text.trim()+".json", sketch, 0):
+                                json_sketch.exportJSONSketch(scenariosPath+title_field.default_title+".json", sketch, 0)
                     stack_view.pop()
                 }
             }
@@ -85,7 +85,10 @@ ToolBar {
             MouseArea{
                 anchors.fill: parent
                 onClicked: {
-                    console.log(json_sketch.exportJSONSketch(sketch_name + ".json", sketch, 0))
+                    title_field.text.trim().length>0 ?
+                                json_sketch.exportJSONSketch(scenariosPath+title_field.text.trim()+".json", sketch, 0):
+                                json_sketch.exportJSONSketch(scenariosPath+title_field.default_title+".json", sketch, 0)
+
                 }
             }
         }
@@ -120,7 +123,10 @@ ToolBar {
                 MenuItem {
                     text: "Export sketch in mm"
                     onClicked: {
-                        console.log(json_sketch.exportJSONSketch(scenariosPath+sketch_name + ".json", sketch, 1))
+                        title_field.text.trim().length>0 ?
+                                    json_sketch.exportJSONSketch(scenariosPath+title_field.text.trim()+".json", sketch, 1):
+                                    json_sketch.exportJSONSketch(scenariosPath+title_field.default_title+".json", sketch, 1)
+
                     }
                 }
                 /*MenuItem {

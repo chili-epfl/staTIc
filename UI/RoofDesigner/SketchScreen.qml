@@ -65,13 +65,13 @@ Page {
 
     Image {
         id: backgroundgrid
-        width: parent.width / scale
-        height: parent.height / scale
+        width: parent.width/scale
+        height: parent.height/scale
         anchors.centerIn: parent
         fillMode: Image.Tile
         opacity: 0.42
         source: "qrc:/ui/UI/RoofDesigner/pictures/background_grid.png"
-        scale: sketch.scaleFactor / 5
+        scale: (sketch.scaleFactor / 5) //the grid is 50px -> 10cm
         transform:  Scale{
             origin.x: sketch.zoom_origin_x
             origin.y: sketch.zoom_origin_y
@@ -86,6 +86,22 @@ Page {
 //        mouse_area.enabled: Qt.platform.os=="android"? current_tool!==select_tool : true
 //        pinch_area.enabled: Qt.platform.os=="android" ? current_tool===select_tool : false
 
+    }
+    Grid{
+        anchors.fill: parent
+        columns: parent.height/100
+        rows: parent.width/100
+        horizontalItemAlignment: Grid.AlignHCenter
+        verticalItemAlignment: Grid.AlignVCenter
+        Repeater{
+            model: parent.columns*parent.rows
+            Rectangle{
+                border.color: "black"
+                color: "transparent"
+                width: 100
+                height: 100
+            }
+        }
     }
 
     ConstraintsPanel {

@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
 #endif
 
     view.rootContext()->setContextProperty("logger",&logger);
-    view.rootContext()->setContextProperty("scenariosPath", "file://"+scenariosPath);
+    view.rootContext()->setContextProperty("scenariosPath", scenariosPath);
 
     view.resize(2560, 1600);
     view.setResizeMode(QQuickView::SizeRootObjectToView);

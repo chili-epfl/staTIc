@@ -71,7 +71,7 @@ Item {
         onPinchUpdated: {
             if(pinch.scale>0){
                 var new_scale=Math.max(1, parent.zoomFactor*(pinch.scale/pinch.previousScale));
-                new_scale=Math.min(3, new_scale);
+//                new_scale=Math.min(3, new_scale);
                 parent.zoomFactor=new_scale;
             }
             parent.zoom_origin_x=pinch.center.x
@@ -100,8 +100,9 @@ Item {
                 parent.parent.x=wheel.x-parent.parent.width/2
                 var new_scale
                 if(wheel.angleDelta.y>0){
-                    new_scale=Math.max(1, parent.parent.zoomFactor*(1.25*wheel.angleDelta.y/120))
-                    new_scale=Math.min(3, new_scale);
+//                    new_scale=Math.max(1, parent.parent.zoomFactor*(1.25*wheel.angleDelta.y/120))
+//                    new_scale=Math.min(3, new_scale);
+                    new_scale=parent.parent.zoomFactor*(1.25*wheel.angleDelta.y/120)
                     parent.parent.zoomFactor=new_scale
                     parent.parent.zoom_origin_x=mouse_area.mouseX
                     parent.parent.zoom_origin_y=mouse_area.mouseY
