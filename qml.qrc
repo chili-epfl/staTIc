@@ -187,6 +187,41 @@
         <file>UI/MaterialDesigner/assets/camera_icon_trasparent.png</file>
         <file>UI/MaterialDesigner/assets/camera_icon.png</file>
         <file>UI/MaterialDesigner/assets/backgroud.jpg</file>
+        <file>UI/RoofDesigner/Sketch.qml</file>
+        <file>UI/RoofDesigner/TopBar.qml</file>
+        <file>UI/RoofDesigner/ToolsMenu.qml</file>
+        <file>UI/RoofDesigner/SketchScreen.qml</file>
+        <file>UI/RoofDesigner/PointContextMenu.qml</file>
+        <file>UI/RoofDesigner/Point.qml</file>
+        <file>UI/RoofDesigner/MoveTool.qml</file>
+        <file>UI/RoofDesigner/Line.qml</file>
+        <file>UI/RoofDesigner/InsertTool.qml</file>
+        <file>UI/RoofDesigner/ConstraintsPanel.qml</file>
+        <file>UI/RoofDesigner/Constraint.qml</file>
+        <file>UI/RoofDesigner/BottomBar.qml</file>
+        <file>UI/RoofDesigner/CaptureImage.qml</file>
+        <file>UI/RoofDesigner/SelectTool.qml</file>
+        <file>UI/RoofDesigner/WelcomeScreen.qml</file>
+        <file>UI/RoofDesigner/RoofDesignerSettings.qml</file>
+        <file>UI/RoofDesigner/DeleteTool.qml</file>
+        <file>UI/RoofDesigner/MessageBox.qml</file>
+        <file>UI/RoofDesigner/icons/undo-4-xxl.png</file>
+        <file>UI/RoofDesigner/icons/simple-orange-house-md.png</file>
+        <file>UI/RoofDesigner/icons/shear.png</file>
+        <file>UI/RoofDesigner/icons/redo-4-xxl.png</file>
+        <file>UI/RoofDesigner/icons/realto_logo.png</file>
+        <file>UI/RoofDesigner/icons/plus_pressed.png</file>
+        <file>UI/RoofDesigner/icons/plus-1270001_1280.png</file>
+        <file>UI/RoofDesigner/icons/plus.png</file>
+        <file>UI/RoofDesigner/icons/minus_pressed.png</file>
+        <file>UI/RoofDesigner/icons/minus.png</file>
+        <file>UI/RoofDesigner/icons/export3d.png</file>
+        <file>UI/RoofDesigner/icons/camera.png</file>
+        <file>UI/RoofDesigner/icons/camera.jpg</file>
+        <file>UI/RoofDesigner/RoofDesignerMain.qml</file>
+        <file>UI/RoofDesigner/fonts/FontAwesome.otf</file>
+        <file>UI/RoofDesigner/fonts/CODE2000.TTF</file>
+        <file>UI/RoofDesigner/pictures/background_grid.png</file>
     </qresource>
     <qresource prefix="/soundeffects">
         <file>AR/SoundEffects/crash_wood_1.mp3</file>

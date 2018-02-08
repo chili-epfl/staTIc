@@ -209,6 +209,12 @@ Item {
                 text:"Select Board"
                 onClicked: boardSelection_box.visible=true
             }
+            Button{
+//                anchors.left: synch_img.right
+//                anchors.bottom:  parent.bottom
+                text:"design roof"
+                onClicked: aux_loader.source="qrc:/ui/UI/RoofDesigner/RoofDesignerMain.qml"
+            }
             }
 
             Image{

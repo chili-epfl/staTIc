@@ -23,6 +23,8 @@
 #include "AR/quaternionhelper.h"
 #include "logger.h"
 #include <Qt3DExtras/QSkyboxEntity>
+#include "UI/RoofDesigner/src/constraints.h"
+#include "UI/RoofDesigner/src/jsonsketch.h"
 int main(int argc, char *argv[])
 {
 //    QApplication app(argc, argv);
@@ -69,6 +71,10 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<QuaternionHelper>("QuaternionHelper",1,0,"QuaternionHelper");
 
+    qmlRegisterType<JSONSketch>("JSONSketch", 1, 0, "JSONSketch");
+    qmlRegisterType<Constraints>("Constraints", 1, 0, "Constraints");
+    //qmlRegisterSingletonType(QUrl("qrc:/ui/UI/RoofDesigner/RoofDesignerSettings.qml"), "RoofDesignerSettings", 1, 0, "RoofDesignerSettings");
+
     /*Tools*/
 //    qmlRegisterType<ConcentratedForce>("QuickConcentratedForce", 1, 0, "QuickConcentratedForce");
 //    qmlRegisterType<Scaffold>("QuickScaffold", 1, 0, "QuickScaffold");
@@ -96,6 +102,7 @@ int main(int argc, char *argv[])
 #endif
 
     view.rootContext()->setContextProperty("logger",&logger);
+    view.rootContext()->setContextProperty("scenariosPath", "file://"+scenariosPath);
 
     view.resize(2560, 1600);
     view.setResizeMode(QQuickView::SizeRootObjectToView);

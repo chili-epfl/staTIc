@@ -3,6 +3,9 @@ TEMPLATE = app
 QT += qml quick widgets 3dcore 3drender 3dinput multimedia network sensors concurrent
 DEFINES += VIDEOFORMAT=43
 CONFIG += c++11 concurrent
+
+INCLUDEPATH += $$_PRO_FILE_PWD_/3rdparty/
+
 SOURCES += main.cpp \
     statics/elements/joint.cpp \
     statics/abstractstaticsmodule.cpp \
@@ -35,7 +38,9 @@ SOURCES += main.cpp \
     #Tools/TangibleTrapzLoad/tangibletrapzload.cpp \
     AR/quaternionhelper.cpp \
     #Tools/Snow/snow.cpp \
-    logger.cpp
+    logger.cpp \
+    UI/RoofDesigner/src/jsonsketch.cpp \
+    UI/RoofDesigner/src/constraints.cpp
 
 
 HEADERS += \
@@ -83,7 +88,9 @@ HEADERS += \
     #Tools/TangibleTrapzLoad/tangibletrapzload.h \
     AR/quaternionhelper.h \
     #Tools/Snow/snow.h \
-    logger.h
+    logger.h \
+    UI/RoofDesigner/src/jsonsketch.h \
+    UI/RoofDesigner/src/constraints.h
 
 
 RESOURCES += qml.qrc
@@ -94,12 +101,13 @@ QML_IMPORT_PATH =
 # Default rules for deployment.
 include(deployment.pri)
 
-LIBS += -lquazip -lz
-
+LIBS += -lquazip -lz -lslvs
 
 android {
     #INCLUDEPATH += $(ANDROID_STANDALONE_TOOLCHAIN)/sysroot/usr/include
     LIBS += -L/home/chili/ARToolKit5-bin-5.3.2-Android/android/libs/armeabi-v7a
+    LIBS+= -L$$_PRO_FILE_PWD_/3rdparty/solvespace/build-android/src
+
 
     ANDROID_EXTRA_LIBS = \
         /home/chili/ARToolKit5-bin-5.3.2-Android/android/libs/armeabi-v7a/libc++_shared.so\
@@ -114,6 +122,7 @@ android {
 !android{
     LIBS += -L/home/chili/ARToolKit5-bin-5.3.2r1-Linux-x86_64/lib
     LIBS+= -lAR -lARICP -lARMulti -lAR2
+    LIBS+= -L$$_PRO_FILE_PWD_/3rdparty/solvespace/build-unix/src
 
 }
 
