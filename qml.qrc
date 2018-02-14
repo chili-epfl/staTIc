@@ -221,7 +221,6 @@
         <file>UI/RoofDesigner/RoofDesignerMain.qml</file>
         <file>UI/RoofDesigner/fonts/FontAwesome.otf</file>
         <file>UI/RoofDesigner/fonts/CODE2000.TTF</file>
-        <file>UI/RoofDesigner/pictures/background_grid.png</file>
     </qresource>
     <qresource prefix="/soundeffects">
         <file>AR/SoundEffects/crash_wood_1.mp3</file>

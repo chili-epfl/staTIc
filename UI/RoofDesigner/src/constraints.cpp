@@ -64,9 +64,9 @@ void Constraints::compute2d(QObject* sketch) {
     foreach (QObject* child, sketch->children()) {
         if (!QString::compare(child->property("class_type").toString(), "Point")
                 && child->property("existing").toBool()) {
-            pointIdsFromPosition.insert(QVector2D(child->property("x").toInt(), child->property("y").toInt()), entityId);
-            sys.param[sys.params++] = Slvs_MakeParam(paramId++, g, child->property("x").toInt());
-            sys.param[sys.params++] = Slvs_MakeParam(paramId++, g, child->property("y").toInt());
+            pointIdsFromPosition.insert(QVector2D(child->property("x").toReal(), child->property("y").toReal()), entityId);
+            sys.param[sys.params++] = Slvs_MakeParam(paramId++, g, child->property("x").toReal());
+            sys.param[sys.params++] = Slvs_MakeParam(paramId++, g, child->property("y").toReal());
             sys.entity[sys.entities++] = Slvs_MakePoint2d(entityId, g, entityPlanId, paramId - 2, paramId - 1);
             entityObjects.insert(entityId++, child);
         }
@@ -117,12 +117,12 @@ void Constraints::compute2d(QObject* sketch) {
 
                 QObject* ptA = qvariant_cast<QObject*>(child->property("ptA"));
                 if (ptA && ptA->property("x").isValid() && ptA->property("y").isValid()) {
-                    hPtA = pointIdsFromPosition[QVector2D(ptA->property("x").toInt(), ptA->property("y").toInt())];
+                    hPtA = pointIdsFromPosition[QVector2D(ptA->property("x").toReal(), ptA->property("y").toReal())];
                 }
 
                 QObject* ptB = qvariant_cast<QObject*>(child->property("ptB"));
                 if (ptB && ptB->property("x").isValid() && ptB->property("y").isValid()) {
-                    hPtB = pointIdsFromPosition[QVector2D(ptB->property("x").toInt(), ptB->property("y").toInt())];
+                    hPtB = pointIdsFromPosition[QVector2D(ptB->property("x").toReal(), ptB->property("y").toReal())];
                 }
 
                 QObject* entityA = qvariant_cast<QObject*>(child->property("entityA"));
@@ -206,8 +206,8 @@ int Constraints::getPointId(QObject* line, const char* pointPropertyName) const 
     if (p->property("x").isNull() || p->property("y").isNull()){
         return 0;
     }
-    int px = p->property("x").toInt();
-    int py = p->property("y").toInt();
+    int px = p->property("x").toReal();
+    int py = p->property("y").toReal();
     return pointIdsFromPosition[QVector2D(px, py)];
 }
 

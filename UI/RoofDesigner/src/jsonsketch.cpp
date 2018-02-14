@@ -34,7 +34,7 @@ QString JSONSketch::loadSketch(const QString url, QObject* sketch)
 
 QString JSONSketch::read(const QJsonObject json, QObject* sketch)
 {
-    sketch->setProperty("scaleFactor", json["scaleFactor"].toDouble());
+    //sketch->setProperty("scaleFactor", json["scaleFactor"].toDouble());
 
     int json_sketch_width=json["sketch_width"].toInt();
     int json_sketch_height=json["sketch_height"].toInt();
@@ -43,6 +43,9 @@ QString JSONSketch::read(const QJsonObject json, QObject* sketch)
 
     qreal scale_w=(qreal)sketch->property("width").toInt()/json_sketch_width;
     qreal scale_h=(qreal)sketch->property("height").toInt()/json_sketch_height;
+
+
+
 
     QJsonArray qPid = json["pid"].toArray();
     QJsonArray qLid = json["lid"].toArray();
@@ -53,15 +56,50 @@ QString JSONSketch::read(const QJsonObject json, QObject* sketch)
     QJsonObject qConstraints = json["constraints"].toObject();
 
     QJsonArray currPoint;
+
+    qreal max_x=-HUGE_VAL,min_x=HUGE_VAL,max_y=-HUGE_VAL,min_y=HUGE_VAL,centre_x=0,centre_y=0;
     for(int p(0); p < qPoints.size(); p++){
         int intPid = qPid[p].toInt();
         currPoint = qPoints[QString::number(intPid)].toArray();
         if (currPoint.size() != 2){
             return "corrupted point with id: " + QString::number(intPid);
         }
-        points.insert(intPid, QVector2D(currPoint[0].toInt()*scale_w, currPoint[1].toInt()*scale_h));
+        max_x=qMax(max_x,currPoint[0].toDouble());
+        max_y=qMax(max_y,currPoint[1].toDouble());
+        min_x=qMin(min_x,currPoint[0].toDouble());
+        min_y=qMin(min_y,currPoint[1].toDouble());
+        centre_x+=currPoint[0].toDouble();
+        centre_y+=currPoint[1].toDouble();
     }
 
+    centre_x/=qPoints.size();
+    centre_y/=qPoints.size();
+
+
+    qreal sketch_width=2*(qreal)sketch->property("width").toInt()/3;
+    qreal sketch_height=2*(qreal)sketch->property("height").toInt()/3;
+
+
+    qreal scale;
+    if(qFuzzyCompare(max_y-min_y,0) && qFuzzyCompare(max_x-min_x,0) )
+        scale=1;
+    else if(qFuzzyCompare(max_y-min_y,0)) scale=sketch_width/(max_x-min_x);
+    else if(qFuzzyCompare(max_x-min_x,0)) scale=sketch_height/(max_y-min_y);
+    else scale=qMin(sketch_width/(max_x-min_x), sketch_height/(max_y-min_y));
+
+
+    for(int p(0); p < qPoints.size(); p++){
+        int intPid = qPid[p].toInt();
+        currPoint = qPoints[QString::number(intPid)].toArray();
+        if (currPoint.size() != 2){
+            return "corrupted point with id: " + QString::number(intPid);
+        }
+        //points.insert(intPid, QVector2D(currPoint[0].toInt()*scale_w, currPoint[1].toInt()*scale_h));
+        points.insert(intPid, QVector2D( (currPoint[0].toDouble()-centre_x)*scale+sketch->property("width").toInt()/2,
+                                          (currPoint[1].toDouble()-centre_y)*scale+sketch->property("height").toInt()/2));
+    }
+
+    sketch->setProperty("scaleFactor", scale); // px/mm
     QJsonArray currLine;
     for(int l(0); l < qLines.size(); l++){
         int intLid = qLid[l].toInt();
@@ -224,8 +262,10 @@ bool JSONSketch::writeAll(QJsonObject &json, QObject* sketch)
             child->setProperty("id", id);
             qPid.append(id);
             QJsonArray currPoint;
-            currPoint.append(child->property("x").toInt());
-            currPoint.append(child->property("y").toInt());
+            currPoint.append(child->property("x").toReal()/
+                             sketch->property("scaleFactor").toReal());
+            currPoint.append(child->property("y").toReal()/
+                             sketch->property("scaleFactor").toReal());
             qPoints.insert(QString::number(id), currPoint);
         }
     }

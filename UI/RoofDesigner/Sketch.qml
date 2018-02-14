@@ -1,13 +1,13 @@
 import QtQuick 2.7
 import QtQuick.Window 2.0
 import Constraints 1.0
+import QtQuick.Controls 2.2
 
 Item {
 
     anchors.fill:parent
 
     property real scaleFactor: Screen.pixelDensity
-
     property var origin;
 
     property real zoomFactor: 1
@@ -27,6 +27,10 @@ Item {
         xScale: zoomFactor
         yScale: zoomFactor
     }
+
+
+
+
     property alias mouse_area: mouse_area
     property alias pinch_area: pinch_area
 
@@ -71,7 +75,6 @@ Item {
         onPinchUpdated: {
             if(pinch.scale>0){
                 var new_scale=Math.max(1, parent.zoomFactor*(pinch.scale/pinch.previousScale));
-//                new_scale=Math.min(3, new_scale);
                 parent.zoomFactor=new_scale;
             }
             parent.zoom_origin_x=pinch.center.x
@@ -97,20 +100,17 @@ Item {
             }
             onCanceled: current_tool.abort()
             onWheel: {
-                parent.parent.x=wheel.x-parent.parent.width/2
+                //parent.parent.x=wheel.x-parent.parent.width/2
                 var new_scale
                 if(wheel.angleDelta.y>0){
-//                    new_scale=Math.max(1, parent.parent.zoomFactor*(1.25*wheel.angleDelta.y/120))
-//                    new_scale=Math.min(3, new_scale);
-                    new_scale=parent.parent.zoomFactor*(1.25*wheel.angleDelta.y/120)
+                    new_scale=parent.parent.zoomFactor+0.10
                     parent.parent.zoomFactor=new_scale
                     parent.parent.zoom_origin_x=mouse_area.mouseX
                     parent.parent.zoom_origin_y=mouse_area.mouseY
 
                 }
                 else if(wheel.angleDelta.y<0){
-                    new_scale=Math.max(1, -parent.parent.zoomFactor*(0.75*wheel.angleDelta.y/120))
-                    new_scale=Math.min(3, new_scale);
+                    new_scale=Math.max(1,parent.parent.zoomFactor-0.10)
                     parent.parent.zoomFactor=new_scale
                     parent.parent.zoom_origin_x=mouse_area.mouseX
                     parent.parent.zoom_origin_y=mouse_area.mouseY
@@ -118,7 +118,6 @@ Item {
             }
         }
     }
-
 
     Constraints {
         id: constraints

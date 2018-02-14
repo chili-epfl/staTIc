@@ -28,7 +28,7 @@ Page {
     property alias visibleBackground: backgroundImage.visible
     property alias background_picture_url: sketch.background_picture_url
 
-    property alias visibleGrid: backgroundgrid.visible
+    property alias visibleGrid: gridCanvas.visible
 
     property string toolName: "SelectTool"
     property var current_tool: toolName == "SelectTool" ? select_tool :
@@ -63,46 +63,40 @@ Page {
 
     }
 
-    Image {
-        id: backgroundgrid
-        width: parent.width/scale
-        height: parent.height/scale
-        anchors.centerIn: parent
-        fillMode: Image.Tile
-        opacity: 0.42
-        source: "qrc:/ui/UI/RoofDesigner/pictures/background_grid.png"
-        scale: (sketch.scaleFactor / 5) //the grid is 50px -> 10cm
-        transform:  Scale{
-            origin.x: sketch.zoom_origin_x
-            origin.y: sketch.zoom_origin_y
-            xScale: sketch.zoomFactor
-            yScale: sketch.zoomFactor
-        }
-        mipmap: true
-    }
 
+    Canvas {
+        id:gridCanvas
+        anchors.fill: parent
+        renderTarget: Canvas.FramebufferObject
+        renderStrategy: Canvas.Threaded
+        property real cellSize: Screen.pixelDensity*10
+        Connections{
+            ignoreUnknownSignals:true
+            target: sketch
+            onZoomFactorChanged:gridCanvas.requestPaint()
+        }
+        onPaint: {
+            var ctx = getContext("2d");
+            ctx.reset()
+            ctx.translate(-sketch.zoom_origin_x*(sketch.zoomFactor%1),
+                          -sketch.zoom_origin_y*(sketch.zoomFactor%1) );
+            ctx.scale(1+sketch.zoomFactor%1, 1+sketch.zoomFactor%1);
+            for(var i=0; i<width;i=i+cellSize )
+                for(var j=0; j<height;j=j+cellSize )
+                ctx.strokeRect(i, j, cellSize, cellSize);
+
+
+        }
+
+    }
     Sketch{
         id:sketch
 //        mouse_area.enabled: Qt.platform.os=="android"? current_tool!==select_tool : true
 //        pinch_area.enabled: Qt.platform.os=="android" ? current_tool===select_tool : false
 
     }
-    Grid{
-        anchors.fill: parent
-        columns: parent.height/100
-        rows: parent.width/100
-        horizontalItemAlignment: Grid.AlignHCenter
-        verticalItemAlignment: Grid.AlignVCenter
-        Repeater{
-            model: parent.columns*parent.rows
-            Rectangle{
-                border.color: "black"
-                color: "transparent"
-                width: 100
-                height: 100
-            }
-        }
-    }
+
+
 
     ConstraintsPanel {
         id: constraintsPanel

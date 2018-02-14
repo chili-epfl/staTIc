@@ -120,7 +120,7 @@ android {
         android.hardware.camera
 }
 !android{
-    LIBS += -L/home/chili/ARToolKit5-bin-5.3.2r1-Linux-x86_64/lib
+    LIBS += -L/home/lorenzo/ARToolKit5-bin-5.3.2r1-Linux-x86_64/lib
     LIBS+= -lAR -lARICP -lARMulti -lAR2
     LIBS+= -L$$_PRO_FILE_PWD_/3rdparty/solvespace/build-unix/src
 
