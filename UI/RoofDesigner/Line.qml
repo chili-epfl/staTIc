@@ -142,4 +142,12 @@ Rectangle {
         onCanceled: {current_tool.abort();}
         enabled: parent.class_type
     }
+
+    QtObject{
+        objectName: "structureData"
+        property string visual_name
+        property real width: 25
+        property real height: 50
+        property string materialID
+    }
 }

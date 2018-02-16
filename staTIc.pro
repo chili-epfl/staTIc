@@ -111,8 +111,8 @@ android {
 
     ANDROID_EXTRA_LIBS = \
         /home/chili/ARToolKit5-bin-5.3.2-Android/android/libs/armeabi-v7a/libc++_shared.so\
-        /home/chili/ARToolKit5-bin-5.3.2-Android/android/libs/armeabi-v7a/libARWrapper.so
-
+        /home/chili/ARToolKit5-bin-5.3.2-Android/android/libs/armeabi-v7a/libARWrapper.so \
+        $$_PRO_FILE_PWD_/3rdparty/solvespace/build-android/src/libslvs.so
     ANDROID_PERMISSIONS += \
         android.permission.CAMERA
 
@@ -120,7 +120,7 @@ android {
         android.hardware.camera
 }
 !android{
-    LIBS += -L/home/lorenzo/ARToolKit5-bin-5.3.2r1-Linux-x86_64/lib
+    LIBS += -L/home/chili/ARToolKit5-bin-5.3.2r1-Linux-x86_64/lib
     LIBS+= -lAR -lARICP -lARMulti -lAR2
     LIBS+= -L$$_PRO_FILE_PWD_/3rdparty/solvespace/build-unix/src
 

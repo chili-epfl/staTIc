@@ -122,6 +122,17 @@ Rectangle {
         id:context_menu
     }
 
+    QtObject{
+        objectName: "structureData"
+        property string visual_name
+        property bool reac_x:false
+        property bool reac_y:false
+        property bool reac_z:true
+        property bool reac_xx:true
+        property bool reac_yy:true
+        property bool reac_zz:false
+    }
+
 }
 
 

@@ -1,8 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file>main.qml</file>
         <file>Settings.qml</file>
-        <file>Experiment-Mode.qml</file>
+        <file>main.qml</file>
         <file>AR/board_configuration.dat</file>
         <file>AR/single_markers.json</file>
     </qresource>
@@ -100,18 +99,12 @@
     <qresource prefix="/scripts">
         <file>Scripts/DefaultScript.qml</file>
         <file>Scripts/DefaultScriptScene3D.qml</file>
-        <file>Scripts/CableExercise.qml</file>
-        <file>Scripts/SupportExercise.qml</file>
-        <file>Scripts/Stories.qml</file>
         <file>Scripts/Story_1/chicken_shelter.png</file>
         <file>Scripts/Story_1/Model.structure</file>
         <file>Scripts/Story_1/boss_suggestion.png</file>
         <file>Scripts/Story_1/suggestion.png</file>
         <file>Scripts/Story_2/steal_cable.jpg</file>
         <file>Scripts/Story_2/Model.structure</file>
-        <file>Scripts/FindAxialForceExercise.qml</file>
-        <file>Scripts/tens_comp.jpeg</file>
-        <file>Scripts/default.jpg</file>
         <file>Scripts/Full_Roof/Full_roof.structure</file>
         <file>Scripts/Vault/Vault.structure</file>
         <file>Scripts/Howe/Howe.structure</file>
@@ -120,10 +113,6 @@
         <file>Scripts/Vault/vault.png</file>
         <file>Scripts/Gazebo/gazebo.jpg</file>
         <file>Scripts/Howe/howe.jpg</file>
-        <file>Scripts/Demo.structure</file>
-        <file>Scripts/test.structure</file>
-        <file>Scripts/test_copy.structure</file>
-        <file>Scripts/FindAxialForceExercise_v2.qml</file>
     </qresource>
     <qresource prefix="/ui">
         <file>UI/ViewFilterBar.qml</file>

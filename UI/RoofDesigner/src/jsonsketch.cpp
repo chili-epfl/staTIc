@@ -10,11 +10,11 @@
 #include <QString>
 #include <QQmlContext>
 #include <QQmlComponent>
-
+#include <QMatrix4x4>
 #include "jsonsketch.h"
 #include "constraints.h"
 
-JSONSketch::JSONSketch(QObject *parent): QObject(parent), nextPointId(0) {}
+JSONSketch::JSONSketch(QObject *parent): QObject(parent) {}
 
 QString JSONSketch::loadSketch(const QString url, QObject* sketch)
 {
@@ -34,52 +34,30 @@ QString JSONSketch::loadSketch(const QString url, QObject* sketch)
 
 QString JSONSketch::read(const QJsonObject json, QObject* sketch)
 {
-    //sketch->setProperty("scaleFactor", json["scaleFactor"].toDouble());
-
-    int json_sketch_width=json["sketch_width"].toInt();
-    int json_sketch_height=json["sketch_height"].toInt();
-
-    originId = json["origin_id"].toInt();
-
-    qreal scale_w=(qreal)sketch->property("width").toInt()/json_sketch_width;
-    qreal scale_h=(qreal)sketch->property("height").toInt()/json_sketch_height;
-
-
-
-
-    QJsonArray qPid = json["pid"].toArray();
-    QJsonArray qLid = json["lid"].toArray();
-    QJsonArray qCid = json["cid"].toArray();
 
     QJsonObject qPoints = json["points"].toObject();
     QJsonObject qLines = json["lines"].toObject();
-    QJsonObject qConstraints = json["constraints"].toObject();
-
-    QJsonArray currPoint;
+    QJsonArray qConstraints = json["constraints"].toArray();
 
     qreal max_x=-HUGE_VAL,min_x=HUGE_VAL,max_y=-HUGE_VAL,min_y=HUGE_VAL,centre_x=0,centre_y=0;
-    for(int p(0); p < qPoints.size(); p++){
-        int intPid = qPid[p].toInt();
-        currPoint = qPoints[QString::number(intPid)].toArray();
-        if (currPoint.size() != 2){
-            return "corrupted point with id: " + QString::number(intPid);
+    for (const QString &key : qPoints.keys()){
+        auto currPoint=qPoints[key].toObject();
+        if(!qFuzzyCompare(currPoint["z"].toDouble(),0)){
+            qDebug()<<"Not 2D Sketch";
+            return "Not 2D Sketch";
         }
-        max_x=qMax(max_x,currPoint[0].toDouble());
-        max_y=qMax(max_y,currPoint[1].toDouble());
-        min_x=qMin(min_x,currPoint[0].toDouble());
-        min_y=qMin(min_y,currPoint[1].toDouble());
-        centre_x+=currPoint[0].toDouble();
-        centre_y+=currPoint[1].toDouble();
+        max_x=qMax(max_x,currPoint["x"].toDouble());
+        max_y=qMax(max_y,-currPoint["y"].toDouble());
+        min_x=qMin(min_x,currPoint["x"].toDouble());
+        min_y=qMin(min_y,-currPoint["y"].toDouble());
+        centre_x+=currPoint["x"].toDouble();
+        centre_y-=currPoint["y"].toDouble();
     }
 
     centre_x/=qPoints.size();
     centre_y/=qPoints.size();
-
-
     qreal sketch_width=2*(qreal)sketch->property("width").toInt()/3;
     qreal sketch_height=2*(qreal)sketch->property("height").toInt()/3;
-
-
     qreal scale;
     if(qFuzzyCompare(max_y-min_y,0) && qFuzzyCompare(max_x-min_x,0) )
         scale=1;
@@ -87,105 +65,69 @@ QString JSONSketch::read(const QJsonObject json, QObject* sketch)
     else if(qFuzzyCompare(max_x-min_x,0)) scale=sketch_height/(max_y-min_y);
     else scale=qMin(sketch_width/(max_x-min_x), sketch_height/(max_y-min_y));
 
-
-    for(int p(0); p < qPoints.size(); p++){
-        int intPid = qPid[p].toInt();
-        currPoint = qPoints[QString::number(intPid)].toArray();
-        if (currPoint.size() != 2){
-            return "corrupted point with id: " + QString::number(intPid);
-        }
-        //points.insert(intPid, QVector2D(currPoint[0].toInt()*scale_w, currPoint[1].toInt()*scale_h));
-        points.insert(intPid, QVector2D( (currPoint[0].toDouble()-centre_x)*scale+sketch->property("width").toInt()/2,
-                                          (currPoint[1].toDouble()-centre_y)*scale+sketch->property("height").toInt()/2));
-    }
-
+    //Actual Generation
     sketch->setProperty("scaleFactor", scale); // px/mm
-    QJsonArray currLine;
-    for(int l(0); l < qLines.size(); l++){
-        int intLid = qLid[l].toInt();
-        currLine = qLines[QString::number(intLid)].toArray();
-        if (currLine.size() != 2){
-            return "corrupted line with id: " + QString::number(intLid);
-        }
-        if(currLine[0] == currLine[1] ||
-                !points.contains(currLine[0].toInt()) ||
-                !points.contains(currLine[1].toInt())) {
-            return "corrupted point id of line with id: ";
-        }
-        lines.insert(intLid, QVector2D(currLine[0].toInt(), currLine[1].toInt()));
-    }
 
-    QJsonArray currConst;
-    for(int c(0); c < qConstraints.size(); c++){
-        int intCid = qCid[c].toInt();
-        currConst = qConstraints[QString::number(intCid)].toArray();
-        if (currConst.size() != 6){
-            return "corrupted constraints with id: " + QString::number(intCid);
-        }
-        constraints.insert(intCid, QList<int>(
-        {currConst[0].toInt(), currConst[1].toInt(),
-         currConst[2].toInt(), currConst[3].toInt(),
-         currConst[4].toInt(), currConst[5].toInt()}));
-    }
-
-    generateSketch(sketch);
-
-    sketch->setProperty("background_picture_url", qvariant_cast<QUrl>(json["background_picture_url"].toString()));
-
-    return "Sketch read";
-}
-
-void JSONSketch::generateSketch(QObject* sketch) {
+    //Points
     QQmlComponent point_component(qmlEngine(sketch),sketch);
     point_component.loadUrl(QUrl("qrc:/ui/UI/RoofDesigner/Point.qml"));
 
-    QMap<int, QObject*> qPoints;
+    QHash<QString, QQuickItem*> pointsQML;
 
-    foreach (int pid, points.keys()) {
+
+    for (const QString &key : qPoints.keys()){
+        auto currPoint=qPoints[key].toObject();
         QQmlContext* point_context = new QQmlContext(qmlContext(sketch),sketch);
         QQuickItem* point = qobject_cast<QQuickItem*>(point_component.create(point_context));
 
         point_context->setContextObject(point);
-        point->setProperty("x", points[pid].x());
-        point->setProperty("y", points[pid].y());
+        point->setProperty("x", (currPoint["x"].toDouble()-centre_x)*scale+sketch->property("width").toInt()/2);
+        point->setProperty("y", (-currPoint["y"].toDouble()-centre_y)*scale+sketch->property("height").toInt()/2);
 
         point->setParent(sketch);
         point->setParentItem(qobject_cast<QQuickItem*>(sketch));
         point_component.completeCreate();
 
-        qPoints.insert(pid, point);
+        auto structureData=point->findChild<QObject*>(QString("structureData"), Qt::FindDirectChildrenOnly);
+        structureData->setProperty("visual_name",currPoint["name"].toString());
+        structureData->setProperty("reac_x",currPoint["reac_x"].toBool());
+        structureData->setProperty("reac_y",currPoint["reac_y"].toBool());
+        structureData->setProperty("reac_z",currPoint["reac_z"].toBool());
+        structureData->setProperty("reac_xx",currPoint["reac_xx"].toBool());
+        structureData->setProperty("reac_yy",currPoint["reac_yy"].toBool());
+        structureData->setProperty("reac_zz",currPoint["reac_zz"].toBool());
+        pointsQML[key]=point;
     }
-
-    if (originId >= 0){
-        qPoints[originId]->setProperty("color", "green");
-        sketch->setProperty("origin", qVariantFromValue(qPoints[originId]));
-    }
-
+    //Line
     QQmlComponent line_component(qmlEngine(sketch),sketch);
     line_component.loadUrl(QUrl("qrc:/ui/UI/RoofDesigner/Line.qml"));
-
-    QMap<int, QObject*> qLines;
-
-    foreach (int lid, lines.keys()) {
+    QHash<QString,QQuickItem*> linesQML;
+    for (const QString &key : qLines.keys()){
+        auto currLine=qLines[key].toObject();
         QQmlContext* line_context = new QQmlContext(qmlContext(sketch),sketch);
         QQuickItem* line = qobject_cast<QQuickItem*>(line_component.beginCreate(line_context));
 
         line_context->setContextObject(line);
-
-        line->setProperty("p1", qVariantFromValue(qPoints[lines[lid].x()]));
-        line->setProperty("p2", qVariantFromValue(qPoints[lines[lid].y()]));
+        line->setProperty("p1", qVariantFromValue(pointsQML[currLine["p1"].toString()]));
+        line->setProperty("p2", qVariantFromValue(pointsQML[currLine["p2"].toString()]));
 
         line->setParent(sketch);
         line->setParentItem(qobject_cast<QQuickItem*>(sketch));
         line_component.completeCreate();
 
-        qLines.insert(lid, line);
+        auto structureData=line->findChild<QObject*>(QString("structureData"), Qt::FindDirectChildrenOnly);
+        structureData->setProperty("visual_name",currLine["name"].toString());
+        structureData->setProperty("width",currLine["width"].toDouble());
+        structureData->setProperty("height",currLine["height"].toDouble());
+        structureData->setProperty("materialID",currLine["materialID"].toString());
+        linesQML[key]=line;
+
     }
 
+    //Constraints
     QQmlComponent const_component(qmlEngine(sketch),sketch);
     const_component.loadUrl(QUrl("qrc:/ui/UI/RoofDesigner/Constraint.qml"));
-
-    foreach (int cid, constraints.keys()) {
+    for(int c(0); c < qConstraints.size(); c++){
         QQmlContext* const_context = new QQmlContext(qmlContext(sketch),sketch);
         QQuickItem* constraint = qobject_cast<QQuickItem*>(const_component.beginCreate(const_context));
 
@@ -195,39 +137,119 @@ void JSONSketch::generateSketch(QObject* sketch) {
         constraint->setParentItem(qobject_cast<QQuickItem*>(sketch));
         const_component.completeCreate();
 
-        constraint->setProperty("type", constraints[cid][0]);
-        constraint->setProperty("valA", constraints[cid][1]);
-        constraint->setProperty("ptA", qVariantFromValue(constraints[cid][2] == -1 ? nullptr : qPoints[constraints[cid][2]]));
-        constraint->setProperty("ptB", qVariantFromValue(constraints[cid][3] == -1 ? nullptr : qPoints[constraints[cid][3]]));
-        constraint->setProperty("entityA", qVariantFromValue(constraints[cid][4] == -1 ? nullptr : qLines[constraints[cid][4]]));
-        constraint->setProperty("entityB", qVariantFromValue(constraints[cid][5] == -1 ? nullptr : qLines[constraints[cid][5]]));
+        auto jsonConstrain=qConstraints[c].toObject();
+        constraint->setProperty("type", jsonConstrain["type"].toInt());
+        constraint->setProperty("valA", jsonConstrain["valA"].toDouble());
+        constraint->setProperty("ptA", jsonConstrain["ptA"].toString() =="-1" ? qVariantFromValue(nullptr) :
+                                                                                qVariantFromValue(pointsQML[jsonConstrain["ptA"].toString()]));
+        constraint->setProperty("ptB", jsonConstrain["ptB"].toString() =="-1" ? qVariantFromValue(nullptr) :
+                                                                                qVariantFromValue(pointsQML[jsonConstrain["ptB"].toString()]));
+        constraint->setProperty("entityA", jsonConstrain["entityA"].toString() =="-1" ? qVariantFromValue(nullptr) :
+                                                                                        qVariantFromValue(linesQML[jsonConstrain["entityA"].toString()]));
+        constraint->setProperty("entityB", jsonConstrain["entityB"].toString() =="-1" ? qVariantFromValue(nullptr) :
+                                                                                        qVariantFromValue(linesQML[jsonConstrain["entityB"].toString()]));
+
     }
+
+    sketch->setProperty("background_picture_url", qvariant_cast<QUrl>(json["background_picture_url"].toString()));
+
+    if (json["origin_id"].toString() != "-1"){
+        pointsQML[json["origin_id"].toString()]->setProperty("color", "green");
+        sketch->setProperty("origin", qVariantFromValue(pointsQML[json["origin_id"].toString()]));
+    }
+    auto structureData=sketch->findChild<QObject*>(QString("structureData"), Qt::FindDirectChildrenOnly);
+    if(structureData){
+        structureData->setProperty("scaleFactorPhysical",json["scaleFactorPhysical"].toDouble());
+        auto poseOffsetJSON =json["poseOffset"].toArray();
+        QMatrix4x4 poseOffset(poseOffsetJSON[0].toDouble(),poseOffsetJSON[1].toDouble(),poseOffsetJSON[2].toDouble(),
+                poseOffsetJSON[3].toDouble(),poseOffsetJSON[4].toDouble(),poseOffsetJSON[5].toDouble(),poseOffsetJSON[6].toDouble(),
+                poseOffsetJSON[7].toDouble(),poseOffsetJSON[8].toDouble(),poseOffsetJSON[9].toDouble(),poseOffsetJSON[10].toDouble(),
+                poseOffsetJSON[11].toDouble(),poseOffsetJSON[12].toDouble(),poseOffsetJSON[13].toDouble(),poseOffsetJSON[14].toDouble(),
+                poseOffsetJSON[15].toDouble());
+        structureData->setProperty("poseOffset",poseOffset);
+    }
+    return "Sketch read";
 }
 
-QString JSONSketch::exportJSONSketch(const QString url, QObject* sketch, int mode) {
-    QList<QString> modeStrings = {"", "mm"};
-    if (mode < 0 || mode >= modeStrings.length()){
-        return "invalid mode";
-    }
+
+
+//void JSONSketch::generateSketch(QObject* sketch) {
+//    QQmlComponent point_component(qmlEngine(sketch),sketch);
+//    point_component.loadUrl(QUrl("qrc:/ui/UI/RoofDesigner/Point.qml"));
+
+//    QMap<int, QObject*> qPoints;
+
+//    foreach (int pid, points.keys()) {
+//        QQmlContext* point_context = new QQmlContext(qmlContext(sketch),sketch);
+//        QQuickItem* point = qobject_cast<QQuickItem*>(point_component.create(point_context));
+
+//        point_context->setContextObject(point);
+//        point->setProperty("x", points[pid].x());
+//        point->setProperty("y", points[pid].y());
+
+//        point->setParent(sketch);
+//        point->setParentItem(qobject_cast<QQuickItem*>(sketch));
+//        point_component.completeCreate();
+
+//        qPoints.insert(pid, point);
+//    }
+
+//    if (originId >= 0){
+//        qPoints[originId]->setProperty("color", "green");
+//        sketch->setProperty("origin", qVariantFromValue(qPoints[originId]));
+//    }
+
+//    QQmlComponent line_component(qmlEngine(sketch),sketch);
+//    line_component.loadUrl(QUrl("qrc:/ui/UI/RoofDesigner/Line.qml"));
+
+//    QMap<int, QObject*> qLines;
+
+//    foreach (int lid, lines.keys()) {
+//        QQmlContext* line_context = new QQmlContext(qmlContext(sketch),sketch);
+//        QQuickItem* line = qobject_cast<QQuickItem*>(line_component.beginCreate(line_context));
+
+//        line_context->setContextObject(line);
+
+//        line->setProperty("p1", qVariantFromValue(qPoints[lines[lid].x()]));
+//        line->setProperty("p2", qVariantFromValue(qPoints[lines[lid].y()]));
+
+//        line->setParent(sketch);
+//        line->setParentItem(qobject_cast<QQuickItem*>(sketch));
+//        line_component.completeCreate();
+
+//        qLines.insert(lid, line);
+//    }
+
+//    QQmlComponent const_component(qmlEngine(sketch),sketch);
+//    const_component.loadUrl(QUrl("qrc:/ui/UI/RoofDesigner/Constraint.qml"));
+
+//    foreach (int cid, constraints.keys()) {
+//        QQmlContext* const_context = new QQmlContext(qmlContext(sketch),sketch);
+//        QQuickItem* constraint = qobject_cast<QQuickItem*>(const_component.beginCreate(const_context));
+
+//        const_context->setContextObject(constraint);
+
+//        constraint->setParent(sketch);
+//        constraint->setParentItem(qobject_cast<QQuickItem*>(sketch));
+//        const_component.completeCreate();
+
+//        constraint->setProperty("type", constraints[cid][0]);
+//        constraint->setProperty("valA", constraints[cid][1]);
+//        constraint->setProperty("ptA", qVariantFromValue(constraints[cid][2] == -1 ? nullptr : qPoints[constraints[cid][2]]));
+//        constraint->setProperty("ptB", qVariantFromValue(constraints[cid][3] == -1 ? nullptr : qPoints[constraints[cid][3]]));
+//        constraint->setProperty("entityA", qVariantFromValue(constraints[cid][4] == -1 ? nullptr : qLines[constraints[cid][4]]));
+//        constraint->setProperty("entityB", qVariantFromValue(constraints[cid][5] == -1 ? nullptr : qLines[constraints[cid][5]]));
+//    }
+//}
+
+QString JSONSketch::exportJSONSketch(const QString url, QObject* sketch) {
 
     QJsonObject object;
-    switch (mode){
-    case 0:
-        if(!writeAll(object, sketch)){
-            return "Empty sketch";
-        }
-        break;
-    case 1:
-        if(!writeMm(object, sketch)){
-            return "No origin";
-        }
-        break;
-    default:
-        return "unknown mode";
-        break;
+    if(!writeJSON(object, sketch)){
+        return "Empty sketch";
     }
 
-    QFile file(url + modeStrings[mode]);
+    QFile file(url);
 
     if (!file.open(QIODevice::WriteOnly)) {
         return "cannot open the JSON file";
@@ -240,32 +262,47 @@ QString JSONSketch::exportJSONSketch(const QString url, QObject* sketch, int mod
     return "Sketch exported";
 }
 
-bool JSONSketch::writeAll(QJsonObject &json, QObject* sketch)
+bool JSONSketch::writeJSON(QJsonObject &json, QObject* sketch)
 {
-    nextPointId = 0;
-    nextLineId = 0;
-    nextConstraintId = 0;
+    int nextPointId = 0;
+    int nextLineId = 0;
 
     QJsonObject qPoints;
-    QJsonArray qPid;
-
     QJsonObject qLines;
-    QJsonArray qLid;
+    QJsonArray qConstraints;
 
-    QJsonObject qConstraints;
-    QJsonArray qCid;
+    QHash<QObject*, int> mapIds;
+    QObject* origin = qvariant_cast<QObject*>(sketch->property("origin"));
+    qreal origin_coordinate_x=0.0,origin_coordinate_y=0.0;
+
+    qreal sketch_width=sketch->property("width").toReal();
+
+    if (origin != nullptr){
+        origin_coordinate_x=origin->property("x").toReal();
+        origin_coordinate_y=sketch_width-origin->property("y").toReal();
+    }
+
 
     foreach (QObject* child, sketch->children()) {
         if (!QString::compare(child->property("class_type").toString(), "Point")
                 && child->property("existing").toBool()) {
-            int id = addPoint(child->property("x").toInt(), child->property("y").toInt());
-            child->setProperty("id", id);
-            qPid.append(id);
-            QJsonArray currPoint;
-            currPoint.append(child->property("x").toReal()/
+            int id = nextPointId++;
+            mapIds[child]=id;
+            QJsonObject currPoint;
+            currPoint.insert("x",(child->property("x").toReal()-origin_coordinate_x)/
                              sketch->property("scaleFactor").toReal());
-            currPoint.append(child->property("y").toReal()/
+            currPoint.insert("y",(sketch_width-child->property("y").toReal()-origin_coordinate_y)/
                              sketch->property("scaleFactor").toReal());
+            currPoint.insert("z",0);
+            auto structureData=child->findChild<QObject*>(QString("structureData"), Qt::FindDirectChildrenOnly);
+            currPoint.insert("name", structureData->property("visual_name").toString());
+            currPoint.insert("reac_x", structureData->property("reac_x").toBool());
+            currPoint.insert("reac_y", structureData->property("reac_y").toBool());
+            currPoint.insert("reac_z", structureData->property("reac_z").toBool());
+            currPoint.insert("reac_xx", structureData->property("reac_xx").toBool());
+            currPoint.insert("reac_yy", structureData->property("reac_yy").toBool());
+            currPoint.insert("reac_zz", structureData->property("reac_zz").toBool());
+
             qPoints.insert(QString::number(id), currPoint);
         }
     }
@@ -275,15 +312,17 @@ bool JSONSketch::writeAll(QJsonObject &json, QObject* sketch)
             QObject* p1 = qvariant_cast<QObject*>(child->property("p1"));
             QObject* p2 = qvariant_cast<QObject*>(child->property("p2"));
             if(p1 != nullptr && p2 !=nullptr){
-                int id = addLine(p1->property("id").toInt(), p2->property("id").toInt());
-                child->setProperty("id", id);
-                qLid.append(id);
-                QJsonArray currLine;
-                currLine.append(p1->property("id").toInt());
-                currLine.append(p2->property("id").toInt());
+                int id = nextLineId++;
+                mapIds[child]=id;
+                QJsonObject currLine;
+                currLine.insert("p1",QString::number(mapIds[p1]));
+                currLine.insert("p2",QString::number(mapIds[p2]));
+                auto structureData=child->findChild<QObject*>(QString("structureData"), Qt::FindDirectChildrenOnly);
+                currLine.insert("name", structureData->property("visual_name").toString());
+                currLine.insert("width", structureData->property("width").toReal());
+                currLine.insert("height", structureData->property("height").toReal());
+                currLine.insert("materialID", structureData->property("materialID").toString());
                 qLines.insert(QString::number(id), currLine);
-            } else {
-                child->setProperty("existing", false);
             }
         }
     }
@@ -301,135 +340,160 @@ bool JSONSketch::writeAll(QJsonObject &json, QObject* sketch)
             QObject* entityA = qvariant_cast<QObject*>(child->property("entityA"));
             QObject* entityB = qvariant_cast<QObject*>(child->property("entityB"));
 
-            int id = addConstraint(type, valA,
-                                   ptA == nullptr ? -1 : ptA->property("id").toInt(),
-                                   ptB == nullptr ? -1 : ptB->property("id").toInt(),
-                                   entityA == nullptr ? -1 : entityA->property("id").toInt(),
-                                   entityB == nullptr ? -1 : entityB->property("id").toInt());
-            child->setProperty("id", id);
-            qCid.append(id);
-            QJsonArray currConst;
-            currConst.append(type);
-            currConst.append(valA);
-            ptA == nullptr ? currConst.append(-1) : currConst.append(ptA->property("id").toInt());
-            ptB == nullptr ? currConst.append(-1) : currConst.append(ptB->property("id").toInt());
-            entityA == nullptr ? currConst.append(-1) : currConst.append(entityA->property("id").toInt());
-            entityB == nullptr ? currConst.append(-1) : currConst.append(entityB->property("id").toInt());
-            qConstraints.insert(QString::number(id), currConst);
+            QJsonObject currConst;
+            currConst.insert("type",type);
+            currConst.insert("valA",valA);
+            ptA == nullptr ? currConst.insert("ptA","-1") : currConst.insert("ptA",QString::number(mapIds[ptA]));
+            ptB == nullptr ? currConst.insert("ptB","-1") : currConst.insert("ptB",QString::number(mapIds[ptB]));
+            entityA == nullptr ? currConst.insert("entityA","-1") : currConst.insert("entityA",QString::number(mapIds[entityA]));
+            entityB == nullptr ? currConst.insert("entityB","-1") : currConst.insert("entityB",QString::number(mapIds[entityB]));
+            qConstraints.append(currConst);
         }
     }
 
-    json["sketch_width"] = sketch->property("width").toInt();
-    json["sketch_height"] = sketch->property("height").toInt();
-
-    json["scaleFactor"] = sketch->property("scaleFactor").toReal();
-    QObject* origin = qvariant_cast<QObject*>(sketch->property("origin"));
     if (origin != nullptr){
-        json["origin_id"] = origin->property("id").toInt();
+        json["origin_id"] = QString::number(mapIds[origin]);
     } else {
-        json["origin_id"] = -1;
+        json["origin_id"] = "-1";
     }
 
+    auto structureData=sketch->findChild<QObject*>(QString("structureData"), Qt::FindDirectChildrenOnly);
 
-    json["pid"] = qPid;
     json["points"] = qPoints;
-
-    json["lid"] = qLid;
     json["lines"] = qLines;
-
-    json["cid"] = qCid;
     json["constraints"] = qConstraints;
-
     json["background_picture_url"] = sketch->property("background_picture_url").toString();
+
+    json["scaleFactorPhysical"]=structureData->property("scaleFactorPhysical").toReal();
+
+    auto poseOffset=qvariant_cast<QMatrix4x4>(structureData->property("poseOffset"));
+
+    QJsonArray poseOffsetJson;
+    poseOffsetJson.append(poseOffset(0,0));
+    poseOffsetJson.append(poseOffset(0,1));
+    poseOffsetJson.append(poseOffset(0,2));
+    poseOffsetJson.append(poseOffset(0,3));
+    poseOffsetJson.append(poseOffset(1,0));
+    poseOffsetJson.append(poseOffset(1,1));
+    poseOffsetJson.append(poseOffset(1,2));
+    poseOffsetJson.append(poseOffset(1,3));
+    poseOffsetJson.append(poseOffset(2,0));
+    poseOffsetJson.append(poseOffset(2,1));
+    poseOffsetJson.append(poseOffset(2,2));
+    poseOffsetJson.append(poseOffset(2,3));
+    poseOffsetJson.append(poseOffset(3,0));
+    poseOffsetJson.append(poseOffset(3,1));
+    poseOffsetJson.append(poseOffset(3,2));
+    poseOffsetJson.append(poseOffset(3,3));
+    json["poseOffset"]=poseOffsetJson;
+
 
     return qPoints.size() > 0;
 }
 
-bool JSONSketch::writeMm(QJsonObject &json, QObject* sketch)
-{
-    if (qvariant_cast<QObject*>(sketch->property("origin")) == nullptr){
-        return false;
-    }
 
-    nextPointId = 0;
-    nextLineId = 0;
 
-    QJsonObject qPoints;
-    QJsonArray qPid;
 
-    QJsonObject qLines;
 
-    QObject* origin = qvariant_cast<QObject*>(sketch->property("origin"));
 
-    foreach (QObject* child, sketch->children()) {
-        if (!QString::compare(child->property("class_type").toString(), "Point")
-                && child->property("existing").toBool()) {
-            int id = addPoint(child->property("x").toInt(), child->property("y").toInt());
-            child->setProperty("id", id);
-            qPid.append(id);
-            QJsonArray currPoint;
-            currPoint.append((child->property("x").toInt() - origin->property("x").toInt()) /
-                             sketch->property("scaleFactor").toReal());
-            currPoint.append((child->property("y").toInt() - origin->property("y").toInt()) /
-                             sketch->property("scaleFactor").toReal());
-            qPoints.insert(QString::number(id), currPoint);
-        }
-    }
+//bool JSONSketch::writeJSON(QJsonObject &json, QObject* sketch)
+//{
+//    nextPointId = 0;
+//    nextLineId = 0;
+//    nextConstraintId = 0;
 
-    foreach (QObject* child, sketch->children()) {
-        if (!QString::compare(child->property("class_type").toString(), "Line")
-                && child->property("existing").toBool()) {
-            QObject* p1 = qvariant_cast<QObject*>(child->property("p1"));
-            QObject* p2 = qvariant_cast<QObject*>(child->property("p2"));
-            if(p1 != nullptr && p2 !=nullptr){
-                int id = addLine(p1->property("id").toInt(), p2->property("id").toInt());
-                child->setProperty("id", id);
-                QJsonArray currLine;
-                currLine.append(p1->property("id").toInt());
-                currLine.append(p2->property("id").toInt());
-                qLines.insert(QString::number(id), currLine);
-            } else {
-                child->setProperty("existing", false);
-            }
-        }
-    }
+//    QJsonObject qPoints;
+//    QJsonArray qPid;
 
-    json["origin_id"] = origin->property("id").toInt();
+//    QJsonObject qLines;
+//    QJsonArray qLid;
 
-    json["pid"] = qPid;
-    json["points"] = qPoints;
+//    QJsonObject qConstraints;
+//    QJsonArray qCid;
 
-    json["lines"] = qLines;
+//    foreach (QObject* child, sketch->children()) {
+//        if (!QString::compare(child->property("class_type").toString(), "Point")
+//                && child->property("existing").toBool()) {
+//            int id = addPoint(child->property("x").toInt(), child->property("y").toInt());
+//            child->setProperty("id", id);
+//            qPid.append(id);
+//            QJsonArray currPoint;
+//            currPoint.append(child->property("x").toReal()/
+//                             sketch->property("scaleFactor").toReal());
+//            currPoint.append(child->property("y").toReal()/
+//                             sketch->property("scaleFactor").toReal());
+//            qPoints.insert(QString::number(id), currPoint);
+//        }
+//    }
+//    foreach (QObject* child, sketch->children()) {
+//        if (!QString::compare(child->property("class_type").toString(), "Line")
+//                && child->property("existing").toBool()) {
+//            QObject* p1 = qvariant_cast<QObject*>(child->property("p1"));
+//            QObject* p2 = qvariant_cast<QObject*>(child->property("p2"));
+//            if(p1 != nullptr && p2 !=nullptr){
+//                int id = addLine(p1->property("id").toInt(), p2->property("id").toInt());
+//                child->setProperty("id", id);
+//                qLid.append(id);
+//                QJsonArray currLine;
+//                currLine.append(p1->property("id").toInt());
+//                currLine.append(p2->property("id").toInt());
+//                qLines.insert(QString::number(id), currLine);
+//            } else {
+//                child->setProperty("existing", false);
+//            }
+//        }
+//    }
 
-    return qPoints.length() > 0;
-}
+//    foreach (QObject* child, sketch->children()) {
+//        if (!QString::compare(child->property("class_type").toString(), "Constraint")
+//                && child->property("existing").toBool()) {
+//            int type = qvariant_cast<int>(child->property("type"));
+//            if (type == 9) { // if type == WHERE_DRAGGED
+//                continue;
+//            }
+//            double valA = qvariant_cast<double>(child->property("valA"));
+//            QObject* ptA = qvariant_cast<QObject*>(child->property("ptA"));
+//            QObject* ptB = qvariant_cast<QObject*>(child->property("ptB"));
+//            QObject* entityA = qvariant_cast<QObject*>(child->property("entityA"));
+//            QObject* entityB = qvariant_cast<QObject*>(child->property("entityB"));
 
-int JSONSketch::addPoint(int x, int y) {
-    int id = incrementPointsId();
-    points.insert(id, QVector2D(x, y));
-    return id;
-}
+//            int id = addConstraint(type, valA,
+//                                   ptA == nullptr ? -1 : ptA->property("id").toInt(),
+//                                   ptB == nullptr ? -1 : ptB->property("id").toInt(),
+//                                   entityA == nullptr ? -1 : entityA->property("id").toInt(),
+//                                   entityB == nullptr ? -1 : entityB->property("id").toInt());
+//            child->setProperty("id", id);
+//            qCid.append(id);
+//            QJsonArray currConst;
+//            currConst.append(type);
+//            currConst.append(valA);
+//            ptA == nullptr ? currConst.append(-1) : currConst.append(ptA->property("id").toInt());
+//            ptB == nullptr ? currConst.append(-1) : currConst.append(ptB->property("id").toInt());
+//            entityA == nullptr ? currConst.append(-1) : currConst.append(entityA->property("id").toInt());
+//            entityB == nullptr ? currConst.append(-1) : currConst.append(entityB->property("id").toInt());
+//            qConstraints.insert(QString::number(id), currConst);
+//        }
+//    }
 
-int JSONSketch::addLine(int p1, int p2) {
-    int id = incrementLinesId();
-    lines.insert(id, QVector2D(p1, p2));
-    return id;
-}
+//    QObject* origin = qvariant_cast<QObject*>(sketch->property("origin"));
+//    if (origin != nullptr){
+//        json["origin_id"] = origin->property("id").toInt();
+//    } else {
+//        json["origin_id"] = -1;
+//    }
 
-int JSONSketch::addConstraint(int type, int valA, int ptA, int ptB, int entityA, int entityB) {
-    int id = incrementConstraintId();
-    constraints.insert(id, QList<int>({type, valA, ptA, ptB, entityA, entityB}));
-    return id;
-}
 
-int JSONSketch::incrementPointsId() {
-    return nextPointId++;
-}
+//    json["pid"] = qPid;
+//    json["points"] = qPoints;
 
-int JSONSketch::incrementLinesId() {
-    return nextLineId++;
-}
+//    json["lid"] = qLid;
+//    json["lines"] = qLines;
 
-int JSONSketch::incrementConstraintId() {
-    return nextConstraintId++;
-}
+//    json["cid"] = qCid;
+//    json["constraints"] = qConstraints;
+
+//    json["background_picture_url"] = sketch->property("background_picture_url").toString();
+
+//    return qPoints.size() > 0;
+//}
+

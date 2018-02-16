@@ -73,14 +73,8 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<JSONSketch>("JSONSketch", 1, 0, "JSONSketch");
     qmlRegisterType<Constraints>("Constraints", 1, 0, "Constraints");
-    //qmlRegisterSingletonType(QUrl("qrc:/ui/UI/RoofDesigner/RoofDesignerSettings.qml"), "RoofDesignerSettings", 1, 0, "RoofDesignerSettings");
 
     /*Tools*/
-//    qmlRegisterType<ConcentratedForce>("QuickConcentratedForce", 1, 0, "QuickConcentratedForce");
-//    qmlRegisterType<Scaffold>("QuickScaffold", 1, 0, "QuickScaffold");
-//    qmlRegisterType<BeamRemover>("QuickBeamRemover", 1, 0, "QuickBeamRemover");
-//    qmlRegisterType<TangibleTrapzLoad>("QuickTangibleTPZLoad", 1, 0, "QuickTangibleTPZLoad");
-//    qmlRegisterType<Snow>("QuickSnow", 1, 0, "QuickSnow");
     qmlRegisterType<DeformingBeamMesh>("DeformingBeamMesh", 1, 0, "DeformingBeamMesh");
 
     Logger logger(&view);
@@ -93,21 +87,20 @@ int main(int argc, char *argv[])
 
 #ifdef ANDROID
     view.rootContext()->setContextProperty("Platform","ANDROID");
-    QString conf_folder="file:"+QString(getenv("EXTERNAL_STORAGE"))+"/staTIc/";
-    view.rootContext()->setContextProperty("Conf_folder",conf_folder);
+
 #else
     view.rootContext()->setContextProperty("Platform","UNIX");
-    QString conf_folder="file:"+QString(getenv("HOME"));
-    view.rootContext()->setContextProperty("Conf_folder",conf_folder);
+
 #endif
 
     view.rootContext()->setContextProperty("logger",&logger);
+
     view.rootContext()->setContextProperty("scenariosPath", scenariosPath);
+    view.rootContext()->setContextProperty("boardsPath", boardsPath);
 
     view.resize(2560, 1600);
     view.setResizeMode(QQuickView::SizeRootObjectToView);
-//    view.setSource(QUrl("qrc:/main.qml"));
-    view.setSource(QUrl("qrc:/Experiment-Mode.qml"));
+    view.setSource(QUrl("qrc:/main.qml"));
     view.show();
 
    return app.exec();

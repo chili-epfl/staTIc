@@ -37,8 +37,8 @@ ToolBar {
                 onClicked: {
                     //Add code to save
                     title_field.text.trim().length>0 ?
-                                json_sketch.exportJSONSketch(scenariosPath+title_field.text.trim()+".json", sketch, 0):
-                                json_sketch.exportJSONSketch(scenariosPath+title_field.default_title+".json", sketch, 0)
+                                json_sketch.exportJSONSketch(scenariosPath+title_field.text.trim()+".json", sketch):
+                                json_sketch.exportJSONSketch(scenariosPath+title_field.default_title+".json", sketch)
                     stack_view.pop()
                 }
             }
@@ -118,15 +118,6 @@ ToolBar {
                     checked: sketchScreen.visibleGrid
                     onTriggered: {
                         sketchScreen.visibleGrid=this.checked
-                    }
-                }
-                MenuItem {
-                    text: "Export sketch in mm"
-                    onClicked: {
-                        title_field.text.trim().length>0 ?
-                                    json_sketch.exportJSONSketch(scenariosPath+title_field.text.trim()+".json", sketch, 1):
-                                    json_sketch.exportJSONSketch(scenariosPath+title_field.default_title+".json", sketch, 1)
-
                     }
                 }
                 /*MenuItem {

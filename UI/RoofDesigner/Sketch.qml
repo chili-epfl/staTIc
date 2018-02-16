@@ -1,7 +1,7 @@
 import QtQuick 2.7
 import QtQuick.Window 2.0
 import Constraints 1.0
-import QtQuick.Controls 2.2
+import QtQuick.Controls 2.1
 
 Item {
 
@@ -261,5 +261,14 @@ Item {
             if (d !== -1)
                 sketch.scaleFactor = d / c.valA
         }
+    }
+
+    QtObject{
+        objectName: "structureData"
+        property matrix4x4 poseOffset:Qt.matrix4x4(1,0,0,0,
+                                                   0,1,0,0,
+                                                   0,0,1,0,
+                                                   0,0,0,1)
+        property real scaleFactorPhysical: 0.1
     }
 }

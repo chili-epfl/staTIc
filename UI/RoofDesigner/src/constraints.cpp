@@ -25,9 +25,9 @@ int operator <(QVector2D v1, QVector2D v2){
 
 void Constraints::compute2d(QObject* sketch) {
     Slvs_hGroup g;
-    pointIdsFromPosition.clear();
-    linesIdsFromPointIds.clear();
-    entityObjects.clear();
+    ids2entityObjects.clear();
+    entityObjects2ids.clear();
+
     int paramId = 1;
     const int entityOriginId = 1;
     const int entityQuaternionId = 2;
@@ -64,11 +64,11 @@ void Constraints::compute2d(QObject* sketch) {
     foreach (QObject* child, sketch->children()) {
         if (!QString::compare(child->property("class_type").toString(), "Point")
                 && child->property("existing").toBool()) {
-            pointIdsFromPosition.insert(QVector2D(child->property("x").toReal(), child->property("y").toReal()), entityId);
             sys.param[sys.params++] = Slvs_MakeParam(paramId++, g, child->property("x").toReal());
             sys.param[sys.params++] = Slvs_MakeParam(paramId++, g, child->property("y").toReal());
             sys.entity[sys.entities++] = Slvs_MakePoint2d(entityId, g, entityPlanId, paramId - 2, paramId - 1);
-            entityObjects.insert(entityId++, child);
+            ids2entityObjects.insert(entityId++, child);
+            entityObjects2ids.insert(child,entityId-1);
         }
     }
 
@@ -83,9 +83,9 @@ void Constraints::compute2d(QObject* sketch) {
                 && child->property("existing").toBool()) {
             int p1Id = getPointId(child, "p1");
             int p2Id = getPointId(child, "p2");
-            linesIdsFromPointIds.insert(QVector2D(p1Id, p2Id), entityId);
             sys.entity[sys.entities++] = Slvs_MakeLineSegment(entityId, g, entityPlanId, p1Id, p2Id);
-            entityObjects.insert(entityId++, child);
+            ids2entityObjects.insert(entityId++, child);
+            entityObjects2ids.insert(child,entityId-1);
         }
     }
 
@@ -117,22 +117,26 @@ void Constraints::compute2d(QObject* sketch) {
 
                 QObject* ptA = qvariant_cast<QObject*>(child->property("ptA"));
                 if (ptA && ptA->property("x").isValid() && ptA->property("y").isValid()) {
-                    hPtA = pointIdsFromPosition[QVector2D(ptA->property("x").toReal(), ptA->property("y").toReal())];
+                    hPtA = entityObjects2ids[ptA];
+
                 }
 
                 QObject* ptB = qvariant_cast<QObject*>(child->property("ptB"));
                 if (ptB && ptB->property("x").isValid() && ptB->property("y").isValid()) {
-                    hPtB = pointIdsFromPosition[QVector2D(ptB->property("x").toReal(), ptB->property("y").toReal())];
+                    hPtB = entityObjects2ids[ptB];
+
                 }
 
                 QObject* entityA = qvariant_cast<QObject*>(child->property("entityA"));
                 if (entityA && getPointId(entityA, "p1") && getPointId(entityA, "p2")) {
-                    hEntityA = linesIdsFromPointIds[QVector2D(getPointId(entityA, "p1"), getPointId(entityA, "p2"))];
+                    hEntityA = entityObjects2ids[entityA];
+
                 }
 
                 QObject* entityB = qvariant_cast<QObject*>(child->property("entityB"));
                 if (entityB && getPointId(entityB, "p1") && getPointId(entityB, "p2"))  {
-                    hEntityB = linesIdsFromPointIds[QVector2D(getPointId(entityB, "p1"), getPointId(entityB, "p2"))];
+                    hEntityB = entityObjects2ids[entityB];
+
                 }
                 sys.constraint[sys.constraints++] =
                         Slvs_MakeConstraint(
@@ -164,12 +168,12 @@ void Constraints::solve(){
             /* sys.param[sys.entity[i].param[0] - 1]: it's needed to decrease the index
              * of sys.param since the param with handle 0 is reserved but not stored in the array.*/
             if (entity.type == SLVS_E_POINT_IN_2D){
-                entityObjects[entity.h]->setProperty("x", sys.param[entity.param[0] - 1].val);
-                entityObjects[entity.h]->setProperty("y", sys.param[entity.param[1] - 1].val);
-                entityObjects[entity.h]->setProperty("conflicting", false);
+                ids2entityObjects[entity.h]->setProperty("x", sys.param[entity.param[0] - 1].val);
+                ids2entityObjects[entity.h]->setProperty("y", sys.param[entity.param[1] - 1].val);
+                ids2entityObjects[entity.h]->setProperty("conflicting", false);
             }
             if (entity.type == SLVS_E_LINE_SEGMENT) {
-                entityObjects[entity.h]->setProperty("conflicting", false);
+                ids2entityObjects[entity.h]->setProperty("conflicting", false);
             }
 
         }
@@ -189,7 +193,7 @@ void Constraints::solve(){
                 Slvs_Entity entity = sys.entity[e];
                 if (entity.h == failed.ptA || entity.h == failed.ptB ||
                         entity.h == failed.entityA || entity.h == failed.entityB) {
-                    entityObjects[entity.h]->setProperty("conflicting", true);
+                    ids2entityObjects[entity.h]->setProperty("conflicting", true);
                 }
             }
         }
@@ -204,11 +208,17 @@ void Constraints::solve(){
 int Constraints::getPointId(QObject* line, const char* pointPropertyName) const {
     QObject* p = qvariant_cast<QObject*>(line->property(pointPropertyName));
     if (p->property("x").isNull() || p->property("y").isNull()){
+        qDebug("Serious Problem");
         return 0;
     }
-    int px = p->property("x").toReal();
-    int py = p->property("y").toReal();
-    return pointIdsFromPosition[QVector2D(px, py)];
+    if(!entityObjects2ids.contains(p)){
+        qDebug("Serious Problem");
+        return 0;
+    }
+    return entityObjects2ids[p];
+//    int px = p->property("x").toReal();
+//    int py = p->property("y").toReal();
+//    return pointIdsFromPosition[QVector2D(px, py)];
 }
 
 void Constraints::apply(QObject* sketch)

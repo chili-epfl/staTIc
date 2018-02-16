@@ -4,7 +4,7 @@
 #include <array>
 #include <stdlib.h>
 #include <QList>
-#include <QMap>
+#include <QHash>
 #include <QObject>
 #include <QVector2D>
 #include <solvespace/include/slvs.h>
@@ -23,13 +23,12 @@ private:
     void compute2d(QObject* sketch);
     int getPointId(QObject* line, const char* pointPropertyName) const;
 
-    QMap<QVector2D, int> pointIdsFromPosition;
-    QMap<QVector2D, int> linesIdsFromPointIds;
-
     int m_allocated_memory;
     Slvs_System sys;
-    QMap<int, QObject*> entityObjects;
-    QMap<int, QObject*> constraintObjects;
+    QHash<int, QObject*> ids2entityObjects;
+    QHash<QObject*,int> entityObjects2ids;
+
+    QHash<int, QObject*> constraintObjects;
 };
 
 #endif // CONSTRAINTS_H

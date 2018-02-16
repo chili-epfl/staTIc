@@ -46,7 +46,7 @@ Rectangle{
                     FolderListModel {
                         id: folderModel
                         showDirs: false
-                        folder: Conf_folder
+                        folder: boardsPath
                         nameFilters: ["*.data"]
                         onCountChanged: folderModel.count>0 ? file_view.currentIndex=0 : file_view.currentIndex=-1
                     }

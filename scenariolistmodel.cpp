@@ -91,3 +91,4 @@ void ScenarioListModel::setSource(){
     emit dataChanged(this->createIndex(0,0),this->createIndex(m_scenariosNames.count(),0));
 
 }
+

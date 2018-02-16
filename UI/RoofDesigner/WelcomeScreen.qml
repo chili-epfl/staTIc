@@ -55,13 +55,17 @@ Page {
                 height: welcome_page.availableHeight/3
                 border.color: "black"
                 border.width: 3
-                JSONSketch{
-                    id:json_sketch
+                Item{
+                    enabled: false
+                    anchors.fill: parent
+                    JSONSketch{
+                        id:json_sketch
+                    }
+                    Component.onCompleted: {
+                        json_sketch.loadSketch(filePath,this)
+                    }
                 }
-                Component.onCompleted: {
-                    json_sketch.loadSketch(filePath,this)
-                }
-                MouseArea{
+                MouseArea{                  
                     anchors.fill: parent
                     onDoubleClicked: {
                         loading_indicator.visible=true;

@@ -5,24 +5,32 @@ import QtQuick.Layouts 1.1
 import ScenarioListModel 1.0
 import ResourcesFetcher 1.0
 import QtQuick.Dialogs 1.2
+import QtSensors 5.3
+import Qt.labs.folderlistmodel 2.1
+import JSONSketch 1.0
 import "qrc:/ui"
-//import QtSensors 5.3
+import "qrc:/scripts/Scripts"
+import "qrc:/ui/UI/Help"
+import "qrc:/ui/UI/"
+import "qrc:/ui/UI/MaterialDesigner"
 
 Item {
+
+    property string board_path: boardSelection_box.boardPath
+
     function pt2px(pt){return pt*0.3759*Screen.pixelDensity}
+    function mm2px(mm){return mm*Screen.pixelDensity}
+
     id: applicationWindow
     visible: true
-    //width: 2560
-    //height: 1600
-//    Gyroscope{
-//        id:gyro
-//        active: true
-//    }
-    property bool use_custom_board:false
+
+    RotationSensor{
+        id: rotationSensor
+        active:  true
+    }
 
     focus:true
     Keys.onReleased: {
-        console.log(event.key)
         if (event.key === Qt.Key_Back) {
             event.accepted = true
         }
@@ -41,14 +49,6 @@ Item {
         username: "lollo"
         onLoadingChanged: if(!loading) scenarioListModel.reloadResources();
     }
-    ScenarioListModel{
-        id:scenarioListModel
-        onDataChanged:
-        {
-            gridview.model="null"
-            gridview.model=scenarioListModel
-        }
-    }
 
     Loader{
         id:scriptLoader
@@ -58,8 +58,7 @@ Item {
         onLoaded: {
             intromenu.visible=false;
             intromenu.enabled=false;
-            item.structureUrl=gridview.model.get(gridview.currentIndex,"ScenarioStructure");
-            item.structure3DAsset=gridview.model.get(gridview.currentIndex,"Scenario3DAsset");
+            item.structureUrl=folder_list_model.get(gridview.currentIndex, "fileURL")
         }
     }
 
@@ -67,10 +66,7 @@ Item {
         ignoreUnknownSignals: true
         target: scriptLoader.valid ? scriptLoader.item : null
         onPageExit: {
-            logger.close_logger();
-            intromenu.visible=true;
-            intromenu.enabled=true;
-            scriptLoader.source=""
+            intromenu.visible=true;intromenu.enabled=true;scriptLoader.source=""
         }
     }
 
@@ -80,7 +76,6 @@ Item {
         anchors.margins:10
         id:intromenu
         spacing: 5
-
         /*Banner*/
         Item{
             id:banner
@@ -103,56 +98,58 @@ Item {
             Layout.preferredHeight: parent.height*0.6
             Layout.alignment: Qt.AlignCenter
 
-
-            ListView{
-                orientation: Qt.Horizontal
+            GridView{
                 highlightMoveDuration:400
                 id: gridview
                 clip:true
-                spacing: 10
+                cellWidth: gridRect.width/5; cellHeight: gridRect.height/2
                 anchors.fill: parent
-                model: scenarioListModel
-                highlight: Rectangle { color: "lightsteelblue"; radius: 2 }
-                delegate: Rectangle{
-                    color: "#55FFFF99"
-                    width: gridRect.height; height:gridRect.height
-                    ColumnLayout{
+                model: folder_list_model
+
+                FolderListModel {
+                    id:folder_list_model
+                    showDirs: false
+                    folder: "file:"+scenariosPath
+                    nameFilters: ["*.json"]
+                }
+                delegate:
+                    Item{
+                    width: Math.min(gridview.cellHeight,gridview.cellWidth);
+                    height:width
+                    Rectangle{
+                        color: "white"
+                        border.color: gridview.currentIndex == index ? "red": "transparent"
+                        border.width: 10
                         anchors.fill: parent
-                        Item{
-                            id:scenarioListView
-                            //Layout.alignment: Qt.AlignCenter
-                            Layout.preferredHeight:  0.8*parent.height;
-                            Layout.preferredWidth: parent.height;
-                            Image {
-                                anchors.fill: parent
-                                anchors.margins: 10
-                                fillMode: Image.PreserveAspectFit
-                                source: decoration;
-                            }
+                        anchors.margins: 10
+                        JSONSketch{
+                            id:json_sketch
                         }
-                        Item{
-                            //Layout.alignment: Qt.AlignCenter
-                            Layout.preferredHeight:  0.2*parent.height;
-                            Layout.preferredWidth: parent.height;
-                            Text {
-                                id:caption;
-                                text: display;
-                                anchors.fill: parent
-                                fontSizeMode: Text.Fit
-                                horizontalAlignment: Text.AlignHCenter
-                                verticalAlignment: Text.AlignVCenter
-                            }
+                        Component.onCompleted: {
+                            json_sketch.loadSketch(filePath,this)
+                        }
+                        property alias background_picture_url: backgroundImage.source
+                        Image {
+                            id: backgroundImage
+                            mipmap: true
+                            anchors.fill: parent
+                            fillMode: Image.PreserveAspectCrop
+                        }
+                        Text {
+                            z:1
+                            anchors.fill: parent
+                            text: index
+                            horizontalAlignment: Text.AlignHCenter
+                            verticalAlignment:  Text.AlignVCenter
+                            fontSizeMode: Text.Fit
+                            minimumPixelSize: 10; font.pixelSize: 50
+                            color: "black"
                         }
                         MouseArea {
                             anchors.fill: parent
                             onClicked: gridview.currentIndex = index
                         }
                     }
-                }
-
-                flickableChildren: MouseArea {
-                    anchors.fill: parent
-                    onClicked: gridview.currentIndex = -1
                 }
             }
         }
@@ -161,69 +158,91 @@ Item {
         Item{
             Layout.preferredWidth: parent.width
             Layout.preferredHeight: parent.height*0.1
-
-            Layout.preferredWidth: parent.width
-            Layout.preferredHeight: parent.height*0.1
-
-            Image{
-                id:synch_img
-                width: 100
-                height: 100
-                source: synch_mouse_area.pressed ? "qrc:/icons/Icons/synch_pressed.png" : "qrc:/icons/Icons/synch_ON.png"
+            Row{
                 anchors.bottom:  parent.bottom
-                anchors.rightMargin: 10
+                Image{
+                    id:synch_img
+                    width: 100
+                    height: 100
+                    source: synch_mouse_area.pressed ? "qrc:/icons/Icons/synch_pressed.png" : "qrc:/icons/Icons/synch_ON.png"
+                    //                anchors.bottom:  parent.bottom
+                    //                anchors.rightMargin: 10
 
-                MouseArea{
-                    id:synch_mouse_area
-                    anchors.fill: parent
-                    onClicked: synch_dialog_box.visible=true
+                    MouseArea{
+                        id:synch_mouse_area
+                        anchors.fill: parent
+                        onClicked: synch_dialog_box.visible=true
+                    }
+                }
+                Image{
+                    width: 100
+                    height: 100
+                    source: "qrc:/icons/Icons/material_design.png"
+                    //                anchors.right: parent.right
+                    //                anchors.bottom:  parent.bottom
+                    //                anchors.rightMargin: 10
+                    MouseArea{
+                        anchors.fill: parent
+                        onClicked: aux_loader.source="qrc:/ui/UI/MaterialDesigner/MaterialDesigner.qml"
+                    }
+                }
+                Button{
+                    //                anchors.left: synch_img.right
+                    //                anchors.bottom:  parent.bottom
+                    text:"Select Board"
+                    onClicked: boardSelection_box.visible=true
+                }
+                Button{
+                    //                anchors.left: synch_img.right
+                    //                anchors.bottom:  parent.bottom
+                    text:"design roof"
+                    onClicked: aux_loader.source="qrc:/ui/UI/RoofDesigner/RoofDesignerMain.qml"
                 }
             }
-            Rectangle{
-                anchors.left: synch_img.right
-                anchors.bottom:  parent.bottom
-                id:custom_board_enable_rect
-                width: 100
-                height: 100
-                color: use_custom_board ? "green" : "red"
-                Text {
-                    anchors.fill: parent
-                    fontSizeMode: Text.Fit
-                    wrapMode: Text.Wrap
-                    text: "Use Custom Board"
-                }
-                MouseArea{
-                    anchors.fill: parent
-                    onClicked: use_custom_board=!use_custom_board
-                }
-            }
 
             Image{
                 width: 100
                 height: 100
-                source: "qrc:/icons/Icons/material_design.png"
+                source: start_button.pressed? "qrc:/icons/Icons/next_pressed.png" :"qrc:/icons/Icons/next.png"
                 anchors.right: parent.right
                 anchors.bottom:  parent.bottom
                 anchors.rightMargin: 10
                 MouseArea{
+                    id:start_button
                     anchors.fill: parent
                     onClicked: if(gridview.currentIndex !=-1){
-//                                   scriptLoader.source="qrc:/scripts/Scripts/CableExercise.qml"
-                                     scriptLoader.source="qrc:/scripts/Scripts/DefaultScript.qml"
-//                                   scriptLoader.source="qrc:/scripts/Scripts/SupportExercise.qml"
-                                     logger.restart_logger();
+                                   scriptLoader.source="qrc:/scripts/Scripts/DefaultScript.qml";
                                }
                 }
             }
         }
     }
+
+    Loader{
+        property bool valid: item !== null
+        id:aux_loader
+        anchors.fill: parent
+
+    }
+    Connections {
+        ignoreUnknownSignals: true
+        target: aux_loader.valid ? aux_loader.item : null
+        onPageExit: {
+            aux_loader.source=""
+        }
+    }
+
     SynchDialogBox{
         id:synch_dialog_box
         resourcesFetcher: resourcesFetcher
     }
-    MaterialDesigner{
-        id:materialDesigner
+
+    BoardSelection{
+        id:boardSelection_box
+        visible:false
     }
+
+
 
 
 }

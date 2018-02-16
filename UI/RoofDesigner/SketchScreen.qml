@@ -67,8 +67,6 @@ Page {
     Canvas {
         id:gridCanvas
         anchors.fill: parent
-        renderTarget: Canvas.FramebufferObject
-        renderStrategy: Canvas.Threaded
         property real cellSize: Screen.pixelDensity*10
         Connections{
             ignoreUnknownSignals:true
