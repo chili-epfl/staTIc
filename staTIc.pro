@@ -106,13 +106,12 @@ LIBS += -lquazip -lz -lslvs
 android {
     #INCLUDEPATH += $(ANDROID_STANDALONE_TOOLCHAIN)/sysroot/usr/include
     LIBS += -L/home/chili/ARToolKit5-bin-5.3.2-Android/android/libs/armeabi-v7a
-    LIBS+= -L$$_PRO_FILE_PWD_/3rdparty/solvespace/build-android/src
+    LIBS+= -L$$_PRO_FILE_PWD_/3rdparty/solvespace/build-android-static/src
 
 
     ANDROID_EXTRA_LIBS = \
         /home/chili/ARToolKit5-bin-5.3.2-Android/android/libs/armeabi-v7a/libc++_shared.so\
-        /home/chili/ARToolKit5-bin-5.3.2-Android/android/libs/armeabi-v7a/libARWrapper.so \
-        $$_PRO_FILE_PWD_/3rdparty/solvespace/build-android/src/libslvs.so
+        /home/chili/ARToolKit5-bin-5.3.2-Android/android/libs/armeabi-v7a/libARWrapper.so
     ANDROID_PERMISSIONS += \
         android.permission.CAMERA
 

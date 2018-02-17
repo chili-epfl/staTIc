@@ -19,10 +19,10 @@ Requirement:
 ```
   mkdir android-build
   cd android-build
-  ccmake .. -DCMAKE_TOOLCHAIN_FILE=[tool-chain-file] -DANDROID_PLATFORM=[platform] -DANDROID_ARM_MODE=arm -DANDROID_ABI=[abi]   -DANDROID_CPP_FEATURES="rtti exceptions"
+  ccmake .. -DCMAKE_TOOLCHAIN_FILE=[tool-chain-file] -DANDROID_PLATFORM=[platform] -DANDROID_ARM_MODE=arm -DANDROID_ABI=[abi]   -DANDROID_CPP_FEATURES="rtti exceptions" -DSTATIC_LIB=ON
   make
 ```	
 For example 
 ```
-ccmake .. -DCMAKE_TOOLCHAIN_FILE=/home/chili/android-ndk-r13b/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-19 -DANDROID_ARM_MODE=arm -DANDROID_ABI=armeabi-v7a\ with\ NEON -DANDROID_CPP_FEATURES="rtti exceptions"
+ccmake .. -DCMAKE_TOOLCHAIN_FILE=/home/chili/android-ndk-r13b/build/cmake/android.toolchain.cmake -DANDROID_PLATFORM=android-19 -DANDROID_ARM_MODE=arm -DANDROID_ABI=armeabi-v7a\ with\ NEON -DANDROID_CPP_FEATURES="rtti exceptions" -DSTATIC_LIB=ON
 ```

@@ -6,6 +6,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
             "    rm -rf CMakeCache.txt CMakeFiles/\n"
             "    mkdir build && cd build && cmake ..")
 endif()
+option(STATIC_LIB "Build Static lib" OFF)
 
 cmake_minimum_required(VERSION 3.1.0 FATAL_ERROR)
 cmake_policy(VERSION 3.1.0)

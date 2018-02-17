@@ -21,12 +21,19 @@ set(libslvs_SOURCES
 set(libslvs_HEADERS
     solvespace.h)
 
-add_library(slvs SHARED
-    ${libslvs_SOURCES}
-    ${libslvs_HEADERS}
-    ${util_SOURCES}
-    lib.cpp)
-
+if(STATIC_LIB)
+	add_library(slvs STATIC
+	   	 ${libslvs_SOURCES}
+		 ${libslvs_HEADERS}
+    		 ${util_SOURCES}
+    		 lib.cpp)
+else()
+	add_library(slvs SHARED
+	   	 ${libslvs_SOURCES}
+		 ${libslvs_HEADERS}
+    		 ${util_SOURCES}
+    		 lib.cpp)
+endif()
 target_compile_definitions(slvs
     PRIVATE -DLIBRARY)
 
