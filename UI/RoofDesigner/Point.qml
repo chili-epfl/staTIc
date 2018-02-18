@@ -3,12 +3,13 @@ import QtQuick.Window 2.0
 
 Rectangle {
     id:_root
+    color: parent.origin === _root ? "green" :"blue"
+
     width: parent.class_type ? Screen.pixelDensity*5*1/(parent.zoomFactor) : 10
     height: width
     radius: 0.5*width
     antialiasing: true
 
-    color: "blue"
     z:1
 
     onParentChanged: {
@@ -123,6 +124,9 @@ Rectangle {
     }
 
     QtObject{
+        //Immutable. It changes only when loading a skecth.
+        //It does not need to be in store undo-redo
+        id:structureData
         objectName: "structureData"
         property string visual_name
         property bool reac_x:false

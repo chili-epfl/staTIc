@@ -9,6 +9,11 @@ Item {
 
     property real scaleFactor: Screen.pixelDensity
     property var origin;
+    Connections{
+        ignoreUnknownSignals: false
+        target: origin ? origin : null
+        onExistingChanged: if(!origin.existing) origin=null;
+    }
 
     property real zoomFactor: 1
     property int zoom_origin_x: width/2
@@ -48,9 +53,10 @@ Item {
         if(undo_buffer.length>0){
             redo_buffer.push(undo_buffer.pop())
             if(undo_buffer.length>0){
-
+                var state=undo_buffer[undo_buffer.length-1]
+                origin=state.origin
             }else{
-
+                origin=null
             }
         }
     }
@@ -58,13 +64,16 @@ Item {
     onRedo: {
         if(redo_buffer.length>0){
             var state=redo_buffer.pop()
+            origin=state.origin
             undo_buffer.push(state)
         }
     }
 
+    //Store state should be called at the end of procedures like moving, dragging creating and
+    //NOT WHEN PROPERTIES CHANGES!
     signal store_state(var epoch)
     onStore_state: {
-        var state={}
+        var state={'origin':origin}
         undo_buffer.push(state)
         redo_buffer=[]
     }
@@ -264,6 +273,8 @@ Item {
     }
 
     QtObject{
+        //Immutable. It changes only when loading a skecth.
+        //It does not need to be in store undo-redo
         objectName: "structureData"
         property matrix4x4 poseOffset:Qt.matrix4x4(1,0,0,0,
                                                    0,1,0,0,

@@ -11,14 +11,20 @@
 #include <QQmlContext>
 #include <QQmlComponent>
 #include <QMatrix4x4>
+
 #include "jsonsketch.h"
 #include "constraints.h"
 
+bool pointSortingByX(const QObject* o1, const  QObject* o2)
+{
+    return o1->property("x").toDouble() < o2->property("x").toDouble();
+}
+
 JSONSketch::JSONSketch(QObject *parent): QObject(parent) {}
 
-QString JSONSketch::loadSketch(const QString url, QObject* sketch)
+QString JSONSketch::loadSketch(const QString path,const QString name, QObject* sketch)
 {
-    QFile file(url);
+    QFile file(path+name);
 
     if (!file.open(QIODevice::ReadOnly)) {
         return "cannot open the JSON file";
@@ -28,25 +34,36 @@ QString JSONSketch::loadSketch(const QString url, QObject* sketch)
 
     QJsonParseError error;
     QJsonDocument doc(QJsonDocument::fromJson(data, &error));
-
-    return read(doc.object(), sketch) + ", Sketch loaded";
+    if(!doc.isObject()){
+        return "cannot open the JSON object";
+    }
+    return read(doc.object(), sketch,path) + ", Sketch loaded";
 }
 
-QString JSONSketch::read(const QJsonObject json, QObject* sketch)
+QString JSONSketch::read(const QJsonObject json, QObject* sketch,QString jsonFilePath)
 {
-
+    if(!json["points"].isObject())
+        return "Cannot read points";
     QJsonObject qPoints = json["points"].toObject();
+    if(!json["lines"].isObject())
+        return "Cannot read lines";
     QJsonObject qLines = json["lines"].toObject();
+    if(!json["constraints"].isArray())
+        return "Cannot read constraints";
     QJsonArray qConstraints = json["constraints"].toArray();
 
     qreal max_x=-HUGE_VAL,min_x=HUGE_VAL,max_y=-HUGE_VAL,min_y=HUGE_VAL,centre_x=0,centre_y=0;
     for (const QString &key : qPoints.keys()){
+        if(!qPoints[key].isObject())
+            return "Cannot read point";
         auto currPoint=qPoints[key].toObject();
+        if(!currPoint["x"].isDouble() || !currPoint["y"].isDouble() || !currPoint["z"].isDouble())
+            return "Cannot read coordinates";
         if(!qFuzzyCompare(currPoint["z"].toDouble(),0)){
             qDebug()<<"Not 2D Sketch";
             return "Not 2D Sketch";
         }
-        max_x=qMax(max_x,currPoint["x"].toDouble());
+        max_x=qMax(max_x,currPoint["x"].toDouble() );
         max_y=qMax(max_y,-currPoint["y"].toDouble());
         min_x=qMin(min_x,currPoint["x"].toDouble());
         min_y=qMin(min_y,-currPoint["y"].toDouble());
@@ -74,7 +91,6 @@ QString JSONSketch::read(const QJsonObject json, QObject* sketch)
 
     QHash<QString, QQuickItem*> pointsQML;
 
-
     for (const QString &key : qPoints.keys()){
         auto currPoint=qPoints[key].toObject();
         QQmlContext* point_context = new QQmlContext(qmlContext(sketch),sketch);
@@ -89,6 +105,10 @@ QString JSONSketch::read(const QJsonObject json, QObject* sketch)
         point_component.completeCreate();
 
         auto structureData=point->findChild<QObject*>(QString("structureData"), Qt::FindDirectChildrenOnly);
+        if(!currPoint["name"].isString() || !currPoint["reac_x"].isBool() ||!currPoint["reac_y"].isBool() ||
+                !currPoint["reac_z"].isBool() ||!currPoint["reac_xx"].isBool() ||!currPoint["reac_yy"].isBool() ||
+                !currPoint["reac_zz"].isBool() )
+            return "Cannot read porint properties";
         structureData->setProperty("visual_name",currPoint["name"].toString());
         structureData->setProperty("reac_x",currPoint["reac_x"].toBool());
         structureData->setProperty("reac_y",currPoint["reac_y"].toBool());
@@ -103,11 +123,16 @@ QString JSONSketch::read(const QJsonObject json, QObject* sketch)
     line_component.loadUrl(QUrl("qrc:/ui/UI/RoofDesigner/Line.qml"));
     QHash<QString,QQuickItem*> linesQML;
     for (const QString &key : qLines.keys()){
+        if(!qLines[key].isObject())
+            return "Cannot read line";
         auto currLine=qLines[key].toObject();
+
         QQmlContext* line_context = new QQmlContext(qmlContext(sketch),sketch);
         QQuickItem* line = qobject_cast<QQuickItem*>(line_component.beginCreate(line_context));
 
         line_context->setContextObject(line);
+        if(!currLine["p1"].isString() || !currLine["p2"].isString())
+            return "Cannot read extremes";
         line->setProperty("p1", qVariantFromValue(pointsQML[currLine["p1"].toString()]));
         line->setProperty("p2", qVariantFromValue(pointsQML[currLine["p2"].toString()]));
 
@@ -115,6 +140,9 @@ QString JSONSketch::read(const QJsonObject json, QObject* sketch)
         line->setParentItem(qobject_cast<QQuickItem*>(sketch));
         line_component.completeCreate();
 
+        if(!currLine["name"].isString() || !currLine["materialID"].isString() ||
+                !currLine["width"].isDouble()||!currLine["height"].isDouble())
+            return "Cannot read line properties";
         auto structureData=line->findChild<QObject*>(QString("structureData"), Qt::FindDirectChildrenOnly);
         structureData->setProperty("visual_name",currLine["name"].toString());
         structureData->setProperty("width",currLine["width"].toDouble());
@@ -137,7 +165,15 @@ QString JSONSketch::read(const QJsonObject json, QObject* sketch)
         constraint->setParentItem(qobject_cast<QQuickItem*>(sketch));
         const_component.completeCreate();
 
+        if(!qConstraints[c].isObject())
+            return "Cannot read constraint";
+
         auto jsonConstrain=qConstraints[c].toObject();
+        if(!jsonConstrain["type"].isDouble() ||!jsonConstrain["valA"].isDouble() ||
+                !jsonConstrain["ptA"].isString() ||!jsonConstrain["ptB"].isString() ||
+                !jsonConstrain["entityA"].isString() ||!jsonConstrain["entityB"].isString() )
+            return "Cannot  constraint properties";
+
         constraint->setProperty("type", jsonConstrain["type"].toInt());
         constraint->setProperty("valA", jsonConstrain["valA"].toDouble());
         constraint->setProperty("ptA", jsonConstrain["ptA"].toString() =="-1" ? qVariantFromValue(nullptr) :
@@ -150,17 +186,32 @@ QString JSONSketch::read(const QJsonObject json, QObject* sketch)
                                                                                         qVariantFromValue(linesQML[jsonConstrain["entityB"].toString()]));
 
     }
+    if(!json["background_picture"].isString())
+        return "Cannot read picture";
+    if(json["background_picture"].toString().contains('/'))
+        return "Picture seems a path";
+    if(!json["background_picture"].toString().isEmpty())
+        sketch->setProperty("background_picture_url", QUrl::fromLocalFile(jsonFilePath+ json["background_picture"].toString()));
 
-    sketch->setProperty("background_picture_url", qvariant_cast<QUrl>(json["background_picture_url"].toString()));
+    if(!json["origin_id"].isString())
+        return "Cannot read origin";
 
     if (json["origin_id"].toString() != "-1"){
-        pointsQML[json["origin_id"].toString()]->setProperty("color", "green");
         sketch->setProperty("origin", qVariantFromValue(pointsQML[json["origin_id"].toString()]));
     }
     auto structureData=sketch->findChild<QObject*>(QString("structureData"), Qt::FindDirectChildrenOnly);
     if(structureData){
+        if(!json["scaleFactorPhysical"].isDouble())
+            return "Cannot read scaleFactorPhysical";
         structureData->setProperty("scaleFactorPhysical",json["scaleFactorPhysical"].toDouble());
+        if(!json["poseOffset"].isArray())
+            return "Cannot read poseOffset";
         auto poseOffsetJSON =json["poseOffset"].toArray();
+        if(poseOffsetJSON.size()!=16)
+            return "Cannot read poseOffset";
+        for(int i=0;i<16;i++)
+            if(!poseOffsetJSON[i].isDouble())
+                return "Cannot read poseOffset";
         QMatrix4x4 poseOffset(poseOffsetJSON[0].toDouble(),poseOffsetJSON[1].toDouble(),poseOffsetJSON[2].toDouble(),
                 poseOffsetJSON[3].toDouble(),poseOffsetJSON[4].toDouble(),poseOffsetJSON[5].toDouble(),poseOffsetJSON[6].toDouble(),
                 poseOffsetJSON[7].toDouble(),poseOffsetJSON[8].toDouble(),poseOffsetJSON[9].toDouble(),poseOffsetJSON[10].toDouble(),
@@ -242,24 +293,61 @@ QString JSONSketch::read(const QJsonObject json, QObject* sketch)
 //    }
 //}
 
-QString JSONSketch::exportJSONSketch(const QString url, QObject* sketch) {
+QString JSONSketch::exportJSONSketch(const QString path, const QString name,  QObject* sketch) {
 
     QJsonObject object;
     if(!writeJSON(object, sketch)){
         return "Empty sketch";
     }
 
-    QFile file(url);
+    QFile file(path+name+".json");
 
     if (!file.open(QIODevice::WriteOnly)) {
         return "cannot open the JSON file";
     }
 
+    QString background_picture=object["background_picture"].toString();
+    if(!background_picture.isEmpty()){
+        QString image_path=QUrl(background_picture).path();
+        QStringList name_parts=image_path.split('.');
+        QString new_image_path=path+name+"."+name_parts[name_parts.length()-1];
+        if(QUrl::fromLocalFile(image_path)!=QUrl::fromLocalFile(new_image_path)){
+            QFile::remove(new_image_path);
+            QFile::copy(image_path,new_image_path);
+        }
+        object["background_picture"]=name+"."+name_parts[name_parts.length()-1];
+    }
     QJsonDocument doc(object);
     file.write(doc.toJson());
     file.close();
 
     return "Sketch exported";
+}
+
+QString JSONSketch::deleteSketchFile(const QString path, const QString name)
+{
+    QFile file(path+name);
+
+    if (!file.open(QIODevice::ReadOnly)) {
+        return "cannot open the JSON file";
+    }
+
+    QByteArray data = file.readAll();
+
+    QJsonParseError error;
+    QJsonDocument doc(QJsonDocument::fromJson(data, &error));
+    if(doc.isObject()){
+        auto jsonroot=doc.object();
+        if(jsonroot["background_picture"].isString()){
+            auto img_name=jsonroot["background_picture"].toString();
+            if(!img_name.isEmpty() && !img_name.contains('/')){
+                QFile::remove(path+img_name);
+            }
+        }
+    }
+    file.close();
+    QFile::remove(path+name);
+    return QString("Done");
 }
 
 bool JSONSketch::writeJSON(QJsonObject &json, QObject* sketch)
@@ -273,15 +361,59 @@ bool JSONSketch::writeJSON(QJsonObject &json, QObject* sketch)
 
     QHash<QObject*, int> mapIds;
     QObject* origin = qvariant_cast<QObject*>(sketch->property("origin"));
+    if (origin == nullptr){
+        qreal origin_candidate_x=HUGE_VAL;
+        qreal origin_candidate_y=-HUGE_VAL;
+        foreach (QObject* child, sketch->children()) {
+            if (!QString::compare(child->property("class_type").toString(), "Point")
+                    && child->property("existing").toBool()) {
+                auto y=child->property("y").toReal();
+                auto x=child->property("x").toReal();
+                //Lowest point has max y
+                if(origin_candidate_y<y){
+                    origin_candidate_y=y;
+                    origin_candidate_x=x;
+                    origin=child;
+                }
+                else if(origin_candidate_y==y){
+                    if(origin_candidate_x>x){
+                        origin_candidate_x=x;
+                        origin=child;
+                    }
+                }
+            }
+        }
+        if(origin!=nullptr){
+            sketch->setProperty("origin", qVariantFromValue(origin));
+            QMetaObject::invokeMethod(sketch,"store_state", Qt::DirectConnection,Q_ARG(QVariant,0));
+        }
+    }
+    //At the end of this block origin could be null if there were no points
+
+    qreal sketch_height=sketch->property("height").toReal();
     qreal origin_coordinate_x=0.0,origin_coordinate_y=0.0;
 
-    qreal sketch_width=sketch->property("width").toReal();
-
-    if (origin != nullptr){
+    if(origin!=nullptr){
         origin_coordinate_x=origin->property("x").toReal();
-        origin_coordinate_y=sketch_width-origin->property("y").toReal();
+        origin_coordinate_y=sketch_height-origin->property("y").toReal();
     }
 
+    //Generate names (very inefficient)
+    QVector<QObject*> sorted_points;
+    QHash<QObject*,QString> pointsNames;
+    foreach (QObject* child, sketch->children()) {
+        if (!QString::compare(child->property("class_type").toString(), "Point")
+                && child->property("existing").toBool()) {
+            sorted_points.append(child);
+        }
+    }
+    qSort(sorted_points.begin(),sorted_points.end(),pointSortingByX);
+    for(int i=0;i<sorted_points.length();i++) {
+        auto structureData=sorted_points[i]->findChild<QObject*>(QString("structureData"), Qt::FindDirectChildrenOnly);
+        auto name=QString(QChar(65+(i%26))).repeated(1+(int)(i/26));
+        structureData->setProperty("visual_name",name);
+        pointsNames[sorted_points[i]]=name;
+    }
 
     foreach (QObject* child, sketch->children()) {
         if (!QString::compare(child->property("class_type").toString(), "Point")
@@ -291,7 +423,7 @@ bool JSONSketch::writeJSON(QJsonObject &json, QObject* sketch)
             QJsonObject currPoint;
             currPoint.insert("x",(child->property("x").toReal()-origin_coordinate_x)/
                              sketch->property("scaleFactor").toReal());
-            currPoint.insert("y",(sketch_width-child->property("y").toReal()-origin_coordinate_y)/
+            currPoint.insert("y",(sketch_height-child->property("y").toReal()-origin_coordinate_y)/
                              sketch->property("scaleFactor").toReal());
             currPoint.insert("z",0);
             auto structureData=child->findChild<QObject*>(QString("structureData"), Qt::FindDirectChildrenOnly);
@@ -318,7 +450,8 @@ bool JSONSketch::writeJSON(QJsonObject &json, QObject* sketch)
                 currLine.insert("p1",QString::number(mapIds[p1]));
                 currLine.insert("p2",QString::number(mapIds[p2]));
                 auto structureData=child->findChild<QObject*>(QString("structureData"), Qt::FindDirectChildrenOnly);
-                currLine.insert("name", structureData->property("visual_name").toString());
+                //currLine.insert("name", structureData->property("visual_name").toString());
+                currLine.insert("name",pointsNames[p1]+"-"+pointsNames[p2]);
                 currLine.insert("width", structureData->property("width").toReal());
                 currLine.insert("height", structureData->property("height").toReal());
                 currLine.insert("materialID", structureData->property("materialID").toString());
@@ -362,7 +495,7 @@ bool JSONSketch::writeJSON(QJsonObject &json, QObject* sketch)
     json["points"] = qPoints;
     json["lines"] = qLines;
     json["constraints"] = qConstraints;
-    json["background_picture_url"] = sketch->property("background_picture_url").toString();
+    json["background_picture"] = sketch->property("background_picture_url").toString();
 
     json["scaleFactorPhysical"]=structureData->property("scaleFactorPhysical").toReal();
 

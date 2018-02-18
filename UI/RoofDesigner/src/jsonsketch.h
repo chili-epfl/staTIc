@@ -12,12 +12,13 @@ class JSONSketch : public QObject
 public:
     explicit JSONSketch(QObject* parent=0);
 
-    Q_INVOKABLE QString loadSketch(const QString url, QObject* sketch);
-    Q_INVOKABLE QString exportJSONSketch(const QString url, QObject* sketch);
+    Q_INVOKABLE QString loadSketch(const QString path, const QString name, QObject* sketch);
+    Q_INVOKABLE QString exportJSONSketch(const QString path, const QString name, QObject* sketch);
+    Q_INVOKABLE QString deleteSketchFile(const QString path, const QString name);
 
 private:
 
-    QString read(const QJsonObject json, QObject* sketch);
+    QString read(const QJsonObject json, QObject* sketch, QString jsonFilePath);
     void generateSketch(QObject* sketch);
 
     bool writeJSON(QJsonObject &json, QObject* sketch);

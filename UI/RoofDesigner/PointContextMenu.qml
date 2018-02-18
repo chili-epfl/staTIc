@@ -27,11 +27,10 @@ Popup {
             font.family: "FontAwesome"
             anchors.horizontalCenter: parent.horizontalCenter
             onClicked: {
-                if (sketch.origin != null){
-                    sketch.origin.color = "blue"
+                if(sketch.origin !== _root){
+                    sketch.origin = _root
+                    sketch.store_state(sketch.undo_buffer.length+1);
                 }
-                sketch.origin = _root
-                _root.color = "green"
             }
         }
 

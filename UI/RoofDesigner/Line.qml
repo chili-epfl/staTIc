@@ -144,6 +144,8 @@ Rectangle {
     }
 
     QtObject{
+        //Immutable. It changes only when loading a skecth.
+        //It does not need to be in store undo-redo
         objectName: "structureData"
         property string visual_name
         property real width: 25

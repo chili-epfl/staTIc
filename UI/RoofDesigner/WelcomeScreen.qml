@@ -5,7 +5,6 @@ import QtQuick.Layouts 1.1
 import JSONSketch 1.0
 Page {
     id:welcome_page
-
     Rectangle{
         anchors.fill: parent
         color:"lightgrey"
@@ -62,7 +61,7 @@ Page {
                         id:json_sketch
                     }
                     Component.onCompleted: {
-                        json_sketch.loadSketch(filePath,this)
+                        json_sketch.loadSketch(scenariosPath,fileName,this)
                     }
                 }
                 MouseArea{                  
@@ -72,6 +71,26 @@ Page {
                         stack_view.push("qrc:/ui/UI/RoofDesigner/SketchScreen.qml",{"sketch_to_load":fileBaseName});
                         sketch_list_view.model=0
                     }
+                    onPressAndHold: {
+                        delete_button.visible=true
+                    }
+                    Button{
+                        visible: false
+                        id: delete_button
+                        anchors.bottom: parent.bottom
+                        anchors.margins: 5
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        onClicked: json_sketch.deleteSketchFile(scenariosPath,fileName);
+                        text:"Delete"
+                        Timer{
+                            interval: 2000
+                            repeat: false
+                            running: parent.visible
+                            onTriggered: parent.visible=false
+                        }
+
+                    }
+
                 }
             }
             BusyIndicator {
@@ -91,6 +110,15 @@ Page {
 
             }
 
+        }
+    }
+    RoundButton{
+        anchors.top: parent.top
+        anchors.left: parent.left
+        anchors.margins: 10
+        text: "\u25C0"
+        onClicked: {
+           stack_view.parent.pageExit();
         }
     }
 }

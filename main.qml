@@ -126,7 +126,7 @@ Item {
                             id:json_sketch
                         }
                         Component.onCompleted: {
-                            json_sketch.loadSketch(filePath,this)
+                            json_sketch.loadSketch(scenariosPath,fileName,this)
                         }
                         property alias background_picture_url: backgroundImage.source
                         Image {

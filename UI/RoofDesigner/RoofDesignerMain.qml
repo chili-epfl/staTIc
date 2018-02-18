@@ -7,7 +7,7 @@ Item{
     visible: true
     width:parent.width
     height: parent.height
-
+    signal pageExit();
     property real scalePixelFactor:Math.min( (1/110)*width/Screen.pixelDensity,
                                              (1/65)*height/Screen.pixelDensity)
 
