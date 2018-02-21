@@ -77,6 +77,7 @@ Beam::Beam(JointPtr extreme1, JointPtr extreme2,MaterialsManager* mm,QString nam
                   pow(extreme1->position().y()-extreme2->position().y(),2)+
                   pow(extreme1->position().z()-extreme2->position().z(),2));
     m_materialsManager=mm;
+    setMaterial("default");
     m_tangibleSection=QSizeF(34,17);
     connect(m_extreme1.data(),SIGNAL(destroyed(QObject*)),this,SIGNAL(killMe()));
     connect(m_extreme2.data(),SIGNAL(destroyed(QObject*)),this,SIGNAL(killMe()));

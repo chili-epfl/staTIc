@@ -33,25 +33,13 @@ Entity {
     /*.....*/
 
     property alias mouseEventHasBeenAccepted: deselection_guard.eventHasBeenAccepted
-    property url structureLoaderURL
-    onStructureLoaderURLChanged: {
-        if(structureLoaderURL.toString().search(".dae")!=-1){
-            structureLoader.source=structureLoaderURL;
-            structureLoaded=Qt.binding(function(){return structureLoader.status==SceneLoader.Loaded})
-            structureLoaded=true
-        }
-        else if(structureLoaderURL.toString().search(".obj")!=-1){
-            meshStructure.source=structureLoaderURL;
-            structureLoaded=true;
-        }
-    }
-    property bool structureLoaded: true
+
     property alias structureEntity: structureEntity
-    property alias scene_camera: scene_camera
-    property bool ghostMode: false
 
     property int globalNumericAnimation;
+    onGlobalNumericAnimationChanged: console.log("Test")
 
+    //scale factors to match the camera video with the 3D scene
     property real cameraScaleX:1;
     property real cameraScaleY:1;
 
@@ -70,7 +58,7 @@ Entity {
         objectName: "camera"
         projectionType: CameraLens.FrustumProjection
         nearPlane : 0.1
-        farPlane : clippingPlaneSlider.value
+        farPlane : 3000
 
         top: 0.1*(marker_detector.projectionMatrix.m23/(cameraScaleX*marker_detector.projectionMatrix.m11))
         bottom: -0.1*(marker_detector.projectionMatrix.m23/(cameraScaleX*marker_detector.projectionMatrix.m11))
@@ -81,20 +69,6 @@ Entity {
         upVector: Qt.vector3d( 0.0, 1.0, 0.0 )
         viewCenter: Qt.vector3d( 0.0, 0.0, 0.0 )
     }
-
-    //    Configuration  {
-    //        controlledCamera: camera
-    //    }
-
-    //    MouseController {
-    //        id: mouseController
-    //    }
-
-
-
-    //    CameraController{
-    //        camera: camera
-    //    }
 
     components: [
         RenderSettings {
@@ -115,13 +89,10 @@ Entity {
                                 SortPolicy.BackToFront
                             ]
                             ClearBuffers{
-//                                buffers: ClearBuffers.DepthStencilBuffer
-//                                clearStencilValue: 255
                                 buffers: ClearBuffers.DepthBuffer
                                 TechniqueFilter {
                                     matchAll: [ FilterKey { name: "renderingStyle"; value: "ar" } ]
                                 }
-
                             }
                             ClearBuffers{
                                 buffers : ClearBuffers.ColorBuffer
@@ -136,10 +107,12 @@ Entity {
             }},
         InputSettings {}
     ]
+
     MouseDevice {
         id: mouseDevice
     }
 
+    //If the user did not click on anything, the guard will clear the current selection
     Entity{
         id:deselection_guard
         property bool eventHasBeenAccepted:false;
@@ -164,111 +137,52 @@ Entity {
     }
 
 
-    //    Entity{
-
-    //        components: [Transform{
-    //                translation:Qt.vector3d(0,0,-1000)
-    //            },
-    //            CuboidMesh{xExtent: 100;yExtent: 100;zExtent: 100},
-    //            PhongMaterial{}
-    //        ]
-
-    //    }
-
     Entity{
-        components:[
-            Transform {
-                rotation:  !structure_tag.objectIsVisible ||
-                           (!applicationRoot.firstInit && !camDevice.isRunning) ?
-                               quaternion_helper.product(
-                                   quaternion_helper.product(
-                                       fromAxisAndAngle(0,1,0,-(rotationSensor.reading.z-
-                                                                structure_tag.last_sensor_read.z)),
-                                       fromAxisAndAngle(0,0,-1,-(rotationSensor.reading.x-
-                                                                 structure_tag.last_sensor_read.x))),
-                                   fromAxisAndAngle(-1,0,0,-(rotationSensor.reading.y-
-                                                             structure_tag.last_sensor_read.y)))
-                             :
-                               Qt.quaternion(1,0,0,0)
+        Transform {
+            id: structureLoaderTransform
+            rotation: structure_tag.rotationQuaternion
+            property quaternion inv_rotation: quaternion_helper.invert(rotation)
+            property vector3d euler_angles: quaternion_helper.eulerAngles(rotation)
+            QQ2.Timer{
+                running: true
+                repeat: true
+                interval: 3000
+                onTriggered: logger.log_position("Structure",structure_tag.translation,structureLoaderTransform.rotationX,structureLoaderTransform.rotationY,structureLoaderTransform.rotationZ)
             }
-        ]
-
-        Entity{
-            Transform {
-                id: structureLoaderTransform
-                //            translation:Qt.vector3d(0,-100,-1000)
-                rotation: structure_tag.rotationQuaternion
-                property quaternion inv_rotation: quaternion_helper.invert(rotation)
-                property vector3d euler_angles: quaternion_helper.eulerAngles(rotation)
-                QQ2.Timer{
-                    running: true
-                    repeat: true
-                    interval: 3000
-                    onTriggered: logger.log_position("Structure",structure_tag.translation,structureLoaderTransform.rotationX,structureLoaderTransform.rotationY,structureLoaderTransform.rotationZ)
-                }
-                //            QuaternionAnimation on rotation{
-                //            }
-                // translation:settings.focus_on_joint ? Qt.vector3d(0,0,-300) : structure_tag.translation
-                translation: structure_tag.has_appeared ? structure_tag.translation : staticsModule.initialPose
-                QQ2.Component.onCompleted:
-                    //structure_tag.appendQuaternion(fromAxisAndAngle(1,1,1,120))
-                    structure_tag.appendQuaternion(fromAxisAndAngle(1,0,0,90))
-            }
-            components: [structureLoaderTransform]
+            translation: structure_tag.has_appeared ? structure_tag.translation : staticsModule.initialPose
+            QQ2.Component.onCompleted:
+                structure_tag.appendQuaternion(fromAxisAndAngle(1,0,0,90))
+        }
+        components: [structureLoaderTransform]
 
 
-            Entity {
-                id:structureEntity
-
-                function findEntityByName(name){
-                    for(var child_index=0;child_index<childNodes.length;child_index++){
-                        if(childNodes[child_index])
-                            if(childNodes[child_index].objectName==name)
-                                return childNodes[child_index];
-                    }
-                }
-                function findBeams(){
-                    var beams=[]
-                    for(var child_index=0;child_index<childNodes.length;child_index++){
-                        if(childNodes[child_index])
-                            if(childNodes[child_index].type=="beam")
-                                beams.push(childNodes[child_index]);
-                    }
-                    return beams;
-                }
-                components: [
-                    Transform{
-                        //                    translation:settings.focus_on_joint ?
-                        //                                    infobox.current_item.position.times(-1)
-                        //                                  :
-                        //                                    Qt.vector3d(0,0,0)
-                    }
-                ]
-
-
-                Entity{
-                    enabled:ghostMode
-                    Mesh{
-                        id:meshStructure
-                    }
-                    SceneLoader{
-                        id:structureLoader
-                        objectName: "structureLoader"
-                    }
-                    PhongAlphaMaterial {
-                        id:material
-                        ambient:  "#783e0b"
-                        diffuse:"grey"
-                        specular:"black"
-                        alpha:0.80
-                    }
-                    components: structureLoader.status==SceneLoader.Loaded?
-                                    [structureLoader]:
-                                    [meshStructure, material]
-
-
+        Entity {
+            //The actual scene root which is the parent of all the joints, beams, loads entities
+            id:structureEntity
+            function findEntityByName(name){
+                for(var child_index=0;child_index<childNodes.length;child_index++){
+                    if(childNodes[child_index])
+                        if(childNodes[child_index].objectName===name)
+                            return childNodes[child_index];
                 }
             }
+            function findBeams(){
+                var beams=[]
+                for(var child_index=0;child_index<childNodes.length;child_index++){
+                    if(childNodes[child_index])
+                        if(childNodes[child_index].type==="beam")
+                            beams.push(childNodes[child_index]);
+                }
+                return beams;
+            }
+            property vector3d eulerAngles
+            property vector3d translation:Qt.vector3d(10,0,0)
+            components: [
+                Transform{
+                    rotation: fromEulerAngles(parent.eulerAngles)
+                    translation: parent.translation.times(staticsModule.modelScale)
+                }
+            ]
         }
     }
 

@@ -16,7 +16,6 @@ Item {
     property bool joint_is_selectable: true
     property bool load_is_selectable: true
     property bool load_is_draggable: true
-    property bool show_tangible_button:false
     property bool show_beam: true
     property bool show_beam_spring: true
     property bool show_beam_sphere: false
@@ -79,7 +78,6 @@ Item {
         visible_loader="DEFAULT";
         focus_on_joint=false;
         show_help_button=false
-        show_tangible_button=false
 
     }
 

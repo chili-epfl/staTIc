@@ -45,7 +45,7 @@ Entity{
     property DiffuseMapMaterial material_diffuse: DiffuseMapMaterial{
         ambient: Qt.rgba( 0.2, 0.2, 0.2, 1.0 )
         shininess: 2.0
-        diffuse: asset3DTextureURL
+        diffuse: TextureLoader { source:asset3DTextureURL}
     }
 
     property Material material: isSelected  ? trapz_force_commons.material_for_selection :material_diffuse

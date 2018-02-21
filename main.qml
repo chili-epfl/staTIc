@@ -2,10 +2,7 @@ import QtQuick 2.3
 import QtQuick.Controls 1.3
 import QtQuick.Window 2.0
 import QtQuick.Layouts 1.1
-import ScenarioListModel 1.0
-import ResourcesFetcher 1.0
 import QtQuick.Dialogs 1.2
-import QtSensors 5.3
 import Qt.labs.folderlistmodel 2.1
 import JSONSketch 1.0
 import "qrc:/ui"
@@ -17,17 +14,11 @@ import "qrc:/ui/UI/MaterialDesigner"
 Item {
 
     property string board_path: boardSelection_box.boardPath
-
     function pt2px(pt){return pt*0.3759*Screen.pixelDensity}
     function mm2px(mm){return mm*Screen.pixelDensity}
 
     id: applicationWindow
     visible: true
-
-    RotationSensor{
-        id: rotationSensor
-        active:  true
-    }
 
     focus:true
     Keys.onReleased: {
@@ -41,13 +32,6 @@ Item {
         fillMode: Image.Tile
         id:background
         source: "qrc:/images/Images/woodbackground.png"
-    }
-
-    ResourcesFetcher{
-        id:resourcesFetcher
-        hostUrl: "http://localhost:3003/api/carpenterData"
-        username: "lollo"
-        onLoadingChanged: if(!loading) scenarioListModel.reloadResources();
     }
 
     Loader{
@@ -171,7 +155,7 @@ Item {
                     MouseArea{
                         id:synch_mouse_area
                         anchors.fill: parent
-                        onClicked: synch_dialog_box.visible=true
+                        //onClicked: synch_dialog_box.visible=true
                     }
                 }
                 Image{
@@ -232,10 +216,6 @@ Item {
         }
     }
 
-    SynchDialogBox{
-        id:synch_dialog_box
-        resourcesFetcher: resourcesFetcher
-    }
 
     BoardSelection{
         id:boardSelection_box

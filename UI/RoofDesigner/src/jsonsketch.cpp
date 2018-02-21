@@ -204,20 +204,31 @@ QString JSONSketch::read(const QJsonObject json, QObject* sketch,QString jsonFil
         if(!json["scaleFactorPhysical"].isDouble())
             return "Cannot read scaleFactorPhysical";
         structureData->setProperty("scaleFactorPhysical",json["scaleFactorPhysical"].toDouble());
-        if(!json["poseOffset"].isArray())
-            return "Cannot read poseOffset";
-        auto poseOffsetJSON =json["poseOffset"].toArray();
-        if(poseOffsetJSON.size()!=16)
-            return "Cannot read poseOffset";
-        for(int i=0;i<16;i++)
-            if(!poseOffsetJSON[i].isDouble())
-                return "Cannot read poseOffset";
-        QMatrix4x4 poseOffset(poseOffsetJSON[0].toDouble(),poseOffsetJSON[1].toDouble(),poseOffsetJSON[2].toDouble(),
-                poseOffsetJSON[3].toDouble(),poseOffsetJSON[4].toDouble(),poseOffsetJSON[5].toDouble(),poseOffsetJSON[6].toDouble(),
-                poseOffsetJSON[7].toDouble(),poseOffsetJSON[8].toDouble(),poseOffsetJSON[9].toDouble(),poseOffsetJSON[10].toDouble(),
-                poseOffsetJSON[11].toDouble(),poseOffsetJSON[12].toDouble(),poseOffsetJSON[13].toDouble(),poseOffsetJSON[14].toDouble(),
-                poseOffsetJSON[15].toDouble());
-        structureData->setProperty("poseOffset",poseOffset);
+        if(!json["poseOffsetTranslation"].isArray())
+            return "Cannot read poseOffsetTranslation";
+        auto poseOffsetTranslationJSON =json["poseOffsetTranslation"].toArray();
+        if(poseOffsetTranslationJSON.size()!=3)
+            return "Cannot read poseOffsetTranslation";
+        for(int i=0;i<3;i++)
+            if(!poseOffsetTranslationJSON[i].isDouble())
+                return "Cannot read poseOffsetTranslation";
+
+        structureData->setProperty("poseOffsetTranslation",QVector3D(poseOffsetTranslationJSON[0].toDouble(),
+                                   poseOffsetTranslationJSON[1].toDouble(),
+                                    poseOffsetTranslationJSON[2].toDouble()));
+
+        if(!json["poseOffsetEulerAngles"].isArray())
+            return "Cannot read poseOffsetEulerAngles";
+        auto poseOffsetEulerAnglesJSON =json["poseOffsetEulerAngles"].toArray();
+        if(poseOffsetEulerAnglesJSON.size()!=3)
+            return "Cannot read poseOffsetEulerAngles";
+        for(int i=0;i<3;i++)
+            if(!poseOffsetEulerAnglesJSON[i].isDouble())
+                return "Cannot read poseOffsetEulerAngles";
+
+        structureData->setProperty("poseOffsetEulerAngles",QVector3D(poseOffsetEulerAnglesJSON[0].toDouble(),
+                                   poseOffsetEulerAnglesJSON[1].toDouble(),
+                                    poseOffsetEulerAnglesJSON[2].toDouble()));
     }
     return "Sketch read";
 }
@@ -499,27 +510,21 @@ bool JSONSketch::writeJSON(QJsonObject &json, QObject* sketch)
 
     json["scaleFactorPhysical"]=structureData->property("scaleFactorPhysical").toReal();
 
-    auto poseOffset=qvariant_cast<QMatrix4x4>(structureData->property("poseOffset"));
+    auto poseOffsetTranslation=qvariant_cast<QVector3D>(structureData->property("poseOffsetTranslation"));
 
-    QJsonArray poseOffsetJson;
-    poseOffsetJson.append(poseOffset(0,0));
-    poseOffsetJson.append(poseOffset(0,1));
-    poseOffsetJson.append(poseOffset(0,2));
-    poseOffsetJson.append(poseOffset(0,3));
-    poseOffsetJson.append(poseOffset(1,0));
-    poseOffsetJson.append(poseOffset(1,1));
-    poseOffsetJson.append(poseOffset(1,2));
-    poseOffsetJson.append(poseOffset(1,3));
-    poseOffsetJson.append(poseOffset(2,0));
-    poseOffsetJson.append(poseOffset(2,1));
-    poseOffsetJson.append(poseOffset(2,2));
-    poseOffsetJson.append(poseOffset(2,3));
-    poseOffsetJson.append(poseOffset(3,0));
-    poseOffsetJson.append(poseOffset(3,1));
-    poseOffsetJson.append(poseOffset(3,2));
-    poseOffsetJson.append(poseOffset(3,3));
-    json["poseOffset"]=poseOffsetJson;
+    QJsonArray poseOffsetTranslationJson;
+    poseOffsetTranslationJson.append(poseOffsetTranslation.x());
+    poseOffsetTranslationJson.append(poseOffsetTranslation.y());
+    poseOffsetTranslationJson.append(poseOffsetTranslation.z());
+    json["poseOffsetTranslation"]=poseOffsetTranslationJson;
 
+    auto poseOffsetEulerAngles=qvariant_cast<QVector3D>(structureData->property("poseOffsetEulerAngles"));
+
+    QJsonArray poseOffsetEulerAnglesJson;
+    poseOffsetEulerAnglesJson.append(poseOffsetEulerAngles.x());
+    poseOffsetEulerAnglesJson.append(poseOffsetEulerAngles.y());
+    poseOffsetEulerAnglesJson.append(poseOffsetEulerAngles.z());
+    json["poseOffsetEulerAngles"]=poseOffsetEulerAnglesJson;
 
     return qPoints.size() > 0;
 }

@@ -1,5 +1,6 @@
 import QtQuick 2.0
 import QtQuick.Controls 1.2
+import QtQuick.Controls 2.3 as QQ2
 import QtQuick.Layouts 1.1
 import QtQuick.Controls.Styles 1.4
 import QtGraphicalEffects 1.0
@@ -122,7 +123,7 @@ Rectangle {
                         visible: catalog_grid.count > 0
                         width: parent.width
                         //Min between the max allowed and the numeber of objects available
-                        height: Math.min(2*parent.height/3, catalog_grid.cellHeight*Math.ceil(catalog_grid.count/2) )
+                        height: Math.min(2*parent.height/3, 10+catalog_grid.cellHeight*Math.ceil(catalog_grid.count/2) )
                         anchors.margins: 10
                         color:"transparent"
                         radius: 1
@@ -959,6 +960,388 @@ Rectangle {
 
                 }
             }
+        }
+        Tab{
+            id:poseOffsetTab
+            title: "Adjust AR"
+            focus: true
+            Rectangle{
+                id:ar_settings_box
+                border.color: "#F0F0F0"
+                border.width: 5
+                color: "#2f3439"
+                anchors.fill: parent
+                anchors.margins: 10
+                property vector3d translation:sceneRoot.translation
+                Binding{
+                    target: sceneRoot
+                    property: "translation"
+                    value:ar_settings_box.translation
+                }
+                property vector3d eulerAngles:sceneRoot.eulerAngles
+                Binding{
+                    target: sceneRoot
+                    property: "eulerAngles"
+                    value:ar_settings_box.eulerAngles
+                }
+                Flickable{
+                    anchors.fill: parent
+                    anchors.margins: 10
+                    clip: true
+                    contentWidth: parent.width
+                    contentHeight: ar_setting_column.implicitHeight
+                    flickableDirection: Flickable.VerticalFlick
+                    Column{
+                        id:ar_setting_column
+                        width: parent.width
+                        spacing: mm2px(5)
+                        Item{
+                            width: parent.width
+                            height:Math.max(label_spinbox_x.implicitHeight,spinbox_x.implicitHeight)
+                            QQ2.Label{
+                                id:label_spinbox_x
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.margins: 10
+                                text: "Offset X (mm)"
+                                font.bold: true
+                                color:"#F0F0F0"
+                                wrapMode:QQ2.Label.WordWrap
+                                anchors.left: parent.left
+                                anchors.right: parent.horizontalCenter
+                            }
+                            QQ2.SpinBox{
+                                focus:false
+                                activeFocusOnTab: false
+                                id:spinbox_x
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.horizontalCenter
+                                anchors.right: parent.right
+                                anchors.margins: 10
+                                from:-1000
+                                to:1000
+                                value: ar_settings_box.translation.x
+                                onValueChanged: ar_settings_box.translation.x=value;
+
+//                                validator: IntValidator {
+//                                    bottom: Math.min(parent.from, parent.to)
+//                                    top:  Math.max(parent.from, parent.to)
+//                                }
+                                editable: true
+
+                            }
+                        }
+                        Item{
+                            width: parent.width
+                            height:Math.max(label_spinbox_y.implicitHeight,spinbox_y.implicitHeight)
+                            QQ2.Label{
+                                id:label_spinbox_y
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.margins: 10
+                                text: "Offset Y (mm)"
+                                font.bold: true
+                                color:"#F0F0F0"
+                                wrapMode:QQ2.Label.WordWrap
+                                anchors.left: parent.left
+                                anchors.right: parent.horizontalCenter
+                            }
+                            QQ2.SpinBox{
+                                anchors.right: parent.right
+                                id:spinbox_y
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.horizontalCenter
+                                anchors.margins: 10
+                                from:-1000
+                                to:1000
+//                                validator: IntValidator {
+//                                    bottom: Math.min(parent.from, parent.to)
+//                                    top:  Math.max(parent.from, parent.to)
+//                                }
+                                editable: true
+                                value: ar_settings_box.translation.y
+                                onValueChanged: ar_settings_box.translation.y=value;
+                            }
+                        }
+                        Item{
+                            width: parent.width
+                            height:Math.max(label_spinbox_z.implicitHeight,spinbox_z.implicitHeight)
+                            QQ2.Label{
+                                id:label_spinbox_z
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.margins: 10
+                                text: "Offset Z (mm)"
+                                font.bold: true
+                                color:"#F0F0F0"
+                                wrapMode:QQ2.Label.WordWrap
+                                anchors.left: parent.left
+                                anchors.right: parent.horizontalCenter
+                            }
+                            QQ2.SpinBox{
+                                id:spinbox_z
+                                anchors.right: parent.right
+                                focus:false
+                                activeFocusOnTab: false
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.horizontalCenter
+                                anchors.margins: 10
+                                from:-1000
+                                to:1000
+//                                validator: IntValidator {
+//                                    bottom: Math.min(parent.from, parent.to)
+//                                    top:  Math.max(parent.from, parent.to)
+//                                }
+                                editable: true
+                                value: ar_settings_box.translation.z
+                                onValueChanged: ar_settings_box.translation.z=value;
+                            }
+                        }
+                        Item{
+                            width: parent.width
+                            height:Math.max(label_spinbox_rot_x.implicitHeight,spinbox_rotx.implicitHeight)
+
+                            QQ2.Label{
+                                id:label_spinbox_rot_x
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.margins: 10
+                                text: "Rotation X (degrees)"
+                                font.bold: true
+                                color:"#F0F0F0"
+                                wrapMode:QQ2.Label.WordWrap
+                                anchors.left: parent.left
+                                anchors.right: parent.horizontalCenter
+                            }
+                            QQ2.SpinBox{
+                                focus:false
+                                anchors.right: parent.right
+                                activeFocusOnTab: false
+                                id:spinbox_rotx
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.horizontalCenter
+                                anchors.margins: 10
+                                from: -1800
+                                to: 1800
+                                stepSize: 1
+
+                                property int decimals: 1
+                                property real realValue: value / 10
+
+                                onRealValueChanged: ar_settings_box.eulerAngles.x=realValue;
+                                value:ar_settings_box.eulerAngles.x*10
+                                onValueModified: value=value//break binding
+
+                                validator: DoubleValidator {
+                                    bottom: Math.min(parent.from, parent.to)
+                                    top:  Math.max(parent.from, parent.to)
+                                }
+
+                                textFromValue: function(value, locale) {
+                                    return Number(value / 10).toLocaleString(locale, 'f', decimals)
+                                }
+
+                                valueFromText: function(text, locale) {
+                                    return Number.fromLocaleString(locale, text) * 10
+                                }
+                                editable: true
+
+                            }
+                        }
+                        Item{
+                            width: parent.width
+                            height:Math.max(label_spinbox_rot_y.implicitHeight,spinbox_roty.implicitHeight)
+
+                            QQ2.Label{
+                                id: label_spinbox_rot_y
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.margins: 10
+                                text: "Rotation Y (degrees)"
+                                font.bold: true
+                                color:"#F0F0F0"
+                                wrapMode:QQ2.Label.WordWrap
+                                anchors.left: parent.left
+                                anchors.right: parent.horizontalCenter
+                            }
+                            QQ2.SpinBox{
+                                focus:false
+                                anchors.right: parent.right
+
+                                activeFocusOnTab: false
+                                id: spinbox_roty
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.horizontalCenter
+                                anchors.margins: 10
+                                from: -1800
+                                to: 1800
+                                stepSize: 1
+
+                                property int decimals: 1
+                                property real realValue: value / 10
+                                onRealValueChanged: ar_settings_box.eulerAngles.y=realValue;
+                                value:ar_settings_box.eulerAngles.y*10
+                                onValueModified: value=value//break binding
+
+                                validator: DoubleValidator {
+                                    bottom: Math.min(parent.from, parent.to)
+                                    top:  Math.max(parent.from, parent.to)
+                                }
+
+                                textFromValue: function(value, locale) {
+                                    return Number(value / 10).toLocaleString(locale, 'f', decimals)
+                                }
+
+                                valueFromText: function(text, locale) {
+                                    return Number.fromLocaleString(locale, text) * 10
+                                }
+                                editable: true
+
+                            }
+                        }
+                        Item{
+                            width: parent.width
+                            height:Math.max(label_spinbox_rot_z.implicitHeight,spinbox_rotz.implicitHeight)
+
+                            QQ2.Label{
+                                id:label_spinbox_rot_z
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.margins: 10
+                                text: "Rotation Z (degrees)"
+                                font.bold: true
+                                color:"#F0F0F0"
+                                wrapMode:QQ2.Label.WordWrap
+                                anchors.left: parent.left
+                                anchors.right: parent.horizontalCenter
+                            }
+                            QQ2.SpinBox{
+                                anchors.right: parent.right
+                                focus:false
+                                activeFocusOnTab: false
+                                id:spinbox_rotz
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.horizontalCenter
+                                anchors.margins: 10
+                                from: -1800
+                                to: 1800
+                                stepSize: 1
+
+                                property int decimals: 1
+                                property real realValue: value / 10
+
+                                onRealValueChanged: ar_settings_box.eulerAngles.z=realValue;
+                                value:ar_settings_box.eulerAngles.z*10
+                                onValueModified: value=value//break binding
+
+                                validator: DoubleValidator {
+                                    bottom: Math.min(parent.from, parent.to)
+                                    top:  Math.max(parent.from, parent.to)
+                                }
+
+                                textFromValue: function(value, locale) {
+                                    return Number(value / 10).toLocaleString(locale, 'f', decimals)
+                                }
+
+                                valueFromText: function(text, locale) {
+                                    return Number.fromLocaleString(locale, text) * 10
+                                }
+                                editable: true
+
+
+                            }
+                        }
+                        Item{
+                            width: parent.width
+                            height:Math.max(label_modelscale.implicitHeight,spinbox_modelScale.implicitHeight)
+
+                            QQ2.Label{
+                                id:label_modelscale
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.margins: 10
+                                text: "Model Scale"
+                                font.bold: true
+                                color:"#F0F0F0"
+                                wrapMode:QQ2.Label.WordWrap
+                                anchors.left: parent.left
+                                anchors.right: parent.horizontalCenter
+                            }
+                            QQ2.SpinBox{
+                                anchors.right: parent.right
+                                focus:false
+                                activeFocusOnTab: false
+                                id:spinbox_modelScale
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.horizontalCenter
+                                anchors.margins: 10
+                                from: 1
+                                to: 100
+                                stepSize: 1
+
+                                property int decimals: 2
+                                property real realValue: value / 100
+                                onRealValueChanged: staticsModule.modelScale=realValue;
+                                value:staticsModule.modelScale*100
+                                onValueModified: value=value//break binding
+
+                                validator: DoubleValidator {
+                                    bottom: Math.min(parent.from, parent.to)
+                                    top:  Math.max(parent.from, parent.to)
+                                }
+
+                                textFromValue: function(value, locale) {
+                                    return Number(value / 100).toLocaleString(locale, 'f', decimals)
+                                }
+
+                                valueFromText: function(text, locale) {
+                                    return Number.fromLocaleString(locale, text) * 100
+                                }
+                                editable: true
+                            }
+                        }
+                        Item{
+                            width: parent.width
+                            height:label_labeling_threshold.height
+                            QQ2.Label{
+                                id:label_labeling_threshold
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.margins: 10
+                                text: "Light Condition"
+                                font.bold: true
+                                color:"#F0F0F0"
+                                QQ2.Slider{
+                                    id:labeling_threshold
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    anchors.top: parent.bottom
+                                    anchors.margins: 10
+                                    value: 100
+
+                                    from: 30
+                                    to: 220
+                                    stepSize: 5
+
+                                    Binding {
+                                        target: marker_detector
+                                        property: "labelingThreshold"
+                                        value: labeling_threshold.value
+                                    }
+                                    QQ2.Label{
+                                        text:"\u263C"
+                                        anchors.top:parent.bottom
+                                        font.bold: true
+                                        color:"#F0F0F0"
+                                        anchors.margins: 5
+                                    }
+                                    QQ2.Label{
+                                        text:"\u2600"
+                                        anchors.top:parent.bottom
+                                        anchors.right: parent.right
+                                        font.bold: true
+                                        color:"#F0F0F0"
+                                        anchors.margins: 5
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+            }
+            }
+
         }
     }
 

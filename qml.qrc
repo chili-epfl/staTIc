@@ -115,33 +115,15 @@
         <file>Scripts/Howe/howe.jpg</file>
     </qresource>
     <qresource prefix="/ui">
-        <file>UI/ViewFilterBar.qml</file>
         <file>UI/InfoBox.qml</file>
-        <file>UI/InfoBoxScene3DBeam.qml</file>
-        <file>UI/CameraController.qml</file>
-        <file>UI/InfoBoxScene3DJoint.qml</file>
-        <file>UI/InfoBoxBeam.qml</file>
-        <file>UI/InfoBoxJoint.qml</file>
-        <file>UI/arrowR0_70L0_5.obj</file>
-        <file>UI/arrowR0_70L0_5.mtl</file>
-        <file>UI/arrowR0_70L1.obj</file>
-        <file>UI/arrowR0_70L1.mtl</file>
-        <file>UI/half_sphere.obj</file>
         <file>UI/InfoBoxDesigner.qml</file>
-        <file>SynchDialogBox.qml</file>
         <file>UI/BoardSelection.qml</file>
         <file>UI/MaterialDesigner/MaterialDesigner.qml</file>
         <file>UI/PercNumberEntity.qml</file>
         <file>UI/CustomSwitchStyle.qml</file>
         <file>UI/NumberEntity.qml</file>
-        <file>UI/InfoBoxCableEx.qml</file>
         <file>UI/SuggestionBox.qml</file>
         <file>UI/Char_Meshes.qml</file>
-        <file>UI/InfoBoxFindAxialForce.qml</file>
-        <file>UI/Eye_tracking_tags/010.png</file>
-        <file>UI/Eye_tracking_tags/011.png</file>
-        <file>UI/Eye_tracking_tags/012.png</file>
-        <file>UI/Eye_tracking_tags/013.png</file>
         <file>UI/Help/Tutorial.qml</file>
         <file>UI/Help/page_1.jpg</file>
         <file>UI/Help/page_4.gif</file>
@@ -155,16 +137,6 @@
         <file>UI/Help/page_11.gif</file>
         <file>UI/Help/page_12.gif</file>
         <file>UI/Help/page_3.gif</file>
-        <file>UI/Eye_tracking_tags/001.png</file>
-        <file>UI/Eye_tracking_tags/002.png</file>
-        <file>UI/Eye_tracking_tags/003.png</file>
-        <file>UI/Eye_tracking_tags/004.png</file>
-        <file>UI/Eye_tracking_tags/005.png</file>
-        <file>UI/Eye_tracking_tags/006.png</file>
-        <file>UI/Eye_tracking_tags/007.png</file>
-        <file>UI/Eye_tracking_tags/008.png</file>
-        <file>UI/Eye_tracking_tags/009.png</file>
-        <file>UI/InfoBoxFindAxialForce_v2.qml</file>
         <file>UI/MaterialDesigner/TakePicture.qml</file>
         <file>UI/MaterialDesigner/TakeFromFile.qml</file>
         <file>UI/MaterialDesigner/assets/shutter-icon.png</file>

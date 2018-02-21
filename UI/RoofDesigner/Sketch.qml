@@ -276,10 +276,8 @@ Item {
         //Immutable. It changes only when loading a skecth.
         //It does not need to be in store undo-redo
         objectName: "structureData"
-        property matrix4x4 poseOffset:Qt.matrix4x4(1,0,0,0,
-                                                   0,1,0,0,
-                                                   0,0,1,0,
-                                                   0,0,0,1)
+        property vector3d poseOffsetTranslation
+        property vector3d poseOffsetEulerAngles
         property real scaleFactorPhysical: 0.1
     }
 }

@@ -89,7 +89,7 @@ Entity{
    property DiffuseMapMaterial deformingMeshMaterial:
         DiffuseMapMaterial{
                 id: deformingMeshMaterial
-                diffuse: "qrc:/images/Images/woodbackground.png"
+                diffuse: TextureLoader { source: "qrc:/images/Images/woodbackground.png"}
                 specular: Qt.rgba( 0.2, 0.2, 0.2, 1.0 )
                 shininess: 2.0
     }

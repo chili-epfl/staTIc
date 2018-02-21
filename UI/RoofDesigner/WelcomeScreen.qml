@@ -112,13 +112,20 @@ Page {
 
         }
     }
-    RoundButton{
+
+    Image {
+        visible: settings.show_back_button
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.margins: 10
-        text: "\u25C0"
-        onClicked: {
-           stack_view.parent.pageExit();
+        width: 50
+        height: 50
+        source: "qrc:/icons/Icons/back.png"
+        MouseArea{
+            anchors.fill: parent
+            onClicked:{
+                stack_view.parent.pageExit();
+            }
         }
     }
 }

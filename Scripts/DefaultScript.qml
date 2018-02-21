@@ -18,6 +18,7 @@ Item{
     anchors.fill: parent
     signal pageExit();
 
+    property alias marker_detector: marker_detector
     property alias suggestion_box: suggestion_box
     property alias materialsManager: staticsmodule.materialsManager
     property alias staticsModule: staticsmodule
@@ -96,14 +97,13 @@ Item{
         interval: 2000
     }
 
-    Component.onCompleted: if(Platform=="ANDROID"){
+    Component.onCompleted: if(Qt.platform.os=="android"){
                                camDevice.deviceId=QtMultimedia.availableCameras[0].deviceId
                                marker_detector.projectionMatrix=Qt.matrix4x4(
                                            1.0352696831776980e+03 ,0 ,6.4750000000000000e+02,0,
                                            0, 1.0352696831776980e+03 , 4.8550000000000000e+02,0,
                                            0,0,1,0,
                                            0,0,0,1)
-                               rotationSensor.start();
                            }
                            else  {
                                camDevice.deviceId=QtMultimedia.availableCameras[1].deviceId
@@ -206,14 +206,9 @@ Item{
             }
         }
         imageProcessing.whiteBalanceMode: CameraImageProcessing.WhiteBalanceAuto
-        focus.focusMode: CameraFocus.FocusContinuous
+        focus.focusMode: CameraFocus.FocusAuto + CameraFocus.FocusContinuous
+        focus.focusPointMode: CameraFocus.FocusPointAuto
         captureMode: Camera.CaptureViewfinder
-        exposure.exposureMode: CameraExposure.ExposureModeVendor
-        exposure.meteringMode: CameraExposure.MeteringMatrix
-        imageProcessing.colorFilter: CameraImageProcessing.ColorFilterVendor
-        imageProcessing.denoisingLevel: 1
-        imageProcessing.sharpeningLevel: 1
-        //exposure.exposureCompensation:-0.5
         imageCapture {
             onImageCaptured: {
                 stillImage.source = preview
@@ -273,69 +268,6 @@ Item{
                     cameraScaleY: view_finder_width/scene3DContainer.width
                 }
             }
-            //             FastBlur{
-            //                 anchors.fill: parent
-            //                 source: scene3DContainer
-            //                 radius: structure_tag.objectIsVisible ? 0:64
-            //                 NumberAnimation on radius {
-            //                    duration: 3000
-
-            //                 }
-            //             }
-            /*Item {
-                    // Public properties.
-                    property Item scene: scene3DContainer
-                    property MouseArea area: null
-                    anchors.fill: parent
-                    visible: scene != null
-                    property real __scaling: 1
-                    property variant __translation: Qt.point(0,0)
-
-                    // The FBO abstraction handling our first offscreen pass.
-                    ShaderEffectSource {
-                        id: effectSource
-                        anchors.fill: parent
-                        sourceItem: parent.scene
-                        hideSource: true//parent.scene != null
-                        visible: false
-                        smooth: false  // Nearest neighbour texture filtering.
-                    }
-
-                    // The shader abstraction handling our second pass with the
-                    // translation and scaling in the vertex shader and the simple
-                    // texturing from the FBO in the fragment shader.
-                    ShaderEffect {
-                            id: effect
-                            anchors.fill: parent
-                            property real scaling: parent.__scaling
-                            property variant translation:parent.__translation
-                            property variant texture: effectSource
-
-                            vertexShader: "
-                                uniform highp mat4 qt_Matrix;
-                                uniform mediump float scaling;
-                                uniform mediump vec2 translation;
-                                attribute highp vec4 qt_Vertex;
-                                attribute mediump vec2 qt_MultiTexCoord0;
-                                varying vec2 texCoord;
-                                void main() {
-                                    texCoord =
-                                        (qt_MultiTexCoord0 )* vec2(scaling)+translation;
-                                    gl_Position = qt_Matrix * qt_Vertex;
-                                }"
-                            fragmentShader: "
-                                uniform sampler2D texture;
-                                uniform lowp float qt_Opacity;
-                                varying mediump vec2 texCoord;
-                                void main() {
-                                    vec2 dir_1=vec2(-1,1);
-                                    gl_FragColor =
-                                        texture2D(texture, texCoord) * qt_Opacity;
-                                }"
-                    }
-
-                }*/
-
 
             Rectangle{
                 anchors.centerIn: parent
@@ -435,22 +367,6 @@ Item{
                     anchors.left: parent.left
                     anchors.margins: 10
                     spacing: 10
-                    Image {
-                        visible: settings.show_tangible_button
-                        Layout.preferredWidth:  100
-                        Layout.preferredHeight: 100
-                        source:"qrc:/icons/Icons/TANGIBLE.png"
-                        MouseArea{
-                            anchors.fill: parent
-                            onPressedChanged: {
-                                if(pressed){
-                                    settings.enable_scaffold=true;
-                                }
-                                else
-                                    settings.enable_scaffold=false;
-                            }
-                        }
-                    }
 
                     Image {
                         id:ar_button
@@ -464,26 +380,8 @@ Item{
                             anchors.fill: parent
                             onClicked: {
                                 camDevice.isRunning = !camDevice.isRunning
-                                if(camDevice.isRunning) rotationSensor.start();
-                                else rotationSensor.stop();
                                 logger.log("AR_Button_Click",{"running":camDevice.isRunning})
                             }
-                        }
-                    }
-
-
-
-                    Image {
-                        id:ghostMode_button
-                        visible: false
-                        Layout.preferredWidth:  100
-                        Layout.preferredHeight: 100
-                        source: scene3D.ghostMode?
-                                    "qrc:/icons/Icons/ghost_Mode_on.png" :
-                                    "qrc:/icons/Icons/ghost_Mode_OFF.png"
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: scene3D.ghostMode = !scene3D.ghostMode
                         }
                     }
 
@@ -514,29 +412,29 @@ Item{
                             height: stress_col.implicitHeight+10
                             border.width: 2
                             radius:2
-                            border.color: Platform=="ANDROID" ? "white" :"black"
-                            color: Platform=="ANDROID" ? "#2f3439" : "white"
-                        Column{
-                            id:stress_col
-                            anchors.centerIn: parent
-                            ExclusiveGroup { id: stressGroup }
-                            RadioButton {
-                                text: "Axial"
-                                checked: true
-                                onCheckedChanged: if(checked) settings.stress_type=1
-                                exclusiveGroup: stressGroup
+                            border.color:Qt.platform.os=="android" ? "white" :"black"
+                            color: Qt.platform.os=="android" ? "#2f3439" : "white"
+                            Column{
+                                id:stress_col
+                                anchors.centerIn: parent
+                                ExclusiveGroup { id: stressGroup }
+                                RadioButton {
+                                    text: "Axial"
+                                    checked: true
+                                    onCheckedChanged: if(checked) settings.stress_type=1
+                                    exclusiveGroup: stressGroup
+                                }
+                                RadioButton {
+                                    text: "Bending"
+                                    onCheckedChanged: if(checked) settings.stress_type=2
+                                    exclusiveGroup: stressGroup
+                                }
+                                RadioButton {
+                                    text: "Shear"
+                                    onCheckedChanged: if(checked) settings.stress_type=3
+                                    exclusiveGroup: stressGroup
+                                }
                             }
-                            RadioButton {
-                                text: "Bending"
-                                onCheckedChanged: if(checked) settings.stress_type=2
-                                exclusiveGroup: stressGroup
-                            }
-                            RadioButton {
-                                text: "Shear"
-                                onCheckedChanged: if(checked) settings.stress_type=3
-                                exclusiveGroup: stressGroup
-                            }
-                        }
 
                         }
                         Rectangle{
@@ -558,7 +456,6 @@ Item{
                                 }
                             }
                         }
-
                     }
 
                     Image {
@@ -608,11 +505,6 @@ Item{
                         Slider{
                             id:exagerate_disp_slider
                             visible:false
-                            //                        Timer{
-                            //                            running:!show_disp_button.pressed && !exagerate_disp_slider.hovered && exagerate_disp_slider.visible
-                            //                            onTriggered: exagerate_disp_slider.visible=false
-                            //                            interval: 5000
-                            //                        }
                             width: parent.width*2
                             anchors.horizontalCenter: parent.horizontalCenter
                             anchors.bottom: parent.top
@@ -656,33 +548,6 @@ Item{
                     }
                 }
 
-
-                Slider{
-                    id:labeling_threshold_slider
-                    anchors.top:parent.bottom
-                    anchors.left: parent.left
-                    anchors.margins: 10
-                    width: 200
-                    value: 100
-                    minimumValue: 30
-                    maximumValue: 220
-                    stepSize: 5
-                }
-                Slider{
-                    id:sample_rate_slider
-                    anchors.top:parent.bottom
-                    anchors.left: labeling_threshold_slider.right
-                    anchors.margins: 10
-                    width: 200
-                    value: 20
-                    minimumValue: 1
-                    maximumValue: 100
-                    stepSize: 1
-                    Text{
-                        text:parent.value
-                        anchors.left: parent.right
-                    }
-                }
                 SuggestionBox{
                     id:suggestion_box
                 }
@@ -698,6 +563,7 @@ Item{
                     MouseArea{
                         anchors.fill: parent
                         onClicked:{
+                            staticsModule.storePoseOffsetAndModelScale(sceneRoot.translation,sceneRoot.eulerAngles)
                             pageExit()
                         }
                     }
@@ -716,40 +582,6 @@ Item{
                         onClicked: {tutorial.interactive=false;tutorial.visible=true;logger.log("open_help",{})}
                     }
                 }
-
-
-
-                Slider{
-                    id:clippingPlaneSlider
-                    anchors.left: parent.left
-                    anchors.verticalCenter: parent.verticalCenter
-                    orientation: Qt.Vertical
-                    height: parent.height*0.3
-                    value: 3000
-                    stepSize: 100
-                    minimumValue: 100
-                    maximumValue: 3000
-                    tickmarksEnabled: true
-                    onValueChanged: {
-                        logger.log("Change_Clipping_Plane",{"value":clippingPlaneSlider.value})
-                    }
-                }
-
-                Rectangle{
-                    anchors.left: clippingPlaneSlider.right
-                    anchors.leftMargin: 15
-                    anchors.top: clippingPlaneSlider.top
-                    height: clippingPlaneSlider.height
-                    Text{
-                        text: !clippingPlaneSlider.pressed ? "Depth Culling" : clippingPlaneSlider.value/10+"cm"
-                        color: "#F8F8F8"
-                        rotation: 90
-                        anchors.centerIn: parent
-                        fontSizeMode: Text.Fit
-                        font.pointSize: 14
-
-                    }
-                }
             }
 
             Rectangle{
@@ -762,11 +594,8 @@ Item{
 
     ARToolkit{
         id:marker_detector
-        filter_sample_rate:sample_rate_slider.value
-        filter_cutoff_freq:sample_rate_slider.value/2
-        labelingThreshold: labeling_threshold_slider.value
         matrixCode: ARToolkit.MATRIX_CODE_4x4_BCH_13_9_3
-        defaultMarkerSize: 50
+        defaultMarkerSize: 35
         Component.onCompleted: {
             loadSingleMarkersConfigFile("qrc:/AR/single_markers.json")
             if(applicationWindow.board_path=="")
@@ -774,27 +603,20 @@ Item{
             else
                 loadMultiMarkersConfigFile("default","file:"+applicationWindow.board_path)
         }
+
     }
     ARToolkitObject{
         id:structure_tag
         objectId: "default"
-        property vector3d last_sensor_read;
         property bool has_appeared:false
         onObjectIsVisibleChanged:{
             if(objectIsVisible)
                 has_appeared=true
-            else
-                last_sensor_read=Qt.vector3d(rotationSensor.reading.x,rotationSensor.reading.y,rotationSensor.reading.z)
-        }
-        Q3D.QuaternionAnimation on rotation{
-            type: Q3D.QuaternionAnimation.Nlerp
         }
 
         Component.onCompleted: {
             marker_detector.registerObserver(structure_tag)
-            last_sensor_read=Qt.vector3d(rotationSensor.reading.x,rotationSensor.reading.y,rotationSensor.reading.z)
         }
-
     }
 
     Tutorial{

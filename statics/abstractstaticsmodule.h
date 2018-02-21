@@ -44,7 +44,7 @@ class AbstractStaticsModule : public QObject
     Q_PROPERTY(qreal minForce READ minForce NOTIFY minForceChanged)
 
     Q_PROPERTY(MaterialsManager* materialsManager READ materialsManager NOTIFY materialsManagerChanged)
-    Q_PROPERTY(qreal modelScale READ modelScale NOTIFY modelScaleChanged)
+    Q_PROPERTY(qreal modelScale READ modelScale WRITE setModelScale NOTIFY modelScaleChanged)
 
     Q_PROPERTY(Qt3DCore::QEntity* sceneRoot READ sceneRoot WRITE setSceneRoot NOTIFY sceneRootChanged)
 
@@ -54,7 +54,8 @@ public:
 
     enum Stability{UNSTABLE,DETERMINATE,INDETERMINATE};
 
-    static qreal modelScale();
+    qreal modelScale();
+    qreal setModelScale(qreal val);
 
     AbstractStaticsModule(QObject *parent = 0);
     ~AbstractStaticsModule();
@@ -130,7 +131,7 @@ protected:
     void setStability(Stability val);
     Status m_status;
     Stability m_stability;
-    static qreal m_modelScale;
+    qreal m_modelScale;
     MaterialsManager* m_materialsManager;
     bool m_is2D;
 

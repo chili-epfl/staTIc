@@ -2,6 +2,7 @@ import Qt3D.Core 2.0
 import Qt3D.Render 2.0
 import Qt3D.Extras 2.0
 import QtQuick 2.5 as QQ2
+import PhongMaterialCustomDepthTest 1.0
 Entity{
 
     property quaternion char_mesh_rotation:
@@ -10,6 +11,7 @@ Entity{
                                   structureLoaderTransform.inv_rotation)
 
     DepthTest{
+        //Win always the depth test. This makes visible labels
         id:depthTest
         depthFunction: DepthTest.Always
     }
@@ -28,15 +30,11 @@ Entity{
     }
 
     property PhongMaterial label_material:
-        PhongMaterial{
+        PhongMaterialCustomDepthTest{
+        depthTest: depthTest
         id:label_material
         ambient:"#2C3539"
-        QQ2.Component.onCompleted: {
-            for(var i=0;i<label_material.effect.techniques.length;i++){
-                var effect=label_material.effect.techniques[i]
-                effect.renderPasses[0].renderStates=depthTest
-            }
-        }
+
     }
 
     property PhongMaterial phong_material_red:
@@ -51,15 +49,10 @@ Entity{
     }
 
     property PhongMaterial phong_material_green:
-        PhongMaterial{
+        PhongMaterialCustomDepthTest{
+        depthTest: depthTest
         ambient:"green"
         id:phong_material_green
-        QQ2.Component.onCompleted: {
-            for(var i=0;i<phong_material_green.effect.techniques.length;i++){
-                var effect=phong_material_green.effect.techniques[i]
-                effect.renderPasses[0].renderStates=depthTest
-            }
-        }
     }
     property Mesh pinned_support_mesh:
         Mesh{
@@ -91,7 +84,8 @@ Entity{
     }
 
     property PhongMaterial focus_view_color_target:
-        PhongMaterial{
+        PhongMaterialCustomDepthTest{
+        depthTest: depthTest
         id:focus_view_color_target
         property real h:0.33-0.23*settings.focus_view_equilibrium_distance
         ambient:Qt.hsla(h,1,0.32)
@@ -100,12 +94,6 @@ Entity{
         shininess:0
         QQ2.Behavior on h {
             QQ2.NumberAnimation{duration: 1000}
-        }
-        QQ2.Component.onCompleted: {
-            for(var i=0;i<focus_view_color_target.effect.techniques.length;i++){
-                var effect=focus_view_color_target.effect.techniques[i]
-                effect.renderPasses[0].renderStates=depthTest
-            }
         }
 
     }

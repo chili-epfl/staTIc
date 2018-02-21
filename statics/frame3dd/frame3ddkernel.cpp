@@ -94,6 +94,7 @@ qreal Frame3DDKernel::minForce()
 
 bool Frame3DDKernel::readStructure(QString path){
 
+    m_structure_path=path;
     QHash<QString,int> pointKeys2Idx;
 
     QFile inputFile(path);
@@ -257,9 +258,45 @@ bool Frame3DDKernel::readStructure(QString path){
         createBeam(first,second,QSizeF(area_x,area_y),materialID,line["name"].toString());
 
     }
+    if(!root["poseOffsetTranslation"].isArray()){
+        qWarning("Fail to poseOffsetTranslation");
+        setStatus(Status::ERROR);
+        return false;
+    }
+    auto poseOffsetTranslationJSON=root["poseOffsetTranslation"].toArray();
 
-    solve();
+    if(poseOffsetTranslationJSON.size()!=3 || !poseOffsetTranslationJSON[0].isDouble()
+            || !poseOffsetTranslationJSON[1].isDouble()
+            || !poseOffsetTranslationJSON[2].isDouble()){
+        qWarning("Fail to poseOffsetTranslation");
+        setStatus(Status::ERROR);
+        return false;
+    }
+    m_sceneRoot->setProperty("translation",QVector3D(poseOffsetTranslationJSON[0].toDouble(),
+                             poseOffsetTranslationJSON[1].toDouble(),
+                             poseOffsetTranslationJSON[2].toDouble()));
+
+    if(!root["poseOffsetEulerAngles"].isArray()){
+        qWarning("Fail to poseOffsetEulerAngles");
+        setStatus(Status::ERROR);
+        return false;
+    }
+    auto poseOffsetEulerAnglesJSON=root["poseOffsetEulerAngles"].toArray();
+
+    if(poseOffsetEulerAnglesJSON.size()!=3 || !poseOffsetEulerAnglesJSON[0].isDouble()
+            || !poseOffsetEulerAnglesJSON[1].isDouble()
+            || !poseOffsetEulerAnglesJSON[2].isDouble()){
+        qWarning("Fail to poseOffsetEulerAngles");
+        setStatus(Status::ERROR);
+        return false;
+    }
+    m_sceneRoot->setProperty("eulerAngles",QVector3D(poseOffsetEulerAnglesJSON[0].toDouble(),
+                             poseOffsetEulerAnglesJSON[1].toDouble(),
+                             poseOffsetEulerAnglesJSON[2].toDouble()));
+
+    m_is2D=is2d;
     setStatus(Status::LOADED);
+    solve();
     emit is2DChanged();
     emit modelScaleChanged();
     emit initialPoseChanged();
@@ -2781,6 +2818,45 @@ QVector3D Frame3DDKernel::initialPose()
     return QVector3D(-0.5*xmin-0.5*xmax,-0.5*ymin-0.5*ymax,-1000);
 
 }
+
+void Frame3DDKernel::storePoseOffsetAndModelScale(QVector3D translation, QVector3D eulerAngles)
+{
+    QFile file(m_structure_path);
+    if (!file.open(QIODevice::ReadOnly)){
+        qDebug()<<"Failed to open structure file for saving offset";
+    }
+
+    QByteArray data = file.readAll();
+    file.close();
+    QJsonParseError error;
+    QJsonDocument doc(QJsonDocument::fromJson(data, &error));
+    if(error.error!=QJsonParseError::NoError){
+        qDebug()<<"Failed to open structure file for saving offset";
+    }
+    auto root=doc.object();
+    QJsonArray poseOffsetTranslationJSON;
+    poseOffsetTranslationJSON.append(translation.x());
+    poseOffsetTranslationJSON.append(translation.y());
+    poseOffsetTranslationJSON.append(translation.z());
+    root["poseOffsetTranslation"]=poseOffsetTranslationJSON;
+
+    QJsonArray poseOffsetEulerAnglesJSON;
+    poseOffsetEulerAnglesJSON.append(eulerAngles.x());
+    poseOffsetEulerAnglesJSON.append(eulerAngles.y());
+    poseOffsetEulerAnglesJSON.append(eulerAngles.z());
+    root["poseOffsetEulerAngles"]=poseOffsetEulerAnglesJSON;
+
+    root["scaleFactorPhysical"]=m_modelScale;
+
+    doc.setObject(root);
+    if (!file.open(QIODevice::WriteOnly)){
+        qDebug()<<"Failed to open structure file for saving offset";
+    }
+    file.write(doc.toJson());
+    file.close();
+
+}
+
 bool Frame3DDKernel::splitBeam(BeamPtr beam, qreal offset,JointPtr &new_joint){
     if(!beam.isNull() && offset>0 && offset<=beam->length()){
         qDebug()<<"Splitting";

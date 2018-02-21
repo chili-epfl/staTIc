@@ -59,6 +59,8 @@ public:
     Q_INVOKABLE void createUDLoad(Beam *beam, QVariantMap aesthetic=QVariantMap());
 
     QVector3D initialPose();
+    Q_INVOKABLE void storePoseOffsetAndModelScale(QVector3D translation, QVector3D eulerAngles);
+
 signals:
     void gravityChanged();
     void initialPoseChanged();
@@ -127,6 +129,7 @@ private:
     qreal m_relative_equilibrium_error;
     QTimer m_lazyupdateTimer;
     Logger m_logger;
+    QString m_structure_path;
 };
 
 #endif // FRAME3DDKERNEL_H

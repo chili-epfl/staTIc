@@ -45,7 +45,7 @@ Item {
     }
 
     Connections{
-        ignoreUnknownSignals: false
+        ignoreUnknownSignals: true
         target: parent
         onStore_state: store_state(epoch)
         onUndo: undo()

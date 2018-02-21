@@ -30,10 +30,6 @@ void InteriorPointLoad::setDistance(qreal distance){
     }
 }
 
-qreal InteriorPointLoad::scaleDistance()
-{
-    return m_distance*AbstractStaticsModule::modelScale();
-}
 
 void InteriorPointLoad::setForce(QVector3D force){
     if(m_force!=force && !force.isNull()){
