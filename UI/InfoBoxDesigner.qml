@@ -993,7 +993,7 @@ Rectangle {
                     flickableDirection: Flickable.VerticalFlick
                     Column{
                         id:ar_setting_column
-                        width: parent.width
+                        width: parent.width-20
                         spacing: mm2px(5)
                         Item{
                             width: parent.width
@@ -1295,7 +1295,8 @@ Rectangle {
                         }
                         Item{
                             width: parent.width
-                            height:label_labeling_threshold.height
+                            height:label_labeling_threshold.implicitHeight+labeling_threshold.implicitHeight+
+                                   label_sun.implicitHeight+40
                             QQ2.Label{
                                 id:label_labeling_threshold
                                 anchors.horizontalCenter: parent.horizontalCenter
@@ -1308,7 +1309,7 @@ Rectangle {
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     anchors.top: parent.bottom
                                     anchors.margins: 10
-                                    value: 100
+                                    value: 150
 
                                     from: 30
                                     to: 220
@@ -1320,6 +1321,7 @@ Rectangle {
                                         value: labeling_threshold.value
                                     }
                                     QQ2.Label{
+                                        id:label_sun
                                         text:"\u263C"
                                         anchors.top:parent.bottom
                                         font.bold: true

@@ -155,7 +155,6 @@ Entity {
         }
         components: [structureLoaderTransform]
 
-
         Entity {
             //The actual scene root which is the parent of all the joints, beams, loads entities
             id:structureEntity
@@ -176,7 +175,7 @@ Entity {
                 return beams;
             }
             property vector3d eulerAngles
-            property vector3d translation:Qt.vector3d(10,0,0)
+            property vector3d translation
             components: [
                 Transform{
                     rotation: fromEulerAngles(parent.eulerAngles)

@@ -12,6 +12,7 @@ import "qrc:/"
 import Warehouse3D 1.0
 import "qrc:/ui/UI/Help/"
 import QtGraphicalEffects 1.0
+import QtQuick.Window 2.2
 Item{
 
     id: applicationRoot
@@ -99,11 +100,6 @@ Item{
 
     Component.onCompleted: if(Qt.platform.os=="android"){
                                camDevice.deviceId=QtMultimedia.availableCameras[0].deviceId
-                               marker_detector.projectionMatrix=Qt.matrix4x4(
-                                           1.0352696831776980e+03 ,0 ,6.4750000000000000e+02,0,
-                                           0, 1.0352696831776980e+03 , 4.8550000000000000e+02,0,
-                                           0,0,1,0,
-                                           0,0,0,1)
                            }
                            else  {
                                camDevice.deviceId=QtMultimedia.availableCameras[1].deviceId
@@ -199,14 +195,35 @@ Item{
     Camera{
         id:camDevice
         viewfinder.resolution: "640x480"
+//        Component.onCompleted: {
+//            var preferred_aspect_ratio=Qt.platform.os=="android" ? 1.7:
+//                                                             Math.floor(10*applicationRoot.width/applicationRoot.height)/10
+//            var supportedResolutions=supportedViewfinderResolutions();
+//            var found_good_candidate=false
+//            var good_candidate="640x480";
+
+//            for(var i=0;i<supportedResolutions.length;i++){
+//                var aspect_ratio=Math.floor(10*supportedResolutions[i].width/supportedResolutions[i].height)/10;
+//                console.log(aspect_ratio)
+//                console.log(supportedResolutions[i].width," ",supportedResolutions[i].height)
+//                if(aspect_ratio==preferred_aspect_ratio && supportedResolutions[i].width>=640 && supportedResolutions[i].width<1500 ){
+//                    found_good_candidate=true
+//                    good_candidate=supportedResolutions[i];
+//                    console.log("got")
+//                }
+//            }
+//            viewfinder.resolution=Qt.size(good_candidate.width,good_candidate.height)
+//            console.log(viewfinder.resolution)
+//        }
         onCameraStatusChanged: {
             if(firstInit && camDevice.cameraStatus==Camera.ActiveStatus ){
                 loadingAnimation_text.text="Loading 3D structure";
                 staticsmodule.sourceUrl=structureUrl;
+
             }
         }
         imageProcessing.whiteBalanceMode: CameraImageProcessing.WhiteBalanceAuto
-        focus.focusMode: CameraFocus.FocusAuto + CameraFocus.FocusContinuous
+        focus.focusMode: CameraFocus.FocusContinuous
         focus.focusPointMode: CameraFocus.FocusPointAuto
         captureMode: Camera.CaptureViewfinder
         imageCapture {
@@ -596,6 +613,8 @@ Item{
         id:marker_detector
         matrixCode: ARToolkit.MATRIX_CODE_4x4_BCH_13_9_3
         defaultMarkerSize: 35
+        labelingThreshold: 150
+        flip_image: Qt.platform.os=="android"
         Component.onCompleted: {
             loadSingleMarkersConfigFile("qrc:/AR/single_markers.json")
             if(applicationWindow.board_path=="")
