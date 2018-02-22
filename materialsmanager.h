@@ -13,6 +13,7 @@ public:
     Q_INVOKABLE QVariant get(int index, QString info) const;
     Q_INVOKABLE QVariant get(QString uniqueID, QString info) const;
     Q_INVOKABLE bool createFile(QUrl imageUrl, QString name, QString density, QString price, QString Young, QString G, QString fc0, QString fc90, QString fmk, QString ft0, QString ft90, QString fvk);
+    Q_INVOKABLE void deleteMaterial(int index);
 private:
     struct Material{
         QString uniqueID;
@@ -44,9 +45,12 @@ private:
             fvk=_fvk;
         }
     };
+    void init();
     //QList<Material> m_materials;
     QMap<QString,Material> m_materials;
     QList<QString> m_materialsIndex;
+    QList<QString> m_materialsFilePath;
+
 };
 
 #endif // MATERIALSMANAGER_H

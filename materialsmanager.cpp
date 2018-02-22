@@ -9,13 +9,24 @@
 MaterialsManager::MaterialsManager(QObject *parent):
     QAbstractListModel(parent)
 {
+    init();
+}
+
+void MaterialsManager::init()
+{
+    beginResetModel();
+    m_materialsFilePath.clear();
+    m_materials.clear();
+    m_materialsIndex.clear();
+
     /*Creating default material*/
     Material default_material;
     default_material.set("Conifers(C14)",QUrl("qrc:/images/Images/woodbackground.png"),
-                         20,0.350e-9,7000,440,8,16,14,0.4,2,3);
+                         20,0.350,7000,440,8,16,14,0.4,2,3);
     default_material.uniqueID="default";
-
-    m_materials[default_material.uniqueID]=default_material;  
+    m_materials[default_material.uniqueID]=default_material;
+    m_materialsFilePath.append("");
+    m_materialsIndex.append(default_material.uniqueID);
     /*....*/
     QString materialsDir=materialsPath;
     QDirIterator dirIt(materialsDir);
@@ -116,13 +127,16 @@ MaterialsManager::MaterialsManager(QObject *parent):
                     }
                     else{
                         m_materials[material.uniqueID]=material;
+                        m_materialsFilePath.append(it.fileInfo().canonicalFilePath());
+                        m_materialsIndex.append(material.uniqueID);
                     }
                 }
             }
         }
     }
-    m_materialsIndex=m_materials.keys();
+    endResetModel();
 }
+
 
 int MaterialsManager::rowCount(const QModelIndex &parent) const
 {
@@ -183,6 +197,9 @@ QVariant MaterialsManager::get(int index, QString info) const
     }
     else if(info.compare("fvk",Qt::CaseInsensitive)==0){
         return m_materials[m_materialsIndex[index]].fvk;
+    }
+    else if(info.compare("image",Qt::CaseInsensitive)==0){
+        return m_materials[m_materialsIndex[index]].texture_img;
     }
     else if(info.compare("name",Qt::CaseInsensitive)==0){
         return m_materials[m_materialsIndex[index]].name;
@@ -293,13 +310,35 @@ bool MaterialsManager::createFile(QUrl imageUrl, QString name, QString density, 
         <<"fvk:"<<fvk<<";\n"
         <<"TextureImage:"<<uniqueStr<<".png;";
         file.close();
+        image=image.scaledToWidth(200);
         image.save(path+uniqueStr+".png");
+        init();
         return true;
     }
     else{
         file.remove();
         //emit error("Can't create file or read image");
         return false;
+    }
+
+}
+
+
+void MaterialsManager::deleteMaterial(int index){
+    if(index<0 || index>m_materialsFilePath.size()) return;
+    if(m_materialsFilePath[index].isEmpty()) return;
+
+    if(m_materialsFilePath[index].startsWith(QFileInfo(materialsPath).canonicalFilePath())){
+        QFile::remove(m_materialsFilePath[index]);
+        QUrl img_url=m_materials[m_materialsIndex[index]].texture_img;
+        if(img_url.isLocalFile()){
+            QString img_path=img_url.toLocalFile();
+            QFileInfo img_fileInfo(img_path);
+            if(img_fileInfo.canonicalFilePath().startsWith(QFileInfo(materialsPath).canonicalFilePath())){
+                 QFile::remove(img_path);
+            }
+        }
+        init();
     }
 
 }

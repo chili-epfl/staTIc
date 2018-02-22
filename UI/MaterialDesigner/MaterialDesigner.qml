@@ -5,6 +5,7 @@ import QtQuick.Layouts 1.1
 import QtMultimedia 5.5
 import MaterialsManager 1.0
 Rectangle {
+
     signal pageExit();
     visible: true
     radius: 5
@@ -118,8 +119,8 @@ Rectangle {
                         Tab{
                             title: "General"
                             anchors.fill: parent
-                            Item{
-                                //color:"red"
+                            Rectangle{
+                                color:"white"
                                 anchors.fill: parent
 
                                 GridLayout{
@@ -129,70 +130,80 @@ Rectangle {
                                     anchors.margins: 10
                                     Label {
                                         text: "Name"
+                                        color: "#2f3439"
+
                                     }
                                     TextField {
                                         id:name_field
+                                        textColor: "#2f3439"
                                         placeholderText: "Enter Name"
                                         font.pointSize:12
+                                        text:name
                                         onTextChanged: name=text;
 
                                     }
 
                                     Label {
                                         text: "Density(g/cm3)"
+                                        color: "#2f3439"
+
                                     }
-                                    SpinBox {
+                                    TextField {
                                         id: density_field
-                                        decimals: 1
-                                        stepSize: 0.1
-                                        value: density
-                                        minimumValue: 0.1
-                                        maximumValue: 2
+                                        textColor: "#2f3439"
+                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                        validator: DoubleValidator {bottom: 0.1}
+                                        text: density
                                         font.pointSize: 12
-                                        onValueChanged: density=value;
+                                        onTextChanged: density=text;
 
                                     }
 
 
                                     Label {
                                         text: "Price(Chf)"
-                                    }
-                                    SpinBox {
-                                        id: price_field
-                                        stepSize: 1
-                                        value: price
-                                        minimumValue: 1
-                                        maximumValue: 100
-                                        font.pointSize: 12
-                                        onValueChanged: price=value;
+                                        color: "#2f3439"
 
+                                    }
+                                    TextField {
+                                        id: price_field
+                                        textColor: "#2f3439"
+                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                        validator: DoubleValidator {bottom: 0}
+                                        text: price
+                                        font.pointSize: 12
+                                        onTextChanged: price=Number.fromLocaleString(Qt.locale(),text);
                                     }
 
 
                                     Label {
                                         text: "Elasticity(N/mm2)"
+                                        color: "#2f3439"
+
                                     }
-                                    SpinBox {
+                                    TextField {
                                         id: young_field
-                                        stepSize: 500
-                                        value: young
-                                        minimumValue: 3000
-                                        maximumValue: 30000
+                                        textColor: "#2f3439"
+                                        validator: DoubleValidator {bottom: 0.1}
+                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                        text: young
                                         font.pointSize: 12
-                                        onValueChanged: young=value;
+                                        onTextChanged: young=text;
 
                                     }
                                     Label {
                                         text: "Shear Modulus(N/mm2)"
+                                        color: "#2f3439"
+
                                     }
-                                    SpinBox {
+                                    TextField {
                                         id: g_field
-                                        value: g
-                                        stepSize: 50
-                                        minimumValue: 100
-                                        maximumValue: 1500
+                                        textColor: "#2f3439"
+                                        validator: DoubleValidator {bottom: 0.1}
+                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                        text:g
                                         font.pointSize: 12
-                                        onValueChanged: g=value;
+                                        onTextChanged: g=text;
 
                                     }
 
@@ -213,87 +224,97 @@ Rectangle {
                                     anchors.margins: 10
                                     Label {
                                         text: "Fmd(N/mm2)"
+                                        color: "#2f3439"
                                     }
-                                    SpinBox {
+                                    TextField {
                                         id: fmk_field
-                                        decimals: 1
-                                        stepSize: 1
-                                        value: fmk
-                                        minimumValue: 1
-                                        maximumValue: 100
+                                        textColor: "#2f3439"
+                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                        text: fmk
                                         font.pointSize: 12
-                                        onValueChanged: fmk=value;
+                                        onTextChanged: fmk=text;
+                                        validator: DoubleValidator {bottom: 0.1}
+
 
                                     }
                                     Label {
                                         text: "Fvd(N/mm2)"
+                                        color: "#2f3439"
+
                                     }
-                                    SpinBox {
+                                    TextField {
                                         id: fvk_field
-                                        decimals: 1
-                                        stepSize: 1
-                                        value: fvk
-                                        minimumValue: 1
-                                        maximumValue: 100
+                                        textColor: "#2f3439"
+                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                        text: fvk
                                         font.pointSize: 12
-                                        onValueChanged: fvk=value;
+                                        onTextChanged: fvk=text;
+                                        validator: DoubleValidator {bottom: 0.1}
+
 
                                     }
                                     Label {
                                         text: "Ft0d(N/mm2)"
+                                        color: "#2f3439"
                                     }
-                                    SpinBox {
+                                    TextField {
                                         id: ft0_field
-                                        decimals: 1
-                                        stepSize: 1
-                                        value: ft0
-                                        minimumValue: 1
-                                        maximumValue: 100
+                                        textColor: "#2f3439"
+                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                        text: ft0
+
                                         font.pointSize: 12
-                                        onValueChanged: ft0=value;
+                                        onTextChanged: ft0=text;
+                                        validator: DoubleValidator {bottom: 0.1}
+
 
                                     }
                                     Label {
                                         text: "Fc0d(N/mm2)"
+                                        color: "#2f3439"
+
                                     }
-                                    SpinBox {
+                                    TextField {
                                         id: fc0_field
-                                        decimals: 1
-                                        stepSize: 1
-                                        value: fc0
-                                        minimumValue: 1
-                                        maximumValue: 100
+                                        textColor: "#2f3439"
+                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                        text: fc0
                                         font.pointSize: 12
-                                        onValueChanged: fc0=value;
+                                        onTextChanged: fc0=text;
+                                        validator: DoubleValidator {bottom: 0.1}
+
 
                                     }
 
                                     Label {
                                         text: "Ft90d(N/mm2)"
+                                        color: "#2f3439"
+
                                     }
-                                    SpinBox {
+                                    TextField {
                                         id: ft90_field
-                                        decimals: 1
-                                        stepSize: 1
-                                        value: ft90
-                                        minimumValue: 1
-                                        maximumValue: 100
+                                        text: ft90
+                                        textColor: "#2f3439"
+                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
                                         font.pointSize: 12
-                                        onValueChanged: ft90=value;
+                                        onTextChanged: ft90=text;
+                                        validator: DoubleValidator {bottom: 0.1}
+
 
                                     }
                                     Label {
                                         text: "Fc90d(N/mm2)"
+                                        color: "#2f3439"
                                     }
-                                    SpinBox {
+                                    TextField {
                                         id: fc90_field
-                                        decimals: 1
-                                        stepSize: 1
-                                        value: fc90
-                                        minimumValue: 1
-                                        maximumValue: 100
+                                        textColor: "#2f3439"
+                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                        text: fc90
                                         font.pointSize: 12
-                                        onValueChanged: fc90=value;
+                                        onTextChanged: fc90=text;
+                                        validator: DoubleValidator {bottom: 0.1}
+
                                     }
 
                                 }
@@ -310,17 +331,38 @@ Rectangle {
                             text: "Create"
                             onClicked: {
                                 materialManager.createFile(texture_image.source,name,
-                                                    density,price,
-                                                    young,g,
-                                                    fc0,fc90,
-                                                    fmk,ft0,
-                                                    ft90,fvk)
+                                                           density,price,
+                                                           young,g,
+                                                           fc0,fc90,
+                                                           fmk,ft0,
+                                                           ft90,fvk)
                             }
+                        }
+                        Button{
+                            text:"Clear"
+                            onClicked: {
+                                name="";
+                                density=1;
+                                price=1;
+                                young=7000;
+                                g=440;
+                                fmk=10;
+                                fvk=10;
+                                ft0=10;
+                                fc0=10;
+                                fc90=10;
+                                ft90=10;
+
+                            }
+                        }
+                        Button{
+                            text:"Open"
+                            onClicked: file_dialog.visible=true
                         }
                         Button{
                             text: "Done"
                             onClicked: {
-                               pageExit()
+                                pageExit()
                             }
                         }
                     }
@@ -344,29 +386,109 @@ Rectangle {
                     }
                 }
             }
+
+            Item{
+                id:file_dialog
+                visible: false
+                anchors.fill: parent
+                MouseArea{
+                    anchors.fill: parent
+                    onClicked: {
+                        parent.visible=false
+                    }
+                }
+                Rectangle{
+                    width: 2/3*parent.width
+                    height: 2/3*parent.height
+                    color: "#2f3439"
+                    border.color: "#F0F0F0"
+                    border.width: 10
+                    anchors.centerIn: parent
+                    MouseArea{
+                        anchors.fill: parent
+                        propagateComposedEvents: false
+                    }
+                    ColumnLayout{
+                        anchors.fill: parent
+                        anchors.margins: 20
+                        spacing: 10
+                        Label{
+                            Layout.fillWidth: true
+                            Layout.preferredHeight: implicitHeight
+                            text: "Press long to delete"
+                            color: "#F0F0F0"
+                            font.bold: true
+                            horizontalAlignment: Text.AlignHCenter
+                        }
+                        ListView{
+                            id:file_listview
+                            Layout.fillHeight: true
+                            Layout.fillWidth: true
+                            model: materialManager
+                            clip: true
+                            delegate: Rectangle{
+                                width: file_listview.width;
+                                height: file_name_text.implicitHeight*2
+                                color: "#F0F0F0"
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onDoubleClicked: {
+                                        name=materialManager.get(index,"name");
+                                        density=materialManager.get(index,"density");
+                                        price=materialManager.get(index,"price");
+                                        young=materialManager.get(index,"young");
+                                        g=materialManager.get(index,"g");
+                                        fmk=materialManager.get(index,"fmk");
+                                        fvk=materialManager.get(index,"fvk");
+                                        ft0=materialManager.get(index,"ft0");
+                                        fc0=materialManager.get(index,"fc0");
+                                        fc90=materialManager.get(index,"fc90");
+                                        ft90=materialManager.get(index,"ft90");
+                                        currentImage=materialManager.get(index,"image");
+                                        file_dialog.visible=false;
+                                    }
+                                    onPressAndHold: {
+                                        delete_button.visible=true;
+                                    }
+                                }
+                                Text{
+                                    id:file_name_text
+                                    width: parent.width
+                                    text:  display
+                                    color: "#2f3439"
+                                    anchors.verticalCenter: parent.verticalCenter
+                                }
+                                Button{
+                                    id:delete_button
+                                    anchors.centerIn:parent
+                                    visible: false
+                                    text:"Delete"
+                                    onClicked: {
+                                        materialManager.deleteMaterial(index)
+                                    }
+                                    Timer{
+                                        interval: 2000
+                                        running: parent.visible
+                                        repeat: false
+                                        onTriggered: parent.visible=false
+                                    }
+                                }
+
+                            }
+                        }
+
+
+                    }
+
+                }
+
+            }
+
+
         }
 
 
-//        Rectangle{
-//            id:messageBox
-//            visible:false;
-//            width: parent.width/3
-//            height: parent.height/3
-//            anchors.centerIn: parent
-//            Text {
-//                anchors.centerIn: parent
-//                id: message_text
-//            }
-//            function message(text){
-//                visible=true;
-//                message_text.text=text;
-//            }
-//            Timer{
-//                running: parent.visible
-//                onTriggered: parent.visible=false;
-//                interval: 5000
-//            }
-//        }
+
     }
 
 
