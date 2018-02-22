@@ -18,7 +18,7 @@
 #include <Qt3DExtras/QSkyboxEntity>
 #include "UI/RoofDesigner/src/constraints.h"
 #include "UI/RoofDesigner/src/jsonsketch.h"
-
+#include "UI/BoardDesigner/ioboardfile.h"
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -53,6 +53,8 @@ int main(int argc, char *argv[])
 
     qmlRegisterType<JSONSketch>("JSONSketch", 1, 0, "JSONSketch");
     qmlRegisterType<Constraints>("Constraints", 1, 0, "Constraints");
+
+    qmlRegisterType<IOBoardFile>("IOBoardFile", 1, 0, "IOBoardFile");
 
     qmlRegisterType<DeformingBeamMesh>("DeformingBeamMesh", 1, 0, "DeformingBeamMesh");
     qmlRegisterType<PhongMaterialCustomDepthTest>("PhongMaterialCustomDepthTest", 1, 0, "PhongMaterialCustomDepthTest");

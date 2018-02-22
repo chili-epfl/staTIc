@@ -27,7 +27,8 @@ SOURCES += main.cpp \
     logger.cpp \
     UI/RoofDesigner/src/jsonsketch.cpp \
     UI/RoofDesigner/src/constraints.cpp \
-    AR/phongmaterialcustomdepthtest.cpp
+    AR/phongmaterialcustomdepthtest.cpp \
+    UI/BoardDesigner/ioboardfile.cpp
 
 
 HEADERS += \
@@ -56,7 +57,8 @@ HEADERS += \
     logger.h \
     UI/RoofDesigner/src/jsonsketch.h \
     UI/RoofDesigner/src/constraints.h \
-    AR/phongmaterialcustomdepthtest.h
+    AR/phongmaterialcustomdepthtest.h \
+    UI/BoardDesigner/ioboardfile.h
 
 
 RESOURCES += qml.qrc

@@ -144,6 +144,7 @@ Item {
             Layout.preferredHeight: parent.height*0.1
             Row{
                 anchors.bottom:  parent.bottom
+                spacing: mm2px(5)
                 Image{
                     id:synch_img
                     width: 100
@@ -182,6 +183,13 @@ Item {
                     text:"design roof"
                     onClicked: aux_loader.source="qrc:/ui/UI/RoofDesigner/RoofDesignerMain.qml"
                 }
+                Button{
+                    //                anchors.left: synch_img.right
+                    //                anchors.bottom:  parent.bottom
+                    text:"Manage Boards"
+                    onClicked: aux_loader.source="qrc:/ui/UI/BoardDesigner/BoardDesignerMain.qml"
+                }
+
             }
 
             Image{

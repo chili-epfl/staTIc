@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="744.09448819"
+   height="1052.3622047"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   sodipodi:docname="aruco_tags.svg">
+  <defs
+     id="defs4" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.35"
+     inkscape:cx="-392.59923"
+     inkscape:cy="174.0163"
+     inkscape:document-units="px"
+     inkscape:current-layer="g3069"
+     showgrid="false"
+     inkscape:window-width="1535"
+     inkscape:window-height="1176"
+     inkscape:window-x="65"
+     inkscape:window-y="24"
+     inkscape:window-maximized="1"
+     showguides="true"
+     inkscape:guide-bbox="true">
+    <sodipodi:guide
+       orientation="0,1"
+       position="270,1195.7143"
+       id="guide3253" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <g
+       id="g3069"
+       transform="translate(5.7142861,12.857143)">
+      <g
+         id="g3255">
+        <g
+           id="g2992">
+          <image
+             width="124.01575"
+             height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/020.png"
+             id="image3141-65"
+             x="48.636135"
+             y="40.110554" />
+          <rect
+             y="24.589756"
+             x="33.115341"
+             height="155.05733"
+             width="155.05733"
+             id="rect3144-4"
+             style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+        <g
+           transform="translate(-0.9992218,-0.24377251)"
+           id="g2996">
+          <image
+             width="124.01575"
+             height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/021.png"
+             id="image3141-65-2"
+             x="226.56355"
+             y="40.354317" />
+          <rect
+             y="24.833529"
+             x="211.04277"
+             height="155.05733"
+             width="155.05733"
+             id="rect3144-4-2"
+             style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+        <g
+           transform="translate(-2.6424255,-0.24376106)"
+           id="g3000">
+          <image
+             width="124.01575"
+             height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/022.png"
+             id="image3141-65-8"
+             x="405.13498"
+             y="40.354317" />
+          <rect
+             y="24.833517"
+             x="389.6142"
+             height="155.05733"
+             width="155.05733"
+             id="rect3144-4-9"
+             style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+        <g
+           transform="translate(0,-1.6723366)"
+           id="g3004">
+          <image
+             width="124.01575"
+             height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/023.png"
+             id="image3141-65-5"
+             x="579.42072"
+             y="41.782887" />
+          <rect
+             y="26.262093"
+             x="563.8999"
+             height="155.05733"
+             width="155.05733"
+             id="rect3144-4-3"
+             style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+      </g>
+      <g
+         id="g3197"
+         transform="translate(11.750573,0)">
+        <g
+           id="g3182">
+          <g
+             id="g3168">
+            <g
+               id="g2992-1"
+               transform="translate(-11.750573,203.10091)">
+              <image
+                 width="124.01575"
+                 height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/024.png"
+                 id="image3141-65-29"
+                 x="48.636135"
+                 y="40.110554" />
+              <rect
+                 y="24.589756"
+                 x="33.115341"
+                 height="155.05733"
+                 width="155.05733"
+                 id="rect3144-4-7"
+                 style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+            </g>
+            <g
+               transform="translate(-12.749793,202.85714)"
+               id="g2996-1">
+              <image
+                 width="124.01575"
+                 height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/025.png"
+                 id="image3141-65-2-4"
+                 x="226.56355"
+                 y="40.354317" />
+              <rect
+                 y="24.833529"
+                 x="211.04277"
+                 height="155.05733"
+                 width="155.05733"
+                 id="rect3144-4-2-0"
+                 style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+            </g>
+            <g
+               transform="translate(-14.392993,202.85715)"
+               id="g3000-8">
+              <image
+                 width="124.01575"
+                 height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/026.png"
+                 id="image3141-65-8-2"
+                 x="405.13498"
+                 y="40.354317" />
+              <rect
+                 y="24.833517"
+                 x="389.6142"
+                 height="155.05733"
+                 width="155.05733"
+                 id="rect3144-4-9-8"
+                 style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+            </g>
+            <g
+               transform="translate(-11.750573,201.42857)"
+               id="g3004-2">
+              <image
+                 width="124.01575"
+                 height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/027.png"
+                 id="image3141-65-5-5"
+                 x="579.42072"
+                 y="41.782887" />
+              <rect
+                 y="26.262093"
+                 x="563.8999"
+                 height="155.05733"
+                 width="155.05733"
+                 id="rect3144-4-3-1"
+                 style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+            </g>
+          </g>
+        </g>
+      </g>
+      <g
+         id="g3213"
+         transform="translate(14.607714,0)">
+        <g
+           id="g2992-4"
+           transform="translate(-14.607714,393.10091)">
+          <image
+             width="124.01575"
+             height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/028.png"
+             id="image3141-65-85"
+             x="48.636135"
+             y="40.110554" />
+          <rect
+             y="24.589756"
+             x="33.115341"
+             height="155.05733"
+             width="155.05733"
+             id="rect3144-4-0"
+             style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+        <g
+           transform="translate(-15.606936,392.85713)"
+           id="g2996-9">
+          <image
+             width="124.01575"
+             height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/029.png"
+             id="image3141-65-2-5"
+             x="226.56355"
+             y="40.354317" />
+          <rect
+             y="24.833529"
+             x="211.04277"
+             height="155.05733"
+             width="155.05733"
+             id="rect3144-4-2-06"
+             style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+        <g
+           transform="translate(-17.250139,392.85715)"
+           id="g3000-6">
+          <image
+             width="124.01575"
+             height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/030.png"
+             id="image3141-65-8-3"
+             x="405.13498"
+             y="40.354317" />
+          <rect
+             y="24.833517"
+             x="389.6142"
+             height="155.05733"
+             width="155.05733"
+             id="rect3144-4-9-9"
+             style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+        <g
+           transform="translate(-14.607714,391.42857)"
+           id="g3004-7">
+          <image
+             width="124.01575"
+             height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/031.png"
+             id="image3141-65-5-8"
+             x="579.42072"
+             y="41.782887" />
+          <rect
+             y="26.262093"
+             x="563.8999"
+             height="155.05733"
+             width="155.05733"
+             id="rect3144-4-3-4"
+             style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+      </g>
+      <g
+         id="g3227"
+         transform="translate(10.322,0)">
+        <g
+           id="g2992-3"
+           transform="translate(-10.322,584.52948)">
+          <image
+             width="124.01575"
+             height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/032.png"
+             id="image3141-65-51"
+             x="48.636135"
+             y="40.110554" />
+          <rect
+             y="24.589756"
+             x="33.115341"
+             height="155.05733"
+             width="155.05733"
+             id="rect3144-4-98"
+             style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+        <g
+           transform="translate(-11.321222,584.2857)"
+           id="g2996-3">
+          <image
+             width="124.01575"
+             height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/033.png"
+             id="image3141-65-2-1"
+             x="226.56355"
+             y="40.354317" />
+          <rect
+             y="24.833529"
+             x="211.04277"
+             height="155.05733"
+             width="155.05733"
+             id="rect3144-4-2-5"
+             style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+        <g
+           transform="translate(-12.964425,584.28571)"
+           id="g3000-67">
+          <image
+             width="124.01575"
+             height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/034.png"
+             id="image3141-65-8-7"
+             x="405.13498"
+             y="40.354317" />
+          <rect
+             y="24.833517"
+             x="389.6142"
+             height="155.05733"
+             width="155.05733"
+             id="rect3144-4-9-5"
+             style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+        <g
+           transform="translate(-10.322,582.85714)"
+           id="g3004-9">
+          <image
+             width="124.01575"
+             height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/035.png"
+             id="image3141-65-5-59"
+             x="579.42072"
+             y="41.782887" />
+          <rect
+             y="26.262093"
+             x="563.8999"
+             height="155.05733"
+             width="155.05733"
+             id="rect3144-4-3-7"
+             style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+      </g>
+      <g
+         id="g3241"
+         transform="translate(7.4648539,0)">
+        <g
+           id="g2992-3-8"
+           transform="translate(-7.4648539,775.95805)">
+          <image
+             width="124.01575"
+             height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/036.png"
+             id="image3141-65-51-3"
+             x="48.636135"
+             y="40.110554" />
+          <rect
+             y="24.589756"
+             x="33.115341"
+             height="155.05733"
+             width="155.05733"
+             id="rect3144-4-98-5"
+             style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+        <g
+           transform="translate(-8.4640739,775.71427)"
+           id="g2996-3-4">
+          <image
+             width="124.01575"
+             height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/037.png"
+             id="image3141-65-2-1-4"
+             x="226.56355"
+             y="40.354317" />
+          <rect
+             y="24.833529"
+             x="211.04277"
+             height="155.05733"
+             width="155.05733"
+             id="rect3144-4-2-5-6"
+             style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+        <g
+           transform="translate(-10.107284,775.71428)"
+           id="g3000-67-1">
+          <image
+             width="124.01575"
+             height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/038.png"
+             id="image3141-65-8-7-4"
+             x="405.13498"
+             y="40.354317" />
+          <rect
+             y="24.833517"
+             x="389.6142"
+             height="155.05733"
+             width="155.05733"
+             id="rect3144-4-9-5-5"
+             style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+        <g
+           transform="translate(-7.4648539,774.28571)"
+           id="g3004-9-7">
+          <image
+             width="124.01575"
+             height="124.01575"
+             xlink:href="file:///home/chili/Pictures/ARToolkit/AR_MATRIX_CODE_4x4_BCH_13_9_3/039.png"
+             id="image3141-65-5-59-9"
+             x="579.42072"
+             y="41.782887" />
+          <rect
+             y="26.262093"
+             x="563.8999"
+             height="155.05733"
+             width="155.05733"
+             id="rect3144-4-3-7-4"
+             style="fill:none;stroke:#000000;stroke-width:0.8481769px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+        </g>
+      </g>
+      <flowRoot
+         xml:space="preserve"
+         id="flowRoot3269"
+         style="font-size:40px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+         transform="translate(-5.7142861,-12.857143)"><flowRegion
+           id="flowRegion3271"><rect
+             id="rect3273"
+             width="133.84521"
+             height="30.809654"
+             x="51.012703"
+             y="2.3086116" /></flowRegion><flowPara
+           id="flowPara3275">dw</flowPara></flowRoot>    </g>
+  </g>
+</svg>
