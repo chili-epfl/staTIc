@@ -43,12 +43,12 @@ Entity{
                                                 Qt.vector3d(-root_transform.translation.y/rootEntity.parent.length + 0.5,-root_transform.translation.y/rootEntity.parent.length + 0.5,-root_transform.translation.y/rootEntity.parent.length + 0.5):
                                                 Qt.vector3d(0,0,0);
 
-    onRelativeLocalPositionChanged: {
-        if(isSelected){
-            var pos_text="("+relativeLocalPosition.x+","+relativeLocalPosition.y+","+relativeLocalPosition.z+")"
-            logger.log("Trapezoidal_force_move", {"relative_position":pos_text,"beam":parent.objectName})        
-        }
-    }
+//    onRelativeLocalPositionChanged: {
+//        if(isSelected){
+//            var pos_text="("+relativeLocalPosition.x+","+relativeLocalPosition.y+","+relativeLocalPosition.z+")"
+//            logger.log("Trapezoidal_force_move", {"relative_position":pos_text,"beam":parent.objectName})
+//        }
+//    }
 
     property vector3d offsetAugmentation: rootEntity.parent? Qt.vector3d(rootEntity.parent.tangibleSection.height/2,0,
                                                                          0)://-rootEntity.parent.tangibleSection.width/2):

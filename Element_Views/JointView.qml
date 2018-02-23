@@ -14,7 +14,7 @@ Entity{
     function setSupportType(type){
         if(supportType!=type){
             backend_entity.supportType=type
-            logger.log("joint_change_support_type",{"Joint":root.objectName,"Support":type})
+            //logger.log("joint_change_support_type",{"Joint":root.objectName,"Support":type})
         }
     }
 

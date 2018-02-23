@@ -6,7 +6,7 @@ Rectangle {
     id:root
     property var current_item:0;
     property alias lateral_visibility:hideButton.state
-    onLateral_visibilityChanged: logger.log("infobox_change_lateral_visibility",{"visibility":lateral_visibility})
+    //onLateral_visibilityChanged: logger.log("infobox_change_lateral_visibility",{"visibility":lateral_visibility})
     property alias custom_loader: custom_loader
     property alias default_loader: default_loader
 
@@ -17,9 +17,9 @@ Rectangle {
     color:"transparent"
     radius:5
     visible: settings.show_info_box
-    onVisibleChanged: {
-            logger.log("infobox_change_visibility",{"visible":visible,"visible_loader":settings.visible_loader})
-    }
+//    onVisibleChanged: {
+//            logger.log("infobox_change_visibility",{"visible":visible,"visible_loader":settings.visible_loader})
+//    }
 
     Rectangle{
         //close button
@@ -114,12 +114,12 @@ Rectangle {
         asynchronous: false
         onLoaded: if(item.hasOwnProperty('current_item')) item.current_item=Qt.binding(function(){return current_item})
         visible:settings.visible_loader=="CUSTOM"
-        onVisibleChanged: {
-            if(item && item.current_item)
-                logger.log("infobox_custom_loader_visibility",{"visible":visible,"item": item.current_item.objectName})
-            else
-                logger.log("infobox_custom_loader_visibility",{"visible":visible,"item": ""})
-        }
+//        onVisibleChanged: {
+//            if(item && item.current_item)
+//                logger.log("infobox_custom_loader_visibility",{"visible":visible,"item": item.current_item.objectName})
+//            else
+//                logger.log("infobox_custom_loader_visibility",{"visible":visible,"item": ""})
+//        }
     }
 
     Loader{
@@ -129,12 +129,12 @@ Rectangle {
         asynchronous: true
         onLoaded: item.current_item=Qt.binding(function(){return current_item})
         source:"qrc:/ui/UI/InfoBoxDesigner.qml"
-        onVisibleChanged: {
-            if(item && item.current_item)
-                logger.log("infobox_default_loader_visibility",{"visible":visible,"item": item.current_item.objectName})
-            else
-                logger.log("infobox_default_loader_visibility",{"visible":visible,"item": ""})
-        }
+//        onVisibleChanged: {
+//            if(item && item.current_item)
+//                logger.log("infobox_default_loader_visibility",{"visible":visible,"item": item.current_item.objectName})
+//            else
+//                logger.log("infobox_default_loader_visibility",{"visible":visible,"item": ""})
+//        }
     }
 
 }

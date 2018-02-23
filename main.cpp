@@ -19,6 +19,8 @@
 #include "UI/RoofDesigner/src/constraints.h"
 #include "UI/RoofDesigner/src/jsonsketch.h"
 #include "UI/BoardDesigner/ioboardfile.h"
+void copyDir(const QDir&, QString);
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -26,18 +28,22 @@ int main(int argc, char *argv[])
     if(!QDir(materialsPath).exists()){
         qDebug()<<"Creating material Path";
         QDir().mkpath(materialsPath);
+        copyDir(QDir(":/resources/Resources/Materials/"),materialsPath);
     }
     if(!QDir(assets3DPath).exists()){
         qDebug()<<"Creating assets3d Path";
         QDir().mkpath(assets3DPath);
+        copyDir(QDir(":/resources/Resources/Assets3D/"),assets3DPath);
     }
     if(!QDir(scenariosPath).exists()){
         qDebug()<<"Creating scenarios Path";
         QDir().mkpath(scenariosPath);
+        copyDir(QDir(":/resources/Resources/Scenarios/"),scenariosPath);
     }
     if(!QDir(boardsPath).exists()){
         qDebug()<<"Creating boards Path";
         QDir().mkpath(boardsPath);
+        copyDir(QDir(":/resources/Resources/Boards/"),boardsPath);
     }
 
     QQuickView view;
@@ -72,4 +78,21 @@ int main(int argc, char *argv[])
     view.show();
 
    return app.exec();
+}
+
+void copyDir(const QDir& dir, QString dest_path){
+    if(!QDir(dest_path).exists()){
+        if(!QDir().mkpath(dest_path))
+            return;
+    }
+    foreach (QString entry, dir.entryList(QDir::NoDotAndDotDot|QDir::Dirs)){
+        copyDir(QDir(dir.canonicalPath()+"/"+entry),dest_path+entry+"/" );
+    }
+    foreach (QString entry, dir.entryList(QDir::NoDotAndDotDot|QDir::Files)){
+         QFile::copy(dir.canonicalPath()+"/"+entry,dest_path+entry);
+         QFile::setPermissions(dest_path+entry,QFileDevice::ReadOwner|QFileDevice::WriteOwner|
+                               QFileDevice::ReadUser| QFileDevice::WriteUser|
+                               QFileDevice::ReadGroup| QFileDevice::WriteGroup|
+                               QFileDevice::ReadOther|QFileDevice::WriteOther);
+    }
 }

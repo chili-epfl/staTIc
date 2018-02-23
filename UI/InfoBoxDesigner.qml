@@ -196,16 +196,16 @@ Rectangle {
                                     anchors.fill: parent
                                     onClicked:{
                                         if(current_item.type==="trapezoidalForce"){
-                                            logger.log("infobox_designer_remove_load",{"beam":current_item.parent.objectName,"load":current_item.objectName})
+                                            //logger.log("infobox_designer_remove_load",{"beam":current_item.parent.objectName,"load":current_item.objectName})
                                             current_item.killMe();
                                             infobox.current_item=0;
                                         }else if(current_item.type==="nodeForce"){
-                                            logger.log("infobox_designer_remove_load",{"joint":current_item.parent.objectName,"load":current_item.objectName})
+                                            //logger.log("infobox_designer_remove_load",{"joint":current_item.parent.objectName,"load":current_item.objectName})
                                             current_item.killMe();
                                             infobox.current_item=0;
                                         }
                                         else if(current_item.type==="uniformForce"){
-                                            logger.log("infobox_designer_remove_load",{"beam":current_item.parent.objectName,"load":current_item.objectName})
+                                            //logger.log("infobox_designer_remove_load",{"beam":current_item.parent.objectName,"load":current_item.objectName})
                                             current_item.killMe();
                                             infobox.current_item=0;
                                         }
@@ -228,17 +228,17 @@ Rectangle {
                                     onClicked:{
                                         if(current_item.type=="beam"){
                                             if(warehouse3d.get(catalog_grid.currentIndex,"type")!="uniform"){
-                                                logger.log("infobox_designer_add_load",{"beam":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight")})
+                                                //logger.log("infobox_designer_add_load",{"beam":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight")})
                                                 staticsModule.createTPZLoad(current_item.backend_entity,{"parent_entity":current_item,"warehouse_index":catalog_grid.currentIndex})
                                             }else{
-                                                logger.log("infobox_designer_add_load",{"beam":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight"),"type":"uniform"})
+                                                //logger.log("infobox_designer_add_load",{"beam":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight"),"type":"uniform"})
                                                 staticsModule.createUDLoad(current_item.backend_entity,{"parent_entity":current_item,"warehouse_index":catalog_grid.currentIndex})
                                             }
                                         }
 
                                         else if(current_item.type=="joint"){
                                             if(warehouse3d.get(catalog_grid.currentIndex,"type")!="uniform"){
-                                                logger.log("infobox_designer_add_load",{"joint":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight")})
+                                                //logger.log("infobox_designer_add_load",{"joint":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight")})
                                                 staticsModule.createNodeLoad(current_item.backend_entity,{"parent_entity":current_item,"warehouse_index":catalog_grid.currentIndex})
                                             }
                                         }
@@ -378,7 +378,7 @@ Rectangle {
                                                     if(current_item!=0 && current_item.type=="beam"){
                                                         feedback_animation_material.start();
                                                         current_item.setMaterialID(materialsManager.get(index,"UniqueID"))
-                                                        logger.log("infobox_designer_change_material",{"beam":current_item.objectName,"materialID":current_item.materialID})
+                                                        //logger.log("infobox_designer_change_material",{"beam":current_item.objectName,"materialID":current_item.materialID})
                                                     }
                                                 }
                                             }
@@ -400,7 +400,7 @@ Rectangle {
                                                         beams[beam_index].setMaterialID(materialsManager.get(index,"UniqueID"))
                                                     }
                                                     feedback_animation_material.start();
-                                                    logger.log("infobox_designer_change_material_global",{"materialID":current_item.materialID})
+                                                    //logger.log("infobox_designer_change_material_global",{"materialID":current_item.materialID})
 
                                                 }
                                             }
@@ -514,7 +514,7 @@ Rectangle {
                                         if(current_item!=0 && current_item.type=="beam"){
                                             feedback_animation_size.start();
                                             current_item.setBeamSize(Qt.size(w.text,h.text));
-                                            logger.log("infobox_designer_change_section",{"beam":current_item.objectName,"section": current_item.realBeamSize})
+                                            //logger.log("infobox_designer_change_section",{"beam":current_item.objectName,"section": current_item.realBeamSize})
                                         }
                                     }
                                 }
@@ -534,7 +534,7 @@ Rectangle {
                                             beams[beam_index].setBeamSize(Qt.size(w.text,h.text));
                                         }
                                         feedback_animation_size.start();
-                                        logger.log("infobox_designer_change_section_all",{"section": current_item.realBeamSize})
+                                        //logger.log("infobox_designer_change_section_all",{"section": current_item.realBeamSize})
 
                                     }
                                 }
@@ -576,7 +576,7 @@ Rectangle {
                                     ignoreUnknownSignals: true
                                     onEnabledChanged: {
                                         beam_enable_check.checked = current_item.backend_entity.enabled
-                                        logger.log("infobox_designer_enable_beam",{"beam":current_item.objectName,"enabled": beam_enable_check.checked})
+                                        //logger.log("infobox_designer_enable_beam",{"beam":current_item.objectName,"enabled": beam_enable_check.checked})
                                     }
                                 }
                             }
@@ -952,7 +952,7 @@ Rectangle {
                                     if(hasReaction){
                                         logging_fields[forceListModel.get(current_item.connected_beams.length).joint.objectName]=forceListModel.get(current_item.connected_beams.length).isAdded;
                                     }
-                                    logger.log("infobox_joint_change_force_list",logging_fields);
+                                    //logger.log("infobox_joint_change_force_list",logging_fields);
                                 }
                             }
                         }

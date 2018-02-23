@@ -1,5 +1,8 @@
 import QtQuick 2.3
 import QtQuick.Controls 1.3
+
+import QtQuick.Controls 2.3 as QQ2
+
 import QtQuick.Window 2.0
 import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.2
@@ -7,7 +10,6 @@ import Qt.labs.folderlistmodel 2.1
 import JSONSketch 1.0
 import "qrc:/ui"
 import "qrc:/scripts/Scripts"
-import "qrc:/ui/UI/Help"
 import "qrc:/ui/UI/"
 import "qrc:/ui/UI/MaterialDesigner"
 
@@ -89,7 +91,7 @@ Item {
                 cellWidth: gridRect.width/5; cellHeight: gridRect.height/2
                 anchors.fill: parent
                 model: folder_list_model
-
+                currentIndex: -1
                 FolderListModel {
                     id:folder_list_model
                     showDirs: false
@@ -101,37 +103,46 @@ Item {
                     width: Math.min(gridview.cellHeight,gridview.cellWidth);
                     height:width
                     Rectangle{
+                        id:structure_preview
                         color: "white"
                         border.color: gridview.currentIndex == index ? "red": "transparent"
                         border.width: 10
                         anchors.fill: parent
                         anchors.margins: 10
+                        property bool valid: true
                         JSONSketch{
                             id:json_sketch
                         }
                         Component.onCompleted: {
-                            json_sketch.loadSketch(scenariosPath,fileName,this)
+                            var res=json_sketch.loadSketch(scenariosPath,fileName,this)
+                            if(res=="Sketch read" || res=="3D Sketch")
+                                valid=true
+                            else
+                                valid=false
                         }
                         property alias background_picture_url: backgroundImage.source
                         Image {
+                            z:2
                             id: backgroundImage
                             mipmap: true
                             anchors.fill: parent
+                            anchors.margins: 10
                             fillMode: Image.PreserveAspectCrop
                         }
                         Text {
-                            z:1
+                            z:3
                             anchors.fill: parent
-                            text: index
+                            text: structure_preview.valid ? index:"Invalid Format"
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment:  Text.AlignVCenter
                             fontSizeMode: Text.Fit
                             minimumPixelSize: 10; font.pixelSize: 50
                             color: "black"
+                            wrapMode: Text.WordWrap
                         }
                         MouseArea {
                             anchors.fill: parent
-                            onClicked: gridview.currentIndex = index
+                            onClicked: if(structure_preview.valid) gridview.currentIndex = index
                         }
                     }
                 }
@@ -142,57 +153,42 @@ Item {
         Item{
             Layout.preferredWidth: parent.width
             Layout.preferredHeight: parent.height*0.1
-            Row{
-                anchors.bottom:  parent.bottom
-                spacing: mm2px(2.5)
-                Image{
-                    id:synch_img
-                    width: 100
-                    height: 100
-                    source: synch_mouse_area.pressed ? "qrc:/icons/Icons/synch_pressed.png" : "qrc:/icons/Icons/synch_ON.png"
-                    //                anchors.bottom:  parent.bottom
-                    //                anchors.rightMargin: 10
-
-                    MouseArea{
-                        id:synch_mouse_area
-                        anchors.fill: parent
-                        //onClicked: synch_dialog_box.visible=true
+            Flickable{
+                anchors.centerIn: parent
+                width: Math.min(parent.width-2*start_button_img.width,row_of_buttons.implicitWidth)
+                height: parent.height
+                clip: true
+                contentWidth: row_of_buttons.implicitWidth
+                contentHeight: parent.height
+                flickableDirection: Flickable.HorizontalFlick
+                Row{
+                    id: row_of_buttons
+                    height: parent.height
+                    spacing: mm2px(2.5)
+                    QQ2.RoundButton{
+                        text:"Synch on Realto"
                     }
-                }
-                Image{
-                    width: 100
-                    height: 100
-                    source: "qrc:/icons/Icons/material_design.png"
-                    //                anchors.right: parent.right
-                    //                anchors.bottom:  parent.bottom
-                    //                anchors.rightMargin: 10
-                    MouseArea{
-                        anchors.fill: parent
+                    QQ2.RoundButton{
+                        text:"Select Board"
+                        onClicked: boardSelection_box.visible=true
+                    }
+                    QQ2.RoundButton{
+                        text:"Manage Materials"
                         onClicked: aux_loader.source="qrc:/ui/UI/MaterialDesigner/MaterialDesigner.qml"
                     }
-                }
-                Button{
-                    //                anchors.left: synch_img.right
-                    //                anchors.bottom:  parent.bottom
-                    text:"Select Board"
-                    onClicked: boardSelection_box.visible=true
-                }
-                Button{
-                    //                anchors.left: synch_img.right
-                    //                anchors.bottom:  parent.bottom
-                    text:"Design Structure"
-                    onClicked: aux_loader.source="qrc:/ui/UI/RoofDesigner/RoofDesignerMain.qml"
-                }
-                Button{
-                    //                anchors.left: synch_img.right
-                    //                anchors.bottom:  parent.bottom
-                    text:"Manage Boards"
-                    onClicked: aux_loader.source="qrc:/ui/UI/BoardDesigner/BoardDesignerMain.qml"
-                }
+                    QQ2.RoundButton{
+                        text:"Manage Structures"
+                        onClicked: aux_loader.source="qrc:/ui/UI/RoofDesigner/RoofDesignerMain.qml"
+                    }
+                    QQ2.RoundButton{
+                        text:"Manage Boards"
+                        onClicked: aux_loader.source="qrc:/ui/UI/BoardDesigner/BoardDesignerMain.qml"
+                    }
 
+                }
             }
-
             Image{
+                id:start_button_img
                 width: 100
                 height: 100
                 source: start_button.pressed? "qrc:/icons/Icons/next_pressed.png" :"qrc:/icons/Icons/next.png"

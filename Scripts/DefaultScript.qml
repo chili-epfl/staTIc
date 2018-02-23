@@ -10,7 +10,6 @@ import Frame3DDKernel 1.0
 import "qrc:/ui/UI/"
 import "qrc:/"
 import Warehouse3D 1.0
-import "qrc:/ui/UI/Help/"
 import QtGraphicalEffects 1.0
 import QtQuick.Window 2.2
 Item{
@@ -20,11 +19,9 @@ Item{
     signal pageExit();
 
     property alias marker_detector: marker_detector
-    property alias suggestion_box: suggestion_box
     property alias materialsManager: staticsmodule.materialsManager
     property alias staticsModule: staticsmodule
     property alias warehouse: warehouse3d
-    property alias tutorial:tutorial
     property alias sceneRoot: scene3D.structureEntity
 
     property alias maxForce : staticsmodule.maxForce
@@ -92,7 +89,7 @@ Item{
             loadingAnimation.visible=false;
             loadingAnimation.enabled=false;
             firstInit=false;
-            logger.log("Start_default_script",{"structureUrl":structureUrl})
+            //logger.log("Start_default_script",{"structureUrl":structureUrl})
         }
         running: false;
         interval: 2000
@@ -161,9 +158,9 @@ Item{
                 suggestion_box.show_message("The structure is unstable. Check the supports")
             }
         }
-        onUpdated: {
-            logger.log("Static_module_update",{"stability":stability})
-        }
+//        onUpdated: {
+//            logger.log("Static_module_update",{"stability":stability})
+//        }
 
     }
 
@@ -397,7 +394,7 @@ Item{
                             anchors.fill: parent
                             onClicked: {
                                 camDevice.isRunning = !camDevice.isRunning
-                                logger.log("AR_Button_Click",{"running":camDevice.isRunning})
+                                //logger.log("AR_Button_Click",{"running":camDevice.isRunning})
                             }
                         }
                     }
@@ -417,7 +414,7 @@ Item{
                                 //                            if(settings.show_displacement && settings.show_stress)
                                 //                                settings.show_displacement=false;
                                 settings.blink_stress=0;
-                                logger.log("Show_Stress_Click",{"visible":settings.show_stress})
+                                //logger.log("Show_Stress_Click",{"visible":settings.show_stress})
                             }
                         }
 
@@ -494,7 +491,7 @@ Item{
                                     exagerate_disp_slider.visible=true
                                 else
                                     exagerate_disp_slider.visible=false
-                                logger.log("Show_Displacement_Click",{"visible":settings.show_displacement,"exagerate":exagerate_disp_slider.value})
+                                //logger.log("Show_Displacement_Click",{"visible":settings.show_displacement,"exagerate":exagerate_disp_slider.value})
                             }
                             hoverEnabled: true
                             onHoveredChanged:if(settings.show_displacement)
@@ -531,9 +528,9 @@ Item{
                             tickmarksEnabled: true
                             maximumValue: 25
                             value: 1
-                            onValueChanged: {
-                                logger.log("Show_Displacement_Click",{"visible":settings.show_displacement,"exagerate":exagerate_disp_slider.value})
-                            }
+//                            onValueChanged: {
+//                                logger.log("Show_Displacement_Click",{"visible":settings.show_displacement,"exagerate":exagerate_disp_slider.value})
+//                            }
                             Binding{
                                 target:settings
                                 property: "exagerate_displacement_factor"
@@ -565,9 +562,6 @@ Item{
                     }
                 }
 
-                SuggestionBox{
-                    id:suggestion_box
-                }
 
                 Image {
                     visible: settings.show_back_button
@@ -586,19 +580,6 @@ Item{
                     }
                 }
 
-                Image{
-                    visible: !tutorial.visible && settings.show_help_button
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.top: parent.bottom
-                    anchors.margins: 10
-                    width: 50
-                    height: 50
-                    source: "qrc:/icons/Icons/help.png"
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: {tutorial.interactive=false;tutorial.visible=true;logger.log("open_help",{})}
-                    }
-                }
             }
 
             Rectangle{
@@ -616,7 +597,6 @@ Item{
         labelingThreshold: 150
         flip_image: Qt.platform.os=="android"
         Component.onCompleted: {
-            loadSingleMarkersConfigFile("qrc:/AR/single_markers.json")
             if(applicationWindow.board_path=="")
                 loadMultiMarkersConfigFile("default","qrc:/AR/board_configuration.dat")
             else
@@ -638,11 +618,7 @@ Item{
         }
     }
 
-    Tutorial{
-        id:tutorial
-        interactive:false
-        visible:false
-    }
+
 
 
 }

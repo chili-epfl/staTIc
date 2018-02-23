@@ -37,11 +37,19 @@ QString JSONSketch::loadSketch(const QString path,const QString name, QObject* s
     if(!doc.isObject()){
         return "cannot open the JSON object";
     }
-    return read(doc.object(), sketch,path) + ", Sketch loaded";
+    return read(doc.object(), sketch,path);
 }
 
 QString JSONSketch::read(const QJsonObject json, QObject* sketch,QString jsonFilePath)
 {
+    bool is2D=true;
+    if(!json["background_picture"].isString())
+        return "Cannot read picture";
+    if(json["background_picture"].toString().contains('/'))
+        return "Picture seems a path";
+    if(!json["background_picture"].toString().isEmpty())
+        sketch->setProperty("background_picture_url", QUrl::fromLocalFile(jsonFilePath+ json["background_picture"].toString()));
+
     if(!json["points"].isObject())
         return "Cannot read points";
     QJsonObject qPoints = json["points"].toObject();
@@ -60,8 +68,7 @@ QString JSONSketch::read(const QJsonObject json, QObject* sketch,QString jsonFil
         if(!currPoint["x"].isDouble() || !currPoint["y"].isDouble() || !currPoint["z"].isDouble())
             return "Cannot read coordinates";
         if(!qFuzzyCompare(currPoint["z"].toDouble(),0)){
-            qDebug()<<"Not 2D Sketch";
-            return "Not 2D Sketch";
+            is2D=false;
         }
         max_x=qMax(max_x,currPoint["x"].toDouble() );
         max_y=qMax(max_y,-currPoint["y"].toDouble());
@@ -186,13 +193,6 @@ QString JSONSketch::read(const QJsonObject json, QObject* sketch,QString jsonFil
                                                                                         qVariantFromValue(linesQML[jsonConstrain["entityB"].toString()]));
 
     }
-    if(!json["background_picture"].isString())
-        return "Cannot read picture";
-    if(json["background_picture"].toString().contains('/'))
-        return "Picture seems a path";
-    if(!json["background_picture"].toString().isEmpty())
-        sketch->setProperty("background_picture_url", QUrl::fromLocalFile(jsonFilePath+ json["background_picture"].toString()));
-
     if(!json["origin_id"].isString())
         return "Cannot read origin";
 
@@ -230,6 +230,8 @@ QString JSONSketch::read(const QJsonObject json, QObject* sketch,QString jsonFil
                                    poseOffsetEulerAnglesJSON[1].toDouble(),
                                     poseOffsetEulerAnglesJSON[2].toDouble()));
     }
+    if(!is2D)
+        return "3D Sketch";
     return "Sketch read";
 }
 

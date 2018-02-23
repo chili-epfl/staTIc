@@ -14,7 +14,7 @@ Page {
 
     Component.onCompleted: {
         if(sketch_to_load.length>0){
-            console.log(json_sketch.loadSketch(scenariosPath,sketch_to_load+ ".json", sketch))
+            json_sketch.loadSketch(scenariosPath,sketch_to_load+ ".json", sketch)
             topBar.sketch_name=sketch_to_load;
             sketch.store_state(sketch.undo_buffer.length+1);
         }

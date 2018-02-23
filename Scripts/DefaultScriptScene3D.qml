@@ -143,12 +143,12 @@ Entity {
             rotation: structure_tag.rotationQuaternion
             property quaternion inv_rotation: quaternion_helper.invert(rotation)
             property vector3d euler_angles: quaternion_helper.eulerAngles(rotation)
-            QQ2.Timer{
-                running: true
-                repeat: true
-                interval: 3000
-                onTriggered: logger.log_position("Structure",structure_tag.translation,structureLoaderTransform.rotationX,structureLoaderTransform.rotationY,structureLoaderTransform.rotationZ)
-            }
+//            QQ2.Timer{
+//                running: true
+//                repeat: true
+//                interval: 3000
+//                onTriggered: logger.log_position("Structure",structure_tag.translation,structureLoaderTransform.rotationX,structureLoaderTransform.rotationY,structureLoaderTransform.rotationZ)
+//            }
             translation: structure_tag.has_appeared ? structure_tag.translation : staticsModule.initialPose
             QQ2.Component.onCompleted:
                 structure_tag.appendQuaternion(fromAxisAndAngle(1,0,0,90))

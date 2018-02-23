@@ -3,17 +3,8 @@
         <file>Settings.qml</file>
         <file>main.qml</file>
         <file>AR/board_configuration.dat</file>
-        <file>AR/single_markers.json</file>
     </qresource>
     <qresource prefix="/icons">
-        <file>Icons/minus.png</file>
-        <file>Icons/move.png</file>
-        <file>Icons/pan.png</file>
-        <file>Icons/plus.png</file>
-        <file>Icons/resize.png</file>
-        <file>Icons/resize_pressed.png</file>
-        <file>Icons/plus_pressed.png</file>
-        <file>Icons/minus_pressed.png</file>
         <file>Icons/AR_ON.png</file>
         <file>Icons/AR_OFF.png</file>
         <file>Icons/apply_pressed.png</file>
@@ -26,9 +17,6 @@
         <file>Icons/realto_logo.png</file>
         <file>Icons/material_design.png</file>
         <file>Icons/back.png</file>
-        <file>Icons/cuttingPlane.png</file>
-        <file>Icons/ghost_Mode_on.png</file>
-        <file>Icons/ghost_Mode_OFF.png</file>
         <file>Icons/show_stress_off.png</file>
         <file>Icons/show_stress_on.png</file>
         <file>Icons/apply_load.png</file>
@@ -39,9 +27,6 @@
         <file>Icons/delete_load.png</file>
         <file>Icons/next_pressed.png</file>
         <file>Icons/next.png</file>
-        <file>Icons/help.png</file>
-        <file>Icons/help_pressed.png</file>
-        <file>Icons/TANGIBLE.png</file>
         <file>Icons/apply_all_pressed.png</file>
         <file>Icons/apply_all.png</file>
     </qresource>
@@ -49,18 +34,9 @@
         <file>Images/mainbanner.png</file>
         <file>Images/woodbackground.png</file>
         <file>Images/camera_icon.png</file>
-        <file>Images/wood_joint.png</file>
-        <file>Images/wood_beam.png</file>
-        <file>Images/coordinate_system.png</file>
-        <file>Images/coordinate_system_pressed.png</file>
-        <file>Images/designer.png</file>
-        <file>Images/beam_section.png</file>
-        <file>Images/analysis_mode.png</file>
         <file>Images/compression.png</file>
         <file>Images/tension.png</file>
         <file>Images/support.png</file>
-        <file>Images/wood_beam2.png</file>
-        <file>Images/boss.png</file>
         <file>Images/fix_support.png</file>
         <file>Images/fix_support_react.png</file>
         <file>Images/pinned_support.png</file>
@@ -84,35 +60,14 @@
     </qresource>
     <qresource prefix="/opengl">
         <file>Opengl/TransparentMaterial.qml</file>
-        <file>Opengl/robustwireframe.frag</file>
-        <file>Opengl/robustwireframe.geom</file>
-        <file>Opengl/robustwireframe.vert</file>
-        <file>Opengl/WireframeEffect.qml</file>
-        <file>Opengl/WireframeMaterial.qml</file>
         <file>Opengl/TrivialGL3.vert</file>
         <file>Opengl/TrivialGL3.frag</file>
         <file>Opengl/TrivialES2.vert</file>
         <file>Opengl/TrivialES2.frag</file>
-        <file>Opengl/phong.vert</file>
-        <file>Opengl/phong.frag</file>
     </qresource>
     <qresource prefix="/scripts">
         <file>Scripts/DefaultScript.qml</file>
         <file>Scripts/DefaultScriptScene3D.qml</file>
-        <file>Scripts/Story_1/chicken_shelter.png</file>
-        <file>Scripts/Story_1/Model.structure</file>
-        <file>Scripts/Story_1/boss_suggestion.png</file>
-        <file>Scripts/Story_1/suggestion.png</file>
-        <file>Scripts/Story_2/steal_cable.jpg</file>
-        <file>Scripts/Story_2/Model.structure</file>
-        <file>Scripts/Full_Roof/Full_roof.structure</file>
-        <file>Scripts/Vault/Vault.structure</file>
-        <file>Scripts/Howe/Howe.structure</file>
-        <file>Scripts/Gazebo/Gazebo.structure</file>
-        <file>Scripts/Full_Roof/full-roof.jpg</file>
-        <file>Scripts/Vault/vault.png</file>
-        <file>Scripts/Gazebo/gazebo.jpg</file>
-        <file>Scripts/Howe/howe.jpg</file>
     </qresource>
     <qresource prefix="/ui">
         <file>UI/InfoBox.qml</file>
@@ -122,21 +77,7 @@
         <file>UI/PercNumberEntity.qml</file>
         <file>UI/CustomSwitchStyle.qml</file>
         <file>UI/NumberEntity.qml</file>
-        <file>UI/SuggestionBox.qml</file>
         <file>UI/Char_Meshes.qml</file>
-        <file>UI/Help/Tutorial.qml</file>
-        <file>UI/Help/page_1.jpg</file>
-        <file>UI/Help/page_4.gif</file>
-        <file>UI/Help/page_5.png</file>
-        <file>UI/Help/page_2.gif</file>
-        <file>UI/Help/page_6.gif</file>
-        <file>UI/Help/page_7.gif</file>
-        <file>UI/Help/page_8.gif</file>
-        <file>UI/Help/page_9.gif</file>
-        <file>UI/Help/page_10.gif</file>
-        <file>UI/Help/page_11.gif</file>
-        <file>UI/Help/page_12.gif</file>
-        <file>UI/Help/page_3.gif</file>
         <file>UI/MaterialDesigner/TakePicture.qml</file>
         <file>UI/MaterialDesigner/TakeFromFile.qml</file>
         <file>UI/MaterialDesigner/assets/shutter-icon.png</file>
@@ -704,18 +645,6 @@
         <file>UI/BoardDesigner/AR_MATRIX_CODE_4x4_BCH_13_9_3/000.png</file>
     </qresource>
     <qresource prefix="/soundeffects">
-        <file>AR/SoundEffects/crash_wood_1.mp3</file>
-        <file>AR/SoundEffects/crash_wood_2.mp3</file>
-        <file>AR/SoundEffects/creak_low_1.mp3</file>
-        <file>AR/SoundEffects/creak_low_2.mp3</file>
-        <file>AR/SoundEffects/creak_low_3.mp3</file>
-        <file>AR/SoundEffects/creak_low_4.mp3</file>
-        <file>AR/SoundEffects/crash_wood_1.ogg</file>
-        <file>AR/SoundEffects/crash_wood_2.ogg</file>
-        <file>AR/SoundEffects/creak_low_1.ogg</file>
-        <file>AR/SoundEffects/creak_low_2.ogg</file>
-        <file>AR/SoundEffects/creak_low_3.ogg</file>
-        <file>AR/SoundEffects/creak_low_4.ogg</file>
         <file>AR/SoundEffects/crash_wood_2.wav</file>
         <file>AR/SoundEffects/clapping.wav</file>
         <file>AR/SoundEffects/creak_low_2.wav</file>
@@ -748,7 +677,6 @@
         <file>3DObjects/spring.obj</file>
         <file>3DObjects/perc.obj</file>
         <file>3DObjects/mm.obj</file>
-        <file>3DObjects/bar.obj</file>
         <file>3DObjects/rolling support.obj</file>
         <file>3DObjects/pin support.obj</file>
         <file>3DObjects/S2.obj</file>
@@ -765,5 +693,46 @@
         <file>Resources/Assets3D/snow/texture.png</file>
         <file>Resources/Assets3D/snow/preview.png</file>
         <file>Resources/Assets3D/snow/snow.obj</file>
+        <file>Resources/Scenarios/Vault.json</file>
+        <file>Resources/Scenarios/Howe.json</file>
+        <file>Resources/Scenarios/Gazebo.json</file>
+        <file>Resources/Scenarios/Full_roof.json</file>
+        <file>Resources/Scenarios/gazebo.jpg</file>
+        <file>Resources/Scenarios/full-roof.jpg</file>
+        <file>Resources/Scenarios/vault.png</file>
+        <file>Resources/Scenarios/howe.jpg</file>
+        <file>Resources/Materials/D50/lorenzo.lucignano@epfl.ch-8316125742.material</file>
+        <file>Resources/Materials/D50/texture.png</file>
+        <file>Resources/Materials/D70/lorenzo.lucignano@epfl.ch-8316125742.material</file>
+        <file>Resources/Materials/D70/texture.png</file>
+        <file>Resources/Materials/D30/lorenzo.lucignano@epfl.ch-8316125742.material</file>
+        <file>Resources/Materials/D30/texture.png</file>
+        <file>Resources/Materials/C40/lorenzo.lucignano@epfl.ch-8316125742.material</file>
+        <file>Resources/Materials/C40/texture.png</file>
+        <file>Resources/Materials/C30/lorenzo.lucignano@epfl.ch-8316125742.material</file>
+        <file>Resources/Materials/C30/texture.png</file>
+        <file>Resources/Materials/C22/lorenzo.lucignano@epfl.ch-8316125742.material</file>
+        <file>Resources/Materials/C22/texture.png</file>
+        <file>Resources/Materials/C18/lorenzo.lucignano@epfl.ch-8316125742.material</file>
+        <file>Resources/Materials/C18/texture.png</file>
+        <file>Resources/Assets3D/waterTank/watertank.asset</file>
+        <file>Resources/Assets3D/waterTank/watertank.png</file>
+        <file>Resources/Assets3D/waterTank/preview.jpg</file>
+        <file>Resources/Assets3D/waterTank/watertank.obj</file>
+        <file>Resources/Assets3D/tonweight/tonweight.asset</file>
+        <file>Resources/Assets3D/tonweight/texture.png</file>
+        <file>Resources/Assets3D/tonweight/preview.jpg</file>
+        <file>Resources/Assets3D/tonweight/tonweight.obj</file>
+        <file>Resources/Assets3D/solar_pannel/solar_pannel.asset</file>
+        <file>Resources/Assets3D/snow/snow.asset</file>
+        <file>Resources/Assets3D/jacuzzi/layout.png</file>
+        <file>Resources/Assets3D/jacuzzi/jacuzzi.jpg</file>
+        <file>Resources/Assets3D/jacuzzi/jacuzzi.asset</file>
+        <file>Resources/Assets3D/jacuzzi/jacuzzi.obj</file>
+        <file>Resources/Assets3D/girl/girl.asset</file>
+        <file>Resources/Assets3D/girl/texture.jpg</file>
+        <file>Resources/Assets3D/girl/preview.png</file>
+        <file>Resources/Assets3D/girl/girl.obj</file>
+        <file>Resources/Boards/board_configuration.data</file>
     </qresource>
 </RCC>

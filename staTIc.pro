@@ -94,63 +94,6 @@ android {
 }
 
 DISTFILES += \
-    Resources/Scenarios/Model1/Model1.dae \
-    Resources/Scenarios/Model2/Model2.dae \
-    Resources/Scenarios/Model1/Model1.png \
-    Resources/Scenarios/Model2/Model2.png \
-    Resources/Scenarios/Model1/Model1.structure \
-    Resources/Scenarios/Model2/Model2.structure \
-    Resources/Scenarios/Model1/Model1.yml \
-    Resources/Scenarios/Model2/Model2.yml \
-    Resources/Assets3D/solar_pannel/Solar.blend \
-    Resources/Assets3D/girl/girl.obj \
-    Resources/Assets3D/jacuzzi/jacuzzi.obj \
-    Resources/Assets3D/snow/snow.obj \
-    Resources/Assets3D/solar_pannel/Solar.obj \
-    Resources/Assets3D/tonweight/tonweight.obj \
-    Resources/Assets3D/waterTank/watertank.obj \
-    Resources/Assets3D/girl/texture.jpg \
-    Resources/Assets3D/jacuzzi/jacuzzi.jpg \
-    Resources/Materials/oak.jpeg \
-    Resources/Assets3D/jacuzzi/layout.png \
-    Resources/Assets3D/snow/texture.png \
-    Resources/Assets3D/solar_pannel/Solar.png \
-    Resources/Assets3D/tonweight/texture.png \
-    Resources/Assets3D/waterTank/watertank.png \
-    Resources/Assets3D/girl/girl.asset \
-    Resources/Assets3D/jacuzzi/jacuzzi.asset \
-    Resources/Assets3D/snow/snow.asset \
-    Resources/Assets3D/solar_pannel/solar_pannel.asset \
-    Resources/Assets3D/tonweight/watertank.asset \
-    Resources/Assets3D/waterTank/watertank.asset \
-    Resources/Materials/material1.material \
-    Resources/Assets3D/tonweight/preview.jpg \
-    Resources/Assets3D/waterTank/preview.jpg \
-    Resources/Assets3D/girl/preview.png \
-    Resources/Assets3D/snow/preview.png \
-    Resources/Assets3D/solar_pannel/preview.png \
-    Resources/Assets3D/tonweight/tonweight.asset \
-    Resources/Materials/C18/lorenzo.lucignano@epfl.ch-8316125742.material~ \
-    Resources/Materials/C22/lorenzo.lucignano@epfl.ch-8316125742.material~ \
-    Resources/Materials/C30/lorenzo.lucignano@epfl.ch-8316125742.material~ \
-    Resources/Materials/C40/lorenzo.lucignano@epfl.ch-8316125742.material~ \
-    Resources/Materials/D30/lorenzo.lucignano@epfl.ch-8316125742.material~ \
-    Resources/Materials/D50/lorenzo.lucignano@epfl.ch-8316125742.material~ \
-    Resources/Materials/D70/lorenzo.lucignano@epfl.ch-8316125742.material~ \
-    Resources/Materials/C18/texture.png \
-    Resources/Materials/C22/texture.png \
-    Resources/Materials/C30/texture.png \
-    Resources/Materials/C40/texture.png \
-    Resources/Materials/D30/texture.png \
-    Resources/Materials/D50/texture.png \
-    Resources/Materials/D70/texture.png \
-    Resources/Materials/C18/lorenzo.lucignano@epfl.ch-8316125742.material \
-    Resources/Materials/C22/lorenzo.lucignano@epfl.ch-8316125742.material \
-    Resources/Materials/C30/lorenzo.lucignano@epfl.ch-8316125742.material \
-    Resources/Materials/C40/lorenzo.lucignano@epfl.ch-8316125742.material \
-    Resources/Materials/D30/lorenzo.lucignano@epfl.ch-8316125742.material \
-    Resources/Materials/D50/lorenzo.lucignano@epfl.ch-8316125742.material \
-    Resources/Materials/D70/lorenzo.lucignano@epfl.ch-8316125742.material \
     android/AndroidManifest.xml \
     android/gradle/wrapper/gradle-wrapper.jar \
     android/gradlew \

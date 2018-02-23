@@ -11,6 +11,9 @@ Item{
     MouseArea{
         anchors.fill: parent
     }
+    property string boardPath: file_view.currentIndex>-1 ?
+                                   folderModel.get(file_view.currentIndex,"filePath"):
+                                   ""
     Rectangle{
 
         radius: 5
@@ -22,9 +25,7 @@ Item{
         anchors.centerIn: parent
         anchors.margins: 10
 
-        property string boardPath: file_view.currentIndex>-1 ?
-                                       folderModel.get(file_view.currentIndex,"filePath"):
-                                       ""
+
         Rectangle{
             anchors.fill: parent
             anchors.margins: 20
