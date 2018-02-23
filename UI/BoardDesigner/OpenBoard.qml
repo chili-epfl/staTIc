@@ -6,6 +6,7 @@ import ARToolkit 1.0
 import QtQuick.Layouts 1.1
 import IOBoardFile 1.0
 Item {
+    signal pageExit();
     visible: true
     id : root
     anchors.fill: parent
@@ -217,6 +218,7 @@ Item {
                     ioBoardFile.tags_configuration=conf;
                     if(ioBoardFile.writeFile()){
                         text="Save"
+                        pageExit()
                     }
                     else{
                         text="Save(*)"

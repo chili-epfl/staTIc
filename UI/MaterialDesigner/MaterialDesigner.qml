@@ -329,6 +329,7 @@ Rectangle {
                         spacing: 20
                         Button{
                             text: "Create"
+                            enabled: name.length>0
                             onClicked: {
                                 materialManager.createFile(texture_image.source,name,
                                                            density,price,
@@ -336,6 +337,7 @@ Rectangle {
                                                            fc0,fc90,
                                                            fmk,ft0,
                                                            ft90,fvk)
+                                pageExit()
                             }
                         }
                         Button{

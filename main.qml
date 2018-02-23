@@ -144,7 +144,7 @@ Item {
             Layout.preferredHeight: parent.height*0.1
             Row{
                 anchors.bottom:  parent.bottom
-                spacing: mm2px(5)
+                spacing: mm2px(2.5)
                 Image{
                     id:synch_img
                     width: 100
@@ -180,7 +180,7 @@ Item {
                 Button{
                     //                anchors.left: synch_img.right
                     //                anchors.bottom:  parent.bottom
-                    text:"design roof"
+                    text:"Design Structure"
                     onClicked: aux_loader.source="qrc:/ui/UI/RoofDesigner/RoofDesignerMain.qml"
                 }
                 Button{

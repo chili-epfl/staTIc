@@ -1,4 +1,5 @@
 import QtQuick 2.7
+import QtQuick.Controls 2.3 as QQ2
 import QtQuick.Window 2.2
 import QtMultimedia 5.6
 import QtQuick.Controls 1.4
@@ -6,6 +7,7 @@ import ARToolkit 1.0
 import QtQuick.Layouts 1.1
 import IOBoardFile 1.0
 Item {
+    signal pageExit();
     visible: true
     id : root
     anchors.fill: parent
@@ -13,7 +15,10 @@ Item {
     property real scaleX:video_output.contentRect.width/filter.cameraResolution.width
     property real scaleY:video_output.contentRect.height/filter.cameraResolution.height
 
-    property int tag_size_px: 10*Screen.pixelDensity
+    property real tag_size_px: 5*Screen.pixelDensity
+    property real hex_real_dim:90
+    property real tag_real_dim:35
+
     property int col_n: 0
     property real grid_rotation_in_image: 0
 
@@ -27,6 +32,7 @@ Item {
                 target: captureButton
                 text: "Capture"
             }
+
             StateChangeScript{
                 script: {
                     camera.start()
@@ -97,6 +103,7 @@ Item {
         id:background
         fillMode: Image.PreserveAspectCrop
         anchors.fill: parent
+        cache: false
     }
 
     Camera {
@@ -113,6 +120,7 @@ Item {
         captureMode: Camera.CaptureStillImage
 
         imageCapture {
+            resolution: camera.viewfinder.resolution
             onImageSaved: {
                 root.state="previewing"
                 background.source="file://"+path
@@ -189,15 +197,15 @@ Item {
             model: col_n*col_n
             Image{
                 source:"qrc:/ui/UI/BoardDesigner/hex.png"
-                height: (root.height/grid_item.original_root_size.y)*tag_size_px*90/35
+                height: (root.height/grid_item.original_root_size.y)*tag_size_px*hex_real_dim/tag_real_dim
                 mipmap: true
                 fillMode:Image.PreserveAspectFit
 
                 property int model_index:index
                 property int c: Math.floor(model_index/col_n) - Math.floor(col_n/2)
                 property int r: (model_index%col_n) - Math.floor(col_n/2)
-                x:Math.round(c*Math.cos(0.5235987756)*(root.width/grid_item.original_root_size.x)*tag_size_px*90/35- width/2)
-                y:c%2==0? Math.round(-r*(root.height/grid_item.original_root_size.y)*tag_size_px*90/35-height/2) : Math.round((-r-Math.sin(0.5235987756))*(root.height/grid_item.original_root_size.y)*tag_size_px*90/35- height/2)
+                x:Math.round(c*Math.cos(0.5235987756)*(root.width/grid_item.original_root_size.x)*tag_size_px*hex_real_dim/tag_real_dim- width/2)
+                y:c%2==0? Math.round(-r*(root.height/grid_item.original_root_size.y)*tag_size_px*hex_real_dim/tag_real_dim-height/2) : Math.round((-r-Math.sin(0.5235987756))*(root.height/grid_item.original_root_size.y)*tag_size_px*hex_real_dim/tag_real_dim- height/2)
 
                 property int tag_index: -1
                 property string tag_name
@@ -206,8 +214,8 @@ Item {
                 property int current_global_orientation:0
                 property int current_origin_index:(col_n+1)*Math.floor(col_n/2)
 
-                property real world_x: c*Math.cos(0.5235987756)*90
-                property real world_y: c%2==0 ? r*90 : (r+Math.sin(0.5235987756))*90
+                property real world_x: c*Math.cos(0.5235987756)*hex_real_dim
+                property real world_y: c%2==0 ? r*hex_real_dim : (r+Math.sin(0.5235987756))*hex_real_dim
 
                 Connections{
                     target: root
@@ -221,7 +229,7 @@ Item {
                         var dx = global_pos.x - (grid_item.video_output_size.x+0.5*grid_item.scale_factor.x*(filter.detectedMarkers[i]["TLCorner"].x+filter.detectedMarkers[i]["BRCorner"].x))
                         var dy = global_pos.y - (grid_item.video_output_size.y+0.5*grid_item.scale_factor.y*(filter.detectedMarkers[i]["TLCorner"].y+filter.detectedMarkers[i]["BRCorner"].y));
                         var distance=Math.sqrt((dx*dx)+(dy*dy))
-                        if(distance < 10){
+                        if(distance < tag_size_px){
                             if(i==0)
                                 origin=true
                             tag_name=filter.detectedMarkers[i]["id"].substr(4)
@@ -259,11 +267,11 @@ Item {
 
                     var c_origin= Math.floor(origin_id /col_n) - Math.floor(col_n/2)
                     var r_origin= (origin_id % col_n) - Math.floor(col_n/2)
-                    world_x_origin= c_origin*Math.cos(0.5235987756)*90
-                    world_y_origin= c_origin%2==0? r_origin*90: (r_origin+Math.sin(0.5235987756))*90
+                    world_x_origin= c_origin*Math.cos(0.5235987756)*hex_real_dim
+                    world_y_origin= c_origin%2==0? r_origin*hex_real_dim: (r_origin+Math.sin(0.5235987756))*hex_real_dim
 
-                    var pre_rotation_world_x=c*Math.cos(0.5235987756)*90 - world_x_origin
-                    var pre_rotation_world_y= c%2==0? 90*r - world_y_origin: 90*(r+Math.sin(0.5235987756)) - world_y_origin
+                    var pre_rotation_world_x=c*Math.cos(0.5235987756)*hex_real_dim - world_x_origin
+                    var pre_rotation_world_y= c%2==0? hex_real_dim*r - world_y_origin: hex_real_dim*(r+Math.sin(0.5235987756)) - world_y_origin
 
                     var current_global_orientation_rad=Math.PI*current_global_orientation/180
 
@@ -322,6 +330,42 @@ Item {
         height: Screen.pixelDensity*10
         color:"#2f3439"
         anchors.bottom: parent.bottom
+        QQ2.Label{
+            visible: root.state=="capturing"
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.margins: 10
+            anchors.bottom: parent.top
+            text: "Light Condition"
+            font.bold: true
+            color:"#F0F0F0"
+            QQ2.Slider{
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottom: parent.top
+                anchors.margins: 10
+                value: filter.labelingThreshold
+                onValueChanged: filter.labelingThreshold=value
+                from: 30
+                to: 220
+                stepSize: 5
+
+                QQ2.Label{
+                    id:label_sun
+                    text:"\u263C"
+                    anchors.bottom:parent.top
+                    font.bold: true
+                    color:"#F0F0F0"
+                    anchors.margins: 5
+                }
+                QQ2.Label{
+                    text:"\u2600"
+                    anchors.bottom:parent.top
+                    anchors.right: parent.right
+                    font.bold: true
+                    color:"#F0F0F0"
+                    anchors.margins: 5
+                }
+            }
+        }
         Slider{
             id:slider_alpha
             visible: root.state=="editing"
@@ -344,6 +388,13 @@ Item {
                 anchors.horizontalCenter: parent.horizontalCenter
             }
         }
+        Text{
+            anchors.centerIn: parent
+            color: "red"
+            text:"Keep device parallel to the board"
+            font.bold: true
+            visible: root.state=="capturing"
+        }
         Row{
             anchors.right: parent.right
             anchors.verticalCenter: parent.verticalCenter
@@ -352,13 +403,15 @@ Item {
             Button{
                 id : captureButton
                 text : "Capture Frame"
-                property string filename: "save.jpg"
+                property string filename: "board_background.jpg"
                 onClicked: {
                     if(root.state=="capturing"){
                         camera.imageCapture.captureToLocation(filename)
                     }
-                    else if(root.state=="previewing")
+                    else if(root.state=="previewing"){
+                        background.source=""
                         root.state="capturing"
+                    }
                 }
             }
             Button{
@@ -398,6 +451,7 @@ Item {
                     ioBoardFile.tags_configuration=conf;
                     if(ioBoardFile.writeFile()){
                         text="Save"
+                        pageExit()
                     }
                     else{
                         text="Save(*)"

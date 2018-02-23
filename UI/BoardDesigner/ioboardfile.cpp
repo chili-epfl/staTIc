@@ -77,14 +77,26 @@ bool IOBoardFile::writeFile()
     QString mac;
     for(ushort interfaceID=0;interfaceID<netInterfaces.size();interfaceID++){
         mac=netInterfaces[interfaceID].hardwareAddress();
-        if(mac!="00:00:00:00:00:00")
+        if(!mac.isEmpty() && mac!="00:00:00:00:00:00" && mac!="02:00:00:00:00:00")
             break;
+        else{
+            QFile macFile("/sys/class/net/"+netInterfaces[interfaceID].name()+"/address");
+            if (macFile.open(QFile::ReadOnly)){
+                QTextStream textStream(&macFile);
+                mac= QString(textStream.readLine());
+                macFile.close();
+                if(!mac.isEmpty()&&mac!="00:00:00:00:00:00" && mac!="02:00:00:00:00:00")
+                    break;
+            }
+        }
     }
-    if(mac=="00:00:00:00:00:00")
-        return false;
+    if(mac.isEmpty() || mac=="00:00:00:00:00:00" || mac!="02:00:00:00:00:00"){
+        qsrand(QDateTime::currentMSecsSinceEpoch());
+        mac="AAAAAA"+mac.setNum(qrand()%5000000,16);
+    }
+
     mac.remove(':');
     QString filename=boardsPath+mac+"board_conf_"+ QDateTime::currentDateTime().toString("dMyy_Hms")+".data";
-
 
     QFile file(filename);
     QTextStream outputstream;

@@ -123,6 +123,7 @@ Rectangle {
         id:loader
         clip: true
         anchors.centerIn: parent
+        property bool valid: item !== null
         //height: Qt.platform.os=="android" ? parent.height : 480*width/640
         //width: Qt.platform.os=="android" ? parent.width : (480*parent.width/640<=parent.height)? parent.width : parent.height*640/480
         anchors.fill: parent
@@ -130,6 +131,15 @@ Rectangle {
         onLoaded: if(source=="qrc:/ui/UI/BoardDesigner/OpenBoard.qml"){
                     item.file_path=folderModel.get(file_view.currentIndex,"fileName");
                   }
+
+    }
+
+    Connections {
+        ignoreUnknownSignals: true
+        target: loader.valid ? loader.item : null
+        onPageExit: {
+            loader.source=""
+        }
     }
 
     IOBoardFile{
