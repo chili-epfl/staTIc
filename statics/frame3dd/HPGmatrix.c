@@ -164,7 +164,8 @@ void lu_dcmp (
 
 	    for (k=1; k <= n; k++) {
 		if ( 0.0 == (pivot = A[k][k]) ) {
-		    fprintf(stderr," lu_dcmp: zero found on the diagonal\n");
+            //NO NEED TO HANDLE THIS. UNUSED FUNCTION
+            fprintf(stderr," lu_dcmp: zero found on the diagonal\n");
 		    fprintf(stderr," A[%d][%d] = %11.4e\n", k, k, A[k][k] );
 		    *pd = 0;
 		    return;
@@ -246,6 +247,7 @@ void ldl_dcmp (
 
 	    	for (i=m; i < j; i++)	A[j][i] /= d[i];
 		if ( d[j] == 0.0 ) {
+            //ERRORS IN THIS BLOCK ARE EVALUATED THROUGH THE OK VARIABLE
 		    fprintf(stderr," ldl_dcmp(): zero found on diagonal ...\n");
 		    fprintf(stderr," d[%d] = %11.4e\n", j, d[j] );
 		    return;
@@ -402,6 +404,7 @@ void ldl_dcmp_pm (
         for (i=m; i < j; i++) if ( q[i] ) A[j][i] /= d[i];
 
 		if ( d[j] == 0.0 ) {
+            //ERRORS IN THIS BLOCK ARE EVALUATED THROUGH THE OK VARIABLE
 		 fprintf(stderr," ldl_dcmp_pm(): zero found on diagonal ...\n");
 		 fprintf(stderr," d[%d] = %11.4e\n", j, d[j] );
 		 return;
@@ -590,6 +593,7 @@ void pseudo_inv(
 	AtA  = dmatrix(1,n,1,n);
 	AtAi = dmatrix(1,n,1,n);
 
+    //NO NEED TO HANDLE THIS ERROR
 	if (beta>1) fprintf(stderr," pseudo_inv: warning beta = %lf\n", beta);
 
 	for (i=1; i<=n; i++) {
@@ -710,6 +714,7 @@ void invAB( double **A, double **B, int n, int m, double **AiB, int *ok, int ver
 
 	ldl_dcmp( A, n, diag, b, x, 1, 0, ok );	 /*   L D L'  decomp */
 	if ( *ok < 0 ) {
+        //NO NEED TO HANDLE. UNREACHED CODE
 		fprintf(stderr," Make sure that all six");
 		fprintf(stderr," rigid body translations are restrained!\n");
 	}

@@ -211,7 +211,8 @@ void elastic_K(
 						|| fabs(k[j][i]/k[i][i]) > 1e-6
 					)
 				){
-					fprintf(stderr,"elastic_K: element stiffness matrix not symetric ...\n" ); 
+                    //todo
+                    fprintf(stderr,"elastic_K: element stiffness matrix not symetric ...\n" );
 					fprintf(stderr," ... k[%d][%d] = %15.6e \n",i,j,k[i][j] ); 
 					fprintf(stderr," ... k[%d][%d] = %15.6e   ",j,i,k[j][i] ); 
 					fprintf(stderr," ... relative error = %e \n",  fabs(k[i][j]/k[j][i]-1.0) ); 
@@ -301,7 +302,8 @@ void geometric_K(
 						|| fabs(kg[j][i]/kg[i][i]) > 1e-6
 					)
 				){
-					fprintf(stderr,"geometric_K element stiffness matrix not symetric ...\n" ); 
+                    //TODO
+                    fprintf(stderr,"geometric_K element stiffness matrix not symetric ...\n" );
 					fprintf(stderr," ... kg[%d][%d] = %15.6e \n",i,j,kg[i][j] ); 
 					fprintf(stderr," ... kg[%d][%d] = %15.6e   ",j,i,kg[j][i] ); 
 					fprintf(stderr," ... relative error = %e \n",  fabs(kg[i][j]/kg[j][i]-1.0) ); 
@@ -366,6 +368,7 @@ void solve_system(
 	/*  vectors F and D are unchanged */
 	ldl_dcmp_pm ( K, DoF, diag, F, D, R, q,r, 1, 0, ok );
 	if ( *ok < 0 ) {
+        //TODO
 	 	fprintf(stderr," Make sure that all six");
 		fprintf(stderr," rigid body translations are restrained!\n");
 		/* exit(31); */
@@ -450,7 +453,7 @@ void element_end_forces(
 
 		if ( fabs(axial_strain > 0.001) )
 		 fprintf(stderr," Warning! Frame element %2d has an average axial strain of %8.6f\n", m, axial_strain ); 
-
+         //TODO: inside beam delta/L
 	}
 
 	free_dvector(s,1,12);
@@ -739,7 +742,8 @@ void assemble_M(
 
 	for (i=1; i<= DoF; i++) {
 		if ( M[i][i] <= 0.0 ) {
-			fprintf(stderr,"  error: Non pos-def mass matrix\n");
+            //UNREACHED CODE
+            fprintf(stderr,"  error: Non pos-def mass matrix\n");
 			fprintf(stderr,"  M[%d][%d] = %lf\n", i,i, M[i][i] );
 		}
 	}
@@ -854,7 +858,8 @@ void consistent_M(
 						|| fabs(m[j][i]/m[i][i]) > 1e-6
 					)
 				){
-					fprintf(stderr,"consistent_M: element mass matrix not symetric ...\n" ); 
+                    //UNREACHED CODE
+                    fprintf(stderr,"consistent_M: element mass matrix not symetric ...\n" );
 					fprintf(stderr," ... m[%d][%d] = %15.6e \n",i,j,m[i][j] ); 
 					fprintf(stderr," ... m[%d][%d] = %15.6e   ",j,i,m[j][i] ); 
 					fprintf(stderr," ... relative error = %e \n",  fabs(m[i][j]/m[j][i]-1.0) ); 

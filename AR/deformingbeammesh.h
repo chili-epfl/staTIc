@@ -4,6 +4,11 @@
 #include <Qt3DRender>
 #include <QVector4D>
 
+/*
+    The class defined the mesh used to display deformations of beams.
+*/
+
+
 class DeformingBeamMesh: public Qt3DRender::QGeometryRenderer
 {
     Q_OBJECT

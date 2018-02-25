@@ -1,44 +1,107 @@
-# staTIc
-Tangible user interface for teaching statics
 
-##Desktop: Build Qt 5 with QT3d
+# StaticAR
+## StaticAR is an AR environment to explore statics and structural behavior analysis in a qualitative way. 
+[Video](https://www.youtube.com/watch?v=Zm1e330Gxwg)
 
-Install first Assimp.
+## Linux build
+
+ - Download and install Qt 5.10
+ - Download and configure [ARToolkit v5.3.2] (http://archive.artoolkit.org/dist/artoolkit5/5.3/ARToolKit5-bin-5.3.2r1-Linux-x86_64.tar.gz?_ga=2.20558395.229525913.1519569101-2018573868.1518172122)
+ - Set ARToolkit paths in the .pro file
+ - (Optional) Build solvespace (3rdparty folder) for your system and change the path in the .pro file 
+
+## Android build
+
+ - Download and install Qt 5.10
+ - Set it up for Android Development (Android NDK >r13b, Andriod SDK)
+ - Download and configure [ARToolkit v5.3.2] (http://archive.artoolkit.org/dist/artoolkit5/5.3/ARToolKit5-bin-5.3.2-Android.zip?_ga=2.121738504.229525913.1519569101-2018573868.1518172122)
+ - Set ARToolkit paths in the .pro file
+ - (Optional) Build solvespace (3rdparty folder) for your system and change the path in the .pro file. We recommend to compile it as a static lib.
+
+## Configuration Files
+The resources used in StaticAR are :
+ - Structures
+ - Loads 
+ - Materials
+ - AR boards
 
 
-##Android: Build Qt 5 with QT3d
+Structures are defined by .json files describing the nodes and beams plus other properties. 2D structures can be drawn and edited within StaticAR. 3D structures must be written as json files. The coordinate system is opengl like
+```json
+{
+    "background_picture": "full-roof.jpg", <- background image
+    "constraints": [ <- Constrains are created when drawing structures within StaticAR 
+    ],
+    "lines": {
+        "0": {<- Beam Id
+            "height": 40, <- mm
+            "materialID": "default", <- Must match a material unique id otherwise staticAR set it to default. 
+            "name": "AB",
+            "p1": "0", <- The ids of the extremes must be defined as keys of the points objects 
+            "p2": "1",
+            "width": 60 <- mm
+        }
+    },
+    "origin_id": "0", <- Id of the origin point. Used  when drawing the structures
+    "points": {
+        "0": {
+            "name": "A",
+            "reac_x": true, <- Constraints on x,y,z, rot x, rot y, rot z
+            "reac_xx": false,
+            "reac_y": true,
+            "reac_yy": false,
+            "reac_z": true,
+            "reac_zz": false,
+            "x": 0, <- Point position (mm)
+            "y": 0,
+            "z": 0
+        }
+    },
+    "poseOffsetEulerAngles": [ <- rotation offset to be applied in the AR (degrees). 
+        0,
+        0,
+        0
+    ],
+    "poseOffsetTranslation": [ <- translation offset to be applied in the AR (real world mm, the actual AR translation is 		                          poseOffsetTranslation* scaleFactorPhysical)
+        0,
+        300,
+        0
+    ],
+    "scaleFactorPhysical": 0.1 <- AR scale factor to pass from real world mm to AR mm. Ex. 1000mm in the augmentation is 100mm
+}
+``` 
 
-#How to install Assimp.
+Loads are defined by text files (.asset) describing the weight, the extension of the weight and the 3D assets to render them.
 
-It is required :
+```
+thumbnail:jacuzzi.jpg 
+main_asset_url:jacuzzi.obj
+main_asset_diffuse_map_url:layout.png
+weight:2000 <-Kg
+extent:-500,500 <- real world mm
+```
+Materials are specified via text (.material) file that can be created and edited within the application.
 
-* Android NDK 10d
-* Android SDK
-* android.toolchain.cmake file from Opencv project
+```
+UniqueID:bjjfdgfcxjkdxjqwlk;
+Name:Conifers(C18);
+Density:0.380; <-  g/cm3
+Price:1;
+Young:9000; <- Young's Modulus MPa
+G:560; <- Shear Modulus MPa
+fc0:18; <-Compression parallel to grain N/mm2
+fc90:2.2;<-Compression perpendicular to grain N/mm2
+ft0:11;<-Tension parallel to grain N/mm2
+ft90:0.4;<-Tension perpendicular to grain N/mm2
+fmk:18; <-Bending N/mm2
+fvk:3.4;<-Shear N/mm2
+TextureImage:texture.png;
+```
 
-Before you compile it, you have to be sure that the shared libraries of Assimp will not have any version number. 
-In fact, Android doesn't support library versioning.
-What I suggest is to modify the CMakeList.txt and add the option:
+AR boards are text files describing the arrangement of the fiducial markers on the hexagonal grid. They can be created and edited in StaticAR. The format follows the ARToolkit multimarker format. 
 
-    OPTION(NO_VERSION "remove the version form shared libraries" OFF)
+For the file formats have a look at the ./Resources dir. 
 
-Then for each CMakeList.txt in the subdirs of src/ add a IF:
-Example: In code/CMakeList.txt 
 
-IF(NOT NO_VERSION)
-SET_TARGET_PROPERTIES( assimp PROPERTIES
-	VERSION ${ASSIMP_VERSION}
-	SOVERSION ${ASSIMP_SOVERSION} # use full version 
-    OUTPUT_NAME assimp${ASSIMP_LIBRARY_SUFFIX}
-)
-ENDIF(NOT NO_VERSION)
+ 
 
-Then in assimp directory:
-* mkdir build-android and cd build-android 
-* ccmake .. -DANDROID_NDK=[NDK dir] -DCMAKE_TOOLCHAIN_FILE=[android.toolchain.cmake] -DANDROID_TOOLCHAIN_NAME=[TOOLChain name] -DANDROID_NDK_LAYOUT=RELEASE -DANDROID_ABI=[Your ABI]
-* Enable BUILD_SHARED_LIBS, NO_VERSION=true. Check also your install directory.
-* make and make install 
-
-It's important to install the library in the ndk folder, otherwise when compiling qt5 the library is not detected.
-
-When using assimp in your application, don't forget to add the lib in the .pro file as additional ANDROID_EXTRA_LIBS

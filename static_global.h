@@ -3,7 +3,7 @@
 #include <QString>
 
 #if ANDROID
-const QString extstr=QString(getenv("EXTERNAL_STORAGE"))+"/staTIc/";
+const QString extstr=QString(getenv("EXTERNAL_STORAGE"))+"/StaticAR/";
 const QString materialsPath(extstr+"Resources/Materials/");
 const QString assets3DPath(extstr+"Resources/Assets3D/");
 const QString scenariosPath(extstr+"Resources/Scenarios/");

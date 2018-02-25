@@ -3,6 +3,7 @@ TEMPLATE = app
 QT += qml quick widgets 3dcore 3drender 3dinput 3dextras multimedia network concurrent
 CONFIG += c++11 concurrent
 
+#If you compiled solvespace, plase fix the path
 INCLUDEPATH += $$_PRO_FILE_PWD_/3rdparty/
 
 SOURCES += main.cpp \
@@ -72,11 +73,13 @@ include(deployment.pri)
 LIBS +=  -lslvs
 
 android {
-    #INCLUDEPATH += $(ANDROID_STANDALONE_TOOLCHAIN)/sysroot/usr/include
+    #Set the path for ARToolkit
     LIBS += -L/home/chili/ARToolKit5-bin-5.3.2-Android/android/libs/armeabi-v7a
+
+    #If you compiled solvespace, plase fix the path
     LIBS+= -L$$_PRO_FILE_PWD_/3rdparty/solvespace/build-android-static/src
 
-
+    #Set the path for ARToolkit. If you compiled solvespace as shared library, add the libslsv.so file here
     ANDROID_EXTRA_LIBS = \
         /home/chili/ARToolKit5-bin-5.3.2-Android/android/libs/armeabi-v7a/libc++_shared.so\
         /home/chili/ARToolKit5-bin-5.3.2-Android/android/libs/armeabi-v7a/libARWrapper.so
@@ -87,10 +90,11 @@ android {
         android.hardware.camera
 }
 !android{
+    #Set the path for ARToolkit
     LIBS += -L/home/chili/ARToolKit5-bin-5.3.2r1-Linux-x86_64/lib
     LIBS+= -lAR -lARICP -lARMulti -lAR2
+    #If you compiled solvespace, plase fix the path
     LIBS+= -L$$_PRO_FILE_PWD_/3rdparty/solvespace/build-unix/src
-
 }
 
 DISTFILES += \

@@ -581,7 +581,8 @@ int sturm(
 	 fprintf(stdout,"  There are %d modes below %f Hz.", -ok, sqrt(ws)/(2.0*PI) );
 
 	if ( -ok > modes ) {
-		fprintf(stderr," ... %d modes were not found.\n", -ok-modes );
+        //UNREACHED CODE
+        fprintf(stderr," ... %d modes were not found.\n", -ok-modes );
 		fprintf(stderr," Try increasing the number of modes in \n");
 		fprintf(stderr," order to get the missing modes below %f Hz.\n",
 							sqrt(ws)/(2.0*PI) );
@@ -602,6 +603,7 @@ CHECK_NON_NEGATIVE -  checks that a value is non-negative
 void check_non_negative( double x, int i)
 {
 	if ( x <= 1.0e-100 )  {
+        //UNREACHED CODE
 		fprintf(stderr," value %e is less than or equal to zero ", x );
 		fprintf(stderr," i = %d \n", i );
 	} else {
