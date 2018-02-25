@@ -6,7 +6,7 @@
 ## Linux build
 
  - Download and install Qt 5.10
- - Download and configure [ARToolkit v5.3.2] (http://archive.artoolkit.org/dist/artoolkit5/5.3/ARToolKit5-bin-5.3.2r1-Linux-x86_64.tar.gz?_ga=2.20558395.229525913.1519569101-2018573868.1518172122)
+ - Download and configure [ARToolkit v5.3.2](http://archive.artoolkit.org/dist/artoolkit5/5.3/ARToolKit5-bin-5.3.2r1-Linux-x86_64.tar.gz?_ga=2.20558395.229525913.1519569101-2018573868.1518172122)
  - Set ARToolkit paths in the .pro file
  - (Optional) Build solvespace (3rdparty folder) for your system and change the path in the .pro file 
 
@@ -14,7 +14,7 @@
 
  - Download and install Qt 5.10
  - Set it up for Android Development (Android NDK >r13b, Andriod SDK)
- - Download and configure [ARToolkit v5.3.2] (http://archive.artoolkit.org/dist/artoolkit5/5.3/ARToolKit5-bin-5.3.2-Android.zip?_ga=2.121738504.229525913.1519569101-2018573868.1518172122)
+ - Download and configure [ARToolkit v5.3.2](http://archive.artoolkit.org/dist/artoolkit5/5.3/ARToolKit5-bin-5.3.2-Android.zip?_ga=2.121738504.229525913.1519569101-2018573868.1518172122)
  - Set ARToolkit paths in the .pro file
  - (Optional) Build solvespace (3rdparty folder) for your system and change the path in the .pro file. We recommend to compile it as a static lib.
 
@@ -27,7 +27,7 @@ The resources used in StaticAR are :
 
 
 Structures are defined by .json files describing the nodes and beams plus other properties. 2D structures can be drawn and edited within StaticAR. 3D structures must be written as json files. The coordinate system is opengl like
-```json
+```
 {
     "background_picture": "full-roof.jpg", <- background image
     "constraints": [ <- Constrains are created when drawing structures within StaticAR 
