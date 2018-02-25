@@ -7,6 +7,7 @@
 
  - Download and install Qt 5.10
  - Download and configure [ARToolkit v5.3.2](http://archive.artoolkit.org/dist/artoolkit5/5.3/ARToolKit5-bin-5.3.2r1-Linux-x86_64.tar.gz?_ga=2.20558395.229525913.1519569101-2018573868.1518172122)
+ - Download and install [qml-ARToolkit](https://github.com/chili-epfl/qml-ARToolkit) 
  - Set ARToolkit paths in the .pro file
  - (Optional) Build solvespace (3rdparty folder) for your system and change the path in the .pro file 
 
@@ -15,6 +16,7 @@
  - Download and install Qt 5.10
  - Set it up for Android Development (Android NDK >r13b, Andriod SDK)
  - Download and configure [ARToolkit v5.3.2](http://archive.artoolkit.org/dist/artoolkit5/5.3/ARToolKit5-bin-5.3.2-Android.zip?_ga=2.121738504.229525913.1519569101-2018573868.1518172122)
+ - Download and install [qml-ARToolkit](https://github.com/chili-epfl/qml-ARToolkit) 
  - Set ARToolkit paths in the .pro file
  - (Optional) Build solvespace (3rdparty folder) for your system and change the path in the .pro file. We recommend to compile it as a static lib.
 
@@ -101,6 +103,31 @@ TextureImage:texture.png;
 AR boards are text files describing the arrangement of the fiducial markers on the hexagonal grid. They can be created and edited in StaticAR. The format follows the ARToolkit multimarker format. 
 
 For the file formats have a look at the ./Resources dir. 
+
+## License and 3rdparty softwares
+StaticAR is free software; you may redistribute it and/or modify it under the terms of the GNU General Public License (GPL) as published by the Free Software Foundation. 
+
+StaticAR uses 
+
+```
+@misc{frame3DD,
+title = {Frame3DD},
+month = {Nov},
+url = {https://nees.org/resources/1504},
+year = {2010},
+author = {Gavin , Henri P}
+}
+
+@misc{solvespace,
+   key = {SolveSpace},
+   organisation = {SolveSpace},
+   title="SOLVESPACE,parametric 2d/3d CAD",
+   howpublished = "\url{http://solvespace.com}",
+   lastchecked = {23.08.2017},
+   year = 2017
+}
+```
+
 
 
  
