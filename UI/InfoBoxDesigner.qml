@@ -1385,6 +1385,51 @@ Rectangle {
                                 }
                             }
                         }
+                        Item{
+                            width: parent.width
+                            height:label_cutoff.implicitHeight+cutoff_threshold.implicitHeight+
+                                   label_plus.implicitHeight+40
+                            QQ2.Label{
+                                id:label_cutoff
+                                anchors.horizontalCenter: parent.horizontalCenter
+                                anchors.margins: 10
+                                text: "Filter Pose"
+                                font.bold: true
+                                color:"#F0F0F0"
+                                QQ2.Slider{
+                                    id:cutoff_threshold
+                                    anchors.horizontalCenter: parent.horizontalCenter
+                                    anchors.top: parent.bottom
+                                    anchors.margins: 10
+                                    value: 15
+                                    focus: true
+                                    from: 1
+                                    to: 30
+                                    stepSize: 1
+                                    Binding {
+                                        target: marker_detector
+                                        property: "filter_cutoff_freq"
+                                        value: cutoff_threshold.value
+                                    }
+                                    QQ2.Label{
+                                        id:label_plus
+                                        text:"-"
+                                        anchors.top:parent.bottom
+                                        font.bold: true
+                                        color:"#F0F0F0"
+                                        anchors.margins: 5
+                                    }
+                                    QQ2.Label{
+                                        text:"+"
+                                        anchors.top:parent.bottom
+                                        anchors.right: parent.right
+                                        font.bold: true
+                                        color:"#F0F0F0"
+                                        anchors.margins: 5
+                                    }
+                                }
+                            }
+                        }
                     }
 
             }
