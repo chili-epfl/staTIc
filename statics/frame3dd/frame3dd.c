@@ -211,13 +211,13 @@ void elastic_K(
 						|| fabs(k[j][i]/k[i][i]) > 1e-6
 					)
 				){
-                    //todo
+                    //Probabily handled later with ok or rms
                     fprintf(stderr,"elastic_K: element stiffness matrix not symetric ...\n" );
 					fprintf(stderr," ... k[%d][%d] = %15.6e \n",i,j,k[i][j] ); 
 					fprintf(stderr," ... k[%d][%d] = %15.6e   ",j,i,k[j][i] ); 
 					fprintf(stderr," ... relative error = %e \n",  fabs(k[i][j]/k[j][i]-1.0) ); 
 					fprintf(stderr," ... element matrix saved in file 'kt'\n");
-					save_dmatrix ( "kt", k, 1,12, 1,12, 0, "w" ); 
+                    //save_dmatrix ( "kt", k, 1,12, 1,12, 0, "w" );
 				}
 
 				k[i][j] = k[j][i] = 0.5 * ( k[i][j] + k[j][i] );
@@ -302,13 +302,13 @@ void geometric_K(
 						|| fabs(kg[j][i]/kg[i][i]) > 1e-6
 					)
 				){
-                    //TODO
+                    //Probabily handled later with ok or rms
                     fprintf(stderr,"geometric_K element stiffness matrix not symetric ...\n" );
 					fprintf(stderr," ... kg[%d][%d] = %15.6e \n",i,j,kg[i][j] ); 
 					fprintf(stderr," ... kg[%d][%d] = %15.6e   ",j,i,kg[j][i] ); 
 					fprintf(stderr," ... relative error = %e \n",  fabs(kg[i][j]/kg[j][i]-1.0) ); 
 					fprintf(stderr," ... element matrix saved in file 'kg'\n");
-					save_dmatrix ( "kg", kg, 1,12, 1,12, 0, "w" ); 
+                    //save_dmatrix ( "kg", kg, 1,12, 1,12, 0, "w" );
 				}
 
 				kg[i][j] = kg[j][i] = 0.5 * ( kg[i][j] + kg[j][i] );
@@ -368,7 +368,7 @@ void solve_system(
 	/*  vectors F and D are unchanged */
 	ldl_dcmp_pm ( K, DoF, diag, F, D, R, q,r, 1, 0, ok );
 	if ( *ok < 0 ) {
-        //TODO
+        //handled in update_statics(...)
 	 	fprintf(stderr," Make sure that all six");
 		fprintf(stderr," rigid body translations are restrained!\n");
 		/* exit(31); */

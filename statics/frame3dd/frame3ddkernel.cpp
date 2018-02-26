@@ -2438,7 +2438,7 @@ void Frame3DDKernel::update_statics(
     double	disp;
     int	i,j,n;
 
-    if ( ok < 0 ) {
+    if ( ok < 0 || err > 1.0e-9 ) {
         setStability(UNSTABLE);
         qDebug("  * The Stiffness Matrix is not positive-definite *\n");
         qDebug("    Check that all six rigid-body translations are restrained\n");
@@ -2917,6 +2917,7 @@ void Frame3DDKernel::setGravity(QVector3D v)
     if(v!=m_gravity){
         m_gravity=v;
         emit gravityChanged();
+        update();
     }
 }
 

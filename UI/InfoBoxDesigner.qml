@@ -122,8 +122,8 @@ Rectangle {
                         border.width: 5
                         visible: catalog_grid.count > 0
                         width: parent.width
-                        //Min between the max allowed and the numeber of objects available
-                        height: Math.min(2*parent.height/3, 10+catalog_grid.cellHeight*Math.ceil(catalog_grid.count/2) )
+                        //Min between the max allowed and the number of objects available
+                        height: Math.min(2*parent.height/3-gravity_modifier.height, 10+catalog_grid.cellHeight*Math.ceil(catalog_grid.count/2) )
                         anchors.margins: 10
                         color:"transparent"
                         radius: 1
@@ -254,12 +254,48 @@ Rectangle {
                                     }
                                 }
                             }
-
+                            Image {
+                                source: "qrc:/icons/Icons/help.png"
+                                fillMode: Image.PreserveAspectFit
+                                width: mm2px(10)
+                                height: width
+                                anchors.right: parent.right
+                                anchors.bottom: parent.bottom
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: suggestion_box.show_message("To add a load, select the load, click on the target beam or joint and press the button \"Apply\".\n To remove a load, click on it and press the button \"Remove\".\n To move a load along a beam, click the load so that several green spheres appear. Click on a sphere to set the load in that position. ");
+                                }
+                            }
 
 
                         }
-
                     }
+                    Rectangle{
+                        id:gravity_modifier
+                        border.color: "#F0F0F0"
+                        color:"transparent"
+                        border.width: 5
+                        width: parent.width
+                        height: gravity_check_box.implicitHeight+30
+                        Rectangle{
+                            color:"#F0F0F0";
+                            anchors.margins: 10
+                            anchors.fill: parent
+                            CheckBox{
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                id:gravity_check_box
+                                text:"Apply Gravity"
+                                checked: false
+                                onCheckedChanged: {
+                                    checked ?
+                                                      staticsModule.gravity=Qt.vector3d(0,-9800,0)
+                                                      :staticsModule.gravity=Qt.vector3d(0,0,0)}
+                                anchors.margins: 10
+                            }
+                        }
+                    }
+
                 }
             }
         }
@@ -551,7 +587,7 @@ Rectangle {
                         anchors.margins: 10
                         color: "transparent"
                         Rectangle{
-                            color:"#2f3439";
+                            color:"#F0F0F0";
                             anchors.margins: 10
                             anchors.fill: parent
                             CheckBox {
@@ -578,6 +614,18 @@ Rectangle {
                                         beam_enable_check.checked = current_item.backend_entity.enabled
                                         //logger.log("infobox_designer_enable_beam",{"beam":current_item.objectName,"enabled": beam_enable_check.checked})
                                     }
+                                }
+                            }
+                            Image {
+                                source: "qrc:/icons/Icons/help.png"
+                                fillMode: Image.PreserveAspectFit
+                                width: mm2px(10)
+                                height: width
+                                anchors.right: parent.right
+                                anchors.bottom: parent.bottom
+                                MouseArea{
+                                    anchors.fill: parent
+                                    onClicked: suggestion_box.show_message("To change the properties of a beam, you have to click on it first and then apply your changes.");
                                 }
                             }
                         }

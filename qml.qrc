@@ -29,6 +29,8 @@
         <file>Icons/next.png</file>
         <file>Icons/apply_all_pressed.png</file>
         <file>Icons/apply_all.png</file>
+        <file>Icons/help_pressed.png</file>
+        <file>Icons/help.png</file>
     </qresource>
     <qresource prefix="/images">
         <file>Images/mainbanner.png</file>
@@ -643,6 +645,7 @@
         <file>UI/BoardDesigner/AR_MATRIX_CODE_4x4_BCH_13_9_3/002.png</file>
         <file>UI/BoardDesigner/AR_MATRIX_CODE_4x4_BCH_13_9_3/001.png</file>
         <file>UI/BoardDesigner/AR_MATRIX_CODE_4x4_BCH_13_9_3/000.png</file>
+        <file>UI/SuggestionBox.qml</file>
     </qresource>
     <qresource prefix="/soundeffects">
         <file>AR/SoundEffects/crash_wood_2.wav</file>

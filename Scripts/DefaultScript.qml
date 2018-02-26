@@ -36,6 +36,8 @@ Item{
     property bool firstInit : true
     property bool stateLock: false
 
+    property alias suggestion_box: suggestion_box
+
 
     QuaternionHelper{
         id:quaternion_helper
@@ -155,7 +157,7 @@ Item{
         }
         onStabilityChanged: {
             if(stability==Frame3DDKernel.UNSTABLE){
-                suggestion_box.show_message("The structure is unstable. Check the supports")
+                suggestion_box.show_alert_message("The analysis cannot be performed. The structure seeems unstable. Check the supports, the beam properties or reduce the loads.")
             }
         }
 //        onUpdated: {
@@ -618,6 +620,12 @@ Item{
         }
     }
 
+
+    SuggestionBox{
+        id:suggestion_box
+
+
+    }
 
 
 

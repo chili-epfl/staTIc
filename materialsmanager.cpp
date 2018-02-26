@@ -22,7 +22,7 @@ void MaterialsManager::init()
     /*Creating default material*/
     Material default_material;
     default_material.set("Conifers(C14)",QUrl("qrc:/images/Images/woodbackground.png"),
-                         20,0.350,7000,440,8,16,14,0.4,2,3);
+                         20,0.350e-9,7000,440,8,16,14,0.4,2,3);
     default_material.uniqueID="default";
     m_materials[default_material.uniqueID]=default_material;
     m_materialsFilePath.append("");
