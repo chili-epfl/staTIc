@@ -87,7 +87,7 @@ Materials are specified via text (.material) file that can be created and edited
 ```
 UniqueID:bjjfdgfcxjkdxjqwlk;
 Name:Conifers(C18);
-Density:0.380; <-  g/cm3
+Density:0.380e-9; <-  tonne/mm^3
 Price:1;
 Young:9000; <- Young's Modulus MPa
 G:560; <- Shear Modulus MPa
