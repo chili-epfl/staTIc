@@ -136,6 +136,21 @@ bool Frame3DDKernel::readStructure(QString path){
     /*Read node data*/
     for(const QString &key : pointsJson.keys()){
         auto point=pointsJson[key].toObject();
+        if(!point["z"].isDouble()){
+            qWarning("Fail to convert coordinate:");
+            setStatus(Status::ERROR);
+            return false;
+        }
+        qreal z=point["z"].toDouble();
+
+        if(!qFuzzyCompare(z,0)){
+            is2d=false;
+        }
+    }
+    m_is2D=is2d;
+
+    for(const QString &key : pointsJson.keys()){
+        auto point=pointsJson[key].toObject();
         if(!point["x"].isDouble()){
             qWarning("Fail to convert coordinate:");
             setStatus(Status::ERROR);
@@ -157,9 +172,6 @@ bool Frame3DDKernel::readStructure(QString path){
         }
         qreal z=point["z"].toDouble();
 
-        if(!qFuzzyCompare(z,0)){
-            is2d=false;
-        }
         if(!point["name"].isString()){
             qWarning("Fail to convert coordinate:");
             setStatus(Status::ERROR);
@@ -294,7 +306,6 @@ bool Frame3DDKernel::readStructure(QString path){
                              poseOffsetEulerAnglesJSON[1].toDouble(),
                              poseOffsetEulerAnglesJSON[2].toDouble()));
 
-    m_is2D=is2d;
     setStatus(Status::LOADED);
     solve();
     emit is2DChanged();
@@ -2640,8 +2651,8 @@ JointPtr Frame3DDKernel::createJoint(QVector3D position, QString name,
                                      bool support_XX,bool support_YY,bool support_ZZ){
 
     JointPtr joint(new Joint(position,name,this));
-    joint->setSupport(support_X,support_Y,support_Z, support_XX,support_YY,support_ZZ);
     m_joints.append(joint);
+    joint->setSupport(support_X,support_Y,support_Z, support_XX,support_YY,support_ZZ);
     connect(joint.data(),SIGNAL(killMe()),this,SLOT(onKillRequest()));
     connect(joint.data(),SIGNAL(supportChanged()),this,SLOT(update()));
     connect(joint.data(),SIGNAL(connectedBeamsChanged()),this,SLOT(update()));//suspicious....
@@ -2649,6 +2660,7 @@ JointPtr Frame3DDKernel::createJoint(QVector3D position, QString name,
         joint->setSceneRoot(m_sceneRoot);
         joint->createQmlEntity();
     }
+
     update();
 
     return joint;

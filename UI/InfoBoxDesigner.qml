@@ -257,7 +257,7 @@ Rectangle {
                             Image {
                                 source: "qrc:/icons/Icons/help.png"
                                 fillMode: Image.PreserveAspectFit
-                                width: mm2px(10)
+                                width: mm2px(5)
                                 height: width
                                 anchors.right: parent.right
                                 anchors.bottom: parent.bottom
@@ -278,7 +278,7 @@ Rectangle {
                         width: parent.width
                         height: gravity_check_box.implicitHeight+30
                         Rectangle{
-                            color:"#F0F0F0";
+                            color:Qt.platform.os!="android"? "#F0F0F0" : "#2f3439";
                             anchors.margins: 10
                             anchors.fill: parent
                             CheckBox{
@@ -587,7 +587,7 @@ Rectangle {
                         anchors.margins: 10
                         color: "transparent"
                         Rectangle{
-                            color:"#F0F0F0";
+                            color:Qt.platform.os!="android"? "#F0F0F0" : "#2f3439";
                             anchors.margins: 10
                             anchors.fill: parent
                             CheckBox {
@@ -619,7 +619,7 @@ Rectangle {
                             Image {
                                 source: "qrc:/icons/Icons/help.png"
                                 fillMode: Image.PreserveAspectFit
-                                width: mm2px(10)
+                                width: mm2px(5)
                                 height: width
                                 anchors.right: parent.right
                                 anchors.bottom: parent.bottom
@@ -1012,7 +1012,6 @@ Rectangle {
         Tab{
             id:poseOffsetTab
             title: "Adjust AR"
-            focus: true
             Rectangle{
                 id:ar_settings_box
                 border.color: "#F0F0F0"
@@ -1021,6 +1020,7 @@ Rectangle {
                 anchors.fill: parent
                 anchors.margins: 10
                 property vector3d translation:sceneRoot.translation
+
                 Binding{
                     target: sceneRoot
                     property: "translation"
@@ -1036,6 +1036,7 @@ Rectangle {
                     anchors.fill: parent
                     anchors.margins: 10
                     clip: true
+                    focus:false
                     contentWidth: parent.width
                     contentHeight: ar_setting_column.implicitHeight
                     flickableDirection: Flickable.VerticalFlick
@@ -1043,6 +1044,7 @@ Rectangle {
                         id:ar_setting_column
                         width: parent.width-20
                         spacing: mm2px(5)
+                        focus:false
                         Item{
                             width: parent.width
                             height:Math.max(label_spinbox_x.implicitHeight,spinbox_x.implicitHeight)
@@ -1268,7 +1270,6 @@ Rectangle {
                                 from: -1800
                                 to: 1800
                                 stepSize: 1
-
                                 property int decimals: 1
                                 property real realValue: value / 10
 
@@ -1289,8 +1290,6 @@ Rectangle {
                                     return Number.fromLocaleString(locale, text) * 10
                                 }
                                 editable: true
-
-
                             }
                         }
                         Item{
@@ -1358,11 +1357,10 @@ Rectangle {
                                     anchors.top: parent.bottom
                                     anchors.margins: 10
                                     value: 150
-
+                                    focus: true
                                     from: 30
                                     to: 220
                                     stepSize: 5
-
                                     Binding {
                                         target: marker_detector
                                         property: "labelingThreshold"
@@ -1390,6 +1388,7 @@ Rectangle {
                     }
 
             }
+
             }
 
         }

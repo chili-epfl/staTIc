@@ -72,7 +72,7 @@ Rectangle{
         anchors.centerIn: parent
         color: "white"
         text:""
-        width: parent.width
+        width: parent.width-20
         font.pointSize: 14
         fontSizeMode: Text.Fit;
         minimumPointSize: 12
