@@ -227,12 +227,18 @@ Rectangle {
                                     anchors.fill: parent
                                     onClicked:{
                                         if(current_item.type=="beam"){
-                                            if(warehouse3d.get(catalog_grid.currentIndex,"type")!="uniform"){
-                                                //logger.log("infobox_designer_add_load",{"beam":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight")})
-                                                staticsModule.createTPZLoad(current_item.backend_entity,{"parent_entity":current_item,"warehouse_index":catalog_grid.currentIndex})
-                                            }else{
+
+                                            if(warehouse3d.get(catalog_grid.currentIndex,"type")=="uniform"){
                                                 //logger.log("infobox_designer_add_load",{"beam":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight"),"type":"uniform"})
                                                 staticsModule.createUDLoad(current_item.backend_entity,{"parent_entity":current_item,"warehouse_index":catalog_grid.currentIndex})
+                                            }
+                                            else if(warehouse3d.get(catalog_grid.currentIndex,"type")!="uniform"){
+                                                if(warehouse3d.get(catalog_grid.currentIndex,"extent").length()>0){
+                                                    //logger.log("infobox_designer_add_load",{"beam":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight")})
+                                                    staticsModule.createTPZLoad(current_item.backend_entity,{"parent_entity":current_item,"warehouse_index":catalog_grid.currentIndex})
+                                                }
+                                                else
+                                                    suggestion_box.show_alert_message("This load can be applied only on joints")
                                             }
                                         }
 
@@ -241,15 +247,23 @@ Rectangle {
                                                 //logger.log("infobox_designer_add_load",{"joint":current_item.objectName,"load_weight":warehouse3d.get(catalog_grid.currentIndex,"weight")})
                                                 staticsModule.createNodeLoad(current_item.backend_entity,{"parent_entity":current_item,"warehouse_index":catalog_grid.currentIndex})
                                             }
+                                            else
+                                                suggestion_box.show_alert_message("Uniformally distributed loads can be applied only on beams")
+
                                         }
                                         else if(current_item.type=="trapezoidalForceTangible"){
-                                            current_item.weight=warehouse3d.get(catalog_grid.currentIndex,"weight")
-                                            current_item.extent=warehouse3d.get(catalog_grid.currentIndex,"extent")
-                                            current_item.asset3DMeshURL=warehouse3d.get(catalog_grid.currentIndex,"main_asset_url")
-                                            current_item.asset3DTextureURL=warehouse3d.get(catalog_grid.currentIndex,"main_asset_diffuse_map_url")
+                                            if(warehouse3d.get(catalog_grid.currentIndex,"extent").length()>0){
+                                                current_item.weight=warehouse3d.get(catalog_grid.currentIndex,"weight")
+                                                current_item.extent=warehouse3d.get(catalog_grid.currentIndex,"extent")
+                                                current_item.asset3DMeshURL=warehouse3d.get(catalog_grid.currentIndex,"main_asset_url")
+                                                current_item.asset3DTextureURL=warehouse3d.get(catalog_grid.currentIndex,"main_asset_diffuse_map_url")
+                                            }
+                                            else{
+                                                suggestion_box.show_alert_message("This load can be applied only on joints")
+                                            }
                                         }
                                         else{
-                                            suggestion_box.show_message("You need to select a beam first")
+                                            suggestion_box.show_alert_message("You need to select a beam first")
                                         }
                                     }
                                 }
@@ -289,8 +303,8 @@ Rectangle {
                                 checked: false
                                 onCheckedChanged: {
                                     checked ?
-                                                      staticsModule.gravity=Qt.vector3d(0,-9800,0)
-                                                      :staticsModule.gravity=Qt.vector3d(0,0,0)}
+                                                staticsModule.gravity=Qt.vector3d(0,-9800,0)
+                                              :staticsModule.gravity=Qt.vector3d(0,0,0)}
                                 anchors.margins: 10
                             }
                         }
@@ -1072,10 +1086,10 @@ Rectangle {
                                 value: ar_settings_box.translation.x
                                 onValueChanged: ar_settings_box.translation.x=value;
 
-//                                validator: IntValidator {
-//                                    bottom: Math.min(parent.from, parent.to)
-//                                    top:  Math.max(parent.from, parent.to)
-//                                }
+                                //                                validator: IntValidator {
+                                //                                    bottom: Math.min(parent.from, parent.to)
+                                //                                    top:  Math.max(parent.from, parent.to)
+                                //                                }
                                 editable: true
 
                             }
@@ -1102,10 +1116,10 @@ Rectangle {
                                 anchors.margins: 10
                                 from:-1000
                                 to:1000
-//                                validator: IntValidator {
-//                                    bottom: Math.min(parent.from, parent.to)
-//                                    top:  Math.max(parent.from, parent.to)
-//                                }
+                                //                                validator: IntValidator {
+                                //                                    bottom: Math.min(parent.from, parent.to)
+                                //                                    top:  Math.max(parent.from, parent.to)
+                                //                                }
                                 editable: true
                                 value: ar_settings_box.translation.y
                                 onValueChanged: ar_settings_box.translation.y=value;
@@ -1135,10 +1149,10 @@ Rectangle {
                                 anchors.margins: 10
                                 from:-1000
                                 to:1000
-//                                validator: IntValidator {
-//                                    bottom: Math.min(parent.from, parent.to)
-//                                    top:  Math.max(parent.from, parent.to)
-//                                }
+                                //                                validator: IntValidator {
+                                //                                    bottom: Math.min(parent.from, parent.to)
+                                //                                    top:  Math.max(parent.from, parent.to)
+                                //                                }
                                 editable: true
                                 value: ar_settings_box.translation.z
                                 onValueChanged: ar_settings_box.translation.z=value;
@@ -1432,7 +1446,7 @@ Rectangle {
                         }
                     }
 
-            }
+                }
 
             }
 

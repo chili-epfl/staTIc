@@ -620,7 +620,6 @@ Item{
         }
     }
 
-
     SuggestionBox{
         id:suggestion_box
 

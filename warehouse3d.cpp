@@ -38,6 +38,8 @@ Warehouse3D::Warehouse3D(QObject *parent): QAbstractListModel(parent)
         Object obj;
         if(it.fileInfo().isDir() && it.fileName()!="." && it.fileName()!=".." ){
             obj.name=it.fileName();
+            bool isValid=true;
+            //Enter the dir
             QDirIterator it2(it.fileInfo().canonicalFilePath());
             while(it2.hasNext()){
                 it2.next();
@@ -66,28 +68,53 @@ Warehouse3D::Warehouse3D(QObject *parent): QAbstractListModel(parent)
                             obj.decoration_img=QUrl::fromLocalFile(thumbFile);
                             obj.properties["thumbnail"]=QUrl::fromLocalFile(thumbFile);
                         }
+                        else
+                            isValid=false;
                     }
+                    else
+                        isValid=false;
                     if(obj.properties.contains("main_asset_url")){
                         obj.properties["main_asset_url"]=QUrl::fromLocalFile(it.fileInfo().canonicalFilePath()+
                                                                              "/"+obj.properties["main_asset_url"].toString());
                     }
+                    else
+                        isValid=false;
 
                     if(obj.properties.contains("main_asset_diffuse_map_url")){
                         obj.properties["main_asset_diffuse_map_url"]=QUrl::fromLocalFile(it.fileInfo().canonicalFilePath()+
-                                                                             "/"+obj.properties["main_asset_diffuse_map_url"].toString());
+                                                                                         "/"+obj.properties["main_asset_diffuse_map_url"].toString());
                     }
+                    else
+                        isValid=false;
+
                     if(obj.properties.contains("weight")){
-                        obj.properties["weight"]=obj.properties["weight"].toString().toFloat();
+                        auto weight=obj.properties["weight"].toString().toFloat();
+                        if(weight>0)
+                            obj.properties["weight"]=weight;
+                        else isValid=false;
                     }
+                    else
+                        isValid=false;
+
                     if(obj.properties.contains("extent")){
                         QString stringExtent=obj.properties["extent"].toString();
                         QStringList minmax=stringExtent.split(",");
-                        obj.properties["extent"]=QVector2D(minmax[0].toFloat(),minmax[1].toFloat());
+                        obj.properties["extent"]=QVector2D(qMin(minmax[0].toFloat(),minmax[1].toFloat()),
+                                qMax(minmax[0].toFloat(),minmax[1].toFloat()));
+                    }
+                    else
+                        isValid=false;
+                    if(obj.properties.contains("type")){
+                        QString load_type=obj.properties["type"].toString();
+                        if(load_type.compare("uniform",Qt::CaseInsensitive))
+                            obj.properties["type"]="uniform";
+                        else
+                            obj.properties["type"]="";
                     }
                     break;
                 }
             }
-            if(!obj.name.isEmpty() && !obj.decoration_img.isEmpty())
+            if(!obj.name.isEmpty() && isValid )
                 m_objectsIndexes.append(obj);
         }
     }

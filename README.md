@@ -81,6 +81,7 @@ main_asset_url:jacuzzi.obj
 main_asset_diffuse_map_url:layout.png
 weight:2000 <-Kg
 extent:-500,500 <- real world mm
+type:uniform <- optional, define if the load is uniformally distributed
 ```
 Materials are specified via text (.material) file that can be created and edited within the application.
 
