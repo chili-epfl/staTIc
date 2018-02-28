@@ -28,7 +28,7 @@ The resources used in StaticAR are :
  - AR boards
 
 
-Structures are defined by .json files describing the nodes and beams plus other properties. 2D structures can be drawn and edited within StaticAR. 3D structures must be written as json files. The coordinate system is opengl like
+Structures are defined by .json files describing the nodes and beams plus other properties. 2D structures can be drawn and edited within StaticAR. 3D structures must be written as json files. The coordinate system is opengl like.
 ```
 {
     "background_picture": "full-roof.jpg", <- background image
@@ -101,7 +101,7 @@ fvk:3.4;<-Shear N/mm2
 TextureImage:texture.png;
 ```
 
-AR boards are text files describing the arrangement of the fiducial markers on the hexagonal grid. They can be created and edited in StaticAR. The format follows the ARToolkit multimarker format. 
+AR boards are text files. The format follows the ARToolkit multimarker format. The boards describing an arrangement of the fiducial markers on the hexagonal grid can be created and edited in StaticAR. The package includes two board configurations: an hexagonal one (the one used in the lab) and a paper based one (pdf in resources/boards). 
 
 For the file formats have a look at the ./Resources dir. 
 

@@ -198,9 +198,13 @@ Item {
                 MouseArea{
                     id:start_button
                     anchors.fill: parent
-                    onClicked: if(gridview.currentIndex !=-1){
-                                   scriptLoader.source="qrc:/scripts/Scripts/DefaultScript.qml";
-                               }
+                    onClicked:{ if(gridview.currentIndex !=-1 && board_path!=""){
+                            scriptLoader.source="qrc:/scripts/Scripts/DefaultScript.qml";
+                        }
+                        else if(board_path==""){
+                            main_suggestion_box.show_alert_message("Select a valid board!")
+                        }
+                    }
                 }
             }
         }
@@ -224,6 +228,10 @@ Item {
     BoardSelection{
         id:boardSelection_box
         visible:false
+    }
+
+    SuggestionBox{
+        id:main_suggestion_box
     }
 
 

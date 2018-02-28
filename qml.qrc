@@ -738,5 +738,6 @@
         <file>Resources/Assets3D/girl/preview.png</file>
         <file>Resources/Assets3D/girl/girl.obj</file>
         <file>Resources/Boards/board_configuration.data</file>
+        <file>Resources/Boards/paper_board_configuration.data</file>
     </qresource>
 </RCC>
