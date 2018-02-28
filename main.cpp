@@ -89,8 +89,8 @@ void copyDir(const QDir& dir, QString dest_path){
         copyDir(QDir(dir.canonicalPath()+"/"+entry),dest_path+entry+"/" );
     }
     foreach (QString entry, dir.entryList(QDir::NoDotAndDotDot|QDir::Files)){
-         QFile::copy(dir.canonicalPath()+"/"+entry,dest_path+entry);
-         QFile::setPermissions(dest_path+entry,QFileDevice::ReadOwner|QFileDevice::WriteOwner|
+        QFile::copy(dir.canonicalPath()+"/"+entry,dest_path+entry);
+        QFile::setPermissions(dest_path+entry,QFileDevice::ReadOwner|QFileDevice::WriteOwner|
                                QFileDevice::ReadUser| QFileDevice::WriteUser|
                                QFileDevice::ReadGroup| QFileDevice::WriteGroup|
                                QFileDevice::ReadOther|QFileDevice::WriteOther);

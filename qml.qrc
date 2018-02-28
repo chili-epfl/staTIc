@@ -646,6 +646,7 @@
         <file>UI/BoardDesigner/AR_MATRIX_CODE_4x4_BCH_13_9_3/001.png</file>
         <file>UI/BoardDesigner/AR_MATRIX_CODE_4x4_BCH_13_9_3/000.png</file>
         <file>UI/SuggestionBox.qml</file>
+        <file>UI/MaterialDesigner/assets/No_Image_Available.jpg</file>
     </qresource>
     <qresource prefix="/soundeffects">
         <file>AR/SoundEffects/crash_wood_2.wav</file>

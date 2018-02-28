@@ -4,6 +4,7 @@ import QtQuick.Dialogs 1.2
 import QtQuick.Layouts 1.1
 import QtMultimedia 5.5
 import MaterialsManager 1.0
+import QtQuick.Controls.Styles 1.4
 Rectangle {
 
     signal pageExit();
@@ -119,205 +120,296 @@ Rectangle {
                         Tab{
                             title: "General"
                             anchors.fill: parent
-                            Rectangle{
-                                color:"white"
-                                anchors.fill: parent
-
-                                GridLayout{
-                                    rows: 5
-                                    columns: 2
+                            Item{
+                                id:grid_general_root
+                                Rectangle{
+                                    color:"#F0F0F0"
                                     anchors.fill: parent
+                                    //                                    anchors.left: parent.left
+                                    //                                    anchors.right: parent.right
+                                    //                                    anchors.top:parent.top
                                     anchors.margins: 10
-                                    Label {
-                                        text: "Name"
-                                        color: "#2f3439"
+                                    //                                    height: parent.height
+                                    Flickable{
+                                        width: parent.width
+                                        height: parent.height
+                                        anchors.margins: 10
+                                        clip: true
+                                        focus:false
+                                        contentWidth: parent.width
+                                        contentHeight: grid_general.implicitHeight
+                                        flickableDirection: Flickable.VerticalFlick
+                                        Grid{
+                                            id:grid_general
+                                            //rows: 6
+                                            width: parent.width-20
+                                            rowSpacing: (name_field.implicitHeight*5)<grid_general_root.height ?
+                                                         (grid_general_root.height-name_field.implicitHeight*5)/4
+                                                       : mm2px(5)
+                                            columns: 2
+                                            horizontalItemAlignment: Grid.AlignHCenter
+                                            verticalItemAlignment: Grid.AlignVCenter
+                                            //                                    anchors.fill: parent
+                                            //                                    anchors.margins: 10
 
-                                    }
-                                    TextField {
-                                        id:name_field
-                                        textColor: "#2f3439"
-                                        placeholderText: "Enter Name"
-                                        font.pointSize:12
-                                        text:name
-                                        onTextChanged: name=text;
+                                            Label {
+                                                text: "Name"
+                                                color: "#2f3439"
+                                                width: (parent.width)*0.5
+                                                wrapMode: Text.WordWrap
 
-                                    }
-
-                                    Label {
-                                        text: "Density(g/cm3)"
-                                        color: "#2f3439"
-
-                                    }
-                                    TextField {
-                                        id: density_field
-                                        textColor: "#2f3439"
-                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                        validator: DoubleValidator {bottom: 0.1}
-                                        text: density
-                                        font.pointSize: 12
-                                        onTextChanged: density=text;
-
-                                    }
-
-
-                                    Label {
-                                        text: "Price(Chf)"
-                                        color: "#2f3439"
-
-                                    }
-                                    TextField {
-                                        id: price_field
-                                        textColor: "#2f3439"
-                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                        validator: DoubleValidator {bottom: 0}
-                                        text: price
-                                        font.pointSize: 12
-                                        onTextChanged: price=Number.fromLocaleString(Qt.locale(),text);
-                                    }
+                                            }
+                                            TextField {
+                                                id:name_field
+                                                textColor: "#2f3439"
+                                                placeholderText: "Enter Name"
+                                                font.pointSize:12
+                                                text:name
+                                                onTextChanged: name=text;
+                                                width: (parent.width)*0.5
 
 
-                                    Label {
-                                        text: "Elasticity(N/mm2)"
-                                        color: "#2f3439"
+                                            }
 
-                                    }
-                                    TextField {
-                                        id: young_field
-                                        textColor: "#2f3439"
-                                        validator: DoubleValidator {bottom: 0.1}
-                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                        text: young
-                                        font.pointSize: 12
-                                        onTextChanged: young=text;
+                                            Label {
+                                                text: "Density (tonne/mm3)"
+                                                color: "#2f3439"
+                                                width:(parent.width)*0.5
+                                                wrapMode: Text.WordWrap
 
-                                    }
-                                    Label {
-                                        text: "Shear Modulus(N/mm2)"
-                                        color: "#2f3439"
 
-                                    }
-                                    TextField {
-                                        id: g_field
-                                        textColor: "#2f3439"
-                                        validator: DoubleValidator {bottom: 0.1}
-                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                        text:g
-                                        font.pointSize: 12
-                                        onTextChanged: g=text;
+                                            }
+                                            TextField {
+                                                id: density_field
+                                                textColor: "#2f3439"
+                                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                                validator: DoubleValidator {bottom: 0.1}
+                                                text: density
+                                                font.pointSize: 12
+                                                onTextChanged: density=parseFloat(text,10);
+                                                width:(parent.width)*0.5
 
-                                    }
 
-                                }
+                                            }
+
+
+                                            Label {
+                                                text: "Price (Chf)"
+                                                color: "#2f3439"
+                                                width:(parent.width)*0.5
+                                                wrapMode: Text.WordWrap
+
+
+                                            }
+                                            TextField {
+                                                id: price_field
+                                                textColor: "#2f3439"
+                                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                                validator: DoubleValidator {bottom: 0}
+                                                text: price
+                                                font.pointSize: 12
+                                                onTextChanged: price=Number.fromLocaleString(Qt.locale(),text);
+                                                width:(parent.width)*0.5
+
+                                            }
+
+
+                                            Label {
+                                                text: "Elasticity (N/mm2)"
+                                                color: "#2f3439"
+                                                width:(parent.width)*0.5
+                                                wrapMode: Text.WordWrap
+
+                                            }
+                                            TextField {
+                                                id: young_field
+                                                textColor: "#2f3439"
+                                                validator: DoubleValidator {bottom: 0.1}
+                                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                                text: young
+                                                font.pointSize: 12
+                                                onTextChanged: young=parseFloat(text,10);
+                                                width:(parent.width)*0.5
+
+                                            }
+                                            Label {
+                                                text: "Shear Modulus (N/mm2)"
+                                                color: "#2f3439"
+                                                width:(parent.width)*0.5
+                                                wrapMode: Text.WordWrap
+
+                                            }
+                                            TextField {
+                                                id: g_field
+                                                textColor: "#2f3439"
+                                                validator: DoubleValidator {bottom: 0.1}
+                                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                                text:g
+                                                font.pointSize: 12
+                                                onTextChanged: g=parseFloat(text,10);
+                                                width:(parent.width)*0.5
+
+                                            }
+
+                                        }
+                                    }}
                             }
                         }
 
                         Tab{
                             title: "Resistance"
                             anchors.fill: parent
-                            Rectangle{
-                                color:"white"
-                                anchors.fill: parent
-                                GridLayout{
-                                    rows: 6
-                                    columns: 2
+                            Item{
+                                id:grid_resistance_root
+                                Rectangle{
+                                    color:"#F0F0F0"
                                     anchors.fill: parent
                                     anchors.margins: 10
-                                    Label {
-                                        text: "Fmd(N/mm2)"
-                                        color: "#2f3439"
-                                    }
-                                    TextField {
-                                        id: fmk_field
-                                        textColor: "#2f3439"
-                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                        text: fmk
-                                        font.pointSize: 12
-                                        onTextChanged: fmk=text;
-                                        validator: DoubleValidator {bottom: 0.1}
+                                    Flickable{
+                                        width: parent.width
+                                        height: parent.height
+                                        anchors.margins: 10
+                                        clip: true
+                                        focus:false
+                                        contentWidth: parent.width
+                                        contentHeight: grid_resistance.implicitHeight
+                                        flickableDirection: Flickable.VerticalFlick
+                                        Grid{
+                                            id:grid_resistance
+                                            //rows: 6
+                                            width: parent.width-20
+                                            rowSpacing:(fmk_field.implicitHeight*6)<grid_resistance_root.height ?
+                                                        (grid_resistance_root.height-fmk_field.implicitHeight*6)/5
+                                                      : mm2px(5)
+                                            columns: 2
+                                            horizontalItemAlignment: Grid.AlignHCenter
+                                            verticalItemAlignment: Grid.AlignVCenter
+                                            //                                    anchors.fill: parent
+                                            //                                    anchors.margins: 10
+                                            Label {
+                                                text: "F<sub>md</sub> (N/mm2)"
+                                                color: "#2f3439"
+                                                textFormat: Text.RichText
+                                                width:(parent.width)*0.5
+                                                wrapMode: Text.WordWrap
+                                            }
+                                            TextField {
+                                                id: fmk_field
+                                                width:(parent.width)*0.5
+                                                textColor: "#2f3439"
+                                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                                text: fmk
+                                                font.pointSize: 12
+                                                onTextChanged: fmk=parseFloat(text,10);
+                                                validator: DoubleValidator {bottom: 0.1}
 
 
-                                    }
-                                    Label {
-                                        text: "Fvd(N/mm2)"
-                                        color: "#2f3439"
+                                            }
+                                            Label {
+                                                text: "F<sub>vd</sub> (N/mm2)"
+                                                color: "#2f3439"
+                                                width:(parent.width)*0.5
+                                                wrapMode: Text.WordWrap
+                                                textFormat: Text.RichText
 
-                                    }
-                                    TextField {
-                                        id: fvk_field
-                                        textColor: "#2f3439"
-                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                        text: fvk
-                                        font.pointSize: 12
-                                        onTextChanged: fvk=text;
-                                        validator: DoubleValidator {bottom: 0.1}
-
-
-                                    }
-                                    Label {
-                                        text: "Ft0d(N/mm2)"
-                                        color: "#2f3439"
-                                    }
-                                    TextField {
-                                        id: ft0_field
-                                        textColor: "#2f3439"
-                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                        text: ft0
-
-                                        font.pointSize: 12
-                                        onTextChanged: ft0=text;
-                                        validator: DoubleValidator {bottom: 0.1}
+                                            }
+                                            TextField {
+                                                id: fvk_field
+                                                width:(parent.width)*0.5
+                                                textColor: "#2f3439"
+                                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                                text: fvk
+                                                font.pointSize: 12
+                                                onTextChanged: fvk=parseFloat(text,10);
+                                                validator: DoubleValidator {bottom: 0.1}
 
 
-                                    }
-                                    Label {
-                                        text: "Fc0d(N/mm2)"
-                                        color: "#2f3439"
+                                            }
+                                            Label {
+                                                text: "F<sub>t0d</sub> (N/mm2)"
+                                                color: "#2f3439"
+                                                width:(parent.width)*0.5
+                                                wrapMode: Text.WordWrap
+                                                textFormat: Text.RichText
 
-                                    }
-                                    TextField {
-                                        id: fc0_field
-                                        textColor: "#2f3439"
-                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                        text: fc0
-                                        font.pointSize: 12
-                                        onTextChanged: fc0=text;
-                                        validator: DoubleValidator {bottom: 0.1}
-
-
-                                    }
-
-                                    Label {
-                                        text: "Ft90d(N/mm2)"
-                                        color: "#2f3439"
-
-                                    }
-                                    TextField {
-                                        id: ft90_field
-                                        text: ft90
-                                        textColor: "#2f3439"
-                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                        font.pointSize: 12
-                                        onTextChanged: ft90=text;
-                                        validator: DoubleValidator {bottom: 0.1}
+                                            }
+                                            TextField {
+                                                id: ft0_field
+                                                textColor: "#2f3439"
+                                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                                text: ft0
+                                                font.pointSize: 12
+                                                onTextChanged: ft0=parseFloat(text,10);
+                                                validator: DoubleValidator {bottom: 0.1}
+                                                width:(parent.width)*0.5
 
 
-                                    }
-                                    Label {
-                                        text: "Fc90d(N/mm2)"
-                                        color: "#2f3439"
-                                    }
-                                    TextField {
-                                        id: fc90_field
-                                        textColor: "#2f3439"
-                                        inputMethodHints: Qt.ImhFormattedNumbersOnly
-                                        text: fc90
-                                        font.pointSize: 12
-                                        onTextChanged: fc90=text;
-                                        validator: DoubleValidator {bottom: 0.1}
+                                            }
+                                            Label {
+                                                text: "F<sub>c0d</sub> (N/mm2)"
+                                                color: "#2f3439"
+                                                width:(parent.width)*0.5
+                                                wrapMode: Text.WordWrap
 
-                                    }
+                                                textFormat: Text.RichText
 
-                                }
+                                            }
+                                            TextField {
+                                                id: fc0_field
+                                                textColor: "#2f3439"
+                                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                                text: fc0
+                                                font.pointSize: 12
+                                                onTextChanged: fc0=parseFloat(text,10);
+                                                validator: DoubleValidator {bottom: 0.1}
+                                                width:(parent.width)*0.5
+
+
+                                            }
+
+                                            Label {
+                                                text: "F<sub>t90d</sub> (N/mm2)"
+                                                color: "#2f3439"
+                                                width:(parent.width)*0.5
+                                                wrapMode: Text.WordWrap
+
+                                                textFormat: Text.RichText
+
+                                            }
+                                            TextField {
+                                                id: ft90_field
+                                                text: ft90
+                                                textColor: "#2f3439"
+                                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                                font.pointSize: 12
+                                                onTextChanged: ft90=parseFloat(text,10);
+                                                validator: DoubleValidator {bottom: 0.1}
+                                                width:(parent.width)*0.5
+
+
+                                            }
+                                            Label {
+                                                text: "F<sub>c90d</sub> (N/mm2)"
+                                                color: "#2f3439"
+                                                width:(parent.width)*0.5
+                                                wrapMode: Text.WordWrap
+                                                textFormat: Text.RichText
+
+                                            }
+                                            TextField {
+                                                id: fc90_field
+                                                textColor: "#2f3439"
+                                                inputMethodHints: Qt.ImhFormattedNumbersOnly
+                                                text: fc90
+                                                font.pointSize: 12
+                                                onTextChanged: fc90=parseFloat(text,10);
+                                                validator: DoubleValidator {bottom: 0.1}
+                                                width:(parent.width)*0.5
+
+                                            }
+
+                                        }
+                                    }}
                             }
                         }
 

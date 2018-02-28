@@ -1427,14 +1427,14 @@ Rectangle {
                                     }
                                     QQ2.Label{
                                         id:label_plus
-                                        text:"-"
+                                        text:"+"
                                         anchors.top:parent.bottom
                                         font.bold: true
                                         color:"#F0F0F0"
                                         anchors.margins: 5
                                     }
                                     QQ2.Label{
-                                        text:"+"
+                                        text:"-"
                                         anchors.top:parent.bottom
                                         anchors.right: parent.right
                                         font.bold: true

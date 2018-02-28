@@ -194,6 +194,7 @@ Item{
     Camera{
         id:camDevice
         viewfinder.resolution: "640x480"
+//        viewfinder.onResolutionChanged: console.log(viewfinder.resolution)
 //        Component.onCompleted: {
 //            var preferred_aspect_ratio=Qt.platform.os=="android" ? 1.7:
 //                                                             Math.floor(10*applicationRoot.width/applicationRoot.height)/10

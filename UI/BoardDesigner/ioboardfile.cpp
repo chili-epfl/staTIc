@@ -90,13 +90,13 @@ bool IOBoardFile::writeFile()
             }
         }
     }
-    if(mac.isEmpty() || mac=="00:00:00:00:00:00" || mac!="02:00:00:00:00:00"){
+    if(mac.isEmpty() || mac=="00:00:00:00:00:00" || mac=="02:00:00:00:00:00"){
         qsrand(QDateTime::currentMSecsSinceEpoch());
         mac="AAAAAA"+mac.setNum(qrand()%5000000,16);
     }
 
     mac.remove(':');
-    QString filename=boardsPath+mac+"board_conf_"+ QDateTime::currentDateTime().toString("dMyy_Hms")+".data";
+    QString filename=boardsPath+mac+"board_conf_"+ QDateTime::currentDateTime().toString("dMyy_Hmsz")+".data";
 
     QFile file(filename);
     QTextStream outputstream;

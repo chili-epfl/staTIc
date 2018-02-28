@@ -20,8 +20,8 @@ Item{
         border.color: "#F0F0F0"
         border.width: 10
         color: "transparent"
-        width: parent.width/3
-        height: parent.height/3
+        width: parent.width/2
+        height: parent.height/2
         anchors.centerIn: parent
         anchors.margins: 10
 

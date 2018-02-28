@@ -280,19 +280,19 @@ bool MaterialsManager::createFile(QUrl imageUrl, QString name, QString density, 
                 QTextStream textStream(&macFile);
                 mac= QString(textStream.readLine());
                 macFile.close();
-                if(!mac.isEmpty()&&mac!="00:00:00:00:00:00" && mac!="02:00:00:00:00:00")
+                if(!mac.isEmpty() && mac!="00:00:00:00:00:00" && mac!="02:00:00:00:00:00")
                     break;
             }
         }
     }
-    if(mac.isEmpty() || mac=="00:00:00:00:00:00" || mac!="02:00:00:00:00:00"){
+    if(mac.isEmpty() || mac=="00:00:00:00:00:00" || mac=="02:00:00:00:00:00"){
         qsrand(QDateTime::currentMSecsSinceEpoch());
         mac="AAAAAA"+mac.setNum(qrand()%5000000,16);
     }
 
     mac.remove(':');
 
-    QString uniqueStr=mac+"-"+QDateTime::currentDateTime().toString(QString("dMMMyyhms"));
+    QString uniqueStr=mac+"-"+QDateTime::currentDateTime().toString(QString("dMMMyyhmsz"));
     QString path=materialsPath+"/"+uniqueStr+"/";
     QDir dir;
     if(dir.exists(path)){
@@ -308,11 +308,14 @@ bool MaterialsManager::createFile(QUrl imageUrl, QString name, QString density, 
     file.open(QFile::WriteOnly);
     QImage image(imageUrl.toLocalFile());
 
-    if(file.isOpen() && !image.isNull()){
+    if(image.isNull())
+        image.load(":/ui/UI/MaterialDesigner/assets/No_Image_Available.jpg");
+
+    if(file.isOpen()){
         QTextStream out(&file);
         out<< "UniqueID:"<<uniqueStr<<";\n"
         <<"Name:"<<name<<";\n"
-        <<"Density:"<<density<<"e-9"<<";\n"
+        <<"Density:"<<density<<";\n"
         <<"Price:"<<price<<";\n"
         <<"Young:"<<Young<<";\n"
         <<"G:"<<G<<";\n"
@@ -343,6 +346,8 @@ void MaterialsManager::deleteMaterial(int index){
     if(m_materialsFilePath[index].isEmpty()) return;
 
     if(m_materialsFilePath[index].startsWith(QFileInfo(materialsPath).canonicalFilePath())){
+        QFileInfo info(m_materialsFilePath[index]);
+        QString path=info.canonicalPath();
         QFile::remove(m_materialsFilePath[index]);
         QUrl img_url=m_materials[m_materialsIndex[index]].texture_img;
         if(img_url.isLocalFile()){
@@ -352,6 +357,8 @@ void MaterialsManager::deleteMaterial(int index){
                  QFile::remove(img_path);
             }
         }
+        QDir dir;
+        dir.rmdir(path);
         init();
     }
 
