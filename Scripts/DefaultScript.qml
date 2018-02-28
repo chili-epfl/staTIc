@@ -225,10 +225,12 @@ Item{
         imageProcessing.whiteBalanceMode: CameraImageProcessing.WhiteBalanceAuto
         focus.focusMode: CameraFocus.FocusContinuous
         focus.focusPointMode: CameraFocus.FocusPointAuto
-        captureMode: Camera.CaptureViewfinder
+        captureMode: Camera.CaptureStillImage
         imageCapture {
+            resolution: viewfinder.resolution
             onImageCaptured: {
                 stillImage.source = preview
+                camDevice.stop();
             }
         }
         property bool isRunning: true
@@ -238,7 +240,7 @@ Item{
             }
             else{
                 camDevice.imageCapture.capture();
-                camDevice.stop();
+                //camDevice.stop();
             }
         }
     }
