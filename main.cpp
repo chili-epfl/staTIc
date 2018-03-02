@@ -19,10 +19,14 @@
 #include "UI/RoofDesigner/src/constraints.h"
 #include "UI/RoofDesigner/src/jsonsketch.h"
 #include "UI/BoardDesigner/ioboardfile.h"
+
+
 void copyDir(const QDir&, QString);
+void checkForImportableResources();
 
 int main(int argc, char *argv[])
 {
+
     QApplication app(argc, argv);
 
     if(!QDir(materialsPath).exists()){
@@ -45,6 +49,8 @@ int main(int argc, char *argv[])
         QDir().mkpath(boardsPath);
         copyDir(QDir(":/resources/Resources/Boards/"),boardsPath);
     }
+
+    checkForImportableResources();
 
     QQuickView view;
 
@@ -94,5 +100,19 @@ void copyDir(const QDir& dir, QString dest_path){
                                QFileDevice::ReadUser| QFileDevice::WriteUser|
                                QFileDevice::ReadGroup| QFileDevice::WriteGroup|
                                QFileDevice::ReadOther|QFileDevice::WriteOther);
+    }
+}
+
+void checkForImportableResources(){
+    //Here we should unzip files and place them in the right folders
+    QDirIterator dirIt(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/temp/");
+    qDebug()<<QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/temp/";
+    while(dirIt.hasNext()){
+        dirIt.next();
+        if(dirIt.fileInfo().isFile() && dirIt.fileName()!="." && dirIt.fileName()!=".."){
+            qDebug()<<dirIt.fileName();
+            qDebug()<<dirIt.filePath();
+            QFile::remove(dirIt.filePath());
+        }
     }
 }
