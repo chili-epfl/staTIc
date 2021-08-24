@@ -1,0 +1,101 @@
+{
+    "background_picture": "",
+    "constraints": [
+    ],
+    "lines": {
+        "0": {
+            "height": 50,
+            "materialID": "",
+            "name": "A-B",
+            "p1": "0",
+            "p2": "1",
+            "width": 25
+        },
+        "1": {
+            "height": 50,
+            "materialID": "",
+            "name": "B-C",
+            "p1": "1",
+            "p2": "2",
+            "width": 25
+        },
+        "2": {
+            "height": 50,
+            "materialID": "",
+            "name": "C-D",
+            "p1": "2",
+            "p2": "3",
+            "width": 25
+        },
+        "3": {
+            "height": 50,
+            "materialID": "",
+            "name": "A-C",
+            "p1": "0",
+            "p2": "2",
+            "width": 25
+        }
+    },
+    "origin_id": "2",
+    "points": {
+        "0": {
+            "name": "A",
+            "reac_x": false,
+            "reac_xx": true,
+            "reac_y": false,
+            "reac_yy": true,
+            "reac_z": true,
+            "reac_zz": false,
+            "x": -53.799030786773095,
+            "y": 0.6255701254275942,
+            "z": 0
+        },
+        "1": {
+            "name": "B",
+            "reac_x": false,
+            "reac_xx": true,
+            "reac_y": false,
+            "reac_yy": true,
+            "reac_z": true,
+            "reac_zz": false,
+            "x": -18.767103762827826,
+            "y": 34.76382554161916,
+            "z": 0
+        },
+        "2": {
+            "name": "C",
+            "reac_x": false,
+            "reac_xx": true,
+            "reac_y": false,
+            "reac_yy": true,
+            "reac_z": true,
+            "reac_zz": false,
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "3": {
+            "name": "D",
+            "reac_x": false,
+            "reac_xx": true,
+            "reac_y": false,
+            "reac_yy": true,
+            "reac_z": true,
+            "reac_zz": false,
+            "x": 40.39395667046751,
+            "y": 44.236744583808445,
+            "z": 0
+        }
+    },
+    "poseOffsetEulerAngles": [
+        0,
+        0,
+        0
+    ],
+    "poseOffsetTranslation": [
+        0,
+        0,
+        0
+    ],
+    "scaleFactorPhysical": 0.1
+}

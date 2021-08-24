@@ -1,0 +1,349 @@
+{
+    "background_picture": "full-roof.jpg",
+    "constraints": [
+    ],
+    "lines": {
+        "0": {
+            "height": 40,
+            "materialID": "default",
+            "name": "AB",
+            "p1": "0",
+            "p2": "1",
+            "width": 60
+        },
+        "1": {
+            "height": 40,
+            "materialID": "default",
+            "name": "AC",
+            "p1": "0",
+            "p2": "2",
+            "width": 60
+        },
+        "2": {
+            "height": 40,
+            "materialID": "default",
+            "name": "BC",
+            "p1": "1",
+            "p2": "2",
+            "width": 60
+        },
+        "3": {
+            "height": 40,
+            "materialID": "default",
+            "name": "BD",
+            "p1": "1",
+            "p2": "3",
+            "width": 60
+        },
+        "4": {
+            "height": 40,
+            "materialID": "default",
+            "name": "DE",
+            "p1": "3",
+            "p2": "4",
+            "width": 60
+        },
+        "5": {
+            "height": 40,
+            "materialID": "default",
+            "name": "CD",
+            "p1": "2",
+            "p2": "3",
+            "width": 60
+        },
+        "6": {
+            "height": 40,
+            "materialID": "default",
+            "name": "CE",
+            "p1": "2",
+            "p2": "4",
+            "width": 60
+        },
+        "7": {
+            "height": 40,
+            "materialID": "default",
+            "name": "EF",
+            "p1": "4",
+            "p2": "5",
+            "width": 60
+        },
+        "8": {
+            "height": 40,
+            "materialID": "default",
+            "name": "CF",
+            "p1": "2",
+            "p2": "5",
+            "width": 60
+        },
+        "9": {
+            "height": 40,
+            "materialID": "default",
+            "name": "GH",
+            "p1": "6",
+            "p2": "7",
+            "width": 60
+        },
+        "10": {
+            "height": 40,
+            "materialID": "default",
+            "name": "GI",
+            "p1": "6",
+            "p2": "8",
+            "width": 60
+        },
+        "11": {
+            "height": 40,
+            "materialID": "default",
+            "name": "HI",
+            "p1": "7",
+            "p2": "8",
+            "width": 60
+        },
+        "12": {
+            "height": 40,
+            "materialID": "default",
+            "name": "HL",
+            "p1": "7",
+            "p2": "9",
+            "width": 60
+        },
+	"13": {
+            "height": 40,
+            "materialID": "default",
+            "name": "LM",
+            "p1": "9",
+            "p2": "10",
+            "width": 60
+        },
+	"14": {
+            "height": 40,
+            "materialID": "default",
+            "name": "IL",
+            "p1": "8",
+            "p2": "9",
+            "width": 60
+        },
+	"15": {
+            "height": 40,
+            "materialID": "default",
+            "name": "IM",
+            "p1": "8",
+            "p2": "10",
+            "width": 60
+        },
+	"16": {
+            "height": 40,
+            "materialID": "default",
+            "name": "MN",
+            "p1": "10",
+            "p2": "11",
+            "width": 60
+        },
+	"17": {
+            "height": 40,
+            "materialID": "default",
+            "name": "IN",
+            "p1": "8",
+            "p2": "11",
+            "width": 60
+        },
+	"18": {
+            "height": 40,
+            "materialID": "default",
+            "name": "AG",
+            "p1": "0",
+            "p2": "6",
+            "width": 60
+        },
+	"19": {
+            "height": 40,
+            "materialID": "default",
+            "name": "DL",
+            "p1": "3",
+            "p2": "9",
+            "width": 60
+        },
+	"20": {
+            "height": 40,
+            "materialID": "default",
+            "name": "FN",
+            "p1": "5",
+            "p2": "11",
+            "width": 60
+        },
+	"21": {
+            "height": 40,
+            "materialID": "default",
+            "name": "AL",
+            "p1": "0",
+            "p2": "9",
+            "width": 60
+        },
+	"22": {
+            "height": 40,
+            "materialID": "default",
+            "name": "DN",
+            "p1": "3",
+            "p2": "11",
+            "width": 60
+        }
+    },
+    "origin_id": "0",
+    "points": {
+        "0": {
+            "name": "A",
+            "reac_x": true,
+            "reac_xx": false,
+            "reac_y": true,
+            "reac_yy": false,
+            "reac_z": true,
+            "reac_zz": false,
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "1": {
+            "name": "B",
+            "reac_x": false,
+            "reac_xx": false,
+            "reac_y": false,
+            "reac_yy": false,
+            "reac_z": false,
+            "reac_zz": false,
+            "x": 1170,
+            "y": 896.8,
+            "z": 0
+        },
+        "2": {
+            "name": "C",
+            "reac_x": false,
+            "reac_xx": false,
+            "reac_y": false,
+            "reac_yy": false,
+            "reac_z": false,
+            "reac_zz": false,
+            "x": 2340,
+            "y": 0,
+            "z": 0
+        },
+        "3": {
+            "name": "D",
+            "reac_x": false,
+            "reac_xx": false,
+            "reac_y": false,
+            "reac_yy": false,
+            "reac_z": false,
+            "reac_zz": false,
+            "x": 2340,
+            "y": 1793.5,
+            "z": 0
+        },
+        "4": {
+            "name": "E",
+            "reac_x": false,
+            "reac_xx": false,
+            "reac_y": false,
+            "reac_yy": false,
+            "reac_z": false,
+            "reac_zz": false,
+            "x": 3510,
+            "y": 896.8,
+            "z": 0
+        },
+        "5": {
+            "name": "F",
+            "reac_x": false,
+            "reac_xx": false,
+            "reac_y": true,
+            "reac_yy": false,
+            "reac_z": false,
+            "reac_zz": false,
+            "x": 4680,
+            "y": 0,
+            "z": 0
+        },
+        "6": {
+            "name": "G",
+            "reac_x": false,
+            "reac_xx": false,
+            "reac_y": true,
+            "reac_yy": false,
+            "reac_z": false,
+            "reac_zz": false,
+            "x": 0,
+            "y": 0,
+            "z": -2000
+        },
+        "7": {
+            "name": "H",
+            "reac_x": false,
+            "reac_xx": false,
+            "reac_y": false,
+            "reac_yy": false,
+            "reac_z": false,
+            "reac_zz": false,
+            "x": 1170,
+            "y": 896.8,
+            "z": -2000
+        },
+        "8": {
+            "name": "I",
+            "reac_x": false,
+            "reac_xx": false,
+            "reac_y": false,
+            "reac_yy": false,
+            "reac_z": false,
+            "reac_zz": false,
+            "x": 2340,
+            "y": 0,
+            "z": -2000
+        },
+        "9": {
+            "name": "L",
+            "reac_x": false,
+            "reac_xx": false,
+            "reac_y": false,
+            "reac_yy": false,
+            "reac_z": false,
+            "reac_zz": false,
+            "x": 2340,
+            "y": 1793.5,
+            "z": -2000
+        },
+        "10": {
+            "name": "M",
+            "reac_x": false,
+            "reac_xx": false,
+            "reac_y": false,
+            "reac_yy": false,
+            "reac_z": false,
+            "reac_zz": false,
+            "x": 3510,
+            "y": 896.8,
+            "z": -2000
+        },
+        "11": {
+            "name": "N",
+            "reac_x": true,
+            "reac_xx": false,
+            "reac_y": true,
+            "reac_yy": false,
+            "reac_z": true,
+            "reac_zz": false,
+            "x": 4680,
+            "y": 0,
+            "z": -2000
+        }
+    },
+    "poseOffsetEulerAngles": [
+        0,
+        0,
+        0
+    ],
+    "poseOffsetTranslation": [
+        0,
+        300,
+        0
+    ],
+    "scaleFactorPhysical": 0.1
+}

@@ -1,0 +1,221 @@
+{
+    "background_picture": "howe.jpg",
+    "constraints": [
+    ],
+    "lines": {
+        "0": {
+            "height": 40,
+            "materialID": "default",
+            "name": "AB",
+            "p1": "0",
+            "p2": "1",
+            "width": 60
+        },
+        "1": {
+            "height": 40,
+            "materialID": "default",
+            "name": "AC",
+            "p1": "0",
+            "p2": "2",
+            "width": 60
+        },
+        "10": {
+            "height": 40,
+            "materialID": "default",
+            "name": "FG",
+            "p1": "6",
+            "p2": "5",
+            "width": 60
+        },
+        "11": {
+            "height": 40,
+            "materialID": "default",
+            "name": "GH",
+            "p1": "6",
+            "p2": "7",
+            "width": 60
+        },
+        "12": {
+            "height": 40,
+            "materialID": "default",
+            "name": "FH",
+            "p1": "5",
+            "p2": "7",
+            "width": 60
+        },
+        "2": {
+            "height": 40,
+            "materialID": "default",
+            "name": "BC",
+            "p1": "2",
+            "p2": "1",
+            "width": 60
+        },
+        "3": {
+            "height": 40,
+            "materialID": "default",
+            "name": "BD",
+            "p1": "1",
+            "p2": "3",
+            "width": 60
+        },
+        "4": {
+            "height": 40,
+            "materialID": "default",
+            "name": "BE",
+            "p1": "1",
+            "p2": "4",
+            "width": 60
+        },
+        "5": {
+            "height": 40,
+            "materialID": "default",
+            "name": "CE",
+            "p1": "2",
+            "p2": "4",
+            "width": 60
+        },
+        "6": {
+            "height": 40,
+            "materialID": "default",
+            "name": "DE",
+            "p1": "4",
+            "p2": "3",
+            "width": 60
+        },
+        "7": {
+            "height": 40,
+            "materialID": "default",
+            "name": "DF",
+            "p1": "3",
+            "p2": "5",
+            "width": 60
+        },
+        "8": {
+            "height": 40,
+            "materialID": "default",
+            "name": "EF",
+            "p1": "4",
+            "p2": "5",
+            "width": 60
+        },
+        "9": {
+            "height": 40,
+            "materialID": "default",
+            "name": "EG",
+            "p1": "4",
+            "p2": "6",
+            "width": 60
+        }
+    },
+    "origin_id": "0",
+    "points": {
+        "0": {
+            "name": "A",
+            "reac_x": true,
+            "reac_xx": true,
+            "reac_y": true,
+            "reac_yy": true,
+            "reac_z": true,
+            "reac_zz": false,
+            "x": 0,
+            "y": 0,
+            "z": 0
+        },
+        "1": {
+            "name": "B",
+            "reac_x": false,
+            "reac_xx": true,
+            "reac_y": false,
+            "reac_yy": true,
+            "reac_z": true,
+            "reac_zz": false,
+            "x": 1170,
+            "y": 682.6,
+            "z": 0
+        },
+        "2": {
+            "name": "C",
+            "reac_x": false,
+            "reac_xx": true,
+            "reac_y": false,
+            "reac_yy": true,
+            "reac_z": true,
+            "reac_zz": false,
+            "x": 1170,
+            "y": 0,
+            "z": 0
+        },
+        "3": {
+            "name": "D",
+            "reac_x": false,
+            "reac_xx": true,
+            "reac_y": false,
+            "reac_yy": true,
+            "reac_z": true,
+            "reac_zz": false,
+            "x": 2340,
+            "y": 1365.2,
+            "z": 0
+        },
+        "4": {
+            "name": "E",
+            "reac_x": false,
+            "reac_xx": true,
+            "reac_y": false,
+            "reac_yy": true,
+            "reac_z": true,
+            "reac_zz": false,
+            "x": 2340,
+            "y": 0,
+            "z": 0
+        },
+        "5": {
+            "name": "F",
+            "reac_x": false,
+            "reac_xx": true,
+            "reac_y": false,
+            "reac_yy": true,
+            "reac_z": true,
+            "reac_zz": false,
+            "x": 3510,
+            "y": 682.6,
+            "z": 0
+        },
+        "6": {
+            "name": "G",
+            "reac_x": false,
+            "reac_xx": true,
+            "reac_y": false,
+            "reac_yy": true,
+            "reac_z": true,
+            "reac_zz": false,
+            "x": 3510,
+            "y": 0,
+            "z": 0
+        },
+        "7": {
+            "name": "H",
+            "reac_x": false,
+            "reac_xx": true,
+            "reac_y": true,
+            "reac_yy": true,
+            "reac_z": true,
+            "reac_zz": false,
+            "x": 4680,
+            "y": 0,
+            "z": 0
+        }
+    },
+    "poseOffsetEulerAngles": [
+        0,
+        0,
+        0
+    ],
+    "poseOffsetTranslation": [
+        0,
+        300,
+        0
+    ],
+    "scaleFactorPhysical": 0.1
+}

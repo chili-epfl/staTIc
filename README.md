@@ -3,6 +3,19 @@
 ## StaticAR is an AR environment to explore statics and structural behavior analysis in a qualitative way. 
 [Video](https://www.youtube.com/watch?v=Zm1e330Gxwg)
 
+## Running on a new Android Tablet
+
+1) Plug in the tablet to a computer via USB, enable file sharing
+
+2) Copy [StaticAR_1.0.apk](backup/StaticAR_1.0.apk) file in [backup/](backup/) to Downloads folder on the tablet
+
+3) Copy [StaticAR](backup/StaticAR) folder to the top-level folder on the tablet
+
+4) Open the tablet to the Files app, install the app by running the APK
+
+5) Run the app on the tablet!
+
+
 ## Linux build
 
  - Download and install Qt 5.10
@@ -104,6 +117,8 @@ TextureImage:texture.png;
 AR boards are text files. The format follows the ARToolkit multimarker format. The boards describing an arrangement of the fiducial markers on the hexagonal grid can be created and edited in StaticAR. The package includes two board configurations: an hexagonal one (the one used in the lab) and a paper based one (pdf in resources/boards). 
 
 For the file formats have a look at the ./Resources dir. 
+
+
 
 ## License and 3rdparty softwares
 StaticAR is free software; you may redistribute it and/or modify it under the terms of the GNU General Public License (GPL) as published by the Free Software Foundation. 
